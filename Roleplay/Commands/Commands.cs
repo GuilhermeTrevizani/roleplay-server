@@ -39,9 +39,9 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/ferimentos", "Visualiza os ferimentos de um personagem"),
                 new Comando("Geral", "/aceitartratamento", "Aceita o tratamento médico após estar ferido e é levado ao hospital"),
                 new Comando("Geral", "/aceitarck", "Aceita o CK no personagem"),
+                new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
-                new Comando("Propriedades", "/ptrancar"),
                 new Comando("Propriedades", "/pcomprar"),
                 new Comando("Propriedades", "/pvender"),
                 new Comando("Chat IC", "/me"),
@@ -61,7 +61,6 @@ namespace Roleplay.Commands
                 new Comando("Celular", "/gps", "Traça rota para uma propriedade"),
                 new Comando("Veículos", "/vcomprar", "Compra um veículo em um concessionária"),
                 new Comando("Veículos", "/motor", "Liga/desliga o motor de um veículo"),
-                new Comando("Veículos", "/vtrancar", "Tranca/destranca um veículo"),
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
                 new Comando("Veículos", "/vspawn", "Spawna um veículo"),
@@ -1053,6 +1052,59 @@ namespace Roleplay.Commands
             player.Kick("Você aceitou o CK no seu personagem.");
 
             Functions.GravarLog(TipoLog.Morte, $"/aceitarck", p, null);
+        }
+
+        [Command("trancar")]
+        public void CMD_trancar(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                return;
+            }
+
+            var prox = Global.Propriedades
+                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
+                .FirstOrDefault();
+
+            if (prox == null)
+            {
+                prox = Global.Propriedades
+                .Where(x => x.Codigo == player.Dimension
+                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= 2)
+                .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
+                .FirstOrDefault();
+            }
+
+            if (prox != null)
+            {
+                if (prox.Personagem != p.Codigo)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o dono da propriedade!");
+                    return;
+                }
+
+                Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta = !prox.Aberta;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta!");
+                return;
+            }
+
+            var veh = Global.Veiculos
+                .Where(x => (x.Personagem == p.Codigo || (x.Faccao == p.Faccao && x.Faccao != 0))
+                && player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh != null)
+            {
+                veh.Vehicle.LockState = veh.Vehicle.LockState == VehicleLockState.Locked ? VehicleLockState.Unlocked : VehicleLockState.Locked;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo!");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de uma propriedade ou veículo.");
         }
     }
 }

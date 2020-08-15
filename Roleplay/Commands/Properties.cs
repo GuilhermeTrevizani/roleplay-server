@@ -73,47 +73,7 @@ namespace Roleplay.Commands
             player.Position = new Position(prox.EntradaPosX, prox.EntradaPosY, prox.EntradaPosZ);
         }
 
-        [Command("ptrancar", "/ptrancar")]
-        public void CMD_ptrancar(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
-            var prox = Global.Propriedades
-                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
-                .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
-                .FirstOrDefault();
-
-            if (prox == null)
-            {
-                prox = Global.Propriedades
-                .Where(x => x.Codigo == player.Dimension
-                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= 2)
-                .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
-                .FirstOrDefault();
-
-                if (prox == null)
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade!");
-                    return;
-                }
-            }
-
-            if (prox.Personagem != p.Codigo)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o dono da propriedade!");
-                return;
-            }
-
-            Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta = !prox.Aberta;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta!");
-        }
-
-        [Command("pcomprar", "/pcomprar")]
+        [Command("pcomprar")]
         public void CMD_pcomprar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);

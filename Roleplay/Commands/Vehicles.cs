@@ -1,6 +1,5 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Enums;
 using Newtonsoft.Json;
 using Roleplay.Models;
 using System.Linq;
@@ -53,32 +52,6 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo!");
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
-        }
-
-        [Command("vtrancar")]
-        public void CMD_vtrancar(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
-            var veh = Global.Veiculos
-                .Where(x => (x.Personagem == p.Codigo || (x.Faccao == p.Faccao && x.Faccao != 0))
-                && player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
-                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
-                .FirstOrDefault();
-
-            if (veh == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de um veículo seu!");
-                return;
-            }
-
-            veh.Vehicle.LockState = veh.Vehicle.LockState == VehicleLockState.Locked ? VehicleLockState.Unlocked : VehicleLockState.Locked;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo!");
         }
 
         [Command("vcomprarvaga")]
