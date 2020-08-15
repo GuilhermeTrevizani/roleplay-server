@@ -72,7 +72,7 @@ namespace Roleplay
             player.Emit("character:Edit", "");
         }
 
-        /*[Command("skin", "/skin)")]
+        /* [Command("skin", "/skin)")]
         public void CMD_skin(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
