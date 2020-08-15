@@ -34,7 +34,7 @@ namespace Roleplay.Entities
             TextLabel = Functions.CriarTextDraw($"Propriedade Nº {Codigo}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), (int)Dimensao);
 
             if (Personagem == 0)
-                TextLabel2 = Functions.CriarTextDraw($"Use /pcomprar para comprar por ${Valor:N0}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), (int)Dimensao);
+                TextLabel2 = Functions.CriarTextDraw($"Use /comprar para comprar por ${Valor:N0}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), (int)Dimensao);
         }
 
         public void DeletarIdentificador()

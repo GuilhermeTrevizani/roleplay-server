@@ -7,7 +7,7 @@ namespace Roleplay.Commands
 {
     public class Properties
     {
-        [Command("entrar", "/entrar")]
+        [Command("entrar")]
         public void CMD_entrar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
@@ -40,7 +40,7 @@ namespace Roleplay.Commands
             player.Position = new Position(prox.SaidaPosX, prox.SaidaPosY, prox.SaidaPosZ);
         }
 
-        [Command("sair", "/sair")]
+        [Command("sair")]
         public void CMD_sair(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
@@ -71,48 +71,6 @@ namespace Roleplay.Commands
             p.LimparIPLs();
             player.Dimension = 0;
             player.Position = new Position(prox.EntradaPosX, prox.EntradaPosY, prox.EntradaPosZ);
-        }
-
-        [Command("pcomprar")]
-        public void CMD_pcomprar(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
-            var prox = Global.Propriedades
-                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
-                .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
-                .FirstOrDefault();
-
-            if (prox == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade à venda!");
-                return;
-            }
-
-            if (p.Dinheiro < prox.Valor)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
-                return;
-            }
-
-            p.Dinheiro -= prox.Valor;
-            Global.Propriedades[Global.Propriedades.IndexOf(prox)].Personagem = p.Codigo;
-
-            p.SetDinheiro();
-            prox.CriarIdentificador();
-
-            using (var context = new DatabaseContext())
-            {
-                context.Propriedades.Update(Global.Propriedades[Global.Propriedades.IndexOf(prox)]);
-                context.SaveChanges();
-            }
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou a propriedade por ${prox.Valor:N0}!");
         }
 
         [Command("pvender", "/pvender (ID ou nome) (valor)")]

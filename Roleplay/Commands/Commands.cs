@@ -30,7 +30,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/pagar"),
                 new Comando("Geral", "/revistar"),
                 new Comando("Geral", "/multas"),
-                new Comando("Geral", "/comprar"),
+                new Comando("Geral", "/comprar", "Compra um veículo, propriedade ou item"),
                 new Comando("Geral", "/skin", "Compra roupas"),
                 new Comando("Geral", "/emtrabalho"),
                 new Comando("Geral", "/emprego"),
@@ -42,7 +42,6 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
-                new Comando("Propriedades", "/pcomprar"),
                 new Comando("Propriedades", "/pvender"),
                 new Comando("Chat IC", "/me"),
                 new Comando("Chat IC", "/do"),
@@ -59,7 +58,6 @@ namespace Roleplay.Commands
                 new Comando("Celular", "/atender /at", "Atende uma ligação"),
                 new Comando("Celular", " /celular /cel", "Abre o celular"),
                 new Comando("Celular", "/gps", "Traça rota para uma propriedade"),
-                new Comando("Veículos", "/vcomprar", "Compra um veículo em um concessionária"),
                 new Comando("Veículos", "/motor", "Liga/desliga o motor de um veículo"),
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
@@ -785,17 +783,58 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma loja de conveniência!");
+                player.Emit("Server:ComprarConveniencia", JsonConvert.SerializeObject(Global.Precos.Where(x => x.Tipo == TipoPreco.Conveniencia).OrderBy(x => x.Nome).Select(x => new
+                {
+                    x.Nome,
+                    Preco = $"${x.Valor:N0}",
+                }).ToList()));
                 return;
             }
 
-            player.Emit("Server:ComprarConveniencia", JsonConvert.SerializeObject(Global.Precos.Where(x => x.Tipo == TipoPreco.Conveniencia).OrderBy(x => x.Nome).Select(x => new
+            var prox = Global.Propriedades
+                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
+                .FirstOrDefault();
+            if (prox != null)
             {
-                x.Nome,
-                Preco = $"${x.Valor:N0}",
-            }).ToList()));
+                if (p.Dinheiro < prox.Valor)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                    return;
+                }
+
+                p.Dinheiro -= prox.Valor;
+                prox.Personagem = p.Codigo;
+
+                p.SetDinheiro();
+                prox.CriarIdentificador();
+
+                using (var context = new DatabaseContext())
+                {
+                    context.Propriedades.Update(prox);
+                    context.SaveChanges();
+                }
+
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou a propriedade por ${prox.Valor:N0}!");
+                return;
+            }
+
+            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= 2);
+            if (conce != null)
+            {
+                var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
+                {
+                    x.Nome,
+                    Preco = $"${x.Valor:N0}",
+                }).ToList();
+
+                player.Emit("Server:ComprarVeiculo", (int)conce.Tipo, JsonConvert.SerializeObject(veiculos));
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma ponto de compra.");
         }
 
         [Command("emtrabalho")]

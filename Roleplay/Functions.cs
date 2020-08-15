@@ -704,7 +704,7 @@ namespace Roleplay
             foreach (var c in Global.Concessionarias)
             {
                 CriarTextDraw(c.Nome, c.PosicaoCompra, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
-                CriarTextDraw("Use /vcomprar", new Position(c.PosicaoCompra.X, c.PosicaoCompra.Y, c.PosicaoCompra.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
+                CriarTextDraw("Use /comprar", new Position(c.PosicaoCompra.X, c.PosicaoCompra.Y, c.PosicaoCompra.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
             }
         }
 

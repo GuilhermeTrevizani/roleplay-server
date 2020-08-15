@@ -1,6 +1,5 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
-using Newtonsoft.Json;
 using Roleplay.Models;
 using System.Linq;
 
@@ -8,25 +7,6 @@ namespace Roleplay.Commands
 {
     public class Vehicles
     {
-        [Command("vcomprar")]
-        public void CMD_vcomprar(IPlayer player)
-        {
-            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= 2);
-            if (conce == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma concessionária!");
-                return;
-            }
-
-            var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
-            {
-                x.Nome,
-                Preco = $"${x.Valor:N0}",
-            }).ToList();
-
-            player.Emit("Server:ComprarVeiculo", (int)conce.Tipo, JsonConvert.SerializeObject(veiculos));
-        }
-
         [Command("motor")]
         public void CMD_motor(IPlayer player)
         {
@@ -243,7 +223,7 @@ namespace Roleplay.Commands
             target.Convites.Add(convite);
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você ofereceu seu veículo {prox.Codigo} para {target.NomeIC} por ${valor:N0}.");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você o veículo {prox.Codigo} por ${valor:N0}. (/ac {convite.Tipo} para aceitar ou /rc {convite.Tipo} para recusar)");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você o veículo {prox.Codigo} por ${valor:N0}. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
 
             Functions.GravarLog(TipoLog.Venda, $"/vvender {prox.Codigo} {valor}", p, target);
         }
