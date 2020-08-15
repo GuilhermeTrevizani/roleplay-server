@@ -375,27 +375,34 @@ namespace Roleplay
 
         public static void MostrarStats(IPlayer player, Personagem p)
         {
-            EnviarMensagem(player, TipoMensagem.Titulo, $"Informações de {p.Nome} [{p.Codigo}]");
-            EnviarMensagem(player, TipoMensagem.Nenhum, $"OOC: {p.UsuarioBD.Nome} | SocialClub: {p.Player.SocialClubId} | Registro: {p.DataRegistro}");
-            EnviarMensagem(player, TipoMensagem.Nenhum, $"Tempo Conectado (minutos): {p.TempoConectado} | Celular: {p.Celular} | Emprego: {ObterDisplayEnum(p.Emprego)}");
-            EnviarMensagem(player, TipoMensagem.Nenhum, $"Sexo: {p.Sexo} | Nascimento: {p.DataNascimento.ToShortDateString()} | Dinheiro: ${p.Dinheiro:N0} | Banco: ${p.Banco:N0}");
-            EnviarMensagem(player, TipoMensagem.Nenhum, $"Skin: {(PedModel)p.Player.Model} | Vida: {p.Player.Health - 100} | Colete: {p.Player.Armor} | Tempo de Prisão: {p.TempoPrisao}");
+            var html = $@"<div class='box-header with-border'>
+                <h3>{p.NomeIC} [{p.Codigo}] ({DateTime.Now})<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
+            </div>
+            <div class='box-body'>
+            OOC: <strong>{p.UsuarioBD.Nome}</strong> | SocialClub: <strong>{p.Player.SocialClubId}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
+            Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Celular: <strong>{p.Celular}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong><br/>
+            Sexo: <strong>{p.Sexo}</strong> | Nascimento: <strong>{p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)</strong> | Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
+            Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong> | Tempo de Prisão: <strong>{p.TempoPrisao}</strong><br/>";
 
             if (p.UsuarioBD.Staff > 0)
-                EnviarMensagem(player, TipoMensagem.Nenhum, $"Staff: {ObterDisplayEnum(p.UsuarioBD.Staff)} [{(int)p.UsuarioBD.Staff}] | Tempo Serviço Administrativo (minutos): {p.UsuarioBD.TempoTrabalhoAdministrativo} | SOSs Aceitos: {p.UsuarioBD.QuantidadeSOSAceitos}");
+                html += $"Staff: <strong>{ObterDisplayEnum(p.UsuarioBD.Staff)} [{(int)p.UsuarioBD.Staff}]</strong> | Tempo Serviço Administrativo (minutos): <strong>{p.UsuarioBD.TempoTrabalhoAdministrativo}</strong> | SOSs Aceitos: <strong>{p.UsuarioBD.QuantidadeSOSAceitos}</strong><br/>";
 
             if (p.CanalRadio > -1)
-                EnviarMensagem(player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
+                html += $"Canal Rádio 1: <strong>{p.CanalRadio}</strong> | Canal Rádio 2: <strong>{p.CanalRadio2}</strong> | Canal Rádio 3: <strong>{p.CanalRadio3}</strong><br/>";
 
             if (p.Faccao > 0)
-                EnviarMensagem(player, TipoMensagem.Nenhum, $"Facção: {p.FaccaoBD.Nome} [{p.Faccao}] | Rank: {p.RankBD.Nome} [{p.Rank}] | Salário: ${p.RankBD.Salario:N0}");
+                html += $"Facção: <strong>{p.FaccaoBD.Nome} [{p.Faccao}]</strong> | Rank: <strong>{p.RankBD.Nome} [{p.Rank}]</strong> | Salário: <strong>${p.RankBD.Salario:N0}</strong><br/>";
 
             if (p.Propriedades.Count > 0)
             {
-                EnviarMensagem(player, TipoMensagem.Titulo, $"Propriedades de {p.Nome} [{p.Codigo}]");
+                html += $"<h4>Propriedades</h4>";
                 foreach (var prop in p.Propriedades)
-                    EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {prop.Codigo} | Valor: ${prop.Valor:N0}");
+                    html += $"Código: <strong>{prop.Codigo}</strong> | Valor: <strong>${prop.Valor:N0}</strong><br/>";
             }
+
+            html += "</div>";
+
+            player.Emit("Server:BaseHTML", html);
         }
 
         public static void EnviarMensagemCelular(Personagem p, Personagem target, string mensagem)
