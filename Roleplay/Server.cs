@@ -110,6 +110,8 @@ namespace Roleplay
             Functions.CarregarEmpregos();
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
+            Functions.CarregarWeaponComponents();
+
             Functions.CriarTextDraw("Prisão", Constants.PosicaoPrisao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
             Functions.CriarTextDraw("Use /prender", new Position(Constants.PosicaoPrisao.X, Constants.PosicaoPrisao.Y, Constants.PosicaoPrisao.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
 
@@ -918,6 +920,10 @@ namespace Roleplay
 
             player.GiveWeapon(weapon, arma.Municao, false);
             player.SetWeaponTintIndex(weapon, (byte)arma.Pintura);
+            var componentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
+            foreach(var x in componentes)
+                player.AddWeaponComponent(weapon, x);
+
             arma.Estoque--;
             using var context = new DatabaseContext();
             context.ArmariosItens.Update(arma);

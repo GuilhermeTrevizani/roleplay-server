@@ -3,6 +3,7 @@ using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
@@ -615,8 +616,10 @@ namespace Roleplay.Commands
             target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
             target.Player.Spawn(target.Player.Position);
+            target.Player.Health = 200;
+            target.Player.Armor = 0;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.Nome}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");
 
             Functions.GravarLog(TipoLog.Staff, $"/acurar", p, target);
@@ -2465,6 +2468,108 @@ namespace Roleplay.Commands
             player.Position = new Position(x, y, z);
 
             Functions.GravarLog(TipoLog.Staff, $"/pos {x} {y} {z}", p, null);
+        }
+
+        [Command("carmicomp", "/carmicomp (armário) (arma) (componente)")]
+        public void CMD_carmicomp(IPlayer player, int armario, string arma, string componente)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                return;
+            }
+
+            Enum.TryParse(arma, out WeaponModel wep);
+            if (wep == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                return;
+            }
+
+            var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
+            if (item == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                return;
+            }
+
+            var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
+            if (comp == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}!");
+                return;
+            }
+
+            var componentes = JsonConvert.DeserializeObject<List<uint>>(item.Componentes);
+            if (componentes.Contains(comp.Hash))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} já existe na arma {wep} do armário {armario}!");
+                return;
+            }
+
+            componentes.Add(comp.Hash);
+            item.Componentes = JsonConvert.SerializeObject(componentes);
+
+            using (var context = new DatabaseContext())
+            {
+                context.ArmariosItens.Update(item);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} adicionado na arma {wep} no armário {armario}!");
+            Functions.GravarLog(TipoLog.Staff, $"/carmicomp {armario} {item.Arma} {componente}", p, null);
+        }
+
+        [Command("rarmicomp", "/rarmicomp (armário) (arma) (componente)")]
+        public void CMD_rarmicomp(IPlayer player, int armario, string arma, string componente)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                return;
+            }
+
+            Enum.TryParse(arma, out WeaponModel wep);
+            if (wep == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                return;
+            }
+
+            var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
+            if (item == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                return;
+            }
+
+            var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
+            if (comp == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}!");
+                return;
+            }
+
+            var componentes = JsonConvert.DeserializeObject<List<uint>>(item.Componentes);
+            if (!componentes.Contains(comp.Hash))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe na arma {wep} do armário {armario}!");
+                return;
+            }
+
+            componentes.Remove(comp.Hash);
+            item.Componentes = JsonConvert.SerializeObject(componentes);
+
+            using (var context = new DatabaseContext())
+            {
+                context.ArmariosItens.Update(item);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} removido na arma {wep} no armário {armario}!");
+            Functions.GravarLog(TipoLog.Staff, $"/rarmicomp {armario} {item.Arma} {componente}", p, null);
         }
         #endregion Staff 1337
     }

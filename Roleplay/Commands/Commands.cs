@@ -267,6 +267,8 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/earmipintura", "Edita a pintura de uma arma do armário"),
                     new Comando("Manager", "/save", "Exibe sua posição e rotação ou do seu veículo no console"),
                     new Comando("Manager", "/pos", "Vai até a posição"),
+                    new Comando("Manager", "/carmicomp", "Adiciona componentes em um arma de um armário"),
+                    new Comando("Manager", "/rarmicomp", "Remove componentes em um arma de um armário"),
                 });
 
             var html = $@"<div class='box-header with-border'>
@@ -1063,6 +1065,8 @@ namespace Roleplay.Commands
             p.Ferimentos = new List<Ferimento>();
             p.Player.Emit("Server:SelecionarPersonagem");
             p.Player.Spawn(pos);
+            p.Player.Health = 200;
+            p.Player.Armor = 0;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você aceitou o tratamento e foi levado para o hospital.");
         }

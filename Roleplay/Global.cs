@@ -25,5 +25,6 @@ namespace Roleplay
         public static List<SOS> SOSs { get; set; }
         public static List<TextDraw> TextDraws { get; set; }
         public static WeatherType Weather { get; set; }
+        public static List<WeaponComponent> WeaponComponents { get; set; }
     }
 }

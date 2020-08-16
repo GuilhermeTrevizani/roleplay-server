@@ -552,6 +552,8 @@ namespace Roleplay.Commands
             target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
             target.Player.Spawn(target.Player.Position);
+            target.Player.Health = 200;
+            target.Player.Armor = 0;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");

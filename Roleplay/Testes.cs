@@ -1,4 +1,5 @@
-﻿using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Models;
 using System;
@@ -69,7 +70,8 @@ namespace Roleplay
         [Command("teste")]
         public void CMD_teste(IPlayer player)
         {
-            player.Emit("character:Edit", "");
+            //player.AddWeaponComponent(WeaponModel.Pistol, 0x359B7AAE);
+            //player.Emit("character:Edit", "");
         }
 
         /* [Command("skin", "/skin)")]

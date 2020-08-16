@@ -802,5 +802,56 @@ namespace Roleplay
                 _ => "Desconhecida",
             };
         }
+
+        public static void CarregarWeaponComponents()
+        {
+            Global.WeaponComponents = new List<WeaponComponent>()
+            {
+                new WeaponComponent(WeaponModel.BrassKnuckles, "BaseModel", 0xF3462F33),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "ThePimp", 0xC613F685),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheBallas", 0xEED9FD63),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheHustler", 0x50910C31),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheRock", 0x9761D9DC),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheHater", 0x7DECFE30),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheLover", 0x3F4E8AA6),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "ThePlayer", 0x8B808BB),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheKing", 0xE28BABEF),
+                new WeaponComponent(WeaponModel.BrassKnuckles, "TheValor", 0x7AF3F785),
+                new WeaponComponent(WeaponModel.Switchblade, "DefaultHandle", 0x9137A500),
+                new WeaponComponent(WeaponModel.Switchblade, "VIPVariant", 0x5B3E7DB6),
+                new WeaponComponent(WeaponModel.Switchblade, "BodyguardVariant", 0xE7939662),
+                new WeaponComponent(WeaponModel.Pistol, "DefaultClip", 0xFED0FD71),
+                new WeaponComponent(WeaponModel.Pistol, "ExtendedClip", 0xED265A1C),
+                new WeaponComponent(WeaponModel.Pistol, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.Pistol, "Suppressor", 0x65EA7EBB),
+                new WeaponComponent(WeaponModel.Pistol, "YusufAmirLuxuryFinish", 0xD7391086),
+                new WeaponComponent(WeaponModel.CombatPistol, "DefaultClip", 0x721B079),
+                new WeaponComponent(WeaponModel.CombatPistol, "ExtendedClip", 0xD67B4F2D),
+                new WeaponComponent(WeaponModel.CombatPistol, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.CombatPistol, "Suppressor", 0xC304849A),
+                new WeaponComponent(WeaponModel.CombatPistol, "YusufAmirLuxuryFinish", 0xC6654D72),
+                new WeaponComponent(WeaponModel.APPistol, "DefaultClip", 0x31C4B22A),
+                new WeaponComponent(WeaponModel.APPistol, "ExtendedClip", 0x249A17D5),
+                new WeaponComponent(WeaponModel.APPistol, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.APPistol, "Suppressor", 0xC304849A),
+                new WeaponComponent(WeaponModel.APPistol, "GildedGunMetalFinish", 0x9B76C72C),
+                new WeaponComponent(WeaponModel.Pistol50, "DefaultClip", 0x2297BE19),
+                new WeaponComponent(WeaponModel.Pistol50, "ExtendedClip", 0xD9D3AC92),
+                new WeaponComponent(WeaponModel.Pistol50, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.Pistol50, "Suppressor", 0xA73D4664),
+                new WeaponComponent(WeaponModel.Pistol50, "PlatinumPearlDeluxeFinish", 0x77B8AB2F),
+                new WeaponComponent(WeaponModel.HeavyRevolver, "VIPVariant", 0x16EE3040),
+                new WeaponComponent(WeaponModel.HeavyRevolver, "BodyguardVariant", 0x9493B80D),
+                new WeaponComponent(WeaponModel.HeavyRevolver, "DefaultClip", 0xE9867CE3),
+                new WeaponComponent(WeaponModel.SNSPistol, "DefaultClip", 0xF8802ED9),
+                new WeaponComponent(WeaponModel.SNSPistol, "ExtendedClip", 0x7B0033B3),
+                new WeaponComponent(WeaponModel.SNSPistol, "EtchedWoodGripFinish", 0x8033ECAF),
+                new WeaponComponent(WeaponModel.HeavyPistol, "DefaultClip", 0xD4A969A),
+                new WeaponComponent(WeaponModel.HeavyPistol, "ExtendedClip", 0x64F9C62B),
+                new WeaponComponent(WeaponModel.HeavyPistol, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.HeavyPistol, "Suppressor", 0xC304849A),
+                new WeaponComponent(WeaponModel.HeavyPistol, "EtchedWoodGripFinish", 0x7A6A7B7B),
+            };
+        }
     }
 }
