@@ -117,6 +117,9 @@ namespace Roleplay.Entities
         [NotMapped]
         public TagTimer TimerFerido { get; set; } = null;
 
+        [NotMapped]
+        public List<PersonagemArma> Armas { get; set; } = new List<PersonagemArma>();
+
         public void SetDinheiro()
         {
             if (Player != null)

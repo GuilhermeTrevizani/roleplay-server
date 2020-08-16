@@ -87,11 +87,13 @@ namespace Roleplay
                 foreach (var x in acessorios)
                     p.SetAccessories(x.Slot, x.Drawable, x.Texture);
 
-                var armas = context.PersonagensArmas.Where(x => x.Codigo == p.Codigo).ToList();
-                foreach (var x in armas)
+                p.Armas = context.PersonagensArmas.Where(x => x.Codigo == p.Codigo).ToList();
+                foreach (var x in p.Armas)
                 {
                     player.GiveWeapon((WeaponModel)x.Arma, x.Municao, false);
                     player.SetWeaponTintIndex((WeaponModel)x.Arma, (byte)x.Pintura);
+                    foreach (var c in JsonConvert.DeserializeObject<List<uint>>(x.Componentes))
+                        player.AddWeaponComponent((WeaponModel)x.Arma, c);
                 }
 
                 if (Global.PersonagensOnline.Count > Global.Parametros.RecordeOnline)

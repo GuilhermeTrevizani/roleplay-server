@@ -543,6 +543,11 @@ namespace Roleplay
 
             context.Personagens.Add(personagem);
 
+            p.UsuarioBD.PossuiNamechange = false;
+            context.Usuarios.Update(p.UsuarioBD);
+
+            context.SaveChanges();
+
             context.PersonagensContatos.AddRange(new List<PersonagemContato>()
             {
                 new PersonagemContato()
@@ -558,10 +563,6 @@ namespace Roleplay
                     Nome = "Dowtown Cab Co.",
                 },
             });
-
-            p.UsuarioBD.PossuiNamechange = false;
-            context.Usuarios.Update(p.UsuarioBD);
-
             context.SaveChanges();
 
             var user = p.UsuarioBD;
@@ -579,21 +580,15 @@ namespace Roleplay
 
             player.SetDateTime(DateTime.Now);
 
-            var armas = new List<PersonagemArma>();
-            foreach (var x in weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x)))
-            {
-                var y = x.Split("|");
-                long.TryParse(y[0], out long arma);
-                int.TryParse(y[1], out int municao);
-                byte.TryParse(y[2], out byte pintura);
-                armas.Add(new PersonagemArma()
+            var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => new PersonagemArma()
                 {
-                    Codigo = p.Codigo,
-                    Arma = arma,
-                    Municao = municao,
-                    Pintura = pintura,
+                    Arma = long.Parse(x.Split("|")[0]),
+                    Municao = int.Parse(x.Split("|")[1]),
                 });
-            }
+
+            foreach (var x in p.Armas)
+                x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
 
             var dif = DateTime.Now - p.DataUltimaVerificacao;
             if (dif.TotalMinutes >= 1)
@@ -688,8 +683,8 @@ namespace Roleplay
             if (p.Acessorios.Count > 0)
                 context.PersonagensAcessorios.AddRange(p.Acessorios);
 
-            if (armas.Count > 0)
-                context.PersonagensArmas.AddRange(armas);
+            if (p.Armas.Count > 0)
+                context.PersonagensArmas.AddRange(p.Armas);
 
             var usuario = context.Usuarios.FirstOrDefault(x => x.Codigo == p.UsuarioBD.Codigo);
             usuario.Staff = p.UsuarioBD.Staff;
@@ -921,8 +916,17 @@ namespace Roleplay
             player.GiveWeapon(weapon, arma.Municao, false);
             player.SetWeaponTintIndex(weapon, (byte)arma.Pintura);
             var componentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
-            foreach(var x in componentes)
+            foreach (var x in componentes)
                 player.AddWeaponComponent(weapon, x);
+
+            p.Armas.Add(new PersonagemArma()
+            {
+                Codigo = p.Codigo,
+                Arma = arma.Arma,
+                Municao = arma.Municao,
+                Pintura = arma.Pintura,
+                Componentes = arma.Componentes,
+            });
 
             arma.Estoque--;
             using var context = new DatabaseContext();

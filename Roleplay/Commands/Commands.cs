@@ -1047,6 +1047,7 @@ namespace Roleplay.Commands
 
             p.TimerFerido = null;
             p.Player.Dimension = 0;
+            p.Armas = new List<PersonagemArma>();
             p.Player.RemoveAllWeapons();
 
             var pos = new Position(298.16702f, -584.2286f, 43.24829f);

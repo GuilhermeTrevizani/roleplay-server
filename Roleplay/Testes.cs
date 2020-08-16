@@ -1,9 +1,5 @@
-﻿using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
-using AltV.Net.Enums;
+﻿using AltV.Net.Elements.Entities;
 using Roleplay.Models;
-using System;
-using System.Linq;
 
 namespace Roleplay
 {
@@ -18,13 +14,6 @@ namespace Roleplay
             player.Vehicle.BodyHealth = 1000;
             player.Vehicle.EngineHealth = 1000;
             player.Vehicle.PetrolTankHealth = 1000;
-        }
-
-        [Command("w")]
-        public void CMD_w(IPlayer player)
-        {
-            foreach (var w in Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>())
-                player.GiveWeapon(w, 1000, false);
         }
 
         [Command("i")]
@@ -67,9 +56,27 @@ namespace Roleplay
             p.SetClothes(slot, drawable, texture);
         }
 
-        [Command("teste")]
-        public void CMD_teste(IPlayer player)
+        [Command("x")]
+        public void CMD_x(IPlayer player)
         {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Sexo == "M")
+            {
+                p.SetClothes(3, 0, 0);
+                p.SetClothes(8, 58, 0);
+                p.SetClothes(6, 25, 0);
+                p.SetClothes(4, 35, 0);
+                p.SetClothes(11, 55, 0);
+            }
+            else
+            {
+                p.SetClothes(3, 0, 0);
+                p.SetClothes(8, 35, 0);
+                p.SetClothes(6, 25, 0);
+                p.SetClothes(4, 34, 0);
+                p.SetClothes(11, 48, 0);
+            }
+
             //player.AddWeaponComponent(WeaponModel.Pistol, 0x359B7AAE);
             //player.Emit("character:Edit", "");
         }

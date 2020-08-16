@@ -4,6 +4,7 @@ using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
@@ -613,6 +614,7 @@ namespace Roleplay.Commands
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
             target.Ferimentos = new List<Ferimento>();
+            target.Armas = new List<PersonagemArma>();
             target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
             target.Player.Spawn(target.Player.Position);

@@ -549,6 +549,7 @@ namespace Roleplay.Commands
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
             target.Ferimentos = new List<Ferimento>();
+            target.Armas = new List<PersonagemArma>();
             target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
             target.Player.Spawn(target.Player.Position);
