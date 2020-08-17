@@ -648,16 +648,18 @@ namespace Roleplay
                 return;
             }
 
-            var players = Global.PersonagensOnline.Where(x => x.CanalRadio == canal || x.CanalRadio2 == canal || x.CanalRadio3 == canal);
-            foreach (var pl in players)
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.CanalRadio == canal || x.CanalRadio2 == canal || x.CanalRadio3 == canal))
             {
+                if (!pl.IsEmTrabalho && (canal == 911 || canal == 912))
+                        continue;
+
                 var slotPl = 1;
                 if (pl.CanalRadio2 == canal)
                     slotPl = 2;
                 else if (pl.CanalRadio3 == canal)
                     slotPl = 3;
 
-                EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"[S:{slotPl} C:{canal}] {p.Nome}: {mensagem}", Constants.CorRadio);
+                EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"[S:{slotPl} C:{canal}] {p.Nome}: {mensagem}", slotPl == 1 ? "#FFFF9B" : "#9e8d66");
             }
 
             EnviarMensagemChat(p, mensagem, TipoMensagemJogo.Radio);
