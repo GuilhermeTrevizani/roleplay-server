@@ -987,9 +987,9 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (target.Ferimentos.Count == 0)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"{target.NomeIC} não possui ferimentos!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido!");
                 return;
             }
 
