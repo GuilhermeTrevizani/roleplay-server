@@ -8,8 +8,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -141,7 +139,7 @@ namespace Roleplay.Commands
         }
 
         [Command("kick", "/kick (ID ou nome) (motivo)", GreedyArg = true)]
-        public async void CMD_kick(IPlayer player, string idNome, string motivo)
+        public void CMD_kick(IPlayer player, string idNome, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
@@ -170,7 +168,6 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você kickou {target.Nome}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
-            await Task.Delay(1000);
             target.Player.Kick($"{p.UsuarioBD.Nome} kickou você. Motivo: {motivo}");
         }
 
@@ -412,7 +409,7 @@ namespace Roleplay.Commands
         }
 
         [Command("ban", "/ban (ID ou nome) (dias) (motivo)", GreedyArg = true)]
-        public async void CMD_ban(IPlayer player, string idNome, int dias, string motivo)
+        public void CMD_ban(IPlayer player, string idNome, int dias, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
@@ -457,7 +454,6 @@ namespace Roleplay.Commands
             var strBan = dias == 0 ? "permanentemente" : $"por {dias} dia{(dias > 1 ? "s" : string.Empty)}";
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você baniu {target.UsuarioBD.Nome} ({target.Nome}) {strBan}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
-            await Task.Delay(1000);
             target.Player.Kick($"{p.UsuarioBD.Nome} baniu você {strBan}. Motivo: {motivo}");
         }
 
@@ -541,7 +537,7 @@ namespace Roleplay.Commands
 
         #region Staff 3
         [Command("ck", "/ck (ID ou nome) (motivo)", GreedyArg = true)]
-        public async void CMD_ck(IPlayer player, string idNome, string motivo)
+        public void CMD_ck(IPlayer player, string idNome, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
@@ -564,7 +560,6 @@ namespace Roleplay.Commands
             target.MotivoMorte = motivo;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aplicou CK no personagem {target.Nome}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
-            await Task.Delay(1000);
             target.Player.Kick($"{p.UsuarioBD.Nome} aplicou CK no seu personagem. Motivo: {motivo}");
 
             Functions.GravarLog(TipoLog.Staff, $"/ck {motivo}", p, target);

@@ -436,7 +436,27 @@ namespace Roleplay.Commands
                     }
 
                     Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou ser revistado.");
-                    player.Emit("Revistar", target.Codigo);
+                    Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Revista em {p.NomeIC}");
+                    Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
+                    if (p.CanalRadio > -1)
+                        Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
+                    p.Player.GetSyncedMetaData("armas", out string weapons);
+                    if (!string.IsNullOrWhiteSpace(weapons))
+                    {
+                        var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(x => new PersonagemArma()
+                        {
+                            Arma = long.Parse(x.Split("|")[0]),
+                            Municao = int.Parse(x.Split("|")[1]),
+                        });
+
+                        foreach (var x in p.Armas)
+                        {
+                            x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
+                            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Arma} | Munição: {x.Municao}");
+                        }
+                    }
+
                     break;
                 case TipoConvite.VendaVeiculo:
                     if (target == null)
@@ -1065,7 +1085,7 @@ namespace Roleplay.Commands
         }
 
         [Command("aceitarck")]
-        public async void CMD_aceitarck(IPlayer player)
+        public void CMD_aceitarck(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.TimerFerido == null)
@@ -1084,7 +1104,6 @@ namespace Roleplay.Commands
             p.DataMorte = DateTime.Now;
             p.MotivoMorte = "Aceitou CK";
             Functions.SalvarPersonagem(p, false);
-            await Task.Delay(1000);
             player.Kick("Você aceitou o CK no seu personagem.");
 
             Functions.GravarLog(TipoLog.Morte, $"/aceitarck", p, null);

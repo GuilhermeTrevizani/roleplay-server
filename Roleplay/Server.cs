@@ -32,7 +32,6 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
             Alt.OnClient<IPlayer, int>("SelecionarPersonagem", SelecionarPersonagem);
             Alt.OnClient<IPlayer, string, string, string, string>("CriarPersonagem", CriarPersonagem);
-            Alt.OnClient<IPlayer, bool, string>("SalvarPersonagem", SalvarPersonagem);
             Alt.OnClient<IPlayer>("ListarPlayers", ListarPlayers);
             Alt.OnClient<IPlayer, int, string, int, int, int, int, int, int>("ComprarVeiculo", ComprarVeiculo);
             Alt.OnClient<IPlayer, string>("ComprarConveniencia", ComprarConveniencia);
@@ -42,7 +41,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int, uint>("PegarItemArmario", PegarItemArmario);
             Alt.OnClient<IPlayer, bool>("PlayerDigitando", PlayerDigitando);
             Alt.OnClient<IPlayer, int, string, int>("EntregarArma", EntregarArma);
-            Alt.OnClient<IPlayer, int, string>("Revistar", Revistar);
+            Alt.OnClient<IPlayer, string>("SalvarArmas", SalvarArmas);
+            Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -148,8 +148,6 @@ namespace Roleplay
                 Functions.GravarLog(TipoLog.Saida, reason, p, null);
                 Functions.SalvarPersonagem(p, false);
             }
-
-            Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)player.SocialClubId);
         }
 
         private void OnPlayerDead(IPlayer player, IEntity killer, uint weapon)
@@ -574,146 +572,6 @@ namespace Roleplay
             Functions.LogarPersonagem(player, personagem);
         }
 
-        private void SalvarPersonagem(IPlayer player, bool online, string weapons)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-                return;
-
-            player.SetDateTime(DateTime.Now);
-
-            var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => new PersonagemArma()
-                {
-                    Arma = long.Parse(x.Split("|")[0]),
-                    Municao = int.Parse(x.Split("|")[1]),
-                });
-
-            foreach (var x in p.Armas)
-                x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
-
-            var dif = DateTime.Now - p.DataUltimaVerificacao;
-            if (dif.TotalMinutes >= 1)
-            {
-                p.TempoConectado++;
-                p.DataUltimaVerificacao = DateTime.Now;
-
-                if (p.TempoPrisao > 0)
-                {
-                    p.TempoPrisao--;
-                    if (p.TempoPrisao == 0)
-                    {
-                        p.Player.Position = new Position(432.8367f, -981.7594f, 30.71048f);
-                        p.Player.Rotation = new Rotation(0, 0, 86.37479f);
-                        Functions.EnviarMensagem(p.Player, TipoMensagem.Sucesso, $"Seu tempo de prisão acabou e você foi libertado!");
-                    }
-                }
-
-                if (p.TempoConectado % 60 == 0)
-                {
-                    var temIncentivoInicial = false;
-                    var salario = 0;
-                    if (p.Faccao > 0)
-                        salario += p.RankBD.Salario;
-                    else if (p.Emprego > 0)
-                        salario += Global.Parametros.ValorIncentivoGovernamental;
-
-                    if (Convert.ToInt32(p.TempoConectado / 60) <= Global.Parametros.HorasIncentivoInicial)
-                    {
-                        temIncentivoInicial = true;
-                        salario += Global.Parametros.ValorIncentivoInicial;
-                    }
-
-                    p.Banco += salario;
-                    if (salario > 0)
-                    {
-                        Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco!");
-
-                        if (p.Faccao > 0)
-                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Salário Facção: ${p.RankBD.Salario:N0}");
-
-                        if (p.Emprego > 0)
-                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Incentivo Governamental: ${Global.Parametros.ValorIncentivoGovernamental:N0}");
-
-                        if (temIncentivoInicial)
-                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Incentivo Inicial: ${Global.Parametros.ValorIncentivoInicial:N0}");
-                    }
-                }
-
-                if (p.IsEmTrabalhoAdministrativo)
-                    p.UsuarioBD.TempoTrabalhoAdministrativo++;
-            }
-
-            if (!online && p.Celular > 0)
-            {
-                p.LimparLigacao();
-                var pLigando = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
-                if (pLigando != null)
-                {
-                    pLigando.LimparLigacao();
-                    Functions.EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu!", Constants.CorCelularSecundaria);
-                }
-            }
-
-            using var context = new DatabaseContext();
-            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == p.Codigo);
-            personagem.Online = online;
-            personagem.Skin = p.Player.Model;
-            personagem.PosX = p.Player.Position.X;
-            personagem.PosY = p.Player.Position.Y;
-            personagem.PosZ = p.Player.Position.Z;
-            personagem.Vida = p.Player.Health;
-            personagem.Colete = p.Player.Armor;
-            personagem.Dimensao = p.Player.Dimension;
-            personagem.TempoConectado = p.TempoConectado;
-            personagem.Faccao = p.Faccao;
-            personagem.Rank = p.Rank;
-            personagem.Dinheiro = p.Dinheiro;
-            personagem.Celular = p.Celular;
-            personagem.Banco = p.Banco;
-            personagem.IPL = JsonConvert.SerializeObject(p.IPLs);
-            personagem.CanalRadio = p.CanalRadio;
-            personagem.CanalRadio2 = p.CanalRadio2;
-            personagem.CanalRadio3 = p.CanalRadio3;
-            personagem.TempoPrisao = p.TempoPrisao;
-            personagem.RotX = p.Player.Rotation.Roll;
-            personagem.RotY = p.Player.Rotation.Pitch;
-            personagem.RotZ = p.Player.Rotation.Yaw;
-            personagem.DataMorte = p.DataMorte;
-            personagem.MotivoMorte = p.MotivoMorte;
-            personagem.Emprego = p.Emprego;
-            personagem.DataUltimoAcesso = DateTime.Now;
-            personagem.IPUltimoAcesso = Functions.ObterIP(player);
-            context.Personagens.Update(personagem);
-
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensRoupas WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensAcessorios WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensArmas WHERE Codigo = {p.Codigo}");
-
-            if (p.Contatos.Count > 0)
-                context.PersonagensContatos.AddRange(p.Contatos);
-
-            if (p.Roupas.Count > 0)
-                context.PersonagensRoupas.AddRange(p.Roupas);
-
-            if (p.Acessorios.Count > 0)
-                context.PersonagensAcessorios.AddRange(p.Acessorios);
-
-            if (p.Armas.Count > 0)
-                context.PersonagensArmas.AddRange(p.Armas);
-
-            var usuario = context.Usuarios.FirstOrDefault(x => x.Codigo == p.UsuarioBD.Codigo);
-            usuario.Staff = p.UsuarioBD.Staff;
-            usuario.TempoTrabalhoAdministrativo = p.UsuarioBD.TempoTrabalhoAdministrativo;
-            usuario.QuantidadeSOSAceitos = p.UsuarioBD.QuantidadeSOSAceitos;
-            usuario.DataUltimoAcesso = DateTime.Now;
-            usuario.IPUltimoAcesso = Functions.ObterIP(player);
-            context.Usuarios.Update(usuario);
-
-            context.SaveChanges();
-        }
-
         private void ListarPlayers(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
@@ -993,34 +851,9 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Arma, $"/entregararma {arma}", p, target);
         }
 
-        private void Revistar(IPlayer player, int codigo, string weapons)
-        {
-            var p = Functions.ObterPersonagem(player);
+        private void SalvarArmas(IPlayer player, string armas) => player.SetSyncedMetaData("armas", armas);
 
-            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
-            if (target == null)
-                return;
-
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Revista em {p.NomeIC}");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
-            if (p.CanalRadio > -1)
-                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
-            if (!string.IsNullOrWhiteSpace(weapons))
-            {
-                var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => new PersonagemArma()
-                {
-                    Arma = long.Parse(x.Split("|")[0]),
-                    Municao = int.Parse(x.Split("|")[1]),
-                });
-
-                foreach (var x in p.Armas)
-                {
-                    x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
-                    Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Arma} | Munição: {x.Municao}");
-                }
-            }
-        }
+        private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetSyncedMetaData(meta, value);
         #endregion
     }
 }
