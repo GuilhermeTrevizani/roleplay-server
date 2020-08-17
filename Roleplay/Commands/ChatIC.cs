@@ -31,7 +31,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;

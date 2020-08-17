@@ -41,6 +41,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("PagarMulta", PagarMulta);
             Alt.OnClient<IPlayer, int, uint>("PegarItemArmario", PegarItemArmario);
             Alt.OnClient<IPlayer, bool>("PlayerDigitando", PlayerDigitando);
+            Alt.OnClient<IPlayer, int, string, int>("EntregarArma", EntregarArma);
+            Alt.OnClient<IPlayer, int, string>("Revistar", Revistar);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -609,6 +611,7 @@ namespace Roleplay
 
                 if (p.TempoConectado % 60 == 0)
                 {
+                    var temIncentivoInicial = false;
                     var salario = 0;
                     if (p.Faccao > 0)
                         salario += p.RankBD.Salario;
@@ -616,11 +619,25 @@ namespace Roleplay
                         salario += Global.Parametros.ValorIncentivoGovernamental;
 
                     if (Convert.ToInt32(p.TempoConectado / 60) <= Global.Parametros.HorasIncentivoInicial)
+                    {
+                        temIncentivoInicial = true;
                         salario += Global.Parametros.ValorIncentivoInicial;
+                    }
 
                     p.Banco += salario;
                     if (salario > 0)
-                        Functions.EnviarMensagem(p.Player, TipoMensagem.Sucesso, $"Seu salário de ${salario:N0} foi depositado no banco!");
+                    {
+                        Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco!");
+
+                        if (p.Faccao > 0)
+                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Salário Facção: ${p.RankBD.Salario:N0}");
+
+                        if (p.Emprego > 0)
+                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Incentivo Governamental: ${Global.Parametros.ValorIncentivoGovernamental:N0}");
+
+                        if (temIncentivoInicial)
+                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Incentivo Inicial: ${Global.Parametros.ValorIncentivoInicial:N0}");
+                    }
                 }
 
                 if (p.IsEmTrabalhoAdministrativo)
@@ -944,9 +961,66 @@ namespace Roleplay
             }).ToList();
 
             player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), "Você equipou o item!");
+            Functions.GravarLog(TipoLog.Arma, $"/armario {JsonConvert.SerializeObject(arma)}", p, null);
         }
 
         private void PlayerDigitando(IPlayer player, bool state) => player.SetSyncedMetaData("chatting", state);
+
+        private void EntregarArma(IPlayer player, int codigo, string weapon, int municao)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
+            if (target == null)
+                return;
+
+            uint.TryParse(weapon, out uint arma);
+            var wep = p.Armas.FirstOrDefault(x => x.Arma == arma);
+
+            player.Emit("RemoveWeapon", arma);
+            p.Armas.Remove(wep);
+
+            wep.Codigo = target.Codigo;
+            target.Player.GiveWeapon(arma, municao, true);
+            target.Player.SetWeaponTintIndex(arma, (byte)wep.Pintura);
+            var componentes = JsonConvert.DeserializeObject<List<uint>>(wep.Componentes);
+            foreach (var x in componentes)
+                target.Player.AddWeaponComponent(arma, x);
+            target.Armas.Add(wep);
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você deu {(WeaponModel)arma} com {municao} de munição para {target.NomeIC}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} te deu {(WeaponModel)arma} com {municao} de munição.");
+            Functions.GravarLog(TipoLog.Arma, $"/entregararma {arma}", p, target);
+        }
+
+        private void Revistar(IPlayer player, int codigo, string weapons)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
+            if (target == null)
+                return;
+
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Revista em {p.NomeIC}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
+            if (p.CanalRadio > -1)
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
+            if (!string.IsNullOrWhiteSpace(weapons))
+            {
+                var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => new PersonagemArma()
+                {
+                    Arma = long.Parse(x.Split("|")[0]),
+                    Municao = int.Parse(x.Split("|")[1]),
+                });
+
+                foreach (var x in p.Armas)
+                {
+                    x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
+                    Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Arma} | Munição: {x.Municao}");
+                }
+            }
+        }
         #endregion
     }
 }

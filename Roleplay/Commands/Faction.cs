@@ -54,7 +54,7 @@ namespace Roleplay.Commands
                         <th>ID</th>
                         <th>Nome</th>
                         <th>OOC</th>
-                        <th>Status</th>
+                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? "<th>Status</th>" : string.Empty)}
                     </tr>
                 </thead>
                 <tbody>";
@@ -63,7 +63,7 @@ namespace Roleplay.Commands
             foreach (var x in players)
             {
                 var status = x.IsEmTrabalho ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
-                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td><td>{status}</td></tr>";
+                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}</tr>";
             }
 
             html += $@"
@@ -196,12 +196,18 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (target.FaccaoBD.Tipo == TipoFaccao.Policial)
+            {
+                target.Armas = new List<PersonagemArma>();
+                target.Player.RemoveAllWeapons();
+            }
+
             target.Faccao = 0;
             target.Rank = 0;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você demitiu {target.Nome} da facção.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} demitiu você da facção.");
 
-            Functions.GravarLog(TipoLog.FaccaoGestor, "/demitir", p, target);
+            Functions.GravarLog(TipoLog.FaccaoGestor, "/expulsar", p, target);
         }
 
         [Command("m", "/m (mensagem)", GreedyArg = true)]
@@ -248,6 +254,12 @@ namespace Roleplay.Commands
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção!");
                 return;
+            }
+
+            if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
+            {
+                p.Armas = new List<PersonagemArma>();
+                p.Player.RemoveAllWeapons();
             }
 
             p.Faccao = p.Rank = 0;
@@ -352,7 +364,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (player.Position.Distance(Constants.PosicaoPrisao) > 2)
+            if (player.Position.Distance(PosicaoPrisao) > DistanciaRP)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no local que as prisões são efetuadas!");
                 return;
@@ -368,7 +380,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;
@@ -429,7 +441,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;
@@ -480,7 +492,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2 && x.Faccao == p.Faccao);
+            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
             if (armario == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção!");
@@ -515,7 +527,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2 && x.Faccao == p.Faccao);
+            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
             if (armario == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção!");
@@ -540,21 +552,23 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension || target.TimerFerido == null)
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você ou jogador não está ferido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido!");
                 return;
             }
 
-            target.TimerFerido?.Stop();
-            target.TimerFerido = null;
             target.Ferimentos = new List<Ferimento>();
-            target.Armas = new List<PersonagemArma>();
-            target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
-            target.Player.Spawn(target.Player.Position);
             target.Player.Health = 200;
-            target.Player.Armor = 0;
+
+            if (target.TimerFerido != null)
+            {
+                target.TimerFerido?.Stop();
+                target.TimerFerido = null;
+                target.Player.Spawn(target.Player.Position);
+                target.Player.Armor = 0;
+            }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");

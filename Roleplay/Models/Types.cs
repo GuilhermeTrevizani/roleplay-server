@@ -52,6 +52,7 @@ namespace Roleplay.Models
         Entrada = 6,
         Saida = 7,
         Morte = 8,
+        Arma = 9,
     }
 
     public enum TipoConvite

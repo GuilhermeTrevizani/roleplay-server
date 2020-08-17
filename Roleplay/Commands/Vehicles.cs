@@ -30,7 +30,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo!", notify: true);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
 
@@ -79,7 +79,7 @@ namespace Roleplay.Commands
             p.Dinheiro -= Global.Parametros.ValorVagaVeiculo;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou uma vaga por ${Global.Parametros.ValorVagaVeiculo:N0}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou uma vaga por ${Global.Parametros.ValorVagaVeiculo:N0}!", notify: true);
         }
 
         [Command("vestacionar")]
@@ -105,7 +105,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > 2)
+            if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Constants.DistanciaRP)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga!");
                 return;
@@ -121,7 +121,7 @@ namespace Roleplay.Commands
             }
 
             veh.Despawnar();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou seu veículo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou seu veículo!", notify: true);
         }
 
         [Command("vspawn", "/vspawn (código do veículo)")]
@@ -150,7 +150,7 @@ namespace Roleplay.Commands
 
             veh.Spawnar();
             player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo!", notify: true);
         }
 
         [Command("vlista")]
@@ -187,7 +187,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Veiculos
-                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= 2)
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(x.Vehicle.Position))
                 .FirstOrDefault();
 
@@ -201,7 +201,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;

@@ -232,22 +232,25 @@ namespace Roleplay
             };
         }
 
-        public static void EnviarMensagem(IPlayer player, TipoMensagem tipoMensagem, string mensagem, string cor = "#FFFFFF")
+        public static void EnviarMensagem(IPlayer player, TipoMensagem tipoMensagem, string mensagem, string cor = "#FFFFFF", bool notify = false)
         {
             var gradient = new int[3];
             var icone = string.Empty;
+            var type = "info";
 
             if (tipoMensagem == TipoMensagem.Sucesso)
             {
                 cor = "#6EB469";
                 gradient = new int[] { 110, 180, 105 };
                 icone = "check";
+                type = "success";
             }
             else if (tipoMensagem == TipoMensagem.Erro || tipoMensagem == TipoMensagem.Punicao)
             {
                 cor = "#FF6A4D";
                 gradient = new int[] { 255, 106, 77 };
                 icone = "alert";
+                type = "danger";
             }
             else if (tipoMensagem == TipoMensagem.Titulo)
             {
@@ -256,7 +259,10 @@ namespace Roleplay
                 icone = "info";
             }
 
-            player.Emit("chat:sendMessage", mensagem, cor, tipoMensagem == TipoMensagem.Nenhum ? null : gradient, icone);
+            if (notify)
+                player.Emit("chat:notify", mensagem, type);
+            else
+                player.Emit("chat:sendMessage", mensagem, cor, tipoMensagem == TipoMensagem.Nenhum ? null : gradient, icone);
         }
 
         public static Personagem ObterPersonagemPorIdNome(IPlayer player, string idNome, bool isPodeProprioPlayer = true)
@@ -853,6 +859,58 @@ namespace Roleplay
                 new WeaponComponent(WeaponModel.HeavyPistol, "Flashlight", 0x359B7AAE),
                 new WeaponComponent(WeaponModel.HeavyPistol, "Suppressor", 0xC304849A),
                 new WeaponComponent(WeaponModel.HeavyPistol, "EtchedWoodGripFinish", 0x7A6A7B7B),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "DefaultRounds", 0xBA23D8BE),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "TracerRounds", 0xC6D8E476),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "IncendiaryRounds", 0xEFBF25),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "HollowPointRounds", 0x10F42E8F),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "FullMetalJacketRounds", 0xDC8BA3F),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "HolographicSight", 0x420FD713),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "SmallScope", 0x49B2945),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Flashlight", 0x359B7AAE),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Compensator", 0x27077CCB),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "DigitalCamo", 0xC03FED9F),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "BrushstrokeCamo", 0xB5DE24),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "WoodlandCamo", 0xA7FF1B8),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Skull", 0xF2E24289),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "SessantaNove", 0x11317F27),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Perseus", 0x17C30C42),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Leopard", 0x257927AE),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Zebra", 0x37304B1C),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Geometric", 0x48DAEE71),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Boom", 0x20ED9B5B),
+                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Patriotic", 0xD951E867),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "DefaultClip", 0x1466CE6),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "ExtendedClip", 0xCE8C0772),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "TracerRounds", 0x902DA26E),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "IncendiaryRounds", 0xE6AD5F79),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "HollowPointRounds", 0x8D107402),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "FullMetalJacketRounds", 0xC111EB26),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Flashlight", 0x4A4965F3),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "MountedScope", 0x47DE9258),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Suppressor", 0x65EA7EBB),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Compensator", 0xAA8283BF),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "DigitalCamo", 0xF7BEEDD),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "BrushstrokeCamo", 0x8A612EF6),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "WoodlandCamo", 0x76FA8829),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Skull", 0xA93C6CAC),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "SessantaNove", 0x9C905354),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Perseus", 0x4DFA3621),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Leopard", 0x42E91FFF),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Zebra", 0x54A8437D),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Geometric", 0x68C2746),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Boom", 0x2366E467),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Boom2", 0x441882E6),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "DigitalCamo", 0xE7EE68EA),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "BrushstrokeCamo", 0x29366D21),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "WoodlandCamo", 0x3ADE514B),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "SkullSlide", 0xE64513E9),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "SessantaNoveSlide", 0xCD7AEB9A),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "PerseusSlide", 0xFA7B27A6),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "LeopardSlide", 0xE285CA9A),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "ZebraSlide", 0x2B904B19),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "GeometricSlide", 0x22C24F9C),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "BoomSlide", 0x8D0D5ECD),
+                new WeaponComponent(WeaponModel.SNSPistolMkII, "Patriotic", 0x1F07150A),
             };
         }
     }

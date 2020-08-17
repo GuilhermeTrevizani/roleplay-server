@@ -4,11 +4,11 @@ using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
-using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -605,21 +605,23 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (target.TimerFerido == null)
+            if (target.Ferimentos.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
                 return;
             }
 
-            target.TimerFerido?.Stop();
-            target.TimerFerido = null;
             target.Ferimentos = new List<Ferimento>();
-            target.Armas = new List<PersonagemArma>();
-            target.Player.RemoveAllWeapons();
             target.Player.Emit("Server:SelecionarPersonagem");
-            target.Player.Spawn(target.Player.Position);
             target.Player.Health = 200;
-            target.Player.Armor = 0;
+
+            if (target.TimerFerido != null)
+            {
+                target.TimerFerido?.Stop();
+                target.TimerFerido = null;
+                target.Player.Spawn(target.Player.Position);
+                target.Player.Armor = 0;
+            }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.Nome}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");
@@ -1095,9 +1097,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (salario <= 0)
+            if (salario < 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário deve ser maior que 0!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário não pode ser negativo!");
                 return;
             }
 
@@ -1978,9 +1980,15 @@ namespace Roleplay.Commands
             }
 
             p.LimparIPLs();
-            player.Dimension = 0;
+            player.Dimension = (int)armario.Dimensao;
+
+            if (armario.Dimensao > 0)
+            {
+                p.IPLs = Functions.ObterIPLsPorInterior(Global.Propriedades.FirstOrDefault(x => x.Codigo == armario.Dimensao).Interior);
+                p.SetarIPLs();
+            }
+
             player.Position = new Position(armario.PosX, armario.PosY, armario.PosZ);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até o armário {armario.Codigo}!");
         }
 
         [Command("carmi", "/carmi (armário) (arma)")]
@@ -2000,7 +2008,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2047,7 +2055,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2081,7 +2089,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2130,7 +2138,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2172,7 +2180,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2403,7 +2411,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2482,7 +2490,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
@@ -2533,7 +2541,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(arma, out WeaponModel wep);
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");

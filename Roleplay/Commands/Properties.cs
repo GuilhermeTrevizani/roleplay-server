@@ -18,7 +18,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Propriedades
-                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -52,7 +52,7 @@ namespace Roleplay.Commands
 
             var prox = Global.Propriedades
                 .Where(x => player.Dimension == x.Codigo
-                    && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= 2)
+                    && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
                 .FirstOrDefault();
 
@@ -84,7 +84,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Propriedades
-                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -98,7 +98,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;

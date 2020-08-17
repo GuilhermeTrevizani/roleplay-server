@@ -76,9 +76,12 @@ namespace Roleplay
                 p.SetClothes(4, 34, 0);
                 p.SetClothes(11, 48, 0);
             }
+        }
 
-            //player.AddWeaponComponent(WeaponModel.Pistol, 0x359B7AAE);
-            //player.Emit("character:Edit", "");
+        [Command("teste")]
+        public void CMD_teste(IPlayer player)
+        {
+            player.Emit("character:Edit", "");
         }
 
         /* [Command("skin", "/skin)")]
@@ -91,7 +94,7 @@ namespace Roleplay
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma loja de roupas!");
                 return;

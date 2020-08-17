@@ -5,7 +5,7 @@ namespace Roleplay.Commands
 {
     public class Anims
     {
-        [Command("stopanim", "/stopanim", Alias = "sa")]
+        [Command("stopanim", Alias = "sa")]
         public void CMD_stopanim(IPlayer player) => Functions.ChecarAnimacoes(player, true);
 
         [Command("handsup", "/hs (tipo [1-13])", Alias = "hs")]
@@ -492,10 +492,10 @@ namespace Roleplay.Commands
             switch (tipo)
             {
                 case 1:
-                    p.PlayAnimation("missfinale_c1@", "lying_dead_player0", (int)(Constants.AnimationFlags.Loop));
+                    p.PlayAnimation("missfinale_c1@", "lying_dead_player0", (int)Constants.AnimationFlags.Loop);
                     break;
                 case 2:
-                    p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)(Constants.AnimationFlags.Loop));
+                    p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
                     break; 
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 2.");

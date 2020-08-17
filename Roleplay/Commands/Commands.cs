@@ -40,6 +40,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/aceitartratamento", "Aceita o tratamento médico após estar ferido e é levado ao hospital"),
                 new Comando("Geral", "/aceitarck", "Aceita o CK no personagem"),
                 new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
+                new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -378,7 +379,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está próximo de você!");
                         return;
@@ -399,7 +400,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ)) > 2)
+                    if (player.Position.Distance(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ)) > Constants.DistanciaRP)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo da propriedade!");
                         return;
@@ -428,17 +429,14 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está próximo de você!");
                         return;
                     }
 
                     Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou ser revistado.");
-                    Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Revista em {p.NomeIC}");
-                    Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
-                    if (p.CanalRadio > -1)
-                        Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
+                    player.Emit("Revistar", target.Codigo);
                     break;
                 case TipoConvite.VendaVeiculo:
                     if (target == null)
@@ -447,7 +445,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está próximo de você!");
                         return;
@@ -469,7 +467,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(veh.Vehicle.Position) > 2)
+                    if (player.Position.Distance(veh.Vehicle.Position) > Constants.DistanciaRP)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo!");
                         return;
@@ -575,7 +573,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;
@@ -605,7 +603,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > 2 || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
                 return;
@@ -633,7 +631,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Multas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Multas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de pagamento de multas!");
                 return;
@@ -679,7 +677,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2) && p.Celular == 0)
+            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP) && p.Celular == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular!");
                 return;
@@ -719,7 +717,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM!");
                 return;
@@ -755,7 +753,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco!");
                 return;
@@ -785,7 +783,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= 2))
+            if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 player.Emit("Server:ComprarConveniencia", JsonConvert.SerializeObject(Global.Precos.Where(x => x.Tipo == TipoPreco.Conveniencia).OrderBy(x => x.Nome).Select(x => new
                 {
@@ -796,7 +794,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Propriedades
-                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
             if (prox != null)
@@ -823,7 +821,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= 2);
+            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Constants.DistanciaRP);
             if (conce != null)
             {
                 var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
@@ -842,15 +840,9 @@ namespace Roleplay.Commands
         [Command("emtrabalho")]
         public void CMD_emtrabalho(IPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
+            var duty = Global.PersonagensOnline.Where(x => x.IsEmTrabalho);
             Functions.EnviarMensagem(player, TipoMensagem.Titulo, "Jogadores trabalhando");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Policiais: {Global.PersonagensOnline.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial && x.IsEmTrabalho)} | Médicos: {Global.PersonagensOnline.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica && x.IsEmTrabalho)} | Taxistas: {Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.IsEmTrabalho)}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Policiais: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial)} | Médicos: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica)} | Taxistas: {duty.Count(x => x.Emprego == TipoEmprego.Taxista)}");
         }
 
         [Command("sairemprego")]
@@ -886,7 +878,7 @@ namespace Roleplay.Commands
             var emprego = TipoEmprego.Nenhum;
             foreach (var c in Global.Empregos)
             {
-                if (emprego == TipoEmprego.Nenhum && player.Position.Distance(c.Posicao) <= 2)
+                if (emprego == TipoEmprego.Nenhum && player.Position.Distance(c.Posicao) <= Constants.DistanciaRP)
                     emprego = c.Tipo;
             }
 
@@ -988,7 +980,7 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "SOS enviado para os administradores em serviço!");
         }
 
-        [Command("ferimentos", "/ferimentos (ID ou nome)", GreedyArg = true)]
+        [Command("ferimentos", "/ferimentos (ID ou nome)")]
         public void CMD_ferimentos(IPlayer player, string idNome)
         {
             var target = Functions.ObterPersonagemPorIdNome(player, idNome);
@@ -1109,7 +1101,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Propriedades
-                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 2)
+                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -1117,7 +1109,7 @@ namespace Roleplay.Commands
             {
                 prox = Global.Propriedades
                 .Where(x => x.Codigo == player.Dimension
-                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= 2)
+                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
                 .FirstOrDefault();
             }
@@ -1131,7 +1123,7 @@ namespace Roleplay.Commands
                 }
 
                 Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta = !prox.Aberta;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta!");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta!", notify: true);
                 return;
             }
 
@@ -1144,11 +1136,47 @@ namespace Roleplay.Commands
             if (veh != null)
             {
                 veh.Vehicle.LockState = veh.Vehicle.LockState == VehicleLockState.Locked ? VehicleLockState.Unlocked : VehicleLockState.Locked;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo!", notify: true);
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de uma propriedade ou veículo.");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem acesso a nenhuma propriedade ou veículo próximos.");
+        }
+
+        [Command("entregararma", "/entregararma (ID ou nome) (arma)")]
+        public void CMD_entregararma(IPlayer player, string idNome, string arma)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo == TipoFaccao.Policial)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode entregar armas estando em uma facção policial!");
+                return;
+            }
+
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
+            if (!p.Armas.Any(x => x.Arma == (long)wep))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está carregando essa arma!");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                return;
+            }
+
+            if (target.Armas.Any(x => x.Arma == (long)wep))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O jogador já está carregando essa arma!");
+                return;
+            }
+
+            player.Emit("EntregarArma", target.Codigo, (long)wep);
         }
     }
 }
