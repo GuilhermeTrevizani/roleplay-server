@@ -27,6 +27,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (p.Ferimentos.Count > 0)
+            {
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está ferido!");
+                return;
+            }
+
             if (slot < 1 || slot > 3)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Slot deve ser entre 1 e 3!");
@@ -42,6 +48,12 @@ namespace Roleplay.Commands
             if (canal == 912 && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 912 é reservado para facções médicas!");
+                return;
+            }
+
+            if (canal == 999 && p.FaccaoBD?.Tipo != TipoFaccao.Policial && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 911 é reservado para facções governamentais!");
                 return;
             }
 

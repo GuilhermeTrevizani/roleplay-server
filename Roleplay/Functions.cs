@@ -630,6 +630,12 @@ namespace Roleplay
                 return;
             }
 
+            if (p.Ferimentos.Count > 0)
+            {
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está ferido!");
+                return;
+            }
+
             var canal = p.CanalRadio;
             if (slot == 2)
                 canal = p.CanalRadio2;
@@ -642,7 +648,7 @@ namespace Roleplay
                 return;
             }
 
-            if ((canal == 911 || canal == 912) && !p.IsEmTrabalho)
+            if ((canal == 911 || canal == 912 || canal == 999) && !p.IsEmTrabalho)
             {
                 EnviarMensagem(p.Player, TipoMensagem.Erro, $"Você só pode falar no canal {canal} quando estiver em serviço!");
                 return;
@@ -650,7 +656,7 @@ namespace Roleplay
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.CanalRadio == canal || x.CanalRadio2 == canal || x.CanalRadio3 == canal))
             {
-                if (!pl.IsEmTrabalho && (canal == 911 || canal == 912))
+                if (!pl.IsEmTrabalho && (canal == 911 || canal == 912 || canal == 999))
                         continue;
 
                 var slotPl = 1;
