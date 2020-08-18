@@ -1083,7 +1083,8 @@ namespace Roleplay.Commands
             p.Player.Health = 200;
             p.Player.Armor = 0;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você aceitou o tratamento e foi levado para o hospital.");
+            p.Banco -= Global.Parametros.ValorCustosHospitalares;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o tratamento e foi levado para o hospital. Os custos hospitalares foram ${Global.Parametros.ValorCustosHospitalares:N0}.");
         }
 
         [Command("aceitarck")]
