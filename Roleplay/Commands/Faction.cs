@@ -514,7 +514,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens));
+            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica);
         }
 
         [Command("pegarcolete")]

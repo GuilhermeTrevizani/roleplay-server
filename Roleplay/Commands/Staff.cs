@@ -349,9 +349,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (vida < 0 || vida > 100)
+            if (vida < 1 || vida > 100)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Vida deve ser entre 0 e 100.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Vida deve ser entre 1 e 100.");
                 return;
             }
 

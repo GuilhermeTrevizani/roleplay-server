@@ -43,6 +43,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int, string, int>("EntregarArma", EntregarArma);
             Alt.OnClient<IPlayer, string>("SalvarArmas", SalvarArmas);
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
+            Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -818,7 +819,7 @@ namespace Roleplay
                 Rank = Global.Ranks.FirstOrDefault(y => y.Faccao == p.Faccao && y.Codigo == x.Rank).Nome,
             }).ToList();
 
-            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), "Você equipou o item!");
+            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, $"Você equipou {(WeaponModel)weapon}!");
             Functions.GravarLog(TipoLog.Arma, $"/armario {JsonConvert.SerializeObject(arma)}", p, null);
         }
 
@@ -854,6 +855,19 @@ namespace Roleplay
         private void SalvarArmas(IPlayer player, string armas) => player.SetSyncedMetaData("armas", armas);
 
         private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetStreamSyncedMetaData(meta, value);
+
+        private void DevolverItensArmario(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            foreach (var x in p.Armas)
+                player.Emit("RemoveWeapon", (uint)x.Arma);
+
+            p.Armas = new List<PersonagemArma>();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você devolveu seus itens no armário.", notify: true);
+            Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
+        }
         #endregion
     }
 }
