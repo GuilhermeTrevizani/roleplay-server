@@ -444,9 +444,6 @@ namespace Roleplay
             context.Usuarios.Update(usuario);
 
             context.SaveChanges();
-
-            if (!online)
-                Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)p.Player.SocialClubId);
         }
 
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)

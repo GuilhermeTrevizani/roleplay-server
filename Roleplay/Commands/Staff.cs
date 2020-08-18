@@ -614,7 +614,7 @@ namespace Roleplay.Commands
             {
                 target.TimerFerido?.Stop();
                 target.TimerFerido = null;
-                target.Player.Spawn(target.Player.Position);
+                target.StopAnimation();
                 target.Player.Armor = 0;
             }
 

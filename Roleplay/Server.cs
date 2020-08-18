@@ -149,6 +149,8 @@ namespace Roleplay
                 Functions.GravarLog(TipoLog.Saida, reason, p, null);
                 Functions.SalvarPersonagem(p, false);
             }
+
+            Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)p.Player.SocialClubId);
         }
 
         private void OnPlayerDead(IPlayer player, IEntity killer, uint weapon)
@@ -162,12 +164,15 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "Você foi gravemente ferido! Os médicos chegarão em até 3 minutos.");
 
+            p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(180000)
             {
                 Tag = p.Codigo,
             };
             p.TimerFerido.Elapsed += TimerFerido_Elapsed;
             p.TimerFerido.Start();
+            p.Player.Spawn(p.Player.Position);
+            p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
         }
 
         private void TimerFerido_Elapsed(object sender, ElapsedEventArgs e)
