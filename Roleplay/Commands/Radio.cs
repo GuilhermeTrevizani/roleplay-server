@@ -27,9 +27,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.Ferimentos.Count > 0)
+            if (p.TimerFerido != null)
             {
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está ferido!");
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está gravamente ferido!");
                 return;
             }
 

@@ -853,7 +853,7 @@ namespace Roleplay
 
         private void SalvarArmas(IPlayer player, string armas) => player.SetSyncedMetaData("armas", armas);
 
-        private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetSyncedMetaData(meta, value);
+        private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetStreamSyncedMetaData(meta, value);
         #endregion
     }
 }

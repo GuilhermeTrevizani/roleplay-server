@@ -7,7 +7,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -41,6 +40,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/aceitarck", "Aceita o CK no personagem"),
                 new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
                 new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
+                new Comando("Geral", "/timestamp", "Ativa/desativa timestamp do chat"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -139,6 +139,7 @@ namespace Roleplay.Commands
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                     listaComandos.AddRange(new List<Comando>()
                     {
+                        new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
                         new Comando("Facção Policial", "/m", "Megafone"),
                         new Comando("Facção Policial", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção Policial", "/multar", "Multa um personagem online"),
@@ -148,9 +149,9 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/pegarcolete", "Pega colete em um armário da facção"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
-
                     listaComandos.AddRange(new List<Comando>()
                     {
+                        new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
                         new Comando("Facção Médica", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção Médica", "/curar", "Cura um personagem ferido"),
                     });
@@ -1196,6 +1197,15 @@ namespace Roleplay.Commands
             }
 
             player.Emit("EntregarArma", target.Codigo, (long)wep);
+        }
+
+        [Command("timestamp")]
+        public void CMD_timestamp(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            p.TimeStamp = !p.TimeStamp;
+            player.Emit("chat:activateTimeStamp", p.TimeStamp);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.TimeStamp ? "des" : string.Empty)}ativou o timestamp do chat.", notify: true);
         }
     }
 }

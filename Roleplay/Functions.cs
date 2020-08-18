@@ -58,6 +58,7 @@ namespace Roleplay
         {
             player.Emit("Server:SelecionarPersonagem");
             player.Emit("nametags:Config", true);
+            player.Emit("chat:activateTimeStamp", p.TimeStamp);
 
             foreach (var x in Global.Blips)
                 x.CriarIdentificador(player);
@@ -414,6 +415,7 @@ namespace Roleplay
             personagem.Emprego = p.Emprego;
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = ObterIP(p.Player);
+            personagem.TimeStamp = p.TimeStamp;
             context.Personagens.Update(personagem);
 
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
@@ -452,7 +454,7 @@ namespace Roleplay
             if (type == TipoMensagemJogo.Radio)
                 excludePlayer = true;
 
-            var p = Global.PersonagensOnline.FirstOrDefault(x => x.UsuarioBD.SocialClubRegistro == (long)player.SocialClubId);
+            var p = ObterPersonagem(player);
             var distanceGap = range / 5;
 
             var targetList = Global.PersonagensOnline.Where(x => x.Player != null && x.Player.Dimension == player.Dimension).Select(x => x.Player).ToList();
@@ -769,9 +771,9 @@ namespace Roleplay
                 return;
             }
 
-            if (p.Ferimentos.Count > 0)
+            if (p.TimerFerido != null)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está ferido!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está gravamente ferido!");
                 return;
             }
 
