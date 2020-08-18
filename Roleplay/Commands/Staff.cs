@@ -1260,8 +1260,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Enum.TryParse(staff.ToString(), out TipoStaff stf);
-            if (stf == 0)
+            if (!Enum.GetValues(typeof(TipoStaff)).Cast<TipoStaff>().Any(x => (int)x == staff))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Staff {staff} não existe!");
                 return;
@@ -1271,9 +1270,10 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
+            var stf = (TipoStaff)staff;
             target.UsuarioBD.Staff = stf;
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível staff para {staff}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível staff de {target.UsuarioBD.Nome} para {staff}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível staff para {stf} [{staff}].");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível staff de {target.UsuarioBD.Nome} para {stf} [{staff}].");
             Functions.GravarLog(TipoLog.Staff, $"/staff {staff}", p, target);
         }
 
