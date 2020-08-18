@@ -99,29 +99,32 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh.Personagem != p.Codigo)
+            if (veh.Personagem == p.Codigo)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo!");
+                if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Constants.DistanciaRP)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga!");
+                    return;
+                }
+
+                veh.Despawnar();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo!", notify: true);
                 return;
             }
 
-            if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Constants.DistanciaRP)
+            if (veh.Faccao == p.Faccao && veh.Faccao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga!");
-                return;
+                if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção!");
+                    return;
+                }
+
+                veh.Despawnar();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo!", notify: true);
             }
 
-            veh.EngineHealth = player.Vehicle.EngineHealth;
-            veh.BodyHealth = (int)player.Vehicle.BodyHealth;
-
-            using (var context = new DatabaseContext())
-            {
-                context.Veiculos.Update(veh);
-                context.SaveChanges();
-            }
-
-            veh.Despawnar();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou seu veículo!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo!");
         }
 
         [Command("vspawn", "/vspawn (código do veículo)")]

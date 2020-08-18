@@ -1,6 +1,4 @@
-﻿using AltV.Net;
-using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Data;
 using Roleplay.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -47,6 +45,10 @@ namespace Roleplay.Entities
                 case TipoPonto.LojaRoupas:
                     nome = "Loja de Roupas";
                     descricao = "Use /skin";
+                    break;
+                case TipoPonto.SpawnVeiculosFaccao:
+                    nome = "Spawn de Veículos da Facção";
+                    descricao = "Use /fspawn";
                     break;
             }
 

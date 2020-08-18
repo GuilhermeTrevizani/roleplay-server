@@ -4,6 +4,7 @@ using AltV.Net.Enums;
 using Newtonsoft.Json;
 using Roleplay.Entities;
 using Roleplay.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Roleplay.Constants;
@@ -572,6 +573,42 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");
+        }
+
+        [Command("fspawn")]
+        public void CMD_fspawn(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço!");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção!");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var veiculos = context.Veiculos.Where(x => x.Faccao == p.Faccao).ToList()
+                .OrderBy(x => Convert.ToInt32(Global.Veiculos.Any(y => y.Codigo == x.Codigo))).ThenBy(x => x.Modelo).ThenBy(x => x.Placa)
+                .Select(x => new
+                {
+                    x.Codigo,
+                    Modelo = x.Modelo.ToUpper(),
+                    x.Placa,
+                    Spawnado = Global.Veiculos.Any(y => y.Codigo == x.Codigo) ? "SIM" : "NÃO",
+                }).ToList();
+
+            if (veiculos.Count == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua facção não possui veículos para spawnar!");
+                return;
+            }
+
+            player.Emit("Server:SpawnarVeiculosFaccao", p.FaccaoBD.Nome, JsonConvert.SerializeObject(veiculos));
         }
     }
 }

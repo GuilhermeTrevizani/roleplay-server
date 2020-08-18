@@ -147,6 +147,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/prender", "Prende um personagem"),
                         new Comando("Facção Policial", "/algemar", "Algema um personagem"),
                         new Comando("Facção Policial", "/pegarcolete", "Pega colete em um armário da facção"),
+                        new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
@@ -154,6 +155,7 @@ namespace Roleplay.Commands
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
                         new Comando("Facção Médica", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção Médica", "/curar", "Cura um personagem ferido"),
+                        new Comando("Facção Médica", "/fspawn", "Spawna veículos da facção"),
                     });
 
                 if (p.Rank >= p.FaccaoBD.RankGestor)
@@ -263,7 +265,6 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/eblipinativo"),
                     new Comando("Manager", "/cveh", "Cria um veículo"),
                     new Comando("Manager", "/rveh", "Remove um veículo"),
-                    new Comando("Manager", "/evehpos", "Edita a posição de um veículo"),
                     new Comando("Manager", "/evehcor", "Edita as cores de um veículo"),
                     new Comando("Manager", "/evehlivery", "Edita a livery de um veículo"),
                     new Comando("Manager", "/earmipintura", "Edita a pintura de uma arma do armário"),

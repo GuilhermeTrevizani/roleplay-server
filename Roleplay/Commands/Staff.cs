@@ -2255,10 +2255,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            player.Position = new Position(player.Position.X, player.Position.Y, player.Position.Z + 2);
-            veiculo.Spawnar();
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado!");
             Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
         }
 
@@ -2272,62 +2269,28 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo && x.Faccao != 0);
-            if (veh == null)
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não existe ou não pertence a uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
                 return;
             }
 
-            veh.Despawnar();
-
             using (var context = new DatabaseContext())
             {
+                veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+                if (veh.Faccao == 0)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    return;
+                }
+
                 context.Veiculos.Remove(veh);
                 context.SaveChanges();
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veh.Codigo} removido!");
             Functions.GravarLog(TipoLog.Staff, $"/rveh {veh.Codigo}", p, null);
-        }
-
-        [Command("evehpos", "/evehpos")]
-        public void CMD_evehpos(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
-                return;
-            }
-
-            if (!player.IsInVehicle)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um veículo!");
-                return;
-            }
-
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle && x.Faccao != 0);
-            if (veh == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não está em um veículo que pertence a uma facção!");
-                return;
-            }
-
-            using (var context = new DatabaseContext())
-            {
-                veh.PosX = player.Vehicle.Position.X;
-                veh.PosY = player.Vehicle.Position.Y;
-                veh.PosZ = player.Vehicle.Position.Z;
-                veh.RotX = player.Vehicle.Rotation.Roll;
-                veh.RotY = player.Vehicle.Rotation.Pitch;
-                veh.RotZ = player.Vehicle.Rotation.Yaw;
-                context.Veiculos.Update(veh);
-                context.SaveChanges();
-            }
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Posição do veículo {veh.Codigo} alterada com sucesso!");
-            Functions.GravarLog(TipoLog.Staff, $"/evehpos {veh.Codigo} X: {player.Vehicle.Position.X} Y: {player.Vehicle.Position.Y} Z: {player.Vehicle.Position.Z} RX: {player.Vehicle.Rotation.Roll} RY: {player.Vehicle.Rotation.Pitch} RZ: {player.Vehicle.Rotation.Yaw}", p, null);
         }
 
         [Command("evehcor", "/evehcor (código) (r1) (g1) (b1) (r2) (g2) (b2)")]
@@ -2340,15 +2303,22 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo && x.Faccao != 0);
-            if (veh == null)
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo não existe ou não pertence a uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
                 return;
             }
 
             using (var context = new DatabaseContext())
             {
+                veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+                if (veh.Faccao == 0)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    return;
+                }
+
                 veh.Cor1R = r1;
                 veh.Cor1G = g1;
                 veh.Cor1B = b1;
@@ -2359,10 +2329,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            veh.Vehicle.PrimaryColorRgb = new Rgba((byte)veh.Cor1R, (byte)veh.Cor1G, (byte)veh.Cor1B, 0);
-            veh.Vehicle.SecondaryColorRgb = new Rgba((byte)veh.Cor2R, (byte)veh.Cor2G, (byte)veh.Cor2B, 0);
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas para {r1} {g1} {b1} {r2} {g2} {b2}!");
             Functions.GravarLog(TipoLog.Staff, $"/evehcor {veh.Codigo} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
         }
 
@@ -2376,21 +2343,26 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo && x.Faccao != 0);
-            if (veh == null)
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo não existe ou não pertence a uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
                 return;
             }
 
             using (var context = new DatabaseContext())
             {
+                veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+                if (veh.Faccao == 0)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    return;
+                }
+
                 veh.Livery = livery;
                 context.Veiculos.Update(veh);
                 context.SaveChanges();
             }
-
-            veh.Vehicle.Livery = (byte)livery;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Livery do veículo {veh.Codigo} alterada para {livery}!");
             Functions.GravarLog(TipoLog.Staff, $"/evehlivery {veh.Codigo} {livery}", p, null);

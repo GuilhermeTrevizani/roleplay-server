@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Roleplay
@@ -44,6 +45,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("SalvarArmas", SalvarArmas);
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
+            Alt.OnClient<IPlayer, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -58,6 +60,7 @@ namespace Roleplay
             Global.PersonagensOnline = new List<Personagem>();
             Global.SOSs = new List<SOS>();
             Global.TextDraws = new List<TextDraw>();
+            Global.Veiculos = new List<Veiculo>();
 
             using (var context = new DatabaseContext())
             {
@@ -99,12 +102,6 @@ namespace Roleplay
 
                 context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = now(), TipoResposta = 3 WHERE DataResposta is null");
                 Console.WriteLine("SOSs limpos");
-
-                Global.Veiculos = new List<Veiculo>();
-                var veiculos = context.Veiculos.Where(x => x.Faccao != 0).ToList();
-                foreach (var x in veiculos)
-                    x.Spawnar();
-                Console.WriteLine($"Veiculos: {Global.Veiculos.Count}");
             }
 
             Functions.CarregarConcessionarias();
@@ -872,6 +869,29 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você devolveu seus itens no armário.", notify: true);
             Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
+        }
+
+        private async void SpawnarVeiculoFaccao(IPlayer player, int codigo)
+        {
+            if (Global.Veiculos.Any(x => x.Codigo == codigo))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado!", notify: true);
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            veh.PosX = player.Position.X;
+            veh.PosY = player.Position.Y;
+            veh.PosZ = player.Position.Z;
+            veh.RotX = player.Rotation.Roll;
+            veh.RotY = player.Rotation.Pitch;
+            veh.RotZ = player.Rotation.Yaw;
+            veh.Spawnar();
+            await Task.Delay(150);
+            player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
+            player.Emit("Server:CloseView");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {codigo}!", notify: true);
         }
         #endregion
     }

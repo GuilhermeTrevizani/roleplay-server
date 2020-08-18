@@ -48,6 +48,15 @@ namespace Roleplay.Entities
 
         public void Despawnar()
         {
+            EngineHealth = Vehicle.EngineHealth;
+            BodyHealth = (int)Vehicle.BodyHealth;
+
+            using (var context = new DatabaseContext())
+            {
+                context.Veiculos.Update(this);
+                context.SaveChanges();
+            }
+
             Vehicle?.Remove();
             Global.Veiculos.Remove(this);
         }

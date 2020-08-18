@@ -171,6 +171,7 @@ namespace Roleplay.Models
         ATM = 3,
         LojaConveniencia = 4,
         LojaRoupas = 5,
+        SpawnVeiculosFaccao = 6,
     }
 
     public enum TipoEmprego
