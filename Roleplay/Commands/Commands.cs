@@ -1082,6 +1082,7 @@ namespace Roleplay.Commands
             p.Ferimentos = new List<Ferimento>();
             p.Player.Emit("Server:SelecionarPersonagem");
             p.StopAnimation();
+            p.Player.Emit("player:toggleFreeze", false);
             p.Player.Spawn(pos);
             p.Player.Health = 200;
             p.Player.Armor = 0;

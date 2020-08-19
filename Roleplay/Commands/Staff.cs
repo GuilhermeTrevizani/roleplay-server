@@ -614,6 +614,7 @@ namespace Roleplay.Commands
             {
                 target.TimerFerido?.Stop();
                 target.TimerFerido = null;
+                p.Player.Emit("player:toggleFreeze", false);
                 target.StopAnimation();
                 target.Player.Armor = 0;
             }

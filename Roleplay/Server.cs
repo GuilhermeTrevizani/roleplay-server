@@ -171,6 +171,7 @@ namespace Roleplay
             p.TimerFerido.Start();
             p.Player.Spawn(p.Player.Position);
             p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
+            p.Player.Emit("player:toggleFreeze", true);
         }
 
         private void TimerFerido_Elapsed(object sender, ElapsedEventArgs e)
@@ -889,7 +890,7 @@ namespace Roleplay
             veh.RotY = player.Rotation.Pitch;
             veh.RotZ = player.Rotation.Yaw;
             veh.Spawnar();
-            await Task.Delay(150);
+            await Task.Delay(500);
             player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
             player.Emit("Server:CloseView");
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {codigo}!", notify: true);
