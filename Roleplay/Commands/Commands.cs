@@ -148,6 +148,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/algemar", "Algema um personagem"),
                         new Comando("Facção Policial", "/pegarcolete", "Pega colete em um armário da facção"),
                         new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
+                        new Comando("Facção Policial", "/ate", "Atende uma ligação 911"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
@@ -156,6 +157,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Médica", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção Médica", "/curar", "Cura um personagem ferido"),
                         new Comando("Facção Médica", "/fspawn", "Spawna veículos da facção"),
+                        new Comando("Facção Médica", "/ate", "Atende uma ligação 911"),
                     });
 
                 if (p.Rank >= p.FaccaoBD.RankGestor)

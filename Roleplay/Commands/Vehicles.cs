@@ -122,6 +122,7 @@ namespace Roleplay.Commands
 
                 veh.Despawnar();
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo!", notify: true);
+                return;
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo!");

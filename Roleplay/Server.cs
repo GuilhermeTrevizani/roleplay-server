@@ -61,6 +61,7 @@ namespace Roleplay
             Global.SOSs = new List<SOS>();
             Global.TextDraws = new List<TextDraw>();
             Global.Veiculos = new List<Veiculo>();
+            Global.Ligacoes911 = new List<Ligacao911>();
 
             using (var context = new DatabaseContext())
             {
@@ -147,7 +148,7 @@ namespace Roleplay
                 Functions.SalvarPersonagem(p, false);
             }
 
-            Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)p.Player.SocialClubId);
+            Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)player.SocialClubId);
         }
 
         private void OnPlayerDead(IPlayer player, IEntity killer, uint weapon)

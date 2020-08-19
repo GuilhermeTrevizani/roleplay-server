@@ -610,5 +610,26 @@ namespace Roleplay.Commands
 
             player.Emit("Server:SpawnarVeiculosFaccao", p.FaccaoBD.Nome, JsonConvert.SerializeObject(veiculos));
         }
+
+        [Command("ate", "/ate (código)")]
+        public void CMD_ate(IPlayer player, int codigo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço!");
+                return;
+            }
+
+            var ligacao911 = Global.Ligacoes911.FirstOrDefault(x => x.Codigo == codigo);
+            if (ligacao911 == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhuma ligação 911 encontrada com o código {codigo}!");
+                return;
+            }
+
+            player.Emit("Server:SetWaypoint", ligacao911.PosX, ligacao911.PosY);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A localização da ligação de emergência #{codigo} foi marcada no seu GPS.", notify: true);
+        }
     }
 }

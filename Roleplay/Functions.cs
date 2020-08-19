@@ -715,7 +715,24 @@ namespace Roleplay
                         EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas!", Constants.CorCelular);
 
                         var tipoFaccao = p.ExtraLigacao == "LSPD" ? TipoFaccao.Policial : TipoFaccao.Medica;
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911", true, true);
+                        var pos = ObterPosicaoPlayerIC(p);
+
+                        var ligacao911 = new Ligacao911()
+                        {
+                            Tipo = tipoFaccao,
+                            Celular = p.Celular,
+                            PosX = pos.X,
+                            PosY = pos.Y,
+                            PosZ = pos.Z,
+                            Mensagem = message,
+                            ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
+                        };
+                        using var context = new DatabaseContext();
+                        context.Ligacoes911.Add(ligacao911);
+                        context.SaveChanges();
+                        Global.Ligacoes911.Add(ligacao911);
+
+                        EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 #{ligacao911.ID}", true, true);
                         EnviarMensagemTipoFaccao(tipoFaccao, $"De: {p.Celular}", true, true);
                         EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {message}", true, true);
 
@@ -1058,6 +1075,15 @@ namespace Roleplay
                 new WeaponComponent(WeaponModel.SNSPistolMkII, "BoomSlide", 0x8D0D5ECD),
                 new WeaponComponent(WeaponModel.SNSPistolMkII, "Patriotic", 0x1F07150A),
             };
+        }
+
+        public static Position ObterPosicaoPlayerIC(Personagem p)
+        {
+            if (p.Dimensao == 0)
+                return p.Player.Position;
+
+            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == p.Dimensao);
+            return new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
         }
     }
 }

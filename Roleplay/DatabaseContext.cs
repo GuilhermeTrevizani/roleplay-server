@@ -10,6 +10,7 @@ namespace Roleplay
         public DbSet<Banimento> Banimentos { get; set; }
         public DbSet<Blip> Blips { get; set; }
         public DbSet<Faccao> Faccoes { get; set; }
+        public DbSet<Ligacao911> Ligacoes911 { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<Multa> Multas { get; set; }
         public DbSet<Parametro> Parametros { get; set; }
@@ -41,6 +42,8 @@ namespace Roleplay
             modelBuilder.Entity<Blip>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Faccao>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Faccao>().Property(x => x.Tipo).HasConversion(typeof(int));
+            modelBuilder.Entity<Ligacao911>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<Ligacao911>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Log>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Log>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Multa>().HasKey(x => x.Codigo);
