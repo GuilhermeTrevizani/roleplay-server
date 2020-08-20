@@ -47,7 +47,6 @@ namespace Roleplay.Entities
         public DateTime? DataMorte { get; set; } = null;
         public string MotivoMorte { get; set; } = string.Empty;
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
-        public bool TimeStamp { get; set; } = true;
 
         [NotMapped]
         public int ID { get; set; }

@@ -1209,9 +1209,9 @@ namespace Roleplay.Commands
         public void CMD_timestamp(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            p.TimeStamp = !p.TimeStamp;
-            player.Emit("chat:activateTimeStamp", p.TimeStamp);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.TimeStamp ? "des" : string.Empty)}ativou o timestamp do chat.", notify: true);
+            p.UsuarioBD.TimeStamp = !p.UsuarioBD.TimeStamp;
+            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.UsuarioBD.TimeStamp ? "des" : string.Empty)}ativou o timestamp do chat.", notify: true);
         }
     }
 }

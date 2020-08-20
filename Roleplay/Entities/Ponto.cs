@@ -11,6 +11,7 @@ namespace Roleplay.Entities
         public float PosX { get; set; } = 0;
         public float PosY { get; set; } = 0;
         public float PosZ { get; set; } = 0;
+        public string Configuracoes { get; set; }
 
         [NotMapped]
         public TextDraw TextLabel { get; set; }

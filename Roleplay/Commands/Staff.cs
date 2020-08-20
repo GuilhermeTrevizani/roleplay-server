@@ -4,6 +4,7 @@ using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
@@ -1681,13 +1682,16 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var ponto = new Entities.Ponto()
+            var ponto = new Ponto()
             {
                 PosX = player.Position.X,
                 PosY = player.Position.Y,
                 PosZ = player.Position.Z,
                 Tipo = (TipoPonto)tipo,
             };
+
+            if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao)
+                ponto.Configuracoes = JsonConvert.SerializeObject(player.Rotation);
 
             using (var context = new DatabaseContext())
             {
@@ -1748,7 +1752,6 @@ namespace Roleplay.Commands
             p.LimparIPLs();
             player.Dimension = 0;
             player.Position = new Position(ponto.PosX, ponto.PosY, ponto.PosZ);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até o ponto {ponto.Codigo}!");
         }
 
         [Command("eranksalario", "/eranksalario (facção) (código) (salário)")]

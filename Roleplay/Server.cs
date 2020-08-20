@@ -45,7 +45,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("SalvarArmas", SalvarArmas);
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
-            Alt.OnClient<IPlayer, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
+            Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -873,27 +873,34 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
         }
 
-        private async void SpawnarVeiculoFaccao(IPlayer player, int codigo)
+        private async void SpawnarVeiculoFaccao(IPlayer player, int codigoPonto, int veiculo)
         {
-            if (Global.Veiculos.Any(x => x.Codigo == codigo))
+            if (Global.Veiculos.Any(x => x.Codigo == veiculo))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado!", notify: true);
                 return;
             }
 
             using var context = new DatabaseContext();
-            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
             veh.PosX = player.Position.X;
             veh.PosY = player.Position.Y;
             veh.PosZ = player.Position.Z;
-            veh.RotX = player.Rotation.Roll;
-            veh.RotY = player.Rotation.Pitch;
-            veh.RotZ = player.Rotation.Yaw;
+
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigoPonto);
+            if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao)
+            {
+                var rot = JsonConvert.DeserializeObject<Rotation>(ponto.Configuracoes);
+                veh.RotX = rot.Roll;
+                veh.RotY = rot.Pitch;
+                veh.RotZ = rot.Yaw;
+            }
+
             veh.Spawnar();
             await Task.Delay(500);
             player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
             player.Emit("Server:CloseView");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {codigo}!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}!", notify: true);
         }
         #endregion
     }

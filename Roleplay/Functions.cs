@@ -58,7 +58,7 @@ namespace Roleplay
         {
             player.Emit("Server:SelecionarPersonagem");
             player.Emit("nametags:Config", true);
-            player.Emit("chat:activateTimeStamp", p.TimeStamp);
+            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
 
             foreach (var x in Global.Blips)
                 x.CriarIdentificador(player);
@@ -415,7 +415,6 @@ namespace Roleplay
             personagem.Emprego = p.Emprego;
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = ObterIP(p.Player);
-            personagem.TimeStamp = p.TimeStamp;
             context.Personagens.Update(personagem);
 
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
@@ -441,6 +440,7 @@ namespace Roleplay
             usuario.QuantidadeSOSAceitos = p.UsuarioBD.QuantidadeSOSAceitos;
             usuario.DataUltimoAcesso = personagem.DataUltimoAcesso;
             usuario.IPUltimoAcesso = personagem.IPUltimoAcesso;
+            usuario.TimeStamp = p.UsuarioBD.TimeStamp;
             context.Usuarios.Update(usuario);
 
             context.SaveChanges();

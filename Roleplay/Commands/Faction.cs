@@ -586,7 +586,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP))
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
+            if (ponto == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção!");
                 return;
@@ -609,7 +610,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:SpawnarVeiculosFaccao", p.FaccaoBD.Nome, JsonConvert.SerializeObject(veiculos));
+            player.Emit("Server:SpawnarVeiculosFaccao", ponto.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(veiculos));
         }
 
         [Command("ate", "/ate (código)")]

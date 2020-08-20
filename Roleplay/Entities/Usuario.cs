@@ -19,5 +19,6 @@ namespace Roleplay.Entities
         public bool PossuiNamechange { get; set; } = false;
         public int QuantidadeSOSAceitos { get; set; } = 0;
         public int TempoTrabalhoAdministrativo { get; set; } = 0;
+        public bool TimeStamp { get; set; } = true;
     }
 }
