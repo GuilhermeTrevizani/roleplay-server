@@ -875,6 +875,8 @@ namespace Roleplay
 
         private async void SpawnarVeiculoFaccao(IPlayer player, int codigoPonto, int veiculo)
         {
+            var p = Functions.ObterPersonagem(player);
+
             if (Global.Veiculos.Any(x => x.Codigo == veiculo))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado!", notify: true);
@@ -886,6 +888,7 @@ namespace Roleplay
             veh.PosX = player.Position.X;
             veh.PosY = player.Position.Y;
             veh.PosZ = player.Position.Z;
+            veh.PersonagemEncarregado = p.Codigo;
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigoPonto);
             if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao)

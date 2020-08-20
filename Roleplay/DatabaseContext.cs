@@ -5,6 +5,7 @@ namespace Roleplay
 {
     public class DatabaseContext : DbContext
     {
+        public DbSet<Apreensao> Apreensoes { get; set; }
         public DbSet<Armario> Armarios { get; set; }
         public DbSet<ArmarioItem> ArmariosItens { get; set; }
         public DbSet<Banimento> Banimentos { get; set; }
@@ -36,6 +37,7 @@ namespace Roleplay
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Apreensao>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Armario>().HasKey(x => x.Codigo);
             modelBuilder.Entity<ArmarioItem>().HasKey(x => new { x.Codigo, x.Arma });
             modelBuilder.Entity<Banimento>().HasKey(x => x.Codigo);

@@ -1690,7 +1690,7 @@ namespace Roleplay.Commands
                 Tipo = (TipoPonto)tipo,
             };
 
-            if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao)
+            if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao || ponto.Tipo == TipoPonto.ApreensaoVeiculos)
                 ponto.Configuracoes = JsonConvert.SerializeObject(player.Rotation);
 
             using (var context = new DatabaseContext())

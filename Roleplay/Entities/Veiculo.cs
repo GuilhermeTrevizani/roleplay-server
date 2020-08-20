@@ -28,9 +28,16 @@ namespace Roleplay.Entities
         public int BodyHealth { get; set; } = 1000;
         public int EngineHealth { get; set; } = 1000;
         public int Livery { get; set; } = 0;
+        public int ValorApreensao { get; set; } = 0;
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }
+
+        /// <summary>
+        /// Código do personagem que usou o /fspawn
+        /// </summary>
+        [NotMapped]
+        public int PersonagemEncarregado { get; set; } = 0;
 
         public void Spawnar()
         {

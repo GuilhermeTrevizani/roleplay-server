@@ -65,6 +65,7 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/vspawn", "Spawna um veículo"),
                 new Comando("Veículos", "/vlista", "Mostra seus veículos"),
                 new Comando("Veículos", "/vvender", "Vende um veículo para outro personagem"),
+                new Comando("Veículos", "/vliberar", "Libera um veículo apreendido"),
                 new Comando("Banco", "/depositar", "Deposita dinheiro no banco"),
                 new Comando("Banco", "/sacar", "Saca dinheiro do banco"),
                 new Comando("Banco", "/transferir", "Transfere dinheiro para outro personagem"),
@@ -145,10 +146,11 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/multar", "Multa um personagem online"),
                         new Comando("Facção Policial", "/multaroff", "Multa um personagem offline"),
                         new Comando("Facção Policial", "/prender", "Prende um personagem"),
-                        new Comando("Facção Policial", "/algemar", "Algema um personagem"),
+                        new Comando("Facção Policial", "/algemar", "Algema/desalgema um personagem"),
                         new Comando("Facção Policial", "/pegarcolete", "Pega colete em um armário da facção"),
                         new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção Policial", "/ate", "Atende uma ligação 911"),
+                        new Comando("Facção Policial", "/apreender", "Apreende um veículo"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()

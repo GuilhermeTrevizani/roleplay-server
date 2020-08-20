@@ -1,6 +1,7 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Roleplay.Models;
+using System;
 using System.Linq;
 
 namespace Roleplay.Commands
@@ -152,6 +153,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (veh.ValorApreensao > 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está apreendido!");
+                return;
+            }
+
             veh.Spawnar();
             player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo!", notify: true);
@@ -177,7 +184,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Veículos de {p.Nome} [{p.Codigo}]");
             foreach (var v in veiculos)
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? "SIM" : "NÃO")}");
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? "SIM" : "NÃO")} | Apreendido: {(v.ValorApreensao > 0 ? $"SIM (${v.ValorApreensao:N0})" : "NÃO")}");
         }
 
         [Command("vvender", "/vvender (ID ou nome) (valor)")]
@@ -230,6 +237,63 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você o veículo {prox.Codigo} por ${valor:N0}. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
 
             Functions.GravarLog(TipoLog.Venda, $"/vvender {prox.Codigo} {valor}", p, target);
+        }
+
+        [Command("vliberar", "/vliberar (código do veículo)")]
+        public void CMD_vliberar(IPlayer player, int codigo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LiberacaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de liberação de veículos apreendidos!");
+                return;
+            }
+
+            if (Global.Veiculos.Any(x => x.Codigo == codigo))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido!");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh?.Personagem != p.Codigo)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo!");
+                return;
+            }
+
+            if (veh.ValorApreensao == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido!");
+                return;
+            }
+
+            if (p.Dinheiro < veh.ValorApreensao)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                return;
+            }
+
+            p.Dinheiro -= veh.ValorApreensao;
+            p.SetDinheiro();
+
+            veh.ValorApreensao = 0;
+            context.Veiculos.Update(veh);
+
+            var apreensao = context.Apreensoes.Where(x => x.Veiculo == veh.Codigo).ToList().LastOrDefault();
+            apreensao.DataPagamento = DateTime.Now;
+            context.Apreensoes.Update(apreensao);
+
+            context.SaveChanges();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você liberou seu veículo!");
         }
     }
 }

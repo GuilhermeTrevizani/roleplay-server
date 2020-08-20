@@ -51,6 +51,14 @@ namespace Roleplay.Entities
                     nome = "Spawn de Veículos da Facção";
                     descricao = "Use /fspawn";
                     break;
+                case TipoPonto.ApreensaoVeiculos:
+                    nome = "Apreensão de Veículos";
+                    descricao = "Use /apreender";
+                    break;
+                case TipoPonto.LiberacaoVeiculos:
+                    nome = "Liberação de Veículos";
+                    descricao = "Use /vliberar";
+                    break;
             }
 
             TextLabel = Functions.CriarTextDraw(nome, new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);

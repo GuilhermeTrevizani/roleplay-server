@@ -7,6 +7,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using static Roleplay.Constants;
 
 namespace Roleplay.Commands
@@ -632,6 +633,73 @@ namespace Roleplay.Commands
 
             player.Emit("Server:SetWaypoint", ligacao911.PosX, ligacao911.PosY);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A localização da ligação de emergência #{codigo} foi marcada no seu GPS.", notify: true);
+        }
+
+        [Command("apreender", "/apreender (placa) (valor) (motivo)", GreedyArg = true)]
+        public void CMD_apreender(IPlayer player, string placa, int valor, string motivo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                return;
+            }
+
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.ApreensaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
+            if (ponto == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de apreensão de veículos!");
+                return;
+            }
+
+            if (valor < 1 || valor > 5000)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor da apreensão deve ser entre 1 e 5000!");
+                return;
+            }
+
+            if (motivo.Length > 255)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres!");
+                return;
+            }
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Placa.ToUpper() == placa.ToUpper());
+            if (veh.Faccao > 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo pertence a uma facção!");
+                return;
+            }
+
+            if (player.Position.Distance(new Position(veh.Vehicle.Position.X, veh.Vehicle.Position.Y, veh.Vehicle.Position.Z)) > DistanciaRP)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo!");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            veh.ValorApreensao = valor;
+            veh.PosX = ponto.PosX;
+            veh.PosY = ponto.PosY;
+            veh.PosZ = ponto.PosZ;
+            var rot = JsonConvert.DeserializeObject<Rotation>(ponto.Configuracoes);
+            veh.RotX = rot.Roll;
+            veh.RotY = rot.Pitch;
+            veh.RotZ = rot.Yaw;
+            context.Veiculos.Update(veh);
+
+            context.Apreensoes.Add(new Apreensao()
+            {
+                Veiculo = veh.Codigo,
+                Motivo = motivo,
+                PersonagemPolicial = p.Codigo,
+                Valor = valor,
+            });
+            context.SaveChanges();
+
+            veh.Despawnar();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você apreendeu o veículo com a placa {placa.ToUpper()} por ${valor:N0}!");
         }
     }
 }
