@@ -56,10 +56,6 @@ namespace Roleplay
 
         public static void LogarPersonagem(IPlayer player, Personagem p)
         {
-            player.Emit("Server:SelecionarPersonagem");
-            player.Emit("nametags:Config", true);
-            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-
             foreach (var x in Global.Blips)
                 x.CriarIdentificador(player);
 
@@ -106,8 +102,12 @@ namespace Roleplay
                 }
             }
 
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao);
+            player.Emit("nametags:Config", true);
+            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
             player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
             player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+            p.Personalizacao = JsonConvert.DeserializeObject<Personalizacao>(p.InformacoesPersonalizacao);
 
             GravarLog(TipoLog.Entrada, string.Empty, p, null);
         }
@@ -415,6 +415,7 @@ namespace Roleplay
             personagem.Emprego = p.Emprego;
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = ObterIP(p.Player);
+            personagem.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao);
             context.Personagens.Update(personagem);
 
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");

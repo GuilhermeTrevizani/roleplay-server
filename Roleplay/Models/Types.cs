@@ -174,6 +174,7 @@ namespace Roleplay.Models
         SpawnVeiculosFaccao = 6,
         ApreensaoVeiculos = 7,
         LiberacaoVeiculos = 8,
+        Barbearia = 9,
     }
 
     public enum TipoEmprego

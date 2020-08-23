@@ -608,7 +608,7 @@ namespace Roleplay.Commands
             }
 
             target.Ferimentos = new List<Ferimento>();
-            target.Player.Emit("Server:SelecionarPersonagem");
+            target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;
 
             if (target.TimerFerido != null)
@@ -621,7 +621,7 @@ namespace Roleplay.Commands
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.Nome}.", notify: true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.", notify: true);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} curou você.", notify: true);
 
             Functions.GravarLog(TipoLog.Staff, $"/acurar", p, target);
         }

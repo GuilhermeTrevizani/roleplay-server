@@ -46,6 +46,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
             Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
+            Alt.OnClient<IPlayer, int, int, int>("ConfirmarBarbearia", ConfirmarBarbearia);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -520,6 +521,7 @@ namespace Roleplay
                 IPUltimoAcesso = Functions.ObterIP(player),
                 ID = Functions.ObterNovoID(),
                 Skin = (long)(sexo == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01),
+                InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao),
             };
 
             var ultimoPersonagem = context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo).OrderByDescending(x => x.DataMorte).FirstOrDefault();
@@ -904,6 +906,19 @@ namespace Roleplay
             player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
             player.Emit("Server:CloseView");
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}!", notify: true);
+        }
+
+        private void ConfirmarBarbearia(IPlayer player, int cabelo, int cor1, int cor2)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            p.SetClothes(2, cabelo, 0, false);
+            p.Personalizacao.CabeloCor1 = cor1;
+            p.Personalizacao.CabeloCor2 = cor2;
+
+            p.Dinheiro -= Global.Parametros.ValorBarbearia;
+            p.SetDinheiro();
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia!");
         }
         #endregion
     }

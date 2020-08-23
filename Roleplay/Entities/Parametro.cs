@@ -8,6 +8,7 @@
         public int ValorIncentivoGovernamental { get; set; } = 0;
         public int HorasIncentivoInicial { get; set; } = 0;
         public int ValorIncentivoInicial { get; set; } = 0;
-        public int ValorCustosHospitalares { get; set; }
+        public int ValorCustosHospitalares { get; set; } = 0;
+        public int ValorBarbearia { get; set; } = 0;
     }
 }

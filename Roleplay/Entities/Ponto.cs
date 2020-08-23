@@ -59,6 +59,10 @@ namespace Roleplay.Entities
                     nome = "Liberação de Veículos";
                     descricao = "Use /vliberar";
                     break;
+                case TipoPonto.Barbearia:
+                    nome = "Barbearia";
+                    descricao = "Use /barbearia";
+                    break;
             }
 
             TextLabel = Functions.CriarTextDraw(nome, new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);

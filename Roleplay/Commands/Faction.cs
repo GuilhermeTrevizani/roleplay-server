@@ -561,7 +561,7 @@ namespace Roleplay.Commands
             }
 
             target.Ferimentos = new List<Ferimento>();
-            target.Player.Emit("Server:SelecionarPersonagem");
+            target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;
 
             if (target.TimerFerido != null)

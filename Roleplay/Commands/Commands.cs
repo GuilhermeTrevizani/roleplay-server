@@ -41,6 +41,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
                 new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
                 new Comando("Geral", "/timestamp", "Ativa/desativa timestamp do chat"),
+                new Comando("Geral", "/barbearia", "Realiza alterações no cabelo em uma barbearia"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -1082,7 +1083,7 @@ namespace Roleplay.Commands
             }
 
             p.Ferimentos = new List<Ferimento>();
-            p.Player.Emit("Server:SelecionarPersonagem");
+            p.Player.Emit("Server:CurarPersonagem");
             p.StopAnimation();
             p.Player.Emit("player:toggleFreeze", false);
             p.Player.Spawn(pos);
@@ -1214,6 +1215,32 @@ namespace Roleplay.Commands
             p.UsuarioBD.TimeStamp = !p.UsuarioBD.TimeStamp;
             player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.UsuarioBD.TimeStamp ? "des" : string.Empty)}ativou o timestamp do chat.", notify: true);
+        }
+
+        [Command("barbearia")]
+        public void CMD_barbearia(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma barbearia!");
+                return;
+            }
+
+            if (p.Dinheiro < Global.Parametros.ValorBarbearia)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente! (${Global.Parametros.ValorBarbearia:N0})");
+                return;
+            }
+
+            player.Emit("AbrirBarbearia", p.Sexo, $"${Global.Parametros.ValorBarbearia:N0}",
+                p.Roupas.FirstOrDefault(x => x.Slot == 2)?.Drawable ?? 0, p.Personalizacao.CabeloCor1, p.Personalizacao.CabeloCor2);
         }
     }
 }

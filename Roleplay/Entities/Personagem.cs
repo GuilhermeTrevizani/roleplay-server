@@ -47,6 +47,10 @@ namespace Roleplay.Entities
         public DateTime? DataMorte { get; set; } = null;
         public string MotivoMorte { get; set; } = string.Empty;
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
+        public string InformacoesPersonalizacao { get; set; } = "[]";
+
+        [NotMapped]
+        public Personalizacao Personalizacao { get; set; } = new Personalizacao();
 
         [NotMapped]
         public int ID { get; set; }
@@ -177,20 +181,22 @@ namespace Roleplay.Entities
             Player.SetSyncedMetaData("animation", false);
         }
 
-        public void SetClothes(int slot, int drawable, int texture)
+        public void SetClothes(int slot, int drawable, int texture, bool setar = true)
         {
             Roupas.RemoveAll(x => x.Slot == slot);
             Roupas.Add(new PersonagemRoupa() { Codigo = Codigo, Slot = slot, Drawable = drawable, Texture = texture });
 
-            Player.Emit("Server:SetClothes", slot, drawable, texture);
+            if (setar)
+                Player.Emit("Server:SetClothes", slot, drawable, texture);
         }
 
-        public void SetAccessories(int slot, int drawable, int texture)
+        public void SetAccessories(int slot, int drawable, int texture, bool setar = true)
         {
             Acessorios.RemoveAll(x => x.Slot == slot);
             Acessorios.Add(new PersonagemAcessorio() { Codigo = Codigo, Slot = slot, Drawable = drawable, Texture = texture });
 
-            Player.Emit("Server:SetAccessories", slot, drawable, texture);
+            if (setar)
+                Player.Emit("Server:SetAccessories", slot, drawable, texture);
         }
     }
 }
