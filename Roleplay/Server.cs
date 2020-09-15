@@ -12,7 +12,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace Roleplay
@@ -31,6 +30,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("OnPlayerChat", OnPlayerChat);
             Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
+            Alt.OnClient<IPlayer>("ListarPersonagens", ListarPersonagens);
             Alt.OnClient<IPlayer, int>("SelecionarPersonagem", SelecionarPersonagem);
             Alt.OnClient<IPlayer, string, string, string, string>("CriarPersonagem", CriarPersonagem);
             Alt.OnClient<IPlayer>("ListarPlayers", ListarPlayers);
@@ -40,9 +40,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("RemoverContatoCelular", RemoverContatoCelular);
             Alt.OnClient<IPlayer, int>("PagarMulta", PagarMulta);
             Alt.OnClient<IPlayer, int, uint>("PegarItemArmario", PegarItemArmario);
-            Alt.OnClient<IPlayer, bool>("PlayerDigitando", PlayerDigitando);
             Alt.OnClient<IPlayer, int, string, int>("EntregarArma", EntregarArma);
-            Alt.OnClient<IPlayer, string>("SalvarArmas", SalvarArmas);
+            Alt.OnClient<IPlayer, string, string, string>("AtualizarInformacoes", AtualizarInformacoes);
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
             Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
@@ -51,18 +50,9 @@ namespace Roleplay
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
 
-            Console.WriteLine("Desenvolvido por Guilherme Trevizani (TR3V1Z4)");
-
             var config = JsonConvert.DeserializeObject<Configuracao>(File.ReadAllText("settings.json"));
             Global.MaxPlayers = config.MaxPlayers;
             Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
-            Global.Weather = WeatherType.Clear;
-
-            Global.PersonagensOnline = new List<Personagem>();
-            Global.SOSs = new List<SOS>();
-            Global.TextDraws = new List<TextDraw>();
-            Global.Veiculos = new List<Veiculo>();
-            Global.Ligacoes911 = new List<Ligacao911>();
 
             using (var context = new DatabaseContext())
             {
@@ -106,16 +96,18 @@ namespace Roleplay
                 Console.WriteLine("SOSs limpos");
             }
 
-            Functions.CarregarConcessionarias();
+            foreach (var c in Global.Concessionarias)
+                Functions.CriarTextDraw($"{c.Nome}\n~w~Use /comprar", c.PosicaoCompra, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
             Console.WriteLine($"Concessionarias: {Global.Concessionarias.Count}");
 
-            Functions.CarregarEmpregos();
+            foreach (var c in Global.Empregos)
+            {
+                var nome = Functions.ObterDisplayEnum(c.Tipo);
+                Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            }
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
-            Functions.CarregarWeaponComponents();
-
-            Functions.CriarTextDraw("Prisão", Constants.PosicaoPrisao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
-            Functions.CriarTextDraw("Use /prender", new Position(Constants.PosicaoPrisao.X, Constants.PosicaoPrisao.Y, Constants.PosicaoPrisao.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
+            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Constants.PosicaoPrisao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
 
             TimerPrincipal = new Timer(60000);
             TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
@@ -131,13 +123,20 @@ namespace Roleplay
 
         private void OnPlayerConnect(IPlayer player, string reason)
         {
+            player.SetDateTime(DateTime.Now);
+            player.SetWeather(Global.Weather);
+            player.Spawn(new Position(0f, 0f, 0f));
+
             using var context = new DatabaseContext();
 
-            if (!Functions.VerificarBanimento(player, context.Banimentos.FirstOrDefault(x => x.SocialClub == (long)player.SocialClubId)))
+            if (!Functions.VerificarBanimento(player, context.Banimentos.FirstOrDefault(x => (x.SocialClub == (long)player.SocialClubId && x.SocialClub != 0)
+                || x.HardwareIdHash == (long)player.HardwareIdHash
+                || x.HardwareIdExHash == (long)player.HardwareIdExHash)))
                 return;
 
-            player.Spawn(new Position(-486, 1095.75f, 323.85f));
-            player.Emit("Server:Login", context.Usuarios.FirstOrDefault(x => x.SocialClubRegistro == (long)player.SocialClubId)?.Nome ?? string.Empty, string.Empty);
+            player.Emit("Server:Login", context.Usuarios.FirstOrDefault(x => (x.SocialClubRegistro == (long)player.SocialClubId && x.SocialClubRegistro != 0)
+                || x.HardwareIdHashRegistro == (long)player.HardwareIdHash
+                || x.HardwareIdExHashRegistro == (long)player.HardwareIdExHash)?.Nome ?? string.Empty);
         }
 
         private void OnPlayerDisconnect(IPlayer player, string reason)
@@ -149,7 +148,7 @@ namespace Roleplay
                 Functions.SalvarPersonagem(p, false);
             }
 
-            Global.PersonagensOnline.RemoveAll(x => x.UsuarioBD.SocialClubRegistro == (long)player.SocialClubId);
+            Global.PersonagensOnline.RemoveAll(x => x.Player?.HardwareIdHash == player.HardwareIdHash);
         }
 
         private void OnPlayerDead(IPlayer player, IEntity killer, uint weapon)
@@ -161,7 +160,7 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Morte, JsonConvert.SerializeObject(p.Ferimentos), p,
                 killer is IPlayer playerKiller ? Functions.ObterPersonagem(playerKiller) : null);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "Você foi gravemente ferido! Os médicos chegarão em até 3 minutos.");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "Você foi gravemente ferido! Os médicos deverão chegar em até 3 minutos.");
 
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(180000)
@@ -188,7 +187,7 @@ namespace Roleplay
             }
 
             Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
-            Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL!");
+            Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
             timer?.Stop();
         }
 
@@ -337,7 +336,7 @@ namespace Roleplay
         {
             if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(senha))
             {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente!");
+                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
                 return;
             }
 
@@ -346,7 +345,7 @@ namespace Roleplay
             var user = context.Usuarios.FirstOrDefault(x => x.Nome == usuario && x.Senha == senhaCriptografada);
             if (user == null)
             {
-                player.Emit("Server:MostrarErro", "Usuário ou senha inválidos!");
+                player.Emit("Server:MostrarErro", "Usuário ou senha inválidos.");
                 return;
             }
 
@@ -356,22 +355,29 @@ namespace Roleplay
             user.DataUltimoAcesso = DateTime.Now;
             user.IPUltimoAcesso = Functions.ObterIP(player);
             user.SocialClubUltimoAcesso = (long)player.SocialClubId;
+            user.HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash;
+            user.HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash;
             context.Usuarios.Update(user);
             context.SaveChanges();
 
             Global.PersonagensOnline.Add(new Personagem()
             {
                 UsuarioBD = user,
+                Player = player,
             });
 
-            var p = context.Personagens.FirstOrDefault(x => x.Usuario == user.Codigo && x.DataMorte == null);
-            if (p != null)
-            {
-                SelecionarPersonagem(player, p.Codigo);
-                return;
-            }
+            ListarPersonagens(player);
+        }
 
-            player.Emit("Server:CriarPersonagem");
+        private void ListarPersonagens(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            using var context = new DatabaseContext();
+            player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
+                JsonConvert.SerializeObject(context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo && x.DataMorte == null)
+                    .OrderByDescending(x => x.Codigo)
+                    .Select(x => new { x.Codigo, x.Nome })), Global.Parametros.SlotsPersonagens);
         }
 
         private void SelecionarPersonagem(IPlayer player, int id)
@@ -382,18 +388,22 @@ namespace Roleplay
 
             using var context = new DatabaseContext();
             var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == id && x.Usuario == p.UsuarioBD.Codigo && x.DataMorte == null);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Olá {p.UsuarioBD.Nome}, que bom te ver por aqui! Seu último login foi em {personagem.DataUltimoAcesso}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = Functions.ObterIP(player);
             personagem.SocialClubUltimoAcesso = (long)player.SocialClubId;
             personagem.ID = Functions.ObterNovoID();
             personagem.Online = true;
+            personagem.HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash;
+            personagem.HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash;
             context.Personagens.Update(personagem);
             context.SaveChanges();
 
             var user = p.UsuarioBD;
-            Global.PersonagensOnline[Global.PersonagensOnline.IndexOf(p)] = personagem;
-            Global.PersonagensOnline[Global.PersonagensOnline.IndexOf(personagem)].UsuarioBD = user;
+            var index = Global.PersonagensOnline.IndexOf(p);
+            Global.PersonagensOnline[index] = personagem;
+            Global.PersonagensOnline[index].Player = player;
+            Global.PersonagensOnline[index].UsuarioBD = user;
 
             Functions.LogarPersonagem(player, personagem);
         }
@@ -402,45 +412,59 @@ namespace Roleplay
         {
             if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(senha) || string.IsNullOrWhiteSpace(senha2))
             {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente!");
+                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
+                return;
+            }
+
+            if (usuario.Contains(" "))
+            {
+                player.Emit("Server:MostrarErro", "Usuário não pode ter espaços.");
                 return;
             }
 
             if (usuario.Length > 25)
             {
-                player.Emit("Server:MostrarErro", "Usuário não pode ter mais que 25 caracteres!");
+                player.Emit("Server:MostrarErro", "Usuário não pode ter mais que 25 caracteres.");
                 return;
             }
 
             if (email.Length > 100)
             {
-                player.Emit("Server:MostrarErro", "Email não pode ter mais que 100 caracteres!");
+                player.Emit("Server:MostrarErro", "Email não pode ter mais que 100 caracteres.");
                 return;
             }
 
             if (senha != senha2)
             {
-                player.Emit("Server:MostrarErro", "Senhas não são iguais!");
+                player.Emit("Server:MostrarErro", "Senhas não são iguais.");
+                return;
+            }
+
+            if (!Functions.ValidarEmail(email))
+            {
+                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
                 return;
             }
 
             using (var context = new DatabaseContext())
             {
-                if (context.Usuarios.Any(x => x.SocialClubRegistro == (long)player.SocialClubId))
+                if (context.Usuarios.Any(x => (x.SocialClubRegistro == (long)player.SocialClubId && x.SocialClubRegistro != 0)
+                    || x.HardwareIdHashRegistro == (long)player.HardwareIdHash
+                    || x.HardwareIdExHashRegistro == (long)player.HardwareIdExHash))
                 {
-                    player.Emit("Server:MostrarErro", $"Você já possui um usuário!");
+                    player.Emit("Server:MostrarErro", $"Você já possui um usuário.");
                     return;
                 }
 
                 if (context.Usuarios.Any(x => x.Nome == usuario))
                 {
-                    player.Emit("Server:MostrarErro", $"Usuário {usuario} já existe!");
+                    player.Emit("Server:MostrarErro", $"Usuário {usuario} já existe.");
                     return;
                 }
 
                 if (context.Usuarios.Any(x => x.Email == email))
                 {
-                    player.Emit("Server:MostrarErro", $"Email {email} já está sendo utilizado!");
+                    player.Emit("Server:MostrarErro", $"Email {email} já está sendo utilizado.");
                     return;
                 }
 
@@ -453,6 +477,10 @@ namespace Roleplay
                     SocialClubUltimoAcesso = (long)player.SocialClubId,
                     IPRegistro = Functions.ObterIP(player),
                     IPUltimoAcesso = Functions.ObterIP(player),
+                    HardwareIdHashRegistro = (long)player.HardwareIdHash,
+                    HardwareIdExHashRegistro = (long)player.HardwareIdExHash,
+                    HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
+                    HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
                 };
                 context.Usuarios.Add(user);
                 context.SaveChanges();
@@ -470,42 +498,35 @@ namespace Roleplay
             if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(sobrenome) || string.IsNullOrWhiteSpace(sexo)
                 || string.IsNullOrWhiteSpace(dataNascimento))
             {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente!");
+                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
                 return;
             }
 
             var nomeCompleto = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nome)} {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sobrenome)}";
             if (nomeCompleto.Length > 25)
             {
-                player.Emit("Server:MostrarErro", "Nome do personagem não pode possuir mais que 25 caracteres!");
-                return;
-            }
-
-            sexo = sexo.ToUpper();
-            if (sexo != "F" && sexo != "M")
-            {
-                player.Emit("Server:MostrarErro", "Sexo deve ser M ou F!");
+                player.Emit("Server:MostrarErro", "Nome do personagem não pode possuir mais que 25 caracteres.");
                 return;
             }
 
             DateTime.TryParse(dataNascimento, out DateTime dtNascimento);
             if (dtNascimento == DateTime.MinValue)
             {
-                player.Emit("Server:MostrarErro", "Data de Nascimento não foi informada corretamente!");
+                player.Emit("Server:MostrarErro", "Data de Nascimento não foi informada corretamente.");
                 return;
             }
 
             var anos = (DateTime.Now.Date - dtNascimento).TotalDays / 365;
             if (anos < 18 || anos > 90)
             {
-                player.Emit("Server:MostrarErro", "Personagem precisa ter entre 18 e 90 anos!");
+                player.Emit("Server:MostrarErro", "Personagem precisa ter entre 18 e 90 anos.");
                 return;
             }
 
             using var context = new DatabaseContext();
             if (context.Personagens.Any(x => x.Nome == nomeCompleto))
             {
-                player.Emit("Server:MostrarErro", $"Personagem {nomeCompleto} já existe!");
+                player.Emit("Server:MostrarErro", $"Personagem {nomeCompleto} já existe.");
                 return;
             }
 
@@ -522,37 +543,13 @@ namespace Roleplay
                 ID = Functions.ObterNovoID(),
                 Skin = (long)(sexo == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01),
                 InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao),
+                HardwareIdHashRegistro = (long)player.HardwareIdHash,
+                HardwareIdExHashRegistro = (long)player.HardwareIdExHash,
+                HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
+                HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
             };
 
-            var ultimoPersonagem = context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo).OrderByDescending(x => x.DataMorte).FirstOrDefault();
-            if (ultimoPersonagem != null)
-            {
-                personagem.Banco += ultimoPersonagem.Dinheiro + ultimoPersonagem.Banco;
-
-                foreach (var prop in ultimoPersonagem.Propriedades)
-                {
-                    prop.Personagem = 0;
-                    personagem.Banco += prop.Valor;
-                    prop.CriarIdentificador();
-                    context.Propriedades.Update(prop);
-                }
-
-                var veiculos = context.Veiculos.Where(x => x.Personagem == ultimoPersonagem.Codigo).ToList();
-                foreach (var veh in veiculos)
-                {
-                    var preco = Global.Precos.FirstOrDefault(x => x.Tipo != TipoPreco.Conveniencia && x.Nome == veh.Modelo);
-                    personagem.Banco += preco?.Valor ?? 0;
-                    context.Veiculos.Remove(veh);
-                }
-
-                personagem.Banco = Convert.ToInt32(personagem.Banco * (p.UsuarioBD.PossuiNamechange ? 0.75 : 0.25));
-            }
-
             context.Personagens.Add(personagem);
-
-            p.UsuarioBD.PossuiNamechange = false;
-            context.Usuarios.Update(p.UsuarioBD);
-
             context.SaveChanges();
 
             context.PersonagensContatos.AddRange(new List<PersonagemContato>()
@@ -573,8 +570,10 @@ namespace Roleplay
             context.SaveChanges();
 
             var user = p.UsuarioBD;
-            Global.PersonagensOnline[Global.PersonagensOnline.IndexOf(p)] = personagem;
-            Global.PersonagensOnline[Global.PersonagensOnline.IndexOf(personagem)].UsuarioBD = user;
+            var index = Global.PersonagensOnline.IndexOf(p);
+            Global.PersonagensOnline[index] = personagem;
+            Global.PersonagensOnline[index].Player = player;
+            Global.PersonagensOnline[index].UsuarioBD = user;
 
             Functions.LogarPersonagem(player, personagem);
         }
@@ -587,7 +586,11 @@ namespace Roleplay
 
             var personagens = Global.PersonagensOnline.Where(x => x.ID > 0).OrderBy(x => x.ID == p.ID ? 0 : 1).ThenBy(x => x.ID)
                 .Select(x => new { x.ID, x.Nome, x.Player.Ping }).ToList();
-            player.Emit("Server:ListarPlayers", JsonConvert.SerializeObject(personagens));
+
+            var duty = Global.PersonagensOnline.Where(x => x.IsEmTrabalho);
+            player.Emit("Server:ListarPlayers", Global.NomeServidor, JsonConvert.SerializeObject(personagens),
+                duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial), duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica),
+                duty.Count(x => x.Emprego == TipoEmprego.Taxista));
         }
 
         private void ComprarVeiculo(IPlayer player, int tipo, string veiculo, int r1, int g1, int b1, int r2, int g2, int b2)
@@ -598,20 +601,20 @@ namespace Roleplay
 
             if (string.IsNullOrWhiteSpace(veiculo))
             {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente!");
+                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
                 return;
             }
 
             var preco = Global.Precos.FirstOrDefault(x => x.Tipo == (TipoPreco)tipo && x.Nome.ToLower() == veiculo.ToLower());
             if (preco == null)
             {
-                player.Emit("Server:MostrarErro", "Veículo não está disponível para compra!");
+                player.Emit("Server:MostrarErro", "Veículo não está disponível para compra.");
                 return;
             }
 
             if (p.Dinheiro < preco.Valor)
             {
-                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente!");
+                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
                 return;
             }
 
@@ -658,7 +661,7 @@ namespace Roleplay
             var preco = Global.Precos.FirstOrDefault(x => x.Nome == nome && x.Tipo == TipoPreco.Conveniencia);
             if (p.Dinheiro < preco.Valor)
             {
-                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente!");
+                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
                 return;
             }
 
@@ -668,7 +671,7 @@ namespace Roleplay
                 case "Celular":
                     if (p?.Celular > 0)
                     {
-                        player.Emit("Server:MostrarErro", "Você já possui um celular!");
+                        player.Emit("Server:MostrarErro", "Você já possui um celular.");
                         return;
                     }
 
@@ -691,7 +694,7 @@ namespace Roleplay
                 case "Rádio Comunicador":
                     if (p?.CanalRadio > -1)
                     {
-                        player.Emit("Server:MostrarErro", "Você já possui um rádio comunicador!");
+                        player.Emit("Server:MostrarErro", "Você já possui um rádio comunicador.");
                         return;
                     }
 
@@ -699,7 +702,7 @@ namespace Roleplay
                     p.Dinheiro -= preco.Valor;
                     p.SetDinheiro();
 
-                    strMensagem = $"Você comprou um rádio comunicador!";
+                    strMensagem = $"Você comprou um rádio comunicador.";
                     break;
             }
 
@@ -714,13 +717,13 @@ namespace Roleplay
 
             if (string.IsNullOrWhiteSpace(nome) || celular == 0)
             {
-                player.Emit("Server:MostrarErro", "Verifique se os campos foram preenchidos corretamente!");
+                player.Emit("Server:MostrarErro", "Verifique se os campos foram preenchidos corretamente.");
                 return;
             }
 
             if (nome.Length > 25)
             {
-                player.Emit("Server:MostrarErro", "Nome não pode ter mais que 25 caracteres!");
+                player.Emit("Server:MostrarErro", "Nome não pode ter mais que 25 caracteres.");
                 return;
             }
 
@@ -733,12 +736,12 @@ namespace Roleplay
                     Nome = nome,
                     Celular = celular
                 });
-                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} adicionado com sucesso!");
+                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} adicionado com sucesso.");
             }
             else
             {
                 p.Contatos[p.Contatos.IndexOf(contato)].Nome = nome;
-                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} editado com sucesso!");
+                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} editado com sucesso.");
             }
         }
 
@@ -749,7 +752,7 @@ namespace Roleplay
                 return;
 
             p.Contatos.RemoveAll(x => x.Celular == celular);
-            player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Celular {celular} removido dos contatos!");
+            player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Celular {celular} removido dos contatos.");
         }
 
         private void PagarMulta(IPlayer player, int codigo)
@@ -763,7 +766,7 @@ namespace Roleplay
                 var multa = context.Multas.FirstOrDefault(x => x.Codigo == codigo);
                 if (p.Dinheiro < multa.Valor)
                 {
-                    player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente!");
+                    player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
                     return;
                 }
 
@@ -775,7 +778,7 @@ namespace Roleplay
                 p.SetDinheiro();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou a multa {codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou a multa {codigo}.");
             player.Emit("Server:CloseView");
         }
 
@@ -784,14 +787,14 @@ namespace Roleplay
             var arma = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == weapon);
             if ((arma?.Estoque ?? 0) == 0)
             {
-                player.Emit("Server:MostrarErro", $"O item não possui estoque!");
+                player.Emit("Server:MostrarErro", $"O item não possui estoque.");
                 return;
             }
 
             var p = Functions.ObterPersonagem(player);
             if (p.Rank < arma.Rank)
             {
-                player.Emit("Server:MostrarErro", $"Você não possui autorização para pegar o item!");
+                player.Emit("Server:MostrarErro", $"Você não possui autorização para pegar o item.");
                 return;
             }
 
@@ -825,11 +828,9 @@ namespace Roleplay
                 Rank = Global.Ranks.FirstOrDefault(y => y.Faccao == p.Faccao && y.Codigo == x.Rank).Nome,
             }).ToList();
 
-            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, $"Você equipou {(WeaponModel)weapon}!");
+            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, $"Você equipou {(WeaponModel)weapon}.");
             Functions.GravarLog(TipoLog.Arma, $"/armario {JsonConvert.SerializeObject(arma)}", p, null);
         }
-
-        private void PlayerDigitando(IPlayer player, bool state) => player.SetSyncedMetaData("chatting", state);
 
         private void EntregarArma(IPlayer player, int codigo, string weapon, int municao)
         {
@@ -858,7 +859,13 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Arma, $"/entregararma {arma}", p, target);
         }
 
-        private void SalvarArmas(IPlayer player, string armas) => player.SetSyncedMetaData("armas", armas);
+        private void AtualizarInformacoes(IPlayer player, string areaName, string zoneName, string armas)
+        {
+            var p = Functions.ObterPersonagem(player);
+            p.AreaName = areaName;
+            p.ZoneName = zoneName;
+            p.StringArmas = armas;
+        }
 
         private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetStreamSyncedMetaData(meta, value);
 
@@ -875,13 +882,13 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
         }
 
-        private async void SpawnarVeiculoFaccao(IPlayer player, int codigoPonto, int veiculo)
+        private void SpawnarVeiculoFaccao(IPlayer player, int codigoPonto, int veiculo)
         {
             var p = Functions.ObterPersonagem(player);
 
             if (Global.Veiculos.Any(x => x.Codigo == veiculo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado!", notify: true);
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado.", notify: true);
                 return;
             }
 
@@ -890,7 +897,7 @@ namespace Roleplay
             veh.PosX = player.Position.X;
             veh.PosY = player.Position.Y;
             veh.PosZ = player.Position.Z;
-            veh.PersonagemEncarregado = p.Codigo;
+            veh.NomeEncarregado = p.Nome;
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigoPonto);
             if (ponto.Tipo == TipoPonto.SpawnVeiculosFaccao)
@@ -902,10 +909,10 @@ namespace Roleplay
             }
 
             veh.Spawnar();
-            await Task.Delay(500);
+            veh.Vehicle.LockState = VehicleLockState.Unlocked;
             player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
             player.Emit("Server:CloseView");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}.", notify: true);
         }
 
         private void ConfirmarBarbearia(IPlayer player, int cabelo, int cor1, int cor2)
@@ -918,7 +925,7 @@ namespace Roleplay
 
             p.Dinheiro -= Global.Parametros.ValorBarbearia;
             p.SetDinheiro();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
         }
         #endregion
     }

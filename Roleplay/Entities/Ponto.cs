@@ -16,9 +16,6 @@ namespace Roleplay.Entities
         [NotMapped]
         public TextDraw TextLabel { get; set; }
 
-        [NotMapped]
-        public TextDraw TextLabel2 { get; set; }
-
         public void CriarIdentificador()
         {
             DeletarIdentificador();
@@ -45,7 +42,7 @@ namespace Roleplay.Entities
                     break;
                 case TipoPonto.LojaRoupas:
                     nome = "Loja de Roupas";
-                    descricao = "Use /skin";
+                    descricao = "Use /roupas";
                     break;
                 case TipoPonto.SpawnVeiculosFaccao:
                     nome = "Spawn de Veículos da Facção";
@@ -63,16 +60,19 @@ namespace Roleplay.Entities
                     nome = "Barbearia";
                     descricao = "Use /barbearia";
                     break;
+                case TipoPonto.Uniforme:
+                    nome = "Uniforme";
+                    descricao = "Use /uniforme";
+                    break;
+                case TipoPonto.MDC:
+                    nome = "MDC";
+                    descricao = "Use /mdc";
+                    break;
             }
 
-            TextLabel = Functions.CriarTextDraw(nome, new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
-            TextLabel2 = Functions.CriarTextDraw(descricao, new Position(PosX, PosY, PosZ - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
+            TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
         }
 
-        public void DeletarIdentificador()
-        {
-            Functions.RemoverTextDraw(TextLabel);
-            Functions.RemoverTextDraw(TextLabel2);
-        }
+        public void DeletarIdentificador() => Functions.RemoverTextDraw(TextLabel);
     }
 }

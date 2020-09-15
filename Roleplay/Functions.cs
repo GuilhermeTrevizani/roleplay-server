@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Roleplay
 {
@@ -94,11 +96,14 @@ namespace Roleplay
                         player.AddWeaponComponent((WeaponModel)x.Arma, c);
                 }
 
-                if (Global.PersonagensOnline.Count > Global.Parametros.RecordeOnline)
+                if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
                 {
                     Global.Parametros.RecordeOnline = Global.PersonagensOnline.Count;
                     context.Parametros.Update(Global.Parametros);
                     context.SaveChanges();
+
+                    foreach (var u in Global.PersonagensOnline)
+                        EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorSucesso}}}{Global.Parametros.RecordeOnline}");
                 }
             }
 
@@ -112,25 +117,25 @@ namespace Roleplay
             GravarLog(TipoLog.Entrada, string.Empty, p, null);
         }
 
-        public static Personagem ObterPersonagem(IPlayer player)
-        {
-            return Global.PersonagensOnline.FirstOrDefault(x => x.UsuarioBD.SocialClubRegistro == (long)(player?.SocialClubId ?? 0));
-        }
+        public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player.HardwareIdHash);
 
         public static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
         {
             using var context = new DatabaseContext();
             context.Logs.Add(new Log()
             {
-                Data = DateTime.Now,
                 Tipo = tipo,
                 Descricao = descricao,
                 PersonagemOrigem = origem.Codigo,
-                IPOrigem = ObterIP(origem.Player),
-                SocialClubOrigem = (long)origem.Player.SocialClubId,
+                IPOrigem = origem.IPUltimoAcesso,
+                SocialClubOrigem = origem.SocialClubUltimoAcesso,
                 PersonagemDestino = destino?.Codigo ?? 0,
-                IPDestino = ObterIP(destino?.Player),
-                SocialClubDestino = (long)(destino?.Player?.SocialClubId ?? 0),
+                IPDestino = destino?.IPUltimoAcesso,
+                SocialClubDestino = destino?.SocialClubUltimoAcesso ?? 0,
+                HardwareIdHashOrigem = origem.HardwareIdHashUltimoAcesso,
+                HardwareIdHashDestino = destino?.HardwareIdHashUltimoAcesso ?? 0,
+                HardwareIdExHashOrigem = origem.HardwareIdExHashUltimoAcesso,
+                HardwareIdExHashDestino = destino?.HardwareIdExHashUltimoAcesso ?? 0,
             });
             context.SaveChanges();
         }
@@ -262,9 +267,20 @@ namespace Roleplay
             }
 
             if (notify)
+            {
                 player.Emit("chat:notify", mensagem, type);
-            else
-                player.Emit("chat:sendMessage", mensagem, cor, tipoMensagem == TipoMensagem.Nenhum ? null : gradient, icone);
+                return;
+            }
+
+            var matches = new Regex("{#.*?}").Matches(mensagem).ToList();
+
+            foreach (Match x in matches)
+                mensagem = mensagem.Replace(x.Value, $"{(matches.IndexOf(x) != 0 ? "</span>" : string.Empty)}<span style='color:{x.Value.Replace("{", string.Empty).Replace("}", string.Empty)}'>");
+
+            if (matches.Count > 0)
+                mensagem += "</span>";
+
+            player.Emit("chat:sendMessage", mensagem, cor, tipoMensagem == TipoMensagem.Nenhum ? null : gradient, icone);
         }
 
         public static Personagem ObterPersonagemPorIdNome(IPlayer player, string idNome, bool isPodeProprioPlayer = true)
@@ -275,7 +291,7 @@ namespace Roleplay
             {
                 if (!isPodeProprioPlayer && player == p.Player)
                 {
-                    EnviarMensagem(player, TipoMensagem.Erro, $"O jogador não pode ser você!");
+                    EnviarMensagem(player, TipoMensagem.Erro, $"O jogador não pode ser você.");
                     return null;
                 }
 
@@ -287,7 +303,7 @@ namespace Roleplay
             {
                 if (!isPodeProprioPlayer && player == ps.FirstOrDefault().Player)
                 {
-                    EnviarMensagem(player, TipoMensagem.Erro, $"O jogador não pode ser você!");
+                    EnviarMensagem(player, TipoMensagem.Erro, $"O jogador não pode ser você.");
                     return null;
                 }
 
@@ -311,9 +327,8 @@ namespace Roleplay
         public static void SalvarPersonagem(Personagem p, bool online = true)
         {
             p.Player.SetDateTime(DateTime.Now);
-            p.Player.GetSyncedMetaData("armas", out string weapons);
 
-            var armas = (weapons ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+            var armas = (p.StringArmas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => new PersonagemArma()
                 {
                     Arma = long.Parse(x.Split("|")[0]),
@@ -336,7 +351,7 @@ namespace Roleplay
                     {
                         p.Player.Position = new Position(432.8367f, -981.7594f, 30.71048f);
                         p.Player.Rotation = new Rotation(0, 0, 86.37479f);
-                        EnviarMensagem(p.Player, TipoMensagem.Sucesso, $"Seu tempo de prisão acabou e você foi libertado!");
+                        EnviarMensagem(p.Player, TipoMensagem.Sucesso, $"Seu tempo de prisão acabou e você foi libertado.");
                     }
                 }
 
@@ -358,7 +373,7 @@ namespace Roleplay
                     p.Banco += salario;
                     if (salario > 0)
                     {
-                        EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco!");
+                        EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco.");
 
                         if (p.Faccao > 0)
                             EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Facção: ${p.RankBD.Salario:N0}");
@@ -382,7 +397,7 @@ namespace Roleplay
                 if (pLigando != null)
                 {
                     pLigando.LimparLigacao();
-                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu!", Constants.CorCelularSecundaria);
+                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Constants.CorCelularSecundaria);
                 }
             }
 
@@ -416,6 +431,7 @@ namespace Roleplay
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = ObterIP(p.Player);
             personagem.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao);
+            personagem.RoupasCivil = p.RoupasCivil;
             context.Personagens.Update(personagem);
 
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
@@ -464,7 +480,17 @@ namespace Roleplay
 
                     if (distance <= range)
                     {
-                        var chatMessageColor = GetChatMessageColor(distance, distanceGap);
+                        var chatMessageColor = "#6E6E6E";
+
+                        if (distance < distanceGap)
+                            chatMessageColor = "#E6E6E6";
+                        else if (distance < distanceGap * 2)
+                            chatMessageColor = "#C8C8C8";
+                        else if (distance < distanceGap * 3)
+                            chatMessageColor = "#AAAAAA";
+                        else if (distance < distanceGap * 4)
+                            chatMessageColor = "#8C8C8C";
+
                         switch (type)
                         {
                             case TipoMensagemJogo.ChatICNormal:
@@ -504,20 +530,6 @@ namespace Roleplay
                     }
                 }
             }
-        }
-
-        private static string GetChatMessageColor(float distance, float distanceGap)
-        {
-            if (distance < distanceGap)
-                return "#E6E6E6";
-            else if (distance < distanceGap * 2)
-                return "#C8C8C8";
-            else if (distance < distanceGap * 3)
-                return "#AAAAAA";
-            else if (distance < distanceGap * 4)
-                return "#8C8C8C";
-
-            return "#6E6E6E";
         }
 
         public static void MostrarStats(IPlayer player, Personagem p)
@@ -659,20 +671,20 @@ namespace Roleplay
         {
             if (player.IsInVehicle)
             {
-                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação em um veículo!");
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação em um veículo.");
                 return false;
             }
 
             var p = ObterPersonagem(player);
             if (p.Algemado)
             {
-                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação algemado!");
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação algemado.");
                 return false;
             }
 
             if (p.TimerFerido != null)
             {
-                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação ferido!");
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação ferido.");
                 return false;
             }
 
@@ -713,7 +725,7 @@ namespace Roleplay
 
                     if (p.StatusLigacao == TipoStatusLigacao.AguardandoInformacao)
                     {
-                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas!", Constants.CorCelular);
+                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas.", Constants.CorCelular);
 
                         var tipoFaccao = p.ExtraLigacao == "LSPD" ? TipoFaccao.Policial : TipoFaccao.Medica;
                         var pos = ObterPosicaoPlayerIC(p);
@@ -733,22 +745,24 @@ namespace Roleplay
                         context.SaveChanges();
                         Global.Ligacoes911.Add(ligacao911);
 
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 #{ligacao911.ID}", true, true);
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"De: {p.Celular}", true, true);
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {message}", true, true);
+                        EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.ID}", true, true);
+                        EnviarMensagemTipoFaccao(tipoFaccao, $"De: {{#FFFFFF}}{p.Celular}", true, true);
+                        EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", true, true);
+                        EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {{#FFFFFF}}{message}", true, true);
 
                         p.LimparLigacao();
                     }
                 }
                 else if (p.NumeroLigacao == 5555555)
                 {
-                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram alertados e você receberá um SMS de confirmação!", Constants.CorCelular);
+                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram alertados e você receberá um SMS de confirmação.", Constants.CorCelular);
 
                     p.AguardandoTipoServico = (int)TipoEmprego.Taxista;
 
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi #{p.Codigo}", Constants.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {p.Celular}", Constants.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {message}", Constants.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.Codigo}", Constants.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Constants.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Constants.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Constants.CorCelular);
 
                     p.LimparLigacao();
                 }
@@ -768,27 +782,21 @@ namespace Roleplay
 
         public static void EnviarMensagemRadio(Personagem p, int slot, string mensagem)
         {
-            if (p == null)
-            {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
             if (p.CanalRadio == -1)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não possui um rádio!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não possui um rádio.");
                 return;
             }
 
             if (p.TempoPrisao > 0)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está preso!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está preso.");
                 return;
             }
 
             if (p.TimerFerido != null)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está gravamente ferido!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está gravamente ferido.");
                 return;
             }
 
@@ -800,13 +808,13 @@ namespace Roleplay
 
             if (canal == 0)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, $"Seu slot {slot} do rádio não possui um canal configurado!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, $"Seu slot {slot} do rádio não possui um canal configurado.");
                 return;
             }
 
             if ((canal == 911 || canal == 912 || canal == 999) && !p.IsEmTrabalho)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, $"Você só pode falar no canal {canal} quando estiver em serviço!");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, $"Você só pode falar no canal {canal} quando estiver em serviço.");
                 return;
             }
 
@@ -827,59 +835,6 @@ namespace Roleplay
             EnviarMensagemChat(p, mensagem, TipoMensagemJogo.Radio);
         }
 
-        public static void CarregarConcessionarias()
-        {
-            Global.Concessionarias = new List<Concessionaria>()
-            {
-                new Concessionaria()
-                {
-                    Nome = "Concessionária de Carros e Motos",
-                    Tipo = TipoPreco.CarrosMotos,
-                    PosicaoCompra = new Position(-38.63479f, -1109.706f, 26.43781f),
-                    PosicaoSpawn = new Position(-60.224174f, -1106.1494f, 25.909912f),
-                    RotacaoSpawn = new Position(-0.015625f, 0, 1.203125f),
-                },
-                new Concessionaria()
-                {
-                    Nome = "Concessionária de Barcos",
-                    Tipo = TipoPreco.Barcos,
-                    PosicaoCompra = new Position(-787.1262f, -1354.725f, 5.150271f),
-                    PosicaoSpawn = new Position(-805.2659f, -1418.4264f, 0.33190918f),
-                    RotacaoSpawn = new Position(-0.015625f, 0, 0.859375f),
-                },
-                new Concessionaria()
-                {
-                    Nome = "Concessionária de Helicópteros",
-                    Tipo = TipoPreco.Helicopteros,
-                    PosicaoCompra = new Position(-753.5287f, -1512.43f, 5.020952f),
-                    PosicaoSpawn = new Position(- 745.4902f, -1468.695f, 5.099712f),
-                    RotacaoSpawn = new Position(0, 0, 328.6675f),
-                },
-                new Concessionaria()
-                {
-                    Nome = "Concessionária Industrial",
-                    Tipo = TipoPreco.Industrial,
-                    PosicaoCompra = new Position(473.9496f, -1951.891f, 24.6132f),
-                    PosicaoSpawn = new Position(468.1417f, -1957.425f, 24.72257f),
-                    RotacaoSpawn = new Position(0, 0, 208.0628f),
-                },
-                new Concessionaria()
-                {
-                    Nome = "Concessionária de Aviões",
-                    Tipo = TipoPreco.Avioes,
-                    PosicaoCompra = new Position(1725.616f, 3291.571f, 41.19078f),
-                    PosicaoSpawn = new Position(1712.708f, 3252.634f, 41.67871f),
-                    RotacaoSpawn = new Position(0, 0, 122.1655f),
-                },
-            };
-
-            foreach (var c in Global.Concessionarias)
-            {
-                CriarTextDraw(c.Nome, c.PosicaoCompra, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
-                CriarTextDraw("Use /comprar", new Position(c.PosicaoCompra.X, c.PosicaoCompra.Y, c.PosicaoCompra.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
-            }
-        }
-
         public static string ObterDisplayEnum(Enum valor)
         {
             var fi = valor.GetType().GetField(valor.ToString());
@@ -887,25 +842,6 @@ namespace Roleplay
             if (attributes?.Length > 0)
                 return attributes.FirstOrDefault().Name;
             return valor.ToString();
-        }
-
-        public static void CarregarEmpregos()
-        {
-            Global.Empregos = new List<Emprego>()
-            {
-                new Emprego()
-                {
-                    Tipo = TipoEmprego.Taxista,
-                    Posicao = new Position(895.0308f, -179.1359f, 74.70036f),
-                },
-            };
-
-            foreach (var c in Global.Empregos)
-            {
-                var nome = ObterDisplayEnum(c.Tipo);
-                CriarTextDraw($"Emprego de {nome}", c.Posicao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
-                CriarTextDraw($"Use /emprego para se tornar um {nome.ToLower()}", new Position(c.Posicao.X, c.Posicao.Y, c.Posicao.Z - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), 0);
-            }
         }
 
         public static void EnviarMensagemEmprego(TipoEmprego tipo, string mensagem, string cor = "#FFFFFF")
@@ -966,115 +902,12 @@ namespace Roleplay
                 13 => "Cotovelo Esquerdo",
                 14 => "Pulso Esquerdo",
                 15 => "Ombro Direito",
-                16 => "Braço Direto",
-                17 => "Cotovelo Direto",
+                16 => "Braço Direito",
+                17 => "Cotovelo Direito",
                 18 => "Pulso Direito",
                 19 => "Pescoço",
                 20 => "Cabeça",
                 _ => "Desconhecida",
-            };
-        }
-
-        public static void CarregarWeaponComponents()
-        {
-            Global.WeaponComponents = new List<WeaponComponent>()
-            {
-                new WeaponComponent(WeaponModel.BrassKnuckles, "BaseModel", 0xF3462F33),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "ThePimp", 0xC613F685),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheBallas", 0xEED9FD63),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheHustler", 0x50910C31),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheRock", 0x9761D9DC),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheHater", 0x7DECFE30),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheLover", 0x3F4E8AA6),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "ThePlayer", 0x8B808BB),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheKing", 0xE28BABEF),
-                new WeaponComponent(WeaponModel.BrassKnuckles, "TheValor", 0x7AF3F785),
-                new WeaponComponent(WeaponModel.Switchblade, "DefaultHandle", 0x9137A500),
-                new WeaponComponent(WeaponModel.Switchblade, "VIPVariant", 0x5B3E7DB6),
-                new WeaponComponent(WeaponModel.Switchblade, "BodyguardVariant", 0xE7939662),
-                new WeaponComponent(WeaponModel.Pistol, "DefaultClip", 0xFED0FD71),
-                new WeaponComponent(WeaponModel.Pistol, "ExtendedClip", 0xED265A1C),
-                new WeaponComponent(WeaponModel.Pistol, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.Pistol, "Suppressor", 0x65EA7EBB),
-                new WeaponComponent(WeaponModel.Pistol, "YusufAmirLuxuryFinish", 0xD7391086),
-                new WeaponComponent(WeaponModel.CombatPistol, "DefaultClip", 0x721B079),
-                new WeaponComponent(WeaponModel.CombatPistol, "ExtendedClip", 0xD67B4F2D),
-                new WeaponComponent(WeaponModel.CombatPistol, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.CombatPistol, "Suppressor", 0xC304849A),
-                new WeaponComponent(WeaponModel.CombatPistol, "YusufAmirLuxuryFinish", 0xC6654D72),
-                new WeaponComponent(WeaponModel.APPistol, "DefaultClip", 0x31C4B22A),
-                new WeaponComponent(WeaponModel.APPistol, "ExtendedClip", 0x249A17D5),
-                new WeaponComponent(WeaponModel.APPistol, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.APPistol, "Suppressor", 0xC304849A),
-                new WeaponComponent(WeaponModel.APPistol, "GildedGunMetalFinish", 0x9B76C72C),
-                new WeaponComponent(WeaponModel.Pistol50, "DefaultClip", 0x2297BE19),
-                new WeaponComponent(WeaponModel.Pistol50, "ExtendedClip", 0xD9D3AC92),
-                new WeaponComponent(WeaponModel.Pistol50, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.Pistol50, "Suppressor", 0xA73D4664),
-                new WeaponComponent(WeaponModel.Pistol50, "PlatinumPearlDeluxeFinish", 0x77B8AB2F),
-                new WeaponComponent(WeaponModel.HeavyRevolver, "VIPVariant", 0x16EE3040),
-                new WeaponComponent(WeaponModel.HeavyRevolver, "BodyguardVariant", 0x9493B80D),
-                new WeaponComponent(WeaponModel.HeavyRevolver, "DefaultClip", 0xE9867CE3),
-                new WeaponComponent(WeaponModel.SNSPistol, "DefaultClip", 0xF8802ED9),
-                new WeaponComponent(WeaponModel.SNSPistol, "ExtendedClip", 0x7B0033B3),
-                new WeaponComponent(WeaponModel.SNSPistol, "EtchedWoodGripFinish", 0x8033ECAF),
-                new WeaponComponent(WeaponModel.HeavyPistol, "DefaultClip", 0xD4A969A),
-                new WeaponComponent(WeaponModel.HeavyPistol, "ExtendedClip", 0x64F9C62B),
-                new WeaponComponent(WeaponModel.HeavyPistol, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.HeavyPistol, "Suppressor", 0xC304849A),
-                new WeaponComponent(WeaponModel.HeavyPistol, "EtchedWoodGripFinish", 0x7A6A7B7B),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "DefaultRounds", 0xBA23D8BE),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "TracerRounds", 0xC6D8E476),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "IncendiaryRounds", 0xEFBF25),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "HollowPointRounds", 0x10F42E8F),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "FullMetalJacketRounds", 0xDC8BA3F),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "HolographicSight", 0x420FD713),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "SmallScope", 0x49B2945),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Flashlight", 0x359B7AAE),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Compensator", 0x27077CCB),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "DigitalCamo", 0xC03FED9F),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "BrushstrokeCamo", 0xB5DE24),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "WoodlandCamo", 0xA7FF1B8),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Skull", 0xF2E24289),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "SessantaNove", 0x11317F27),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Perseus", 0x17C30C42),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Leopard", 0x257927AE),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Zebra", 0x37304B1C),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Geometric", 0x48DAEE71),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Boom", 0x20ED9B5B),
-                new WeaponComponent(WeaponModel.HeavyRevolverMkII, "Patriotic", 0xD951E867),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "DefaultClip", 0x1466CE6),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "ExtendedClip", 0xCE8C0772),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "TracerRounds", 0x902DA26E),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "IncendiaryRounds", 0xE6AD5F79),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "HollowPointRounds", 0x8D107402),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "FullMetalJacketRounds", 0xC111EB26),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Flashlight", 0x4A4965F3),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "MountedScope", 0x47DE9258),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Suppressor", 0x65EA7EBB),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Compensator", 0xAA8283BF),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "DigitalCamo", 0xF7BEEDD),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "BrushstrokeCamo", 0x8A612EF6),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "WoodlandCamo", 0x76FA8829),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Skull", 0xA93C6CAC),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "SessantaNove", 0x9C905354),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Perseus", 0x4DFA3621),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Leopard", 0x42E91FFF),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Zebra", 0x54A8437D),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Geometric", 0x68C2746),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Boom", 0x2366E467),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Boom2", 0x441882E6),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "DigitalCamo", 0xE7EE68EA),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "BrushstrokeCamo", 0x29366D21),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "WoodlandCamo", 0x3ADE514B),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "SkullSlide", 0xE64513E9),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "SessantaNoveSlide", 0xCD7AEB9A),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "PerseusSlide", 0xFA7B27A6),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "LeopardSlide", 0xE285CA9A),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "ZebraSlide", 0x2B904B19),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "GeometricSlide", 0x22C24F9C),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "BoomSlide", 0x8D0D5ECD),
-                new WeaponComponent(WeaponModel.SNSPistolMkII, "Patriotic", 0x1F07150A),
             };
         }
 
@@ -1085,6 +918,22 @@ namespace Roleplay
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == p.Dimensao);
             return new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
+        }
+
+        public static bool ValidarEmail(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                    return false;
+
+                var m = new MailAddress(email);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }

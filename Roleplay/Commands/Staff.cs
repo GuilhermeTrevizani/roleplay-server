@@ -21,7 +21,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -131,7 +131,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -145,7 +145,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -155,7 +155,7 @@ namespace Roleplay.Commands
 
             using (var context = new DatabaseContext())
             {
-                context.Punicoes.Add(new Entities.Punicao()
+                context.Punicoes.Add(new Punicao()
                 {
                     Data = DateTime.Now,
                     Duracao = 0,
@@ -178,14 +178,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
                 return;
             }
 
@@ -202,20 +202,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (p.Dimensao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não é possível usar esse comando em um interior!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não é possível usar esse comando em um interior.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
                 return;
             }
 
@@ -231,12 +231,12 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             p.IsEmTrabalhoAdministrativo = !p.IsEmTrabalhoAdministrativo;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.");
         }
 
         [Command("listasos")]
@@ -245,13 +245,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (Global.SOSs.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum SOS pendente!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum SOS pendente.");
                 return;
             }
 
@@ -268,21 +268,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var sos = Global.SOSs.FirstOrDefault(x => x.IDPersonagem == codigo);
             if (sos == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe.");
                 return;
             }
 
             var target = sos.Verificar(p.Usuario);
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado.");
                 return;
             }
 
@@ -297,8 +297,8 @@ namespace Roleplay.Commands
 
             p.UsuarioBD.QuantidadeSOSAceitos++;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario})!");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} aceitou seu SOS!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} aceitou seu SOS.");
         }
 
         [Command("rj", "/rj (código)")]
@@ -307,21 +307,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var sos = Global.SOSs.FirstOrDefault(x => x.IDPersonagem == codigo);
             if (sos == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe.");
                 return;
             }
 
             var target = sos.Verificar(p.Usuario);
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado.");
                 return;
             }
 
@@ -334,8 +334,8 @@ namespace Roleplay.Commands
             context.SaveChanges();
             Global.SOSs.Remove(sos);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario})!");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} rejeitou seu SOS!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} rejeitou seu SOS.");
         }
         #endregion Staff 1
 
@@ -346,7 +346,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -372,7 +372,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -398,7 +398,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -415,7 +415,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -425,7 +425,7 @@ namespace Roleplay.Commands
 
             using (var context = new DatabaseContext())
             {
-                var ban = new Entities.Banimento()
+                var ban = new Banimento()
                 {
                     Data = DateTime.Now,
                     Expiracao = null,
@@ -433,6 +433,8 @@ namespace Roleplay.Commands
                     Usuario = target.UsuarioBD.Codigo,
                     SocialClub = target.UsuarioBD.SocialClubRegistro,
                     UsuarioStaff = p.UsuarioBD.Codigo,
+                    HardwareIdHash = target.HardwareIdHashUltimoAcesso,
+                    HardwareIdExHash = target.HardwareIdExHashUltimoAcesso,
                 };
 
                 if (dias > 0)
@@ -440,7 +442,7 @@ namespace Roleplay.Commands
 
                 context.Banimentos.Add(ban);
 
-                context.Punicoes.Add(new Entities.Punicao()
+                context.Punicoes.Add(new Punicao()
                 {
                     Data = DateTime.Now,
                     Duracao = dias,
@@ -464,7 +466,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -472,13 +474,13 @@ namespace Roleplay.Commands
             var per = context.Personagens.FirstOrDefault(x => x.Codigo == personagem);
             if (per == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {personagem} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {personagem} não existe.");
                 return;
             }
 
             var user = context.Usuarios.FirstOrDefault(x => x.Codigo == per.Usuario);
 
-            var ban = new Entities.Banimento()
+            var ban = new Banimento()
             {
                 Data = DateTime.Now,
                 Expiracao = null,
@@ -493,7 +495,7 @@ namespace Roleplay.Commands
 
             context.Banimentos.Add(ban);
 
-            context.Punicoes.Add(new Entities.Punicao()
+            context.Punicoes.Add(new Punicao()
             {
                 Data = DateTime.Now,
                 Duracao = dias,
@@ -514,7 +516,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -523,7 +525,7 @@ namespace Roleplay.Commands
                 var ban = context.Banimentos.FirstOrDefault(x => x.Usuario == usuario);
                 if (ban == null)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não está banido!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não está banido.");
                     return;
                 }
 
@@ -531,7 +533,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você desbaniu {usuario}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você desbaniu {usuario}.");
             Functions.GravarLog(TipoLog.Staff, $"/unban {usuario}", p, null);
         }
         #endregion Staff 2
@@ -543,7 +545,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -572,7 +574,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -593,7 +595,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -615,7 +617,7 @@ namespace Roleplay.Commands
             {
                 target.TimerFerido?.Stop();
                 target.TimerFerido = null;
-                p.Player.Emit("player:toggleFreeze", false);
+                target.Player.Emit("player:toggleFreeze", false);
                 target.StopAnimation();
                 target.Player.Armor = 0;
             }
@@ -634,7 +636,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -651,7 +653,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -704,7 +706,7 @@ namespace Roleplay.Commands
             }
 
             if (!isTemAlgoProximo)
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum item!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum item.");
         }
 
         [Command("cblip", "/cblip (tipo) (cor) (nome)", GreedyArg = true)]
@@ -713,7 +715,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -755,7 +757,7 @@ namespace Roleplay.Commands
                 blip.CriarIdentificador(x.Player);
 
             Global.Blips.Add(blip);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} criado com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} criado com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/cblip {blip.Codigo}", p, null);
         }
 
@@ -765,14 +767,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var blip = Global.Blips.FirstOrDefault(x => x.Codigo == codigo);
             if (blip == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe.");
                 return;
             }
 
@@ -783,7 +785,7 @@ namespace Roleplay.Commands
                 blip.DeletarIdentificador(x.Player);
 
             Global.Blips.Remove(blip);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} removido com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} removido com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rblip {blip.Codigo}", p, null);
         }
 
@@ -793,7 +795,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -805,11 +807,11 @@ namespace Roleplay.Commands
 
             if (!Enum.IsDefined(typeof(TipoFaccao), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
-            var faccao = new Entities.Faccao()
+            var faccao = new Faccao()
             {
                 Nome = nome,
                 Cor = "FFFFFF",
@@ -823,7 +825,7 @@ namespace Roleplay.Commands
             }
 
             Global.Faccoes.Add(faccao);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você criou a facção {faccao.Codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você criou a facção {faccao.Codigo}.");
 
             Functions.GravarLog(TipoLog.Staff, $"/cfac {faccao.Codigo}", p, null);
         }
@@ -834,14 +836,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
@@ -859,7 +861,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o nome da facção {faccao.Codigo} para {nome}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o nome da facção {faccao.Codigo} para {nome}.");
             Functions.GravarLog(TipoLog.Staff, $"/efacnome {faccao.Codigo} {nome}", p, null);
         }
 
@@ -869,20 +871,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoFaccao), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
@@ -894,7 +896,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o tipo da facção {faccao.Codigo} para {tipo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o tipo da facção {faccao.Codigo} para {tipo}.");
             Functions.GravarLog(TipoLog.Staff, $"/efactipo {faccao.Codigo} {tipo}", p, null);
         }
 
@@ -904,14 +906,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
@@ -929,7 +931,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a cor da facção {faccao.Codigo} para {cor}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a cor da facção {faccao.Codigo} para {cor}.");
             Functions.GravarLog(TipoLog.Staff, $"/efaccor {faccao.Codigo} {cor}", p, null);
         }
 
@@ -939,14 +941,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
@@ -964,7 +966,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o rank gestor da facção {faccao.Codigo} para {rank}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o rank gestor da facção {faccao.Codigo} para {rank}.");
             Functions.GravarLog(TipoLog.Staff, $"/efacrankgestor {faccao.Codigo} {rank}", p, null);
         }
 
@@ -974,14 +976,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
@@ -999,7 +1001,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o rank líder da facção {faccao.Codigo} para {rank}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o rank líder da facção {faccao.Codigo} para {rank}.");
             Functions.GravarLog(TipoLog.Staff, $"/efacranklider {faccao.Codigo} {rank}", p, null);
         }
 
@@ -1009,14 +1011,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
                 return;
             }
 
@@ -1024,7 +1026,7 @@ namespace Roleplay.Commands
             {
                 if (context.Personagens.Any(x => x.Faccao == codigo))
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não é possível remover a facção {codigo} pois existem personagens nela!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não é possível remover a facção {codigo} pois existem personagens nela.");
                     return;
                 }
 
@@ -1035,7 +1037,7 @@ namespace Roleplay.Commands
             Global.Faccoes.Remove(faccao);
             Global.Ranks.RemoveAll(x => x.Faccao == codigo);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu a facção {faccao.Codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu a facção {faccao.Codigo}.");
             Functions.GravarLog(TipoLog.Staff, $"/rfac {faccao.Codigo}", p, null);
         }
 
@@ -1045,13 +1047,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (Global.Faccoes.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não existe nenhuma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não existe nenhuma facção.");
                 return;
             }
 
@@ -1090,13 +1092,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (!((int)p?.UsuarioBD?.Staff >= (int)TipoStaff.Manager || (p.Faccao == fac && p.Rank >= p.FaccaoBD.RankLider)))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (salario < 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário não pode ser negativo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário não pode ser negativo.");
                 return;
             }
 
@@ -1109,11 +1111,11 @@ namespace Roleplay.Commands
             var faction = Global.Faccoes.FirstOrDefault(x => x.Codigo == fac);
             if (faction == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe.");
                 return;
             }
 
-            var rank = new Entities.Rank()
+            var rank = new Rank()
             {
                 Faccao = fac,
                 Nome = nome,
@@ -1129,7 +1131,7 @@ namespace Roleplay.Commands
             }
 
             Global.Ranks.Add(rank);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você criou o rank {rank.Nome} [{rank.Codigo}] da facção {faction.Nome} [{faction.Codigo}]!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você criou o rank {rank.Nome} [{rank.Codigo}] da facção {faction.Nome} [{faction.Codigo}].");
             Functions.GravarLog(TipoLog.Staff, $"/crank {faction.Codigo} {rank.Codigo}", p, null);
         }
 
@@ -1139,14 +1141,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (!((int)p?.UsuarioBD?.Staff >= (int)TipoStaff.Manager || (p.Faccao == fac && p.Rank >= p.FaccaoBD.RankLider)))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == fac && x.Codigo == rank);
             if (rk == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe.");
                 return;
             }
 
@@ -1154,7 +1156,7 @@ namespace Roleplay.Commands
             {
                 if (context.Personagens.Any(x => x.Faccao == fac && x.Rank == rank))
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não é possível remover o rank {rank} da facção {fac} pois existem personagens nele!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não é possível remover o rank {rank} da facção {fac} pois existem personagens nele.");
                     return;
                 }
 
@@ -1163,7 +1165,7 @@ namespace Roleplay.Commands
             }
 
             Global.Ranks.Remove(rk);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu o rank {rk.Nome} [{rk.Codigo}] da facção {fac}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu o rank {rk.Nome} [{rk.Codigo}] da facção {fac}.");
             Functions.GravarLog(TipoLog.Staff, $"/rrank {fac} {rk.Codigo}", p, null);
         }
 
@@ -1173,14 +1175,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (!((int)p?.UsuarioBD?.Staff >= (int)TipoStaff.Manager || (p.Faccao == fac && p.Rank >= p.FaccaoBD.RankLider)))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == fac && x.Codigo == rank);
             if (rk == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe.");
                 return;
             }
 
@@ -1198,7 +1200,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o nome do rank {rank} da facção {fac} para {nome}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o nome do rank {rank} da facção {fac} para {nome}.");
             Functions.GravarLog(TipoLog.Staff, $"/eranknome {fac} {rank} {nome}", p, null);
         }
 
@@ -1208,21 +1210,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (!((int)p?.UsuarioBD?.Staff >= (int)TipoStaff.Manager || (p.Faccao == fac && p.Rank >= p.FaccaoBD.RankLider)))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faction = Global.Faccoes.FirstOrDefault(x => x.Codigo == fac);
             if (faction == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe.");
                 return;
             }
 
             var ranks = Global.Ranks.Where(x => x.Faccao == fac).OrderBy(x => x.Codigo).ToList();
             if (ranks.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não existe nenhum rank para a facção {fac}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não existe nenhum rank para a facção {fac}.");
                 return;
             }
 
@@ -1258,13 +1260,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (!Enum.GetValues(typeof(TipoStaff)).Cast<TipoStaff>().Any(x => (int)x == staff))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Staff {staff} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Staff {staff} não existe.");
                 return;
             }
 
@@ -1285,7 +1287,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -1296,14 +1298,14 @@ namespace Roleplay.Commands
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == fac);
             if (faccao == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe.");
                 return;
             }
 
             var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == fac && x.Codigo == faccao.RankLider);
             if (rk == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank líder ({faccao.RankLider}) da facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank líder ({faccao.RankLider}) da facção {fac} não existe.");
                 return;
             }
 
@@ -1321,7 +1323,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -1335,13 +1337,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoInterior), interior))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Interior inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Interior inválido.");
                 return;
             }
 
@@ -1353,7 +1355,7 @@ namespace Roleplay.Commands
 
             var saida = Functions.ObterPosicaoPorInterior((TipoInterior)interior);
 
-            var prop = new Entities.Propriedade()
+            var prop = new Propriedade()
             {
                 Interior = (TipoInterior)interior,
                 EntradaPosX = player.Position.X,
@@ -1375,7 +1377,7 @@ namespace Roleplay.Commands
             prop.CriarIdentificador();
 
             Global.Propriedades.Add(prop);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} criada com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} criada com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/cprop {prop.Codigo} {prop.Valor}", p, null);
         }
 
@@ -1385,20 +1387,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe.");
                 return;
             }
 
             if (prop.Personagem > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} possui um dono!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} possui um dono.");
                 return;
             }
 
@@ -1408,7 +1410,7 @@ namespace Roleplay.Commands
             prop.DeletarIdentificador();
 
             Global.Propriedades.Remove(prop);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} removida com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} removida com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rprop {prop.Codigo}", p, null);
         }
 
@@ -1418,14 +1420,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe.");
                 return;
             }
 
@@ -1445,7 +1447,7 @@ namespace Roleplay.Commands
 
             Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o valor da propriedade {prop.Codigo} para {valor}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o valor da propriedade {prop.Codigo} para {valor}.");
             Functions.GravarLog(TipoLog.Staff, $"/epropvalor {prop.Codigo} {valor}", p, null);
         }
 
@@ -1455,20 +1457,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoInterior), interior))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Interior inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Interior inválido.");
                 return;
             }
 
@@ -1486,7 +1488,7 @@ namespace Roleplay.Commands
 
             Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o interior da propriedade {prop.Codigo} para {interior}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o interior da propriedade {prop.Codigo} para {interior}.");
             Functions.GravarLog(TipoLog.Staff, $"/epropinterior {prop.Codigo} {interior}", p, null);
         }
 
@@ -1496,14 +1498,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe.");
                 return;
             }
 
@@ -1520,7 +1522,7 @@ namespace Roleplay.Commands
 
             Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a posição da propriedade {prop.Codigo} para sua posição atual (X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension})!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a posição da propriedade {prop.Codigo} para sua posição atual (X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}).");
             Functions.GravarLog(TipoLog.Staff, $"/eproppos {prop.Codigo} X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}", p, null);
         }
 
@@ -1530,21 +1532,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {codigo} não existe.");
                 return;
             }
 
             p.LimparIPLs();
             player.Dimension = 0;
             player.Position = new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até a propriedade {prop.Codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até a propriedade {prop.Codigo}.");
         }
 
         [Command("irblip", "/irblip (código)")]
@@ -1553,21 +1555,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var blip = Global.Blips.FirstOrDefault(x => x.Codigo == codigo);
             if (blip == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe.");
                 return;
             }
 
             p.LimparIPLs();
             player.Dimension = 0;
             player.Position = new Position(blip.PosX, blip.PosY, blip.PosZ);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até o blip {blip.Codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até o blip {blip.Codigo}.");
         }
 
         [Command("cpreco", "/cpreco (tipo) (valor) (nome)", GreedyArg = true)]
@@ -1576,13 +1578,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoPreco), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
@@ -1601,13 +1603,11 @@ namespace Roleplay.Commands
             var tp = (TipoPreco)tipo;
             if (tp == TipoPreco.CarrosMotos)
             {
-                Enum.TryParse(nome, out VehicleModel veh);
-                if ((int)veh == 0)
+                if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == nome.ToLower()))
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não existe!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Modelo {nome} não existe.");
                     return;
                 }
-                nome = veh.ToString();
             }
 
             using (var context = new DatabaseContext())
@@ -1615,7 +1615,7 @@ namespace Roleplay.Commands
                 var preco = Global.Precos.FirstOrDefault(x => x.Tipo == tp && x.Nome.ToLower() == nome.ToLower());
                 if (preco == null)
                 {
-                    preco = new Entities.Preco()
+                    preco = new Preco()
                     {
                         Tipo = tp,
                         Nome = nome,
@@ -1626,14 +1626,14 @@ namespace Roleplay.Commands
                 }
                 else
                 {
-                    Global.Precos[Global.Precos.IndexOf(preco)].Valor = valor;
+                    preco.Valor = valor;
                     context.Precos.Update(preco);
                 }
 
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} criado/editado com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} criado/editado com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/cpreco {tipo} {nome} {valor}", p, null);
         }
 
@@ -1643,7 +1643,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -1651,7 +1651,7 @@ namespace Roleplay.Commands
             var preco = Global.Precos.FirstOrDefault(x => x.Tipo == tp && x.Nome.ToLower() == nome.ToLower());
             if (preco == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} não existe.");
                 return;
             }
 
@@ -1662,7 +1662,7 @@ namespace Roleplay.Commands
             }
 
             Global.Precos.Remove(preco);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} removido com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} removido com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rpreco {tipo} {nome}", p, null);
         }
 
@@ -1672,13 +1672,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoPonto), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
@@ -1702,7 +1702,7 @@ namespace Roleplay.Commands
             ponto.CriarIdentificador();
 
             Global.Pontos.Add(ponto);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} criado com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} criado com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/cponto {ponto.Codigo}", p, null);
         }
 
@@ -1712,14 +1712,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigo);
             if (ponto == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Ponto {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Ponto {codigo} não existe.");
                 return;
             }
             using (var context = new DatabaseContext())
@@ -1728,7 +1728,7 @@ namespace Roleplay.Commands
             ponto.DeletarIdentificador();
 
             Global.Pontos.Remove(ponto);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} removido com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} removido com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rponto {ponto.Codigo}", p, null);
         }
 
@@ -1738,14 +1738,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigo);
             if (ponto == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Ponto {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Ponto {codigo} não existe.");
                 return;
             }
 
@@ -1760,20 +1760,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == fac && x.Codigo == rank);
             if (rk == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} da facção {fac} não existe.");
                 return;
             }
 
             if (salario <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário deve ser maior que 0!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Salário deve ser maior que 0.");
                 return;
             }
 
@@ -1785,7 +1785,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o salário do rank {rank} da facção {fac} para ${salario:N0}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o salário do rank {rank} da facção {fac} para ${salario:N0}.");
             Functions.GravarLog(TipoLog.Staff, $"/eranksalario {fac} {rank} {salario}", p, null);
         }
 
@@ -1795,14 +1795,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var blip = Global.Blips.FirstOrDefault(x => x.Codigo == codigo);
             if (blip == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Blip {codigo} não existe.");
                 return;
             }
 
@@ -1817,7 +1817,7 @@ namespace Roleplay.Commands
             foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
                 blip.CriarIdentificador(x.Player);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(blip.Inativo ? "in" : string.Empty)}ativou o blip {blip.Codigo}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(blip.Inativo ? "in" : string.Empty)}ativou o blip {blip.Codigo}.");
             Functions.GravarLog(TipoLog.Staff, $"/eblipinativo {blip.Codigo}", p, null);
         }
 
@@ -1827,18 +1827,18 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var faction = Global.Faccoes.FirstOrDefault(x => x.Codigo == faccao);
             if (faction == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe.");
                 return;
             }
 
-            var armario = new Entities.Armario()
+            var armario = new Armario()
             {
                 PosX = player.Position.X,
                 PosY = player.Position.Y,
@@ -1856,7 +1856,7 @@ namespace Roleplay.Commands
             armario.CriarIdentificador();
 
             Global.Armarios.Add(armario);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} criado com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} criado com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/carm {armario.Codigo} {faccao}", p, null);
         }
 
@@ -1866,14 +1866,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => x.Codigo == codigo);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe.");
                 return;
             }
 
@@ -1887,7 +1887,7 @@ namespace Roleplay.Commands
 
             Global.Armarios.Remove(armario);
             Global.ArmariosItens.RemoveAll(x => x.Codigo == armario.Codigo);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} removido com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} removido com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rarm {armario.Codigo}", p, null);
         }
 
@@ -1897,21 +1897,21 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => x.Codigo == codigo);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe.");
                 return;
             }
 
             var faction = Global.Faccoes.FirstOrDefault(x => x.Codigo == faccao);
             if (faction == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe.");
                 return;
             }
 
@@ -1923,7 +1923,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a facção do armário {armario.Codigo} para {faccao}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a facção do armário {armario.Codigo} para {faccao}.");
             Functions.GravarLog(TipoLog.Staff, $"/earmariofac {armario.Codigo} {faccao}", p, null);
         }
 
@@ -1933,14 +1933,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => x.Codigo == codigo);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe.");
                 return;
             }
 
@@ -1957,7 +1957,7 @@ namespace Roleplay.Commands
 
             Global.Armarios[Global.Armarios.IndexOf(armario)].CriarIdentificador();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a posição do armário {armario.Codigo} para sua posição atual (X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension})!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a posição do armário {armario.Codigo} para sua posição atual (X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}).");
             Functions.GravarLog(TipoLog.Staff, $"/earmpos {armario.Codigo} X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}", p, null);
         }
 
@@ -1967,14 +1967,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => x.Codigo == codigo);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {codigo} não existe.");
                 return;
             }
 
@@ -1996,31 +1996,31 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var arm = Global.Armarios.FirstOrDefault(x => x.Codigo == armario);
             if (arm == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             if (Global.ArmariosItens.Any(x => x.Codigo == armario && x.Arma == (long)wep))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} já existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} já existe no armário {armario}.");
                 return;
             }
 
-            var item = new Entities.ArmarioItem()
+            var item = new ArmarioItem()
             {
                 Codigo = armario,
                 Arma = (long)wep,
@@ -2033,7 +2033,7 @@ namespace Roleplay.Commands
             }
 
             Global.ArmariosItens.Add(item);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} criada no armário {armario} com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} criada no armário {armario} com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/carmi {armario} {item.Arma}", p, null);
         }
 
@@ -2043,28 +2043,28 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var arm = Global.Armarios.FirstOrDefault(x => x.Codigo == armario);
             if (arm == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
             using (var context = new DatabaseContext())
@@ -2074,7 +2074,7 @@ namespace Roleplay.Commands
             }
 
             Global.ArmariosItens.Remove(item);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} removida do armário {armario} com sucesso!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} removida do armário {armario} com sucesso.");
             Functions.GravarLog(TipoLog.Staff, $"/rarmi {armario} {item.Arma}", p, null);
         }
 
@@ -2084,27 +2084,27 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             if (municao <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Munição inválida!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Munição inválida.");
                 return;
             }
 
@@ -2116,7 +2116,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Munição da arma {wep} no armário {armario} alterada para {municao}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Munição da arma {wep} no armário {armario} alterada para {municao}.");
             Functions.GravarLog(TipoLog.Staff, $"/earmimun {armario} {item.Arma} {municao}", p, null);
         }
 
@@ -2126,34 +2126,34 @@ namespace Roleplay.Commands
             var arm = Global.Armarios.FirstOrDefault(x => x.Codigo == armario);
             if (arm == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe.");
                 return;
             }
 
             var p = Functions.ObterPersonagem(player);
             if (!((int)p?.UsuarioBD?.Staff >= (int)TipoStaff.Manager || (p.Faccao == arm.Faccao && p.Rank >= p.FaccaoBD.RankLider)))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             if (!Global.Ranks.Any(x => x.Faccao == arm.Faccao && x.Codigo == rank))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} não existe na facção {arm.Faccao}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} não existe na facção {arm.Faccao}.");
                 return;
             }
 
@@ -2165,7 +2165,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Rank da arma {wep} no armário {armario} alterado para {rank}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Rank da arma {wep} no armário {armario} alterado para {rank}.");
             Functions.GravarLog(TipoLog.Staff, $"/earmirank {armario} {item.Arma} {rank}", p, null);
         }
 
@@ -2175,27 +2175,27 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             if (estoque < 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Estoque inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Estoque inválido.");
                 return;
             }
 
@@ -2207,7 +2207,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Estoque da arma {wep} no armário {armario} alterado para {estoque}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Estoque da arma {wep} no armário {armario} alterado para {estoque}.");
             Functions.GravarLog(TipoLog.Staff, $"/earmiest {armario} {item.Arma} {estoque}", p, null);
         }
 
@@ -2217,24 +2217,25 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
-            if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == modelo.ToLower()))
+            if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == modelo.ToLower())
+                && !Enum.GetValues(typeof(ModeloVeiculo)).Cast<ModeloVeiculo>().Any(x => x.ToString().ToLower() == modelo.ToLower()))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Modelo {modelo} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Modelo {modelo} não existe.");
                 return;
             }
 
             var faction = Global.Faccoes.FirstOrDefault(x => x.Codigo == faccao);
             if (faction == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {faccao} não existe.");
                 return;
             }
 
-            var veiculo = new Entities.Veiculo()
+            var veiculo = new Veiculo()
             {
                 PosX = player.Position.X,
                 PosY = player.Position.Y,
@@ -2259,7 +2260,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
             Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
         }
 
@@ -2269,14 +2270,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado.");
                 return;
             }
 
@@ -2285,7 +2286,7 @@ namespace Roleplay.Commands
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
                 if (veh.Faccao == 0)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;
                 }
 
@@ -2293,7 +2294,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veh.Codigo} removido!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veh.Codigo} removido.");
             Functions.GravarLog(TipoLog.Staff, $"/rveh {veh.Codigo}", p, null);
         }
 
@@ -2303,14 +2304,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado.");
                 return;
             }
 
@@ -2319,7 +2320,7 @@ namespace Roleplay.Commands
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
                 if (veh.Faccao == 0)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;
                 }
 
@@ -2333,7 +2334,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas para {r1} {g1} {b1} {r2} {g2} {b2}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas para {r1} {g1} {b1} {r2} {g2} {b2}.");
             Functions.GravarLog(TipoLog.Staff, $"/evehcor {veh.Codigo} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
         }
 
@@ -2343,14 +2344,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado.");
                 return;
             }
 
@@ -2359,7 +2360,7 @@ namespace Roleplay.Commands
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
                 if (veh.Faccao == 0)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;
                 }
 
@@ -2368,7 +2369,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Livery do veículo {veh.Codigo} alterada para {livery}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Livery do veículo {veh.Codigo} alterada para {livery}.");
             Functions.GravarLog(TipoLog.Staff, $"/evehlivery {veh.Codigo} {livery}", p, null);
         }
 
@@ -2378,27 +2379,27 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             if (pintura < 0 || pintura > 7)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Pintura deve ser entre 0 e 7!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Pintura deve ser entre 0 e 7.");
                 return;
             }
 
@@ -2410,7 +2411,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Pintura da arma {wep} no armário {armario} alterada para {pintura}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Pintura da arma {wep} no armário {armario} alterada para {pintura}.");
             Functions.GravarLog(TipoLog.Staff, $"/earmipintura {armario} {item.Arma} {pintura}", p, null);
         }
 
@@ -2420,7 +2421,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -2442,7 +2443,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -2457,35 +2458,35 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
             if (comp == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}.");
                 return;
             }
 
             var componentes = JsonConvert.DeserializeObject<List<uint>>(item.Componentes);
             if (componentes.Contains(comp.Hash))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} já existe na arma {wep} do armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} já existe na arma {wep} do armário {armario}.");
                 return;
             }
 
@@ -2498,7 +2499,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} adicionado na arma {wep} no armário {armario}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} adicionado na arma {wep} no armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/carmicomp {armario} {item.Arma} {componente}", p, null);
         }
 
@@ -2508,35 +2509,35 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (wep == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
                 return;
             }
 
             var item = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep);
             if (item == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
 
             var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
             if (comp == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}.");
                 return;
             }
 
             var componentes = JsonConvert.DeserializeObject<List<uint>>(item.Componentes);
             if (!componentes.Contains(comp.Hash))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe na arma {wep} do armário {armario}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe na arma {wep} do armário {armario}.");
                 return;
             }
 
@@ -2549,7 +2550,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} removido na arma {wep} no armário {armario}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} removido na arma {wep} no armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/rarmicomp {armario} {item.Arma} {componente}", p, null);
         }
         #endregion Staff 1337

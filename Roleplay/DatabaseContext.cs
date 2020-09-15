@@ -52,10 +52,10 @@ namespace Roleplay
             modelBuilder.Entity<Parametro>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().Property(x => x.Emprego).HasConversion(typeof(int));
-            modelBuilder.Entity<PersonagemAcessorio>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable, x.Texture });
+            modelBuilder.Entity<PersonagemAcessorio>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable });
             modelBuilder.Entity<PersonagemArma>().HasKey(x => new { x.Codigo, x.Arma });
             modelBuilder.Entity<PersonagemContato>().HasKey(x => new { x.Codigo, x.Celular });
-            modelBuilder.Entity<PersonagemRoupa>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable, x.Texture });
+            modelBuilder.Entity<PersonagemRoupa>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable });
             modelBuilder.Entity<Ponto>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Ponto>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Preco>().HasKey(x => new { x.Tipo, x.Nome });

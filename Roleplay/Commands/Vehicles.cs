@@ -14,24 +14,24 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o motorista de um veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o motorista de um veículo.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
             if (veh.Personagem != p.Codigo && (veh.Faccao != p.Faccao || veh.Faccao == 0))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", notify: true);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
 
@@ -41,26 +41,26 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (p.Dinheiro < Global.Parametros.ValorVagaVeiculo)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                 return;
             }
 
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
             if (veh.Personagem != p.Codigo)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace Roleplay.Commands
             p.Dinheiro -= Global.Parametros.ValorVagaVeiculo;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou uma vaga por ${Global.Parametros.ValorVagaVeiculo:N0}!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou uma vaga por ${Global.Parametros.ValorVagaVeiculo:N0}.", notify: true);
         }
 
         [Command("vestacionar")]
@@ -89,13 +89,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo.");
                 return;
             }
 
@@ -104,12 +104,12 @@ namespace Roleplay.Commands
             {
                 if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Constants.DistanciaRP)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga.");
                     return;
                 }
 
                 veh.Despawnar();
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo!", notify: true);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo.", notify: true);
                 return;
             }
 
@@ -117,16 +117,16 @@ namespace Roleplay.Commands
             {
                 if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
                     return;
                 }
 
                 veh.Despawnar();
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo!", notify: true);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo.", notify: true);
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
         }
 
         [Command("vspawn", "/vspawn (código do veículo)")]
@@ -135,13 +135,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (Global.Veiculos.Any(x => x.Codigo == codigo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado.");
                 return;
             }
 
@@ -149,19 +149,19 @@ namespace Roleplay.Commands
             var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh?.Personagem != p.Codigo)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
             }
 
             if (veh.ValorApreensao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está apreendido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está apreendido.");
                 return;
             }
 
             veh.Spawnar();
             player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo!", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo.", notify: true);
         }
 
         [Command("vlista")]
@@ -170,7 +170,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -178,7 +178,7 @@ namespace Roleplay.Commands
             var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList();
             if (veiculos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui veículos!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui veículos.");
                 return;
             }
 
@@ -193,7 +193,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -204,7 +204,7 @@ namespace Roleplay.Commands
 
             if (prox == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo seu!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo seu.");
                 return;
             }
 
@@ -214,13 +214,13 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor não é válido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor não é válido.");
                 return;
             }
 
@@ -245,19 +245,19 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LiberacaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de liberação de veículos apreendidos!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de liberação de veículos apreendidos.");
                 return;
             }
 
             if (Global.Veiculos.Any(x => x.Codigo == codigo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido.");
                 return;
             }
 
@@ -265,19 +265,19 @@ namespace Roleplay.Commands
             var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh?.Personagem != p.Codigo)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
             }
 
             if (veh.ValorApreensao == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está apreendido.");
                 return;
             }
 
             if (p.Dinheiro < veh.ValorApreensao)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                 return;
             }
 
@@ -293,7 +293,7 @@ namespace Roleplay.Commands
 
             context.SaveChanges();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você liberou seu veículo!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você liberou seu veículo.");
         }
     }
 }

@@ -18,8 +18,12 @@ namespace Roleplay.Entities
         public long SocialClubUltimoAcesso { get; set; } = 0;
         public DateTime DataRegistro { get; set; } = DateTime.Now;
         public string IPRegistro { get; set; } = string.Empty;
+        public long HardwareIdHashRegistro { get; set; } = 0;
+        public long HardwareIdExHashRegistro { get; set; } = 0;
         public DateTime DataUltimoAcesso { get; set; } = DateTime.Now;
         public string IPUltimoAcesso { get; set; } = string.Empty;
+        public long HardwareIdHashUltimoAcesso { get; set; } = 0;
+        public long HardwareIdExHashUltimoAcesso { get; set; } = 0;
         public long Skin { get; set; } = (long)PedModel.FreemodeMale01;
         public float PosX { get; set; } = 128.4853f;
         public float PosY { get; set; } = -1737.086f;
@@ -48,6 +52,7 @@ namespace Roleplay.Entities
         public string MotivoMorte { get; set; } = string.Empty;
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
         public string InformacoesPersonalizacao { get; set; } = "[]";
+        public string RoupasCivil { get; set; } = string.Empty;
 
         [NotMapped]
         public Personalizacao Personalizacao { get; set; } = new Personalizacao();
@@ -59,7 +64,7 @@ namespace Roleplay.Entities
         public Usuario UsuarioBD { get; set; }
 
         [NotMapped]
-        public IPlayer Player { get => Alt.GetAllPlayers().FirstOrDefault(x => x.SocialClubId == (ulong)UsuarioBD?.SocialClubRegistro); }
+        public IPlayer Player { get; set; }
 
         [NotMapped]
         public DateTime DataUltimaVerificacao { get; set; }
@@ -123,6 +128,15 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public List<PersonagemArma> Armas { get; set; } = new List<PersonagemArma>();
+
+        [NotMapped]
+        public string AreaName { get; set; }
+
+        [NotMapped]
+        public string ZoneName { get; set; }
+
+        [NotMapped]
+        public string StringArmas { get; set; }
 
         public void SetDinheiro()
         {

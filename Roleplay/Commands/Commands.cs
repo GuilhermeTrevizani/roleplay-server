@@ -31,7 +31,6 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/multas"),
                 new Comando("Geral", "/comprar", "Compra um veículo, propriedade ou item"),
                 new Comando("Geral", "/skin", "Compra roupas"),
-                new Comando("Geral", "/emtrabalho"),
                 new Comando("Geral", "/emprego"),
                 new Comando("Geral", "/staff", "Lista os membros da staff que estão online"),
                 new Comando("Geral", "/sos", "Envia solicitação de ajuda aos administradores em serviço"),
@@ -42,6 +41,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
                 new Comando("Geral", "/timestamp", "Ativa/desativa timestamp do chat"),
                 new Comando("Geral", "/barbearia", "Realiza alterações no cabelo em uma barbearia"),
+                new Comando("Geral", "/roupas", "Realiza alterações nas roupas em uma loja de roupas"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -152,6 +152,8 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção Policial", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção Policial", "/apreender", "Apreende um veículo"),
+                        new Comando("Facção Policial", "/uniforme", "Coloca/retira o uniforme de serviço"),
+                        new Comando("Facção Policial", "/mdc", "Abre o MDC"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
@@ -161,6 +163,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Médica", "/curar", "Cura um personagem ferido"),
                         new Comando("Facção Médica", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção Médica", "/ate", "Atende uma ligação 911"),
+                        new Comando("Facção Médica", "/uniforme", "Coloca/retira o uniforme de serviço"),
                     });
 
                 if (p.Rank >= p.FaccaoBD.RankGestor)
@@ -312,7 +315,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -325,7 +328,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -348,20 +351,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoConvite), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
             var convite = p.Convites.FirstOrDefault(x => x.Tipo == (TipoConvite)tipo);
             if (convite == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui nenhum convite do tipo {tipo}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui nenhum convite do tipo {tipo}.");
                 return;
             }
 
@@ -382,13 +385,13 @@ namespace Roleplay.Commands
                 case TipoConvite.VendaPropriedade:
                     if (target == null)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está online!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está online.");
                         break;
                     }
 
                     if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está próximo de você!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está próximo de você.");
                         return;
                     }
 
@@ -396,7 +399,7 @@ namespace Roleplay.Commands
                     int.TryParse(convite.Valor[1], out int valor);
                     if (p.Dinheiro < valor)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                         break;
                     }
 
@@ -409,7 +412,7 @@ namespace Roleplay.Commands
 
                     if (player.Position.Distance(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ)) > Constants.DistanciaRP)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo da propriedade!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo da propriedade.");
                         return;
                     }
 
@@ -432,13 +435,13 @@ namespace Roleplay.Commands
                 case TipoConvite.Revista:
                     if (target == null)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está online!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está online.");
                         break;
                     }
 
                     if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está próximo de você!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está próximo de você.");
                         return;
                     }
 
@@ -447,10 +450,9 @@ namespace Roleplay.Commands
                     Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
                     if (p.CanalRadio > -1)
                         Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
-                    p.Player.GetSyncedMetaData("armas", out string weapons);
-                    if (!string.IsNullOrWhiteSpace(weapons))
+                    if (!string.IsNullOrWhiteSpace(p.StringArmas))
                     {
-                        var armas = weapons.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+                        var armas = p.StringArmas.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
                         .Select(x => new PersonagemArma()
                         {
                             Arma = long.Parse(x.Split("|")[0]),
@@ -468,13 +470,13 @@ namespace Roleplay.Commands
                 case TipoConvite.VendaVeiculo:
                     if (target == null)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está online!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está online.");
                         break;
                     }
 
                     if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está próximo de você!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está próximo de você.");
                         return;
                     }
 
@@ -483,20 +485,20 @@ namespace Roleplay.Commands
 
                     if (p.Dinheiro < valorVeh)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                         break;
                     }
 
                     var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
                     if (veh == null)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Propriedade inválida!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Propriedade inválida.");
                         break;
                     }
 
                     if (player.Position.Distance(veh.Vehicle.Position) > Constants.DistanciaRP)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo!");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo.");
                         return;
                     }
 
@@ -527,20 +529,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!Enum.IsDefined(typeof(TipoConvite), tipo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
             var convite = p.Convites.FirstOrDefault(x => x.Tipo == (TipoConvite)tipo);
             if (convite == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui nenhum convite do tipo {tipo}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui nenhum convite do tipo {tipo}.");
                 return;
             }
 
@@ -580,19 +582,19 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (p.Dinheiro < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                 return;
             }
 
@@ -602,7 +604,7 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
@@ -622,7 +624,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -632,7 +634,7 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
@@ -654,13 +656,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Multas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de pagamento de multas!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de pagamento de multas.");
                 return;
             }
 
@@ -675,7 +677,7 @@ namespace Roleplay.Commands
 
             if (multas.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui multas pendentes!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui multas pendentes.");
                 return;
             }
 
@@ -688,31 +690,31 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (p.TempoPrisao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está preso!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está preso.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP) && p.Celular == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular.");
                 return;
             }
 
             if (p.Banco < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco.");
                 return;
             }
 
@@ -734,25 +736,25 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM.");
                 return;
             }
 
             if (p.Banco < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco.");
                 return;
             }
 
@@ -770,25 +772,25 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
                 return;
             }
 
             if (p.Dinheiro < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                 return;
             }
 
@@ -806,7 +808,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -828,7 +830,7 @@ namespace Roleplay.Commands
             {
                 if (p.Dinheiro < prox.Valor)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
                     return;
                 }
 
@@ -844,7 +846,7 @@ namespace Roleplay.Commands
                     context.SaveChanges();
                 }
 
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou a propriedade por ${prox.Valor:N0}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou a propriedade por ${prox.Valor:N0}.");
                 return;
             }
 
@@ -864,26 +866,18 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma ponto de compra.");
         }
 
-        [Command("emtrabalho")]
-        public void CMD_emtrabalho(IPlayer player)
-        {
-            var duty = Global.PersonagensOnline.Where(x => x.IsEmTrabalho);
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, "Jogadores trabalhando");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Policiais: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial)} | Médicos: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica)} | Taxistas: {duty.Count(x => x.Emprego == TipoEmprego.Taxista)}");
-        }
-
         [Command("sairemprego")]
         public void CMD_sairemprego(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.Emprego == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego.");
                 return;
             }
 
             p.Emprego = 0;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do seu emprego!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do seu emprego.");
         }
 
         [Command("emprego")]
@@ -892,13 +886,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p.Emprego > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já tem um emprego!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já tem um emprego.");
                 return;
             }
 
             if (p.FaccaoBD?.Tipo == TipoFaccao.Policial || p.FaccaoBD?.Tipo == TipoFaccao.Medica)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode pegar um emprego pois está em uma facção governamental!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode pegar um emprego pois está em uma facção governamental.");
                 return;
             }
 
@@ -911,12 +905,12 @@ namespace Roleplay.Commands
 
             if (emprego == TipoEmprego.Nenhum)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum local de emprego!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum local de emprego.");
                 return;
             }
 
             p.Emprego = emprego;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pegou o emprego {Functions.ObterDisplayEnum(emprego)}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pegou o emprego {Functions.ObterDisplayEnum(emprego)}.");
         }
 
         [Command("staff")]
@@ -925,7 +919,7 @@ namespace Roleplay.Commands
             var players = Global.PersonagensOnline.Where(x => x.UsuarioBD?.Staff > 0).OrderByDescending(x => x.UsuarioBD.Staff).ThenBy(x => x.UsuarioBD.Nome).ToList();
             if (players.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum membro da staff online!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum membro da staff online.");
                 return;
             }
 
@@ -964,20 +958,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.UsuarioBD?.Staff > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             if (Global.SOSs.Any(x => x.IDPersonagem == p.ID))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um SOS pendente de resposta!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um SOS pendente de resposta.");
                 return;
             }
 
             var players = Global.PersonagensOnline.Where(x => x.IsEmTrabalhoAdministrativo && x.UsuarioBD?.Staff > 0).ToList();
             if (players.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há administradores em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há administradores em serviço.");
                 return;
             }
 
@@ -1004,7 +998,7 @@ namespace Roleplay.Commands
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem);
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "SOS enviado para os administradores em serviço!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "SOS enviado para os administradores em serviço.");
         }
 
         [Command("ferimentos", "/ferimentos (ID ou nome)")]
@@ -1016,7 +1010,7 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
             }
 
@@ -1054,13 +1048,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p.TimerFerido == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está ferido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está ferido.");
                 return;
             }
 
             if (p.TimerFerido.ElapsedCount == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando ainda!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando ainda.");
                 return;
             }
 
@@ -1100,13 +1094,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p.TimerFerido == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está ferido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está ferido.");
                 return;
             }
 
             if (p.TimerFerido.ElapsedCount == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando ainda!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando ainda.");
                 return;
             }
 
@@ -1125,7 +1119,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -1147,12 +1141,12 @@ namespace Roleplay.Commands
             {
                 if (prox.Personagem != p.Codigo)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o dono da propriedade!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o dono da propriedade.");
                     return;
                 }
 
                 Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta = !prox.Aberta;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta!", notify: true);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(Global.Propriedades[Global.Propriedades.IndexOf(prox)].Aberta ? "des" : string.Empty)}trancou a porta.", notify: true);
                 return;
             }
 
@@ -1165,7 +1159,7 @@ namespace Roleplay.Commands
             if (veh != null)
             {
                 veh.Vehicle.LockState = veh.Vehicle.LockState == VehicleLockState.Locked ? VehicleLockState.Unlocked : VehicleLockState.Locked;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo!", notify: true);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(veh.Vehicle.LockState == VehicleLockState.Unlocked ? "des" : string.Empty)}trancou o veículo.", notify: true);
                 return;
             }
 
@@ -1178,14 +1172,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo == TipoFaccao.Policial)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode entregar armas estando em uma facção policial!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode entregar armas estando em uma facção policial.");
                 return;
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
             if (!p.Armas.Any(x => x.Arma == (long)wep))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está carregando essa arma!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está carregando essa arma.");
                 return;
             }
 
@@ -1195,13 +1189,13 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
             if (target.Armas.Any(x => x.Arma == (long)wep))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O jogador já está carregando essa arma!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O jogador já está carregando essa arma.");
                 return;
             }
 
@@ -1223,13 +1217,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma barbearia!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma barbearia.");
                 return;
             }
 
@@ -1241,6 +1235,31 @@ namespace Roleplay.Commands
 
             player.Emit("AbrirBarbearia", p.Sexo, $"${Global.Parametros.ValorBarbearia:N0}",
                 p.Roupas.FirstOrDefault(x => x.Slot == 2)?.Drawable ?? 0, p.Personalizacao.CabeloCor1, p.Personalizacao.CabeloCor2);
+        }
+
+        [Command("roupas")]
+        public void CMD_roupas(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma loja de roupas.");
+                return;
+            }
+
+            if (p.Dinheiro < Global.Parametros.ValorRoupas)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente! (${Global.Parametros.ValorBarbearia:N0})");
+                return;
+            }
+
+            player.Emit("AbrirLojaRoupas", p.Sexo, $"${Global.Parametros.ValorRoupas:N0}", JsonConvert.SerializeObject(p.Roupas));
         }
     }
 }

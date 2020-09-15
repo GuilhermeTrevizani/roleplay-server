@@ -13,13 +13,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
             if (p.TempoPrisao > 0 || p.Algemado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
             }
 
@@ -29,14 +29,14 @@ namespace Roleplay.Commands
 
             if (numero == p.Celular)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode enviar um SMS para você mesmo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode enviar um SMS para você mesmo.");
                 return;
             }
 
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível.");
                 return;
             }
 
@@ -52,19 +52,19 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
             if (p.TempoPrisao > 0 || p.Algemado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
             }
 
             if (p.NumeroLigacao > 0 || Global.PersonagensOnline.Any(x => x.NumeroLigacao == p.Celular))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está em uma ligação!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está em uma ligação.");
                 return;
             }
 
@@ -74,7 +74,7 @@ namespace Roleplay.Commands
 
             if (numero == p.Celular)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode ligar para você mesmo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode ligar para você mesmo.");
                 return;
             }
 
@@ -105,13 +105,13 @@ namespace Roleplay.Commands
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível.");
                 return;
             }
 
             if (target.NumeroLigacao > 0 || Global.PersonagensOnline.Any(x => x.NumeroLigacao == target.Celular))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} está ocupado!", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} está ocupado.", Constants.CorCelularSecundaria);
                 return;
             }
 
@@ -141,7 +141,7 @@ namespace Roleplay.Commands
 
             if (timer.ElapsedCount == 5)
             {
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu após tocar 5 vezes!", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu após tocar 5 vezes.", Constants.CorCelularSecundaria);
                 p.LimparLigacao();
                 return;
             }
@@ -149,7 +149,7 @@ namespace Roleplay.Commands
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == p.NumeroLigacao);
             if (target == null)
             {
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu!", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu.", Constants.CorCelularSecundaria);
                 p.LimparLigacao();
                 return;
             }
@@ -164,7 +164,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
@@ -174,12 +174,12 @@ namespace Roleplay.Commands
 
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Seu celular não está tocando ou você não está uma ligação!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Seu celular não está tocando ou você não está uma ligação.");
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação!", Constants.CorCelularSecundaria);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target.Celular)}!", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target.Celular)}.", Constants.CorCelularSecundaria);
 
             p.LimparLigacao();
             target.LimparLigacao();
@@ -191,25 +191,25 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
             if (p.TempoPrisao > 0 || p.Algemado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
             }
 
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Seu celular não está tocando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Seu celular não está tocando.");
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida!", Constants.CorCelularSecundaria);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}!", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}.", Constants.CorCelularSecundaria);
 
             target.StatusLigacao = TipoStatusLigacao.EmLigacao;
             target.LimparLigacao(true);
@@ -221,13 +221,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
             if (p.TempoPrisao > 0 || p.Algemado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
             }
 
@@ -240,20 +240,20 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
                 return;
             }
 
             if (p.TempoPrisao > 0 || p.Algemado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
             }
 
             var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == propriedade);
             if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {propriedade} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Propriedade {propriedade} não existe.");
                 return;
             }
 

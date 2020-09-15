@@ -22,25 +22,18 @@ namespace Roleplay.Entities
         public TextDraw TextLabel { get; set; }
 
         [NotMapped]
-        public TextDraw TextLabel2 { get; set; }
-
-        [NotMapped]
         public bool Aberta { get; set; } = false;
 
         public void CriarIdentificador()
         {
             DeletarIdentificador();
 
-            TextLabel = Functions.CriarTextDraw($"Propriedade Nº {Codigo}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), (int)Dimensao);
-
-            if (Personagem == 0)
-                TextLabel2 = Functions.CriarTextDraw($"Use /comprar para comprar por ${Valor:N0}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ - 0.15f), 5, 0.4f, 4, new Rgba(255, 255, 255, 255), (int)Dimensao);
+            TextLabel = Functions.CriarTextDraw($"Propriedade Nº {Codigo}{(Personagem == 0 ? $"\n~w~Use /comprar para comprar por ${Valor:N0}" : string.Empty)}", new Position(EntradaPosX, EntradaPosY, EntradaPosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), (int)Dimensao);
         }
 
         public void DeletarIdentificador()
         {
             Functions.RemoverTextDraw(TextLabel);
-            Functions.RemoverTextDraw(TextLabel2);
         }
     }
 }

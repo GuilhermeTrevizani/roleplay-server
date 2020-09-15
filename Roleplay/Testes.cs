@@ -56,63 +56,10 @@ namespace Roleplay
             p.SetClothes(slot, drawable, texture);
         }
 
-        [Command("x")]
-        public void CMD_x(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p.Sexo == "M")
-            {
-                p.SetClothes(3, 0, 0);
-                p.SetClothes(8, 58, 0);
-                p.SetClothes(6, 25, 0);
-                p.SetClothes(4, 35, 0);
-                p.SetClothes(11, 55, 0);
-            }
-            else
-            {
-                p.SetClothes(3, 0, 0);
-                p.SetClothes(8, 35, 0);
-                p.SetClothes(6, 25, 0);
-                p.SetClothes(4, 34, 0);
-                p.SetClothes(11, 48, 0);
-            }
-        }
-
         [Command("teste")]
         public void CMD_teste(IPlayer player)
         {
             player.Emit("character:Edit", "");
         }
-
-        /* [Command("skin", "/skin)")]
-        public void CMD_skin(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
-                return;
-            }
-
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma loja de roupas!");
-                return;
-            }
-
-            // Abrir loja de roupas
-
-            if (p.Dinheiro < Global.Parametros.ValorSkin)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente!");
-                return;
-            }
-
-            p.Dinheiro -= Global.Parametros.ValorSkin;
-            p.SetDinheiro();
-            player.SetSkin(pedHash);
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou a skin {pedHash} por ${Global.Parametros.ValorSkin:N0}.");
-        }*/
     }
 }

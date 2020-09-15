@@ -1,19 +1,51 @@
-﻿using AltV.Net;
-using AltV.Net.Elements.Entities;
-using Microsoft.EntityFrameworkCore.Internal;
-using Roleplay;
+﻿using Roleplay;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Timers;
 
 namespace Testador
 {
     class Program
     {
+        static BackgroundWorker bk = new BackgroundWorker();
+        static System.Timers.Timer timer { get; set; } = new System.Timers.Timer(1000);
+
         static void Main(string[] args)
         {
-            OnPlayerChat(Console.ReadLine());
+            bk = new BackgroundWorker()
+            {
+                WorkerSupportsCancellation = true
+            };
+            bk.DoWork += Bk_DoWork;
+            bk.RunWorkerCompleted += Bk_RunWorkerCompleted;
+
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+
+            var msg = Console.ReadLine();
+            //OnPlayerChat(Console.ReadLine());
+        }
+
+        private static void Bk_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            var completo = 1;
+        }
+
+        private static void Bk_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Thread.Sleep(10000);
+
+            var eae = 1;
+        }
+
+        private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (!bk.IsBusy)
+                bk.RunWorkerAsync();
         }
 
         [Command("a", "/a (mensagem)", GreedyArg = true)]

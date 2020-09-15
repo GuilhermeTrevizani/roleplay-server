@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roleplay", "Roleplay\Roleplay.csproj", "{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testador", "Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testador", "Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

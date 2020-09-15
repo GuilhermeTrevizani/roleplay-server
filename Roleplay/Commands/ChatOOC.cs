@@ -14,7 +14,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 

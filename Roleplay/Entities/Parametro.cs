@@ -10,5 +10,7 @@
         public int ValorIncentivoInicial { get; set; } = 0;
         public int ValorCustosHospitalares { get; set; } = 0;
         public int ValorBarbearia { get; set; } = 0;
+        public int ValorRoupas { get; set; } = 0;
+        public int SlotsPersonagens { get; set; } = 0;
     }
 }

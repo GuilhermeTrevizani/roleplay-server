@@ -11,5 +11,7 @@ namespace Roleplay.Entities
         public long SocialClub { get; set; }
         public string Motivo { get; set; }
         public int UsuarioStaff { get; set; }
+        public long HardwareIdHash { get; set; }
+        public long HardwareIdExHash { get; set; }
     }
 }

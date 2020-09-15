@@ -13,7 +13,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -24,13 +24,13 @@ namespace Roleplay.Commands
 
             if (prox == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma entrada!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma entrada.");
                 return;
             }
 
             if (!prox.Aberta)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada.");
                 return;
             }
 
@@ -46,7 +46,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -58,13 +58,13 @@ namespace Roleplay.Commands
 
             if (prox == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma saída!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma saída.");
                 return;
             }
 
             if (!prox.Aberta)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada.");
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
                 return;
             }
 
@@ -90,7 +90,7 @@ namespace Roleplay.Commands
 
             if (prox == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade sua!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade sua.");
                 return;
             }
 
@@ -100,13 +100,13 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor não é válido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor não é válido.");
                 return;
             }
 

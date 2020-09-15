@@ -175,6 +175,8 @@ namespace Roleplay.Models
         ApreensaoVeiculos = 7,
         LiberacaoVeiculos = 8,
         Barbearia = 9,
+        Uniforme = 10,
+        MDC = 11,
     }
 
     public enum TipoEmprego
@@ -218,5 +220,22 @@ namespace Roleplay.Models
         Nenhum = 0,
         EmLigacao = 1,
         AguardandoInformacao = 2,
+    }
+
+    public enum ModeloVeiculo : uint
+    {
+        PoliceSlick,
+        PoliceOld,
+        PScout,
+        BeachP,
+        Polmerit2,
+        Police42,
+        PolSpeedo,
+        PolRiot,
+        LSPDB,
+        Pulice,
+        Pulice2,
+        Pulice3,
+        Pulice4,
     }
 }

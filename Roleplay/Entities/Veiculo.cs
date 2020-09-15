@@ -34,10 +34,10 @@ namespace Roleplay.Entities
         public IVehicle Vehicle { get; set; }
 
         /// <summary>
-        /// Código do personagem que usou o /fspawn
+        /// Nome do personagem que usou o /fspawn
         /// </summary>
         [NotMapped]
-        public int PersonagemEncarregado { get; set; } = 0;
+        public string NomeEncarregado { get; set; }
 
         public void Spawnar()
         {

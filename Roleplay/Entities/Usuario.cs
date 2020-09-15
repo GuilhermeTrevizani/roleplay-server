@@ -13,8 +13,12 @@ namespace Roleplay.Entities
         public long SocialClubUltimoAcesso { get; set; } = 0;
         public string IPRegistro { get; set; } = string.Empty;
         public DateTime DataRegistro { get; set; } = DateTime.Now;
+        public long HardwareIdHashRegistro { get; set; } = 0;
+        public long HardwareIdExHashRegistro { get; set; } = 0;
         public string IPUltimoAcesso { get; set; } = string.Empty;
         public DateTime DataUltimoAcesso { get; set; } = DateTime.Now;
+        public long HardwareIdHashUltimoAcesso { get; set; } = 0;
+        public long HardwareIdExHashUltimoAcesso { get; set; } = 0;
         public TipoStaff Staff { get; set; } = 0;
         public bool PossuiNamechange { get; set; } = false;
         public int QuantidadeSOSAceitos { get; set; } = 0;

@@ -7,7 +7,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using static Roleplay.Constants;
 
 namespace Roleplay.Commands
@@ -20,13 +19,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção.");
                 return;
             }
 
             if (p.FaccaoBD.IsChatBloqueado)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Chat da facção está bloqueado!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Chat da facção está bloqueado.");
                 return;
             }
 
@@ -40,7 +39,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção.");
                 return;
             }
 
@@ -82,12 +81,12 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0 || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
             Global.Faccoes[Global.Faccoes.IndexOf(p.FaccaoBD)].IsChatBloqueado = !p.FaccaoBD.IsChatBloqueado;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.FaccaoBD.IsChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.FaccaoBD.IsChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.");
         }
 
         [Command("convidar", "/convidar (ID ou nome)")]
@@ -96,7 +95,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0 || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -106,7 +105,7 @@ namespace Roleplay.Commands
 
             if (target.Faccao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador já está em uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador já está em uma facção.");
                 return;
             }
 
@@ -132,7 +131,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0 || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -142,26 +141,26 @@ namespace Roleplay.Commands
 
             if (target.Faccao != p.Faccao)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador não pertence a sua facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador não pertence a sua facção.");
                 return;
             }
 
             if (target.Rank > p.Rank)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador possui um rank maior que o seu!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador possui um rank maior que o seu.");
                 return;
             }
 
             var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == p.Faccao && x.Codigo == rank);
             if (rk == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} não existe!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank {rank} não existe.");
                 return;
             }
 
             if (rank >= p.FaccaoBD.RankGestor && p.Rank < p.FaccaoBD.RankLider)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Somente o líder da facção pode alterar o rank de um jogador para gestor!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Somente o líder da facção pode alterar o rank de um jogador para gestor.");
                 return;
             }
 
@@ -178,7 +177,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0 || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -188,13 +187,13 @@ namespace Roleplay.Commands
 
             if (target.Faccao != p.Faccao)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador não pertence a sua facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador não pertence a sua facção.");
                 return;
             }
 
             if (target.Rank > p.Rank)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador possui um rank maior que o seu!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador possui um rank maior que o seu.");
                 return;
             }
 
@@ -218,7 +217,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
@@ -231,7 +230,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica && p?.Emprego == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou médica e não possui um emprego!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou médica e não possui um emprego.");
                 return;
             }
 
@@ -239,12 +238,12 @@ namespace Roleplay.Commands
 
             if (p?.Faccao == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço.");
             }
             else
             {
                 foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao))
-                    Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço!", $"#{p.FaccaoBD.Cor}");
+                    Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço.", $"#{p.FaccaoBD.Cor}");
             }
         }
 
@@ -254,7 +253,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção.");
                 return;
             }
 
@@ -275,7 +274,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
@@ -285,13 +284,13 @@ namespace Roleplay.Commands
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (motivo.Length > 255)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.");
                 return;
             }
 
@@ -318,19 +317,19 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
             if (valor <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
                 return;
             }
 
             if (motivo.Length > 255)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.");
                 return;
             }
 
@@ -340,7 +339,7 @@ namespace Roleplay.Commands
             var personagem = context.Personagens.FirstOrDefault(x => x.Nome.ToLower() == nomeCompleto.ToLower() && !x.Online);
             if (personagem == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {nomeCompleto} não encontrado ou está online!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {nomeCompleto} não encontrado ou está online.");
                 return;
             }
 
@@ -362,13 +361,13 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
             if (player.Position.Distance(PosicaoPrisao) > DistanciaRP)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no local que as prisões são efetuadas!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no local que as prisões são efetuadas.");
                 return;
             }
 
@@ -378,19 +377,19 @@ namespace Roleplay.Commands
 
             if (target.TempoPrisao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador já está preso!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador já está preso.");
                 return;
             }
 
             if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
             if (minutos <= 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Minutos inválidos!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Minutos inválidos.");
                 return;
             }
 
@@ -407,7 +406,7 @@ namespace Roleplay.Commands
                     pos = new Position(460.4085f, -1001.342f, 25);
                     break;
                 default:
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Cela deve ser entre 1 e 3!");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Cela deve ser entre 1 e 3.");
                     break;
             }
 
@@ -435,7 +434,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
@@ -445,7 +444,7 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
             }
 
@@ -473,7 +472,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0 || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
             }
 
@@ -490,14 +489,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.Faccao == 0 || p?.Rank == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
                 return;
             }
 
@@ -512,7 +511,7 @@ namespace Roleplay.Commands
             }).ToList();
             if (itens.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O armário não possui itens!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O armário não possui itens.");
                 return;
             }
 
@@ -525,14 +524,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
             var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
             if (armario == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
                 return;
             }
 
@@ -546,7 +545,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Medica || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção médica ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção médica ou não está em serviço.");
                 return;
             }
 
@@ -556,7 +555,7 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
             }
 
@@ -568,7 +567,7 @@ namespace Roleplay.Commands
             {
                 target.TimerFerido?.Stop();
                 target.TimerFerido = null;
-                p.Player.Emit("player:toggleFreeze", false);
+                target.Player.Emit("player:toggleFreeze", false);
                 target.StopAnimation();
                 target.Player.Armor = 0;
             }
@@ -583,14 +582,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
             }
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
             if (ponto == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
                 return;
             }
 
@@ -602,12 +601,12 @@ namespace Roleplay.Commands
                     x.Codigo,
                     Modelo = x.Modelo.ToUpper(),
                     x.Placa,
-                    Spawnado = Global.Veiculos.Any(y => y.Codigo == x.Codigo) ? "SIM" : "NÃO",
+                    Encarregado = Global.Veiculos.FirstOrDefault(y => y.Codigo == x.Codigo)?.NomeEncarregado ?? "N/A",
                 }).ToList();
 
             if (veiculos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua facção não possui veículos para spawnar!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua facção não possui veículos para spawnar.");
                 return;
             }
 
@@ -620,14 +619,14 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
             }
 
-            var ligacao911 = Global.Ligacoes911.FirstOrDefault(x => x.Codigo == codigo);
+            var ligacao911 = Global.Ligacoes911.FirstOrDefault(x => x.ID == codigo);
             if (ligacao911 == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhuma ligação 911 encontrada com o código {codigo}!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhuma ligação 911 encontrada com o código {codigo}.");
                 return;
             }
 
@@ -641,39 +640,45 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
             }
 
             var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.ApreensaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
             if (ponto == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de apreensão de veículos!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de apreensão de veículos.");
                 return;
             }
 
             if (valor < 1 || valor > 5000)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor da apreensão deve ser entre 1 e 5000!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor da apreensão deve ser entre 1 e 5000.");
                 return;
             }
 
             if (motivo.Length > 255)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.");
                 return;
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Placa.ToUpper() == placa.ToUpper());
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não existe veículo com a placa: {placa.ToUpper()}");
+                return;
+            }
+
             if (veh.Faccao > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo pertence a uma facção!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo pertence a uma facção.");
                 return;
             }
 
             if (player.Position.Distance(new Position(veh.Vehicle.Position.X, veh.Vehicle.Position.Y, veh.Vehicle.Position.Z)) > DistanciaRP)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo!");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo.");
                 return;
             }
 
@@ -699,7 +704,83 @@ namespace Roleplay.Commands
 
             veh.Despawnar();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você apreendeu o veículo com a placa {placa.ToUpper()} por ${valor:N0}!");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você apreendeu o veículo com a placa {placa.ToUpper()} por ${valor:N0}.");
+        }
+
+        [Command("uniforme")]
+        public void CMD_uniforme(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental.");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Uniforme && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de uniformes.");
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(p.RoupasCivil))
+            {
+                var roupas = JsonConvert.DeserializeObject<List<PersonagemRoupa>>(p.RoupasCivil);
+                foreach (var x in roupas)
+                    p.SetClothes(x.Slot, x.Drawable, x.Texture);
+
+                p.RoupasCivil = string.Empty;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você retirou seu uniforme.", notify: true);
+                return;
+            }
+
+            p.RoupasCivil = JsonConvert.SerializeObject(p.Roupas);
+
+            if (p.Sexo == "M")
+            {
+                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
+                {
+                    p.SetClothes(3, 0, 0);
+                    p.SetClothes(8, 58, 0);
+                    p.SetClothes(6, 25, 0);
+                    p.SetClothes(4, 35, 0);
+                    p.SetClothes(11, 55, 0);
+                }
+            }
+            else
+            {
+                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
+                {
+                    p.SetClothes(3, 0, 0);
+                    p.SetClothes(8, 35, 0);
+                    p.SetClothes(6, 25, 0);
+                    p.SetClothes(4, 34, 0);
+                    p.SetClothes(11, 48, 0);
+                }
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você colocou seu uniforme.", notify: true);
+        }
+
+        [Command("mdc")]
+        public void CMD_mdc(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MDC && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP) 
+                && !(Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle)?.Faccao == p.Faccao
+                    && (p.Player.Seat == 1 || p.Player.Seat == 2)))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de MDC ou em um veículo policial nos bancos dianteiros.");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"ABRIR MDC");
         }
     }
 }
