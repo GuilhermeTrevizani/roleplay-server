@@ -12,12 +12,6 @@ namespace Roleplay.Commands
         public void CMD_pm(IPlayer player, string idNome, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;

@@ -21,12 +21,6 @@ namespace Roleplay.Commands
         public void CMD_s(IPlayer player, string idNome, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
@@ -46,7 +40,6 @@ namespace Roleplay.Commands
         public void CMD_ame(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-
             var msgTotal = $"* {p.NomeIC} {mensagem}";
             if (msgTotal.Length > 99)
             {

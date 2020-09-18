@@ -9,12 +9,6 @@ namespace Roleplay.Commands
         public void CMD_canal(IPlayer player, int slot, int canal)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (p.CanalRadio == -1)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um rádio.");

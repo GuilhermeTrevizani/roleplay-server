@@ -310,28 +310,11 @@ namespace Roleplay.Commands
         }
 
         [Command("stats")]
-        public void CMD_stats(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
-            Functions.MostrarStats(player, p);
-        }
+        public void CMD_stats(IPlayer player) => Functions.MostrarStats(player, Functions.ObterPersonagem(player));
 
         [Command("id", "/id (ID ou nome)", GreedyArg = true)]
         public void CMD_id(IPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             int.TryParse(idNome, out int id);
             var personagens = Global.PersonagensOnline.Where(x => x.ID == id || x.Nome.ToLower().Contains(idNome.ToLower())).OrderBy(x => x.ID).ToList();
             if (personagens.Count == 0)
@@ -349,11 +332,6 @@ namespace Roleplay.Commands
         public void CMD_aceitar(IPlayer player, int tipo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (!Enum.IsDefined(typeof(TipoConvite), tipo))
             {
@@ -527,11 +505,6 @@ namespace Roleplay.Commands
         public void CMD_recusar(IPlayer player, int tipo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (!Enum.IsDefined(typeof(TipoConvite), tipo))
             {
@@ -580,11 +553,6 @@ namespace Roleplay.Commands
         public void CMD_pagar(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (valor <= 0)
             {
@@ -622,11 +590,6 @@ namespace Roleplay.Commands
         public void CMD_revistar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
@@ -654,11 +617,6 @@ namespace Roleplay.Commands
         public void CMD_multas(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
@@ -688,12 +646,6 @@ namespace Roleplay.Commands
         public void CMD_transferir(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (p.TempoPrisao > 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está preso.");
@@ -734,12 +686,6 @@ namespace Roleplay.Commands
         public void CMD_sacar(IPlayer player, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (valor <= 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
@@ -770,12 +716,6 @@ namespace Roleplay.Commands
         public void CMD_depositar(IPlayer player, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (valor <= 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
@@ -806,12 +746,6 @@ namespace Roleplay.Commands
         public void CMD_comprar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 player.Emit("Server:ComprarConveniencia", JsonConvert.SerializeObject(Global.Precos.Where(x => x.Tipo == TipoPreco.Conveniencia).OrderBy(x => x.Nome).Select(x => new
@@ -1117,12 +1051,6 @@ namespace Roleplay.Commands
         public void CMD_trancar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var prox = Global.Propriedades
                 .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
@@ -1215,11 +1143,6 @@ namespace Roleplay.Commands
         public void CMD_barbearia(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
@@ -1242,11 +1165,6 @@ namespace Roleplay.Commands
         public void CMD_roupas(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
 
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {

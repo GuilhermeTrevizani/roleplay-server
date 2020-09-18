@@ -11,12 +11,6 @@ namespace Roleplay.Commands
         public void CMD_entrar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var prox = Global.Propriedades
                 .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
@@ -44,12 +38,6 @@ namespace Roleplay.Commands
         public void CMD_sair(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var prox = Global.Propriedades
                 .Where(x => player.Dimension == x.Codigo
                     && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Constants.DistanciaRP)
@@ -77,12 +65,6 @@ namespace Roleplay.Commands
         public void CMD_pvender(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var prox = Global.Propriedades
                 .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))

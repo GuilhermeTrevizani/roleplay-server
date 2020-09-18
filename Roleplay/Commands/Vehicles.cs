@@ -12,12 +12,6 @@ namespace Roleplay.Commands
         public void CMD_motor(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o motorista de um veículo.");
@@ -39,12 +33,6 @@ namespace Roleplay.Commands
         public void CMD_vcomprarvaga(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (p.Dinheiro < Global.Parametros.ValorVagaVeiculo)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
@@ -87,12 +75,6 @@ namespace Roleplay.Commands
         public void CMD_vestacionar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo.");
@@ -133,12 +115,6 @@ namespace Roleplay.Commands
         public void CMD_vspawn(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (Global.Veiculos.Any(x => x.Codigo == codigo))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado.");
@@ -168,12 +144,6 @@ namespace Roleplay.Commands
         public void CMD_vlista(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             using var context = new DatabaseContext();
             var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList();
             if (veiculos.Count == 0)
@@ -191,12 +161,6 @@ namespace Roleplay.Commands
         public void CMD_vvender(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             var prox = Global.Veiculos
                 .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Constants.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(x.Vehicle.Position))
@@ -243,12 +207,6 @@ namespace Roleplay.Commands
         public void CMD_vliberar(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está conectado.");
-                return;
-            }
-
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LiberacaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de liberação de veículos apreendidos.");
