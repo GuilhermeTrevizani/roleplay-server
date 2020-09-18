@@ -83,7 +83,7 @@ namespace Roleplay.Commands
                 p.NumeroLigacao = numero;
                 p.StatusLigacao = TipoStatusLigacao.EmLigacao;
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de emergência, deseja falar com LSPD ou LSFD?", Constants.CorCelular);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de emergência, deseja falar com PD, FD ou PDFD?", Constants.CorCelular);
                 return;
             }
 
@@ -216,7 +216,7 @@ namespace Roleplay.Commands
         }
 
         [Command("celular", Alias = "cel")]
-        public void CMD_cel(IPlayer player)
+        public void CMD_celular(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if ((p?.Celular ?? 0) == 0)
@@ -231,7 +231,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()));
+            player.Emit("Server:AbrirCelular", p.Celular, JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()));
         }
 
         [Command("gps", "/gps (propriedade)")]

@@ -184,7 +184,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Veículos de {p.Nome} [{p.Codigo}]");
             foreach (var v in veiculos)
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? "SIM" : "NÃO")} | Apreendido: {(v.ValorApreensao > 0 ? $"SIM (${v.ValorApreensao:N0})" : "NÃO")}");
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo.ToUpper()} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? $"{{{Global.CorSucesso}}}SIM" : $"{{{Global.CorErro}}}NÃO")}{{#FFFFFF}} | Apreendido: {(v.ValorApreensao > 0 ? $"{{{Global.CorSucesso}}}SIM (${v.ValorApreensao:N0})" : $"{{{Global.CorErro}}}NÃO")}");
         }
 
         [Command("vvender", "/vvender (ID ou nome) (valor)")]

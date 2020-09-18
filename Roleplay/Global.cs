@@ -10,6 +10,7 @@ namespace Roleplay
     {
         public static string CorSucesso { get; set; } = "#6EB469";
         public static string CorAmarelo { get; set; } = "#FEBD0C";
+        public static string CorErro { get; set; } = "#FF6A4D";
         public static string NomeServidor { get; set; } = "Segunda Vida Roleplay";
         public static int MaxPlayers { get; set; }
         public static string ConnectionString { get; set; }
@@ -24,13 +25,15 @@ namespace Roleplay
         public static List<Ponto> Pontos { get; set; }
         public static List<Armario> Armarios { get; set; }
         public static List<ArmarioItem> ArmariosItens { get; set; }
+        public static List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
+        public static List<Resposta> Respostas { get; set; } = new List<Resposta>();
         public static List<Concessionaria> Concessionarias { get; set; } = new List<Concessionaria>()
         {
             new Concessionaria()
             {
                 Nome = "Concessionária de Carros e Motos",
                 Tipo = TipoPreco.CarrosMotos,
-                PosicaoCompra = new Position(-38.63479f, -1109.706f, 26.43781f),
+                PosicaoCompra = new Position(-56.637363f, -1099.0286f, 26.415405f),
                 PosicaoSpawn = new Position(-60.224174f, -1106.1494f, 25.909912f),
                 RotacaoSpawn = new Position(-0.015625f, 0, 1.203125f),
             },

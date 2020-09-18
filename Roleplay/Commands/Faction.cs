@@ -559,7 +559,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            target.Ferimentos = new List<Ferimento>();
+            target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;
 
@@ -736,11 +736,13 @@ namespace Roleplay.Commands
 
             p.RoupasCivil = JsonConvert.SerializeObject(p.Roupas);
 
+            p.SetClothes(3, 0, 0);
+            p.SetClothes(7, 0, 0);
+
             if (p.Sexo == "M")
             {
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                 {
-                    p.SetClothes(3, 0, 0);
                     p.SetClothes(8, 58, 0);
                     p.SetClothes(6, 25, 0);
                     p.SetClothes(4, 35, 0);
@@ -751,7 +753,6 @@ namespace Roleplay.Commands
             {
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                 {
-                    p.SetClothes(3, 0, 0);
                     p.SetClothes(8, 35, 0);
                     p.SetClothes(6, 25, 0);
                     p.SetClothes(4, 34, 0);
@@ -772,7 +773,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MDC && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP) 
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MDC && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP)
                 && !(Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle)?.Faccao == p.Faccao
                     && (p.Player.Seat == 1 || p.Player.Seat == 2)))
             {

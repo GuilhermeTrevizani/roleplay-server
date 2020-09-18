@@ -34,6 +34,8 @@ namespace Roleplay.Models
         Medica = 2,
 
         Criminosa = 3,
+
+        Governo = 4,
     }
 
     public enum TipoPunicao
@@ -166,7 +168,6 @@ namespace Roleplay.Models
 
     public enum TipoPonto
     {
-        Multas = 1,
         Banco = 2,
         ATM = 3,
         LojaConveniencia = 4,
@@ -189,13 +190,10 @@ namespace Roleplay.Models
     {
         Nenhum = 0,
 
-        Helper = 1,
+        Moderator = 1,
 
         [Display(Name = "Game Administrator")]
-        GameModerator = 2,
-
-        [Display(Name = "Game Administrator")]
-        GameAdministrator = 3,
+        GameAdministrator = 2,
 
         [Display(Name = "Lead Administrator")]
         LeadAdministrator = 100,

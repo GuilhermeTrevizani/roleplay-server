@@ -24,13 +24,9 @@ namespace Roleplay.Entities
             string descricao = string.Empty;
             switch (Tipo)
             {
-                case TipoPonto.Multas:
-                    nome = "Pagamento de Multas";
-                    descricao = "Use /multas para checar suas multas pendentes";
-                    break;
                 case TipoPonto.Banco:
                     nome = "Caixa Bancário";
-                    descricao = "Use /sacar, /transferir ou /depositar";
+                    descricao = "Use /sacar, /transferir, /depositar ou /multas";
                     break;
                 case TipoPonto.ATM:
                     nome = "ATM";
@@ -46,7 +42,7 @@ namespace Roleplay.Entities
                     break;
                 case TipoPonto.SpawnVeiculosFaccao:
                     nome = "Spawn de Veículos da Facção";
-                    descricao = "Use /fspawn";
+                    descricao = "Use /fspawn ou /vestacionar";
                     break;
                 case TipoPonto.ApreensaoVeiculos:
                     nome = "Apreensão de Veículos";
@@ -70,7 +66,7 @@ namespace Roleplay.Entities
                     break;
             }
 
-            TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
         }
 
         public void DeletarIdentificador() => Functions.RemoverTextDraw(TextLabel);

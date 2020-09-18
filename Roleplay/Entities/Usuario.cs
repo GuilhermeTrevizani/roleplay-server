@@ -24,5 +24,12 @@ namespace Roleplay.Entities
         public int QuantidadeSOSAceitos { get; set; } = 0;
         public int TempoTrabalhoAdministrativo { get; set; } = 0;
         public bool TimeStamp { get; set; } = true;
+        public long Discord { get; set; } = 0;
+
+        /// <summary>
+        /// Se estiver em branco, o registro do usuário está confirmado
+        /// </summary>
+        public string TokenConfirmacao { get; set; } = string.Empty;
+        public string TokenSenha { get; set; } = string.Empty;
     }
 }

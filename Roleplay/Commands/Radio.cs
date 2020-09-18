@@ -39,21 +39,27 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (canal == 911 && p.FaccaoBD?.Tipo != TipoFaccao.Policial)
+            if (canal >= 911 && canal <= 920 && p.FaccaoBD?.Tipo != TipoFaccao.Policial)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 911 é reservado para facções policiais.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 911 até 920 é reservado para facções policiais.");
                 return;
             }
 
-            if (canal == 912 && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
+            if (canal >= 921 && canal <= 930 && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 912 é reservado para facções médicas.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 921 até 930 é reservado para facções médicas.");
+                return;
+            }
+
+            if (canal >= 931 && canal <= 940 && p.FaccaoBD?.Tipo != TipoFaccao.Governo)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 931 até 940 é reservado para o governo.");
                 return;
             }
 
             if (canal == 999 && p.FaccaoBD?.Tipo != TipoFaccao.Policial && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 911 é reservado para facções governamentais.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 999 é reservado para facções governamentais.");
                 return;
             }
 

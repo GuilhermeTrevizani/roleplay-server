@@ -29,6 +29,7 @@ namespace Roleplay.Entities
         public int EngineHealth { get; set; } = 1000;
         public int Livery { get; set; } = 0;
         public int ValorApreensao { get; set; } = 0;
+        public int Combustivel { get; set; } = 100;
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }

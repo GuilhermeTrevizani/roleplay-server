@@ -19,7 +19,7 @@ namespace Roleplay.Entities
         public void CriarIdentificador()
         {
             DeletarIdentificador();
-            TextLabel = Functions.CriarTextDraw("Armário\n~w~Use /armario", new Position(PosX, PosY, PosZ), 5, 0.4f, 4, new Rgba(254, 189, 12, 255), (int)Dimensao);
+            TextLabel = Functions.CriarTextDraw("Armário\n~w~Use /armario", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, new Rgba(254, 189, 12, 255), (int)Dimensao);
         }
 
         public void DeletarIdentificador() => Functions.RemoverTextDraw(TextLabel);

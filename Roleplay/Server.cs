@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -16,7 +17,7 @@ using System.Timers;
 
 namespace Roleplay
 {
-    public class Server : Resource
+    public class Server : AsyncResource
     {
         Timer TimerPrincipal { get; set; }
 
@@ -28,11 +29,11 @@ namespace Roleplay
             Alt.OnWeaponDamage += OnWeaponDamage;
             Alt.OnPlayerDamage += OnPlayerDamage;
             Alt.OnClient<IPlayer, string>("OnPlayerChat", OnPlayerChat);
-            Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
+            Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
             Alt.OnClient<IPlayer>("ListarPersonagens", ListarPersonagens);
             Alt.OnClient<IPlayer, int>("SelecionarPersonagem", SelecionarPersonagem);
-            Alt.OnClient<IPlayer, string, string, string, string>("CriarPersonagem", CriarPersonagem);
+            Alt.OnClient<IPlayer, int, string, string, string, string, string>("CriarPersonagem", CriarPersonagem);
             Alt.OnClient<IPlayer>("ListarPlayers", ListarPlayers);
             Alt.OnClient<IPlayer, int, string, int, int, int, int, int, int>("ComprarVeiculo", ComprarVeiculo);
             Alt.OnClient<IPlayer, string>("ComprarConveniencia", ComprarConveniencia);
@@ -45,7 +46,14 @@ namespace Roleplay
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
             Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
-            Alt.OnClient<IPlayer, int, int, int>("ConfirmarBarbearia", ConfirmarBarbearia);
+            Alt.OnClient<IPlayer, int, int, int, int, int, int>("ConfirmarBarbearia", ConfirmarBarbearia);
+            Alt.OnClient<IPlayer, string>("ConfirmarLojaRoupas", ConfirmarLojaRoupas);
+            Alt.OnClient<IPlayer, string>("EnviarEmailConfirmacao", EnviarEmailConfirmacao);
+            Alt.OnClient<IPlayer, string>("ValidarTokenConfirmacao", ValidarTokenConfirmacao);
+            Alt.OnClient<IPlayer>("ExibirPerguntas", ExibirPerguntas);
+            Alt.OnClient<IPlayer, string>("ValidarPerguntas", ValidarPerguntas);
+            Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
+            Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -94,20 +102,26 @@ namespace Roleplay
 
                 context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = now(), TipoResposta = 3 WHERE DataResposta is null");
                 Console.WriteLine("SOSs limpos");
+
+                Global.Perguntas = context.Perguntas.ToList();
+                Console.WriteLine($"Perguntas: {Global.Perguntas.Count}");
+
+                Global.Respostas = context.Respostas.ToList();
+                Console.WriteLine($"Respostas: {Global.Respostas.Count}");
             }
 
             foreach (var c in Global.Concessionarias)
-                Functions.CriarTextDraw($"{c.Nome}\n~w~Use /comprar", c.PosicaoCompra, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+                Functions.CriarTextDraw($"{c.Nome}\n~w~Use /comprar", c.PosicaoCompra, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
             Console.WriteLine($"Concessionarias: {Global.Concessionarias.Count}");
 
             foreach (var c in Global.Empregos)
             {
                 var nome = Functions.ObterDisplayEnum(c.Tipo);
-                Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+                Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
             }
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
-            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Constants.PosicaoPrisao, 5, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Constants.PosicaoPrisao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
 
             TimerPrincipal = new Timer(60000);
             TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
@@ -275,7 +289,7 @@ namespace Roleplay
             }
             catch (Exception ex)
             {
-                Console.WriteLine(JsonConvert.SerializeObject(ex));
+                Functions.RecuperarErro(ex);
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não foi possível interpretar o comando.");
             }
         }
@@ -289,7 +303,7 @@ namespace Roleplay
             if (p == null)
                 return false;
 
-            p.Ferimentos.Add(new Ferimento()
+            p.Ferimentos.Add(new Personagem.Ferimento()
             {
                 Data = DateTime.Now,
                 Arma = weapon,
@@ -310,7 +324,7 @@ namespace Roleplay
             if (p == null)
                 return;
 
-            var ferimento = new Ferimento()
+            var ferimento = new Personagem.Ferimento()
             {
                 Data = DateTime.Now,
                 Arma = weapon,
@@ -366,6 +380,12 @@ namespace Roleplay
                 Player = player,
             });
 
+            if (!string.IsNullOrWhiteSpace(user.TokenConfirmacao))
+            {
+                player.Emit("Server:ConfirmacaoRegistro", user.Nome, user.Email);
+                return;
+            }
+
             ListarPersonagens(player);
         }
 
@@ -375,9 +395,32 @@ namespace Roleplay
 
             using var context = new DatabaseContext();
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
-                JsonConvert.SerializeObject(context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo && x.DataMorte == null)
+                JsonConvert.SerializeObject(context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo)
                     .OrderByDescending(x => x.Codigo)
-                    .Select(x => new { x.Codigo, x.Nome })), Global.Parametros.SlotsPersonagens);
+                    .ToList()
+                    .Select(x => new
+                    {
+                        x.Codigo,
+                        x.Nome,
+                        Status = ObterStatusListarPersonagens(x),
+                        PodeLogar = !x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0
+                    })),
+                    Global.Parametros.SlotsPersonagens,
+                    p.UsuarioBD.PossuiNamechange); ;
+        }
+
+        private string ObterStatusListarPersonagens(Personagem x)
+        {
+            var span = $@"<span style=""color:#1de312;"">Vivo</span>";
+
+            if (x.DataMorte.HasValue)
+                span = $@"<span style=""color:#d12c0f;"">Morto</span>";
+            else if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
+                span = $@"<span style=""color:#d12c0f;"">Rejeitado</span>";
+            else if (!string.IsNullOrWhiteSpace(x.Historia) && x.UsuarioStaffAvaliador == 0)
+                span = $@"<span style=""color:#e69215;"">Aguardando Avaliação</span>";
+
+            return span;
         }
 
         private void SelecionarPersonagem(IPlayer player, int id)
@@ -387,7 +430,15 @@ namespace Roleplay
                 return;
 
             using var context = new DatabaseContext();
-            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == id && x.Usuario == p.UsuarioBD.Codigo && x.DataMorte == null);
+            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == id && x.Usuario == p.UsuarioBD.Codigo);
+            if (!string.IsNullOrWhiteSpace(personagem.MotivoRejeicao))
+            {
+                var staffer = context.Usuarios.FirstOrDefault(x => x.Codigo == personagem.UsuarioStaffAvaliador);
+                var nome = personagem.Nome.Split(' ');
+                player.Emit("Server:CriarPersonagem", personagem.Codigo, nome.FirstOrDefault(), nome.LastOrDefault(), personagem.Sexo, personagem.DataNascimento.ToShortDateString(), personagem.Historia, personagem.MotivoRejeicao, staffer.Nome);
+                return;
+            }
+
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = Functions.ObterIP(player);
@@ -404,8 +455,62 @@ namespace Roleplay
             Global.PersonagensOnline[index] = personagem;
             Global.PersonagensOnline[index].Player = player;
             Global.PersonagensOnline[index].UsuarioBD = user;
+            p = personagem;
 
-            Functions.LogarPersonagem(player, personagem);
+            foreach (var x in Global.Blips)
+                x.CriarIdentificador(player);
+
+            foreach (var x in Global.TextDraws)
+                x.CriarIdentificador(player);
+
+            player.SetSyncedMetaData("nametag", p.Nome);
+            player.Dimension = (int)p.Dimensao;
+            p.IPLs = JsonConvert.DeserializeObject<List<string>>(p.IPL);
+            p.SetarIPLs();
+            player.SetDateTime(DateTime.Now);
+            player.Health = (ushort)(p.Vida + 100);
+            player.Armor = (ushort)p.Colete;
+            player.Model = (uint)p.Skin;
+            p.SetDinheiro();
+            player.SetWeather(Global.Weather);
+
+            p.Contatos = context.PersonagensContatos.Where(x => x.Codigo == p.Codigo).ToList();
+
+            var roupas = context.PersonagensRoupas.Where(x => x.Codigo == p.Codigo).ToList();
+            foreach (var x in roupas)
+                p.SetClothes(x.Slot, x.Drawable, x.Texture);
+
+            var acessorios = context.PersonagensAcessorios.Where(x => x.Codigo == p.Codigo).ToList();
+            foreach (var x in acessorios)
+                p.SetAccessories(x.Slot, x.Drawable, x.Texture);
+
+            p.Armas = context.PersonagensArmas.Where(x => x.Codigo == p.Codigo).ToList();
+            foreach (var x in p.Armas)
+            {
+                player.GiveWeapon((WeaponModel)x.Arma, x.Municao, false);
+                player.SetWeaponTintIndex((WeaponModel)x.Arma, (byte)x.Pintura);
+                foreach (var c in JsonConvert.DeserializeObject<List<uint>>(x.Componentes))
+                    player.AddWeaponComponent((WeaponModel)x.Arma, c);
+            }
+
+            if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
+            {
+                Global.Parametros.RecordeOnline = Global.PersonagensOnline.Count;
+                context.Parametros.Update(Global.Parametros);
+                context.SaveChanges();
+
+                foreach (var u in Global.PersonagensOnline)
+                    Functions.EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorSucesso}}}{Global.Parametros.RecordeOnline}{{#FFFFFF}}.");
+            }
+
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao);
+            player.Emit("nametags:Config", true);
+            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
+            player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
+            player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+            p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+
+            Functions.GravarLog(TipoLog.Entrada, string.Empty, p, null);
         }
 
         private void RegistrarUsuario(IPlayer player, string usuario, string email, string senha, string senha2)
@@ -430,7 +535,7 @@ namespace Roleplay
 
             if (email.Length > 100)
             {
-                player.Emit("Server:MostrarErro", "Email não pode ter mais que 100 caracteres.");
+                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
                 return;
             }
 
@@ -481,24 +586,33 @@ namespace Roleplay
                     HardwareIdExHashRegistro = (long)player.HardwareIdExHash,
                     HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                     HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
+                    TokenConfirmacao = new Random().Next(111111, 999999).ToString(),
                 };
                 context.Usuarios.Add(user);
                 context.SaveChanges();
+
+                Functions.EnviarEmail(user.Email, "Confirmação de E-mail", $"Seu token de confirmação é <strong>{user.TokenConfirmacao}</strong>.");
             }
 
             EntrarUsuario(player, usuario, senha);
         }
 
-        private void CriarPersonagem(IPlayer player, string nome, string sobrenome, string sexo, string dataNascimento)
+        private void CriarPersonagem(IPlayer player, int codigo, string nome, string sobrenome, string sexo, string dataNascimento, string historia)
         {
             var p = Functions.ObterPersonagem(player);
             if (p == null || p.ID > 0)
                 return;
 
             if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(sobrenome) || string.IsNullOrWhiteSpace(sexo)
-                || string.IsNullOrWhiteSpace(dataNascimento))
+                || string.IsNullOrWhiteSpace(dataNascimento) || string.IsNullOrWhiteSpace(historia))
             {
                 player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
+                return;
+            }
+
+            if (historia.Length < 500)
+            {
+                player.Emit("Server:MostrarErro", $"História deve possuir mais que 500 caracteres ({historia.Length} de 500).");
                 return;
             }
 
@@ -524,7 +638,7 @@ namespace Roleplay
             }
 
             using var context = new DatabaseContext();
-            if (context.Personagens.Any(x => x.Nome == nomeCompleto))
+            if (context.Personagens.Any(x => x.Nome == nomeCompleto && x.Codigo != codigo))
             {
                 player.Emit("Server:MostrarErro", $"Personagem {nomeCompleto} já existe.");
                 return;
@@ -532,6 +646,7 @@ namespace Roleplay
 
             var personagem = new Personagem()
             {
+                Codigo = codigo,
                 Nome = nomeCompleto,
                 Usuario = p.UsuarioBD.Codigo,
                 Sexo = sexo,
@@ -540,42 +655,45 @@ namespace Roleplay
                 SocialClubUltimoAcesso = (long)player.SocialClubId,
                 IPRegistro = Functions.ObterIP(player),
                 IPUltimoAcesso = Functions.ObterIP(player),
-                ID = Functions.ObterNovoID(),
                 Skin = (long)(sexo == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01),
-                InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao),
+                InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados),
                 HardwareIdHashRegistro = (long)player.HardwareIdHash,
                 HardwareIdExHashRegistro = (long)player.HardwareIdExHash,
                 HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                 HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
+                Historia = historia,
+                UsuarioStaffAvaliador = 0,
+                MotivoRejeicao = string.Empty,
             };
 
-            context.Personagens.Add(personagem);
+            if (codigo == 0)
+                context.Personagens.Add(personagem);
+            else
+                context.Personagens.Update(personagem);
+
             context.SaveChanges();
 
-            context.PersonagensContatos.AddRange(new List<PersonagemContato>()
+            if (codigo == 0)
             {
-                new PersonagemContato()
+                context.PersonagensContatos.AddRange(new List<PersonagemContato>()
                 {
-                    Codigo = personagem.Codigo,
-                    Celular = 911,
-                    Nome = "Central de Emergência",
-                },
-                new PersonagemContato()
-                {
-                    Codigo = personagem.Codigo,
-                    Celular = 5555555,
-                    Nome = "Dowtown Cab Co.",
-                },
-            });
-            context.SaveChanges();
+                    new PersonagemContato()
+                    {
+                        Codigo = personagem.Codigo,
+                        Celular = 911,
+                        Nome = "Central de Emergência",
+                    },
+                    new PersonagemContato()
+                    {
+                        Codigo = personagem.Codigo,
+                        Celular = 5555555,
+                        Nome = "Dowtown Cab Co.",
+                    },
+                });
+                context.SaveChanges();
+            }
 
-            var user = p.UsuarioBD;
-            var index = Global.PersonagensOnline.IndexOf(p);
-            Global.PersonagensOnline[index] = personagem;
-            Global.PersonagensOnline[index].Player = player;
-            Global.PersonagensOnline[index].UsuarioBD = user;
-
-            Functions.LogarPersonagem(player, personagem);
+            ListarPersonagens(player);
         }
 
         private void ListarPlayers(IPlayer player)
@@ -915,17 +1033,134 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}.", notify: true);
         }
 
-        private void ConfirmarBarbearia(IPlayer player, int cabelo, int cor1, int cor2)
+        private void ConfirmarBarbearia(IPlayer player, int cabelo, int cabeloCor1, int cabeloCor2, int barba, int barbaCor, int maquiagem)
         {
             var p = Functions.ObterPersonagem(player);
 
             p.SetClothes(2, cabelo, 0, false);
-            p.Personalizacao.CabeloCor1 = cor1;
-            p.Personalizacao.CabeloCor2 = cor2;
+            p.PersonalizacaoDados.CabeloCor1 = cabeloCor1;
+            p.PersonalizacaoDados.CabeloCor2 = cabeloCor2;
+            p.PersonalizacaoDados.Barba = barba;
+            p.PersonalizacaoDados.BarbaCor = barbaCor;
+            p.PersonalizacaoDados.Maquiagem = maquiagem;
 
             p.Dinheiro -= Global.Parametros.ValorBarbearia;
             p.SetDinheiro();
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
+        }
+
+        private void ConfirmarLojaRoupas(IPlayer player, string strRoupas)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            p.Dinheiro -= Global.Parametros.ValorRoupas;
+            p.SetDinheiro();
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorRoupas:N0} na loja de roupas.");
+        }
+
+        private void EnviarEmailConfirmacao(IPlayer player, string email)
+        {
+            if (email.Length > 100)
+            {
+                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
+                return;
+            }
+
+            if (!Functions.ValidarEmail(email))
+            {
+                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+
+            using var context = new DatabaseContext();
+            p.UsuarioBD.Email = email;
+            context.Usuarios.Update(p.UsuarioBD);
+            context.SaveChanges();
+
+            Functions.EnviarEmail(email, "Confirmação de E-mail", $"Seu token de confirmação é <strong>{p.UsuarioBD.TokenConfirmacao}</strong>.");
+            player.Emit("Server:MostrarSucesso", "E-mail com o token de confirmação enviado.");
+        }
+
+        private void ValidarTokenConfirmacao(IPlayer player, string token)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            if (p.UsuarioBD.TokenConfirmacao != token)
+            {
+                player.Emit("Server:MostrarErro", "Token de confirmação incorreto.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            p.UsuarioBD.TokenConfirmacao = string.Empty;
+            context.Usuarios.Update(p.UsuarioBD);
+            context.SaveChanges();
+
+            ListarPersonagens(player);
+        }
+
+        private void ExibirPerguntas(IPlayer player)
+        {
+            var perguntas = Global.Perguntas.OrderBy(x => Guid.NewGuid()).Take(10).ToList();
+            var respostas = Global.Respostas.OrderBy(x => Guid.NewGuid()).ToList();
+            foreach (var x in perguntas)
+                x.Respostas = respostas.Where(y => y.Pergunta == x.Codigo).ToList();
+            player.Emit("Server:ExibirPerguntas", JsonConvert.SerializeObject(perguntas));
+        }
+
+        private void ValidarPerguntas(IPlayer player, string strPerguntas)
+        {
+            var perguntas = JsonConvert.DeserializeObject<List<Pergunta>>(strPerguntas);
+            var qtdAcertos = perguntas.Count(x => x.RespostaCorreta == x.RespostaSelecionada);
+            if (qtdAcertos < perguntas.Count)
+            {
+                player.Emit("Server:MostrarErro", $"Você não acertou todas as perguntas. Acertos: {qtdAcertos} de {perguntas.Count}.");
+                return;
+            }
+
+            player.Emit("Server:RegistrarUsuario");
+        }
+
+        private void EnviarEmailAlterarSenha(IPlayer player, string usuario, string email)
+        {
+            using var context = new DatabaseContext();
+            var user = context.Usuarios.Where(x => x.Nome == usuario && x.Email == email).FirstOrDefault();
+            if (user != null)
+            {
+                user.TokenSenha = Functions.GerarStringAleatoria(25);
+                context.Usuarios.Update(user);
+                context.SaveChanges();
+
+                Functions.EnviarEmail(email, "Recuperação da Senha", $"Seu token para alteração de senha é <strong>{user.TokenSenha}</strong>.");
+            }
+
+            player.Emit("Server:EsqueciMinhaSenha", user?.Codigo ?? 0);
+        }
+
+        private void AlterarSenhaRecuperacao(IPlayer player, int codigo, string token, string senha, string senha2)
+        {
+            using var context = new DatabaseContext();
+            var user = context.Usuarios.Where(x => x.Codigo == codigo && x.TokenSenha == token && !string.IsNullOrWhiteSpace(x.TokenSenha)).FirstOrDefault();
+            if (user == null)
+            {
+                player.Emit("Server:Login");
+                return;
+            }
+
+            if (senha != senha2)
+            {
+                player.Emit("Server:MostrarErro", "Senhas não são iguais.");
+                return;
+            }
+
+            user.TokenSenha = string.Empty;
+            user.Senha = Functions.Criptografar(senha);
+            context.Usuarios.Update(user);
+            context.SaveChanges();
+
+            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada com sucesso.");
         }
         #endregion
     }

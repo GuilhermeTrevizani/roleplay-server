@@ -187,7 +187,7 @@ namespace Roleplay.Commands
                     });
             }
 
-            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Helper)
+            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Moderator)
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Helper", "/ir", "Vai a um personagem"),
@@ -205,7 +205,7 @@ namespace Roleplay.Commands
                     new Comando("Helper", "/rj", "Rejeita um SOS"),
                 });
 
-            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameModerator)
+            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Game Moderator", "/vida", "Altera a vida de um personagem"),
@@ -660,9 +660,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Multas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de pagamento de multas.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
                 return;
             }
 
@@ -1076,7 +1076,7 @@ namespace Roleplay.Commands
                     pos = new Position(460.4085f, -1001.342f, 25);
             }
 
-            p.Ferimentos = new List<Ferimento>();
+            p.Ferimentos = new List<Personagem.Ferimento>();
             p.Player.Emit("Server:CurarPersonagem");
             p.StopAnimation();
             p.Player.Emit("player:toggleFreeze", false);
@@ -1234,7 +1234,8 @@ namespace Roleplay.Commands
             }
 
             player.Emit("AbrirBarbearia", p.Sexo, $"${Global.Parametros.ValorBarbearia:N0}",
-                p.Roupas.FirstOrDefault(x => x.Slot == 2)?.Drawable ?? 0, p.Personalizacao.CabeloCor1, p.Personalizacao.CabeloCor2);
+                p.Roupas.FirstOrDefault(x => x.Slot == 2)?.Drawable ?? 0, p.PersonalizacaoDados.CabeloCor1, p.PersonalizacaoDados.CabeloCor2,
+                p.PersonalizacaoDados.Barba, p.PersonalizacaoDados.BarbaCor, p.PersonalizacaoDados.Maquiagem);
         }
 
         [Command("roupas")]

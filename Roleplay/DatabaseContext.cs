@@ -15,6 +15,7 @@ namespace Roleplay
         public DbSet<Log> Logs { get; set; }
         public DbSet<Multa> Multas { get; set; }
         public DbSet<Parametro> Parametros { get; set; }
+        public DbSet<Pergunta> Perguntas { get; set; }
         public DbSet<Personagem> Personagens { get; set; }
         public DbSet<PersonagemAcessorio> PersonagensAcessorios { get; set; }
         public DbSet<PersonagemArma> PersonagensArmas { get; set; }
@@ -26,6 +27,7 @@ namespace Roleplay
         public DbSet<Propriedade> Propriedades { get; set; }
         public DbSet<Punicao> Punicoes { get; set; }
         public DbSet<Rank> Ranks { get; set; }
+        public DbSet<Resposta> Respostas { get; set; }
         public DbSet<SOS> SOSs { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Veiculo> Veiculos { get; set; }
@@ -50,6 +52,7 @@ namespace Roleplay
             modelBuilder.Entity<Log>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Multa>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Parametro>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<Pergunta>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().Property(x => x.Emprego).HasConversion(typeof(int));
             modelBuilder.Entity<PersonagemAcessorio>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable });
@@ -66,6 +69,7 @@ namespace Roleplay
             modelBuilder.Entity<Punicao>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Punicao>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Rank>().HasKey(x => new { x.Faccao, x.Codigo });
+            modelBuilder.Entity<Resposta>().HasKey(x => x.Codigo);
             modelBuilder.Entity<SOS>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Usuario>().Property(x => x.Staff).HasConversion(typeof(int));

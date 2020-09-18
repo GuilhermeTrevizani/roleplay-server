@@ -8,7 +8,9 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
@@ -56,66 +58,6 @@ namespace Roleplay
             return false;
         }
 
-        public static void LogarPersonagem(IPlayer player, Personagem p)
-        {
-            foreach (var x in Global.Blips)
-                x.CriarIdentificador(player);
-
-            foreach (var x in Global.TextDraws)
-                x.CriarIdentificador(player);
-
-            player.SetSyncedMetaData("nametag", p.Nome);
-            player.Dimension = (int)p.Dimensao;
-            p.IPLs = JsonConvert.DeserializeObject<List<string>>(p.IPL);
-            p.SetarIPLs();
-            player.SetDateTime(DateTime.Now);
-            player.Health = (ushort)(p.Vida + 100);
-            player.Armor = (ushort)p.Colete;
-            player.Model = (uint)p.Skin;
-            p.SetDinheiro();
-            player.SetWeather(Global.Weather);
-
-            using (var context = new DatabaseContext())
-            {
-                p.Contatos = context.PersonagensContatos.Where(x => x.Codigo == p.Codigo).ToList();
-
-                var roupas = context.PersonagensRoupas.Where(x => x.Codigo == p.Codigo).ToList();
-                foreach (var x in roupas)
-                    p.SetClothes(x.Slot, x.Drawable, x.Texture);
-
-                var acessorios = context.PersonagensAcessorios.Where(x => x.Codigo == p.Codigo).ToList();
-                foreach (var x in acessorios)
-                    p.SetAccessories(x.Slot, x.Drawable, x.Texture);
-
-                p.Armas = context.PersonagensArmas.Where(x => x.Codigo == p.Codigo).ToList();
-                foreach (var x in p.Armas)
-                {
-                    player.GiveWeapon((WeaponModel)x.Arma, x.Municao, false);
-                    player.SetWeaponTintIndex((WeaponModel)x.Arma, (byte)x.Pintura);
-                    foreach (var c in JsonConvert.DeserializeObject<List<uint>>(x.Componentes))
-                        player.AddWeaponComponent((WeaponModel)x.Arma, c);
-                }
-
-                if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
-                {
-                    Global.Parametros.RecordeOnline = Global.PersonagensOnline.Count;
-                    context.Parametros.Update(Global.Parametros);
-                    context.SaveChanges();
-
-                    foreach (var u in Global.PersonagensOnline)
-                        EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorSucesso}}}{Global.Parametros.RecordeOnline}");
-                }
-            }
-
-            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao);
-            player.Emit("nametags:Config", true);
-            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-            player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
-            player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
-            p.Personalizacao = JsonConvert.DeserializeObject<Personalizacao>(p.InformacoesPersonalizacao);
-
-            GravarLog(TipoLog.Entrada, string.Empty, p, null);
-        }
 
         public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player.HardwareIdHash);
 
@@ -247,14 +189,14 @@ namespace Roleplay
 
             if (tipoMensagem == TipoMensagem.Sucesso)
             {
-                cor = "#6EB469";
+                cor = Global.CorSucesso;
                 gradient = new int[] { 110, 180, 105 };
                 icone = "check";
                 type = "success";
             }
             else if (tipoMensagem == TipoMensagem.Erro || tipoMensagem == TipoMensagem.Punicao)
             {
-                cor = "#FF6A4D";
+                cor = Global.CorErro;
                 gradient = new int[] { 255, 106, 77 };
                 icone = "alert";
                 type = "danger";
@@ -430,7 +372,7 @@ namespace Roleplay
             personagem.Emprego = p.Emprego;
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = ObterIP(p.Player);
-            personagem.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.Personalizacao);
+            personagem.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
             personagem.RoupasCivil = p.RoupasCivil;
             context.Personagens.Update(personagem);
 
@@ -539,7 +481,7 @@ namespace Roleplay
             </div>
             <div class='box-body'>
             OOC: <strong>{p.UsuarioBD.Nome}</strong> | SocialClub: <strong>{p.Player.SocialClubId}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
-            Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Celular: <strong>{p.Celular}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong><br/>
+            Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong><br/>
             Sexo: <strong>{p.Sexo}</strong> | Nascimento: <strong>{p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)</strong> | Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
             Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong> | Tempo de Prisão: <strong>{p.TempoPrisao}</strong><br/>";
 
@@ -707,19 +649,21 @@ namespace Roleplay
                 {
                     if (p.StatusLigacao == TipoStatusLigacao.EmLigacao)
                     {
-                        if (message.ToUpper().Contains("LSPD"))
+                        if (message.ToUpper().Contains("LSPD") || message.ToUpper().Contains("PD"))
                             p.ExtraLigacao = "LSPD";
-                        else if (message.ToUpper().Contains("LSFD"))
+                        else if (message.ToUpper().Contains("LSFD") || message.ToUpper().Contains("FD"))
                             p.ExtraLigacao = "LSFD";
+                        else if (message.ToUpper().Contains("PDFD") || message.ToUpper().Contains("FDPD"))
+                            p.ExtraLigacao = "PDFD";
 
                         if (string.IsNullOrWhiteSpace(p.ExtraLigacao))
                         {
-                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Não entendi sua mensagem. Deseja falar com LSPD ou LSFD?", Constants.CorCelular);
+                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Não entendi sua mensagem. Deseja falar com PD, FD ou PDFD?", Constants.CorCelular);
                             return;
                         }
 
                         p.StatusLigacao = TipoStatusLigacao.AguardandoInformacao;
-                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: {p.ExtraLigacao}, qual sua emergência?", Constants.CorCelular);
+                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Qual sua emergência?", Constants.CorCelular);
                         return;
                     }
 
@@ -728,27 +672,38 @@ namespace Roleplay
                         EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas.", Constants.CorCelular);
 
                         var tipoFaccao = p.ExtraLigacao == "LSPD" ? TipoFaccao.Policial : TipoFaccao.Medica;
+
                         var pos = ObterPosicaoPlayerIC(p);
-
-                        var ligacao911 = new Ligacao911()
+                        void Enviar911()
                         {
-                            Tipo = tipoFaccao,
-                            Celular = p.Celular,
-                            PosX = pos.X,
-                            PosY = pos.Y,
-                            PosZ = pos.Z,
-                            Mensagem = message,
-                            ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
-                        };
-                        using var context = new DatabaseContext();
-                        context.Ligacoes911.Add(ligacao911);
-                        context.SaveChanges();
-                        Global.Ligacoes911.Add(ligacao911);
+                            var ligacao911 = new Ligacao911()
+                            {
+                                Tipo = tipoFaccao,
+                                Celular = p.Celular,
+                                PosX = pos.X,
+                                PosY = pos.Y,
+                                PosZ = pos.Z,
+                                Mensagem = message,
+                                ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
+                            };
+                            using var context = new DatabaseContext();
+                            context.Ligacoes911.Add(ligacao911);
+                            context.SaveChanges();
+                            Global.Ligacoes911.Add(ligacao911);
 
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.ID}", true, true);
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"De: {{#FFFFFF}}{p.Celular}", true, true);
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", true, true);
-                        EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {{#FFFFFF}}{message}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.ID}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"De: {{#FFFFFF}}{p.Celular}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {{#FFFFFF}}{message}", true, true);
+                        }
+
+                        Enviar911();
+
+                        if (p.ExtraLigacao == "PDFD")
+                        {
+                            tipoFaccao = TipoFaccao.Policial;
+                            Enviar911();
+                        }
 
                         p.LimparLigacao();
                     }
@@ -934,6 +889,75 @@ namespace Roleplay
             {
                 return false;
             }
+        }
+
+        public static async void EnviarEmail(string email, string titulo, string mensagem)
+        {
+            try
+            {
+                var msg = new MailMessage
+                {
+                    IsBodyHtml = true,
+                    From = new MailAddress("naoresponda@segundavida.com.br", "Segunda Vida Roleplay"),
+                    Subject = titulo,
+                    Body = mensagem,
+                    BodyEncoding = Encoding.UTF8,
+                };
+                msg.To.Add(email);
+
+                var clienteSmtp = new SmtpClient("segundavida.com.br")
+                {
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential("naoresponda@segundavida.com.br", "3sEuV,%GKqg_"),
+                    Port = 587,
+                };
+
+                await clienteSmtp.SendMailAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                RecuperarErro(ex);
+            }
+        }
+
+        public static void RecuperarErro(Exception ex)
+        {
+            try
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(ex));
+
+                var listaErros = new List<BeautifulException>();
+
+                var path = AppDomain.CurrentDomain.BaseDirectory;
+                path = Path.Combine(path, "log");
+                Directory.CreateDirectory(path);
+
+                path = Path.Combine(path, "erros.json");
+                if (File.Exists(path))
+                {
+                    listaErros = JsonConvert.DeserializeObject<List<BeautifulException>>(File.ReadAllText(path));
+                }
+
+                var exception = new BeautifulException()
+                {
+                    Exception = ex,
+                };
+                listaErros.Add(exception);
+
+                File.WriteAllText(path, JsonConvert.SerializeObject(listaErros));
+            }
+            catch (Exception ex1)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(ex1));
+            }
+        }
+
+        public static string GerarStringAleatoria(int tamanho)
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, tamanho).Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

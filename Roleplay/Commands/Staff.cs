@@ -14,12 +14,12 @@ namespace Roleplay.Commands
 {
     public class Staff
     {
-        #region Staff 1
+        #region Moderator
         [Command("ir", "/ir (ID ou nome)")]
         public void CMD_ir(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -42,7 +42,7 @@ namespace Roleplay.Commands
         public void CMD_trazer(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -65,7 +65,7 @@ namespace Roleplay.Commands
         public void CMD_tp(IPlayer player, string idNome, string idNomeDestino)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -95,7 +95,7 @@ namespace Roleplay.Commands
         public void CMD_vw(IPlayer player, string idNome, int vw)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -115,7 +115,7 @@ namespace Roleplay.Commands
         public void CMD_a(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -129,7 +129,7 @@ namespace Roleplay.Commands
         public void CMD_o(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -143,7 +143,7 @@ namespace Roleplay.Commands
         public void CMD_kick(IPlayer player, string idNome, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -176,7 +176,7 @@ namespace Roleplay.Commands
         public void CMD_irveh(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -200,7 +200,7 @@ namespace Roleplay.Commands
         public void CMD_trazerveh(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -229,7 +229,7 @@ namespace Roleplay.Commands
         public void CMD_aduty(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -243,7 +243,7 @@ namespace Roleplay.Commands
         public void CMD_listasos(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -266,7 +266,7 @@ namespace Roleplay.Commands
         public void CMD_aj(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -305,7 +305,7 @@ namespace Roleplay.Commands
         public void CMD_rj(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Helper)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -339,12 +339,12 @@ namespace Roleplay.Commands
         }
         #endregion Staff 1
 
-        #region Staff 2
+        #region Game Administrator
         [Command("vida", "/vida (ID ou nome) (vida)")]
         public void CMD_vida(IPlayer player, string idNome, int vida)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -370,7 +370,7 @@ namespace Roleplay.Commands
         public void CMD_colete(IPlayer player, string idNome, int colete)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -396,7 +396,7 @@ namespace Roleplay.Commands
         public void CMD_checar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -413,7 +413,7 @@ namespace Roleplay.Commands
         public void CMD_ban(IPlayer player, string idNome, int dias, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -464,7 +464,7 @@ namespace Roleplay.Commands
         public void CMD_banoff(IPlayer player, int personagem, int dias, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -514,7 +514,7 @@ namespace Roleplay.Commands
         public void CMD_unban(IPlayer player, int usuario)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameModerator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -538,12 +538,12 @@ namespace Roleplay.Commands
         }
         #endregion Staff 2
 
-        #region Staff 3
+        #region Lead Administrator
         [Command("ck", "/ck (ID ou nome) (motivo)", GreedyArg = true)]
         public void CMD_ck(IPlayer player, string idNome, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -572,7 +572,7 @@ namespace Roleplay.Commands
         public void CMD_tempo(IPlayer player, int tempo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -593,7 +593,7 @@ namespace Roleplay.Commands
         public void CMD_acurar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -609,7 +609,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            target.Ferimentos = new List<Ferimento>();
+            target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;
 
@@ -629,7 +629,7 @@ namespace Roleplay.Commands
         }
         #endregion
 
-        #region Staff 1337
+        #region Manager
         [Command("gmx")]
         public void CMD_gmx(IPlayer player)
         {
@@ -700,7 +700,7 @@ namespace Roleplay.Commands
             {
                 if (player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= distanceVer)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Veículo {x.Codigo} | Modelo: {x.Modelo}");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Veículo {x.Codigo} | Modelo: {x.Modelo.ToUpper()}");
                     isTemAlgoProximo = true;
                 }
             }
@@ -2427,13 +2427,13 @@ namespace Roleplay.Commands
 
             if (player.IsInVehicle)
             {
-                player.Emit("alt:log", $"POS: {player.Vehicle.Position.X.ToString().Replace(",", ".")}, {player.Vehicle.Position.Y.ToString().Replace(",", ".")}, {player.Vehicle.Position.Z.ToString().Replace(",", ".")}");
-                player.Emit("alt:log", $"ROT: {player.Vehicle.Rotation.Roll.ToString().Replace(",", ".")}, {player.Vehicle.Rotation.Pitch.ToString().Replace(",", ".")}, {player.Vehicle.Rotation.Yaw.ToString().Replace(",", ".")}");
+                player.Emit("alt:log", $"POS: {player.Vehicle.Position.X.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Y.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Z.ToString().Replace(",", ".")}f");
+                player.Emit("alt:log", $"ROT: {player.Vehicle.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Yaw.ToString().Replace(",", ".")}f");
             }
             else
             {
-                player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}, {player.Position.Y.ToString().Replace(",", ".")}, {player.Position.Z.ToString().Replace(",", ".")}");
-                player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}, {player.Rotation.Pitch.ToString().Replace(",", ".")}, {player.Rotation.Yaw.ToString().Replace(",", ".")}");
+                player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}f, {player.Position.Y.ToString().Replace(",", ".")}f, {player.Position.Z.ToString().Replace(",", ".")}f");
+                player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Rotation.Yaw.ToString().Replace(",", ".")}f");
             }
         }
 

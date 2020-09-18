@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roleplay", "Roleplay\Rolepl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testador", "Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoleplayBOT", "RoleplayBOT\RoleplayBOT.csproj", "{11D5FB16-45AA-4B96-9D90-4BE90101255E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

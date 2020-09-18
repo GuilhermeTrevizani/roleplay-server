@@ -1,5 +1,4 @@
-﻿using AltV.Net;
-using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Models;
 using System;
@@ -53,9 +52,12 @@ namespace Roleplay.Entities
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
         public string InformacoesPersonalizacao { get; set; } = "[]";
         public string RoupasCivil { get; set; } = string.Empty;
+        public string Historia { get; set; } = string.Empty;
+        public int UsuarioStaffAvaliador { get; set; } = 0;
+        public string MotivoRejeicao { get; set; } = string.Empty;
 
         [NotMapped]
-        public Personalizacao Personalizacao { get; set; } = new Personalizacao();
+        public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
 
         [NotMapped]
         public int ID { get; set; }
@@ -138,6 +140,12 @@ namespace Roleplay.Entities
         [NotMapped]
         public string StringArmas { get; set; }
 
+        [NotMapped]
+        public List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
+
+        [NotMapped]
+        public List<Resposta> Respostas { get; set; } = new List<Resposta>();
+
         public void SetDinheiro()
         {
             if (Player != null)
@@ -211,6 +219,24 @@ namespace Roleplay.Entities
 
             if (setar)
                 Player.Emit("Server:SetAccessories", slot, drawable, texture);
+        }
+
+        public class Ferimento
+        {
+            public DateTime Data { get; set; } = DateTime.Now;
+            public ushort Dano { get; set; }
+            public uint Arma { get; set; }
+            public int CodigoAttacker { get; set; }
+            public sbyte BodyPart { get; set; } = -2;
+        }
+
+        public class Personalizacao
+        {
+            public int CabeloCor1 { get; set; } = 0;
+            public int CabeloCor2 { get; set; } = 0;
+            public int Barba { get; set; } = 255;
+            public int BarbaCor { get; set; } = 0;
+            public int Maquiagem { get; set; } = 255;
         }
     }
 }
