@@ -366,6 +366,12 @@ namespace Roleplay
             if (!Functions.VerificarBanimento(player, context.Banimentos.FirstOrDefault(x => x.Usuario == user.Codigo)))
                 return;
 
+            if (Global.PersonagensOnline.Any(x => x?.UsuarioBD?.Nome == usuario))
+            {
+                player.Emit("Server:MostrarErro", "Usuário já está logado.");
+                return;
+            }
+
             user.DataUltimoAcesso = DateTime.Now;
             user.IPUltimoAcesso = Functions.ObterIP(player);
             user.SocialClubUltimoAcesso = (long)player.SocialClubId;
