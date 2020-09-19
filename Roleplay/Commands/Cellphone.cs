@@ -154,7 +154,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (digite /at ou /des)", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Constants.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
         }
 

@@ -55,6 +55,7 @@ namespace Roleplay.Entities
         public string Historia { get; set; } = string.Empty;
         public int UsuarioStaffAvaliador { get; set; } = 0;
         public string MotivoRejeicao { get; set; } = string.Empty;
+        public TipoStatusNamechange StatusNamechange { get; set; } = TipoStatusNamechange.Liberado;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

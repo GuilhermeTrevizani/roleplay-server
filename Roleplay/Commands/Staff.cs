@@ -589,7 +589,7 @@ namespace Roleplay.Commands
                 x.Player.SetWeather(Global.Weather);
         }
 
-        [Command("acurar", "/acurar (ID ou nome)", GreedyArg = true)]
+        [Command("acurar", "/acurar (ID ou nome)")]
         public void CMD_acurar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
@@ -626,6 +626,27 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} curou você.", notify: true);
 
             Functions.GravarLog(TipoLog.Staff, $"/acurar", p, target);
+        }
+
+        [Command("bloquearnc", "/bloquearnc (ID ou nome)")]
+        public void CMD_bloquearnc(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            target.StatusNamechange = target.StatusNamechange == TipoStatusNamechange.Liberado ? TipoStatusNamechange.Bloqueado : TipoStatusNamechange.Liberado;
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(target.StatusNamechange == TipoStatusNamechange.Liberado ? "des" : string.Empty)}bloqueou a troca de nome de {target.Nome}.", notify: true);
+
+            Functions.GravarLog(TipoLog.Staff, $"/bloquearnc", p, target);
         }
         #endregion
 

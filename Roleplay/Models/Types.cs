@@ -55,6 +55,7 @@ namespace Roleplay.Models
         Saida = 7,
         Morte = 8,
         Arma = 9,
+        Namechange = 10,
     }
 
     public enum TipoConvite
@@ -235,5 +236,12 @@ namespace Roleplay.Models
         Pulice2,
         Pulice3,
         Pulice4,
+    }
+
+    public enum TipoStatusNamechange
+    {
+        Liberado = 0,
+        Bloqueado = 1,
+        Realizado = 2,
     }
 }

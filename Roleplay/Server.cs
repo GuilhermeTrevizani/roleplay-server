@@ -32,7 +32,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
             Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
             Alt.OnClient<IPlayer>("ListarPersonagens", ListarPersonagens);
-            Alt.OnClient<IPlayer, int>("SelecionarPersonagem", SelecionarPersonagem);
+            Alt.OnClient<IPlayer, int, bool>("SelecionarPersonagem", SelecionarPersonagem);
             Alt.OnClient<IPlayer, int, string, string, string, string, string>("CriarPersonagem", CriarPersonagem);
             Alt.OnClient<IPlayer>("ListarPlayers", ListarPlayers);
             Alt.OnClient<IPlayer, int, string, int, int, int, int, int, int>("ComprarVeiculo", ComprarVeiculo);
@@ -225,7 +225,7 @@ namespace Roleplay
                     .FirstOrDefault();
                 if (method == null)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O comando {message} não existe. Digite /ajuda para visualizar os comandos disponíveis.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"O comando {{{Global.CorAmarelo}}}{message}{{#FFFFFF}} não existe. Digite {{{Global.CorAmarelo}}}/ajuda{{#FFFFFF}} para visualizar os comandos disponíveis.");
                     return;
                 }
 
@@ -281,7 +281,7 @@ namespace Roleplay
 
                 if (methodParams.Length != arr.Count)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Os parâmetros do comando não foram informados corretamente. Use: {command.HelpText}");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Os parâmetros do comando não foram informados corretamente. Use: {{{Global.CorAmarelo}}}{command.HelpText}");
                     return;
                 }
 
@@ -401,7 +401,8 @@ namespace Roleplay
 
             using var context = new DatabaseContext();
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
-                JsonConvert.SerializeObject(context.Personagens.Where(x => x.Usuario == p.UsuarioBD.Codigo)
+                JsonConvert.SerializeObject(context.Personagens
+                    .Where(x => x.Usuario == p.UsuarioBD.Codigo && x.StatusNamechange != TipoStatusNamechange.Realizado)
                     .OrderByDescending(x => x.Codigo)
                     .ToList()
                     .Select(x => new
@@ -409,27 +410,38 @@ namespace Roleplay
                         x.Codigo,
                         x.Nome,
                         Status = ObterStatusListarPersonagens(x),
-                        PodeLogar = !x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0
+                        Opcoes = ObterBotaoListarPersonagens(x, p.UsuarioBD),
                     })),
-                    Global.Parametros.SlotsPersonagens,
-                    p.UsuarioBD.PossuiNamechange); ;
+                    Global.Parametros.SlotsPersonagens);
         }
 
         private string ObterStatusListarPersonagens(Personagem x)
         {
             var span = $@"<span style=""color:#1de312;"">Vivo</span>";
 
-            if (x.DataMorte.HasValue)
-                span = $@"<span style=""color:#d12c0f;"">Morto</span>";
-            else if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
+            if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
                 span = $@"<span style=""color:#d12c0f;"">Rejeitado</span>";
-            else if (!string.IsNullOrWhiteSpace(x.Historia) && x.UsuarioStaffAvaliador == 0)
+            else if (x.UsuarioStaffAvaliador == 0)
                 span = $@"<span style=""color:#e69215;"">Aguardando Avaliação</span>";
 
             return span;
         }
 
-        private void SelecionarPersonagem(IPlayer player, int id)
+        private string ObterBotaoListarPersonagens(Personagem x, Usuario u)
+        {
+            var opcoes = string.Empty; 
+            if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0)
+            {
+                if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
+                    opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
+                else
+                    opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
+            }
+            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button onclick='selecionarPersonagem({x.Codigo}, true);'>TROCAR NOME</button>" : string.Empty;
+            return opcoes;
+        }
+
+        private void SelecionarPersonagem(IPlayer player, int id, bool namechange)
         {
             var p = Functions.ObterPersonagem(player);
             if (p == null || p?.ID > 0)
@@ -437,7 +449,7 @@ namespace Roleplay
 
             using var context = new DatabaseContext();
             var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == id && x.Usuario == p.UsuarioBD.Codigo);
-            if (!string.IsNullOrWhiteSpace(personagem.MotivoRejeicao))
+            if (!string.IsNullOrWhiteSpace(personagem.MotivoRejeicao) || namechange)
             {
                 var staffer = context.Usuarios.FirstOrDefault(x => x.Codigo == personagem.UsuarioStaffAvaliador);
                 var nome = personagem.Nome.Split(' ');
@@ -643,7 +655,18 @@ namespace Roleplay
                 return;
             }
 
+            Personagem personagemAntigo = null;
             using var context = new DatabaseContext();
+            if (codigo > 0)
+            {
+                var per = context.Personagens.AsNoTracking().FirstOrDefault(x => x.Codigo == codigo);
+                if (string.IsNullOrWhiteSpace(per.MotivoRejeicao))
+                {
+                    personagemAntigo = per;
+                    codigo = 0;
+                }
+            }
+
             if (context.Personagens.Any(x => x.Nome == nomeCompleto && x.Codigo != codigo))
             {
                 player.Emit("Server:MostrarErro", $"Personagem {nomeCompleto} já existe.");
@@ -696,6 +719,30 @@ namespace Roleplay
                         Nome = "Dowtown Cab Co.",
                     },
                 });
+                context.SaveChanges();
+            }
+
+            if (personagemAntigo != null)
+            {
+                Functions.GravarLog(TipoLog.Namechange, string.Empty, personagemAntigo, personagem);
+
+                context.Database.ExecuteSqlRaw($"UPDATE PersonagensArmas SET Codigo = {personagem.Codigo} WHERE Codigo = {personagemAntigo.Codigo}");
+                context.Database.ExecuteSqlRaw($"UPDATE Propriedades SET Personagem = {personagem.Codigo} WHERE Personagem = {personagemAntigo.Codigo}");
+                context.Database.ExecuteSqlRaw($"UPDATE Veiculos SET Personagem = {personagem.Codigo} WHERE Personagem = {personagemAntigo.Codigo}");
+
+                var propriedades = Global.Propriedades.Where(x => x.Personagem == personagemAntigo.Codigo);
+                foreach (var x in propriedades)
+                    x.Personagem = personagem.Codigo;
+
+                var veiculos = Global.Veiculos.Where(x => x.Personagem == personagemAntigo.Codigo);
+                foreach (var x in veiculos)
+                    x.Personagem = personagem.Codigo;
+
+                personagemAntigo.StatusNamechange = TipoStatusNamechange.Realizado;
+                context.Personagens.Update(personagemAntigo);
+
+                p.UsuarioBD.PossuiNamechange = false;
+                context.Usuarios.Update(p.UsuarioBD);
                 context.SaveChanges();
             }
 

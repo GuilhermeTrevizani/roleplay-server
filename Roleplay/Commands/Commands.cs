@@ -190,38 +190,39 @@ namespace Roleplay.Commands
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Moderator)
                 listaComandos.AddRange(new List<Comando>()
                 {
-                    new Comando("Helper", "/ir", "Vai a um personagem"),
-                    new Comando("Helper", "/trazer", "Traz um personagem"),
-                    new Comando("Helper", "/tp", "Teleporta um personagem para outro"),
-                    new Comando("Helper", "/vw", "Altera o VW de um personagem"),
-                    new Comando("Helper", "/o", "Chat OOC Global"),
-                    new Comando("Helper", "/a", "Chat administrativo"),
-                    new Comando("Helper", "/kick", "Expulsa um personagem"),
-                    new Comando("Helper", "/irveh", "Vai a um veículo"),
-                    new Comando("Helper", "/trazerveh", "Traz um veículo"),
-                    new Comando("Helper", "/aduty", "Entra/sai de serviço administrativo"),
-                    new Comando("Helper", "/listasos", "Lista os SOSs pendentes"),
-                    new Comando("Helper", "/aj", "Aceita um SOS"),
-                    new Comando("Helper", "/rj", "Rejeita um SOS"),
+                    new Comando("Moderator", "/ir", "Vai a um personagem"),
+                    new Comando("Moderator", "/trazer", "Traz um personagem"),
+                    new Comando("Moderator", "/tp", "Teleporta um personagem para outro"),
+                    new Comando("Moderator", "/vw", "Altera o VW de um personagem"),
+                    new Comando("Moderator", "/o", "Chat OOC Global"),
+                    new Comando("Moderator", "/a", "Chat administrativo"),
+                    new Comando("Moderator", "/kick", "Expulsa um personagem"),
+                    new Comando("Moderator", "/irveh", "Vai a um veículo"),
+                    new Comando("Moderator", "/trazerveh", "Traz um veículo"),
+                    new Comando("Moderator", "/aduty", "Entra/sai de serviço administrativo"),
+                    new Comando("Moderator", "/listasos", "Lista os SOSs pendentes"),
+                    new Comando("Moderator", "/aj", "Aceita um SOS"),
+                    new Comando("Moderator", "/rj", "Rejeita um SOS"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
                 listaComandos.AddRange(new List<Comando>()
                 {
-                    new Comando("Game Moderator", "/vida", "Altera a vida de um personagem"),
-                    new Comando("Game Moderator", "/colete", "Altera o colete de um personagem"),
-                    new Comando("Game Moderator", "/checar", "Checa as informações de um personagem"),
-                    new Comando("Game Moderator", "/ban", "Bane um usuário"),
-                    new Comando("Game Moderator", "/unban", "Desbane um usuário"),
-                    new Comando("Game Moderator", "/banoff", "Bane um usuário que está offline"),
+                    new Comando("Game Administrator", "/vida", "Altera a vida de um personagem"),
+                    new Comando("Game Administrator", "/colete", "Altera o colete de um personagem"),
+                    new Comando("Game Administrator", "/checar", "Checa as informações de um personagem"),
+                    new Comando("Game Administrator", "/ban", "Bane um usuário"),
+                    new Comando("Game Administrator", "/unban", "Desbane um usuário"),
+                    new Comando("Game Administrator", "/banoff", "Bane um usuário que está offline"),
                 });
 
-            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
+            if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.LeadAdministrator)
                 listaComandos.AddRange(new List<Comando>()
                 {
-                    new Comando("Game Administrator", "/ck", "Aplica CK em um personagem"),
-                    new Comando("Game Administrator", "/tempo", "Altera o tempo"),
-                    new Comando("Game Administrator", "/acurar", "Cura um personagem ferido"),
+                    new Comando("Lead Administrator", "/ck", "Aplica CK em um personagem"),
+                    new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
+                    new Comando("Lead Administrator", "/acurar", "Cura um personagem ferido"),
+                    new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
