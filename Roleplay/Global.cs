@@ -1,4 +1,5 @@
 ﻿using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -16,7 +17,7 @@ namespace Roleplay
         public static string ConnectionString { get; set; }
         public static Parametro Parametros { get; set; }
         public static List<Personagem> PersonagensOnline { get; set; } = new List<Personagem>();
-        public static List<Blip> Blips { get; set; }
+        public static List<Entities.Blip> Blips { get; set; }
         public static List<Faccao> Faccoes { get; set; }
         public static List<Rank> Ranks { get; set; }
         public static List<Propriedade> Propriedades { get; set; }
@@ -181,5 +182,6 @@ namespace Roleplay
             new WeaponComponent(WeaponModel.SNSPistolMkII, "Patriotic", 0x1F07150A),
         };
         public static List<Ligacao911> Ligacoes911 { get; set; } = new List<Ligacao911>();
+        public static List<IVoiceChannel> TACVoice { get; set; }
     }
 }

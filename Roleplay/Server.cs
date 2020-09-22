@@ -123,6 +123,15 @@ namespace Roleplay
 
             Functions.CriarTextDraw("Prisão\n~w~Use /prender", Constants.PosicaoPrisao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
 
+            Global.TACVoice = new List<IVoiceChannel>
+            {
+                Alt.CreateVoiceChannel(false, 0),
+                Alt.CreateVoiceChannel(false, 0),
+                Alt.CreateVoiceChannel(false, 0),
+                Alt.CreateVoiceChannel(false, 0),
+                Alt.CreateVoiceChannel(false, 0),
+            };
+
             TimerPrincipal = new Timer(60000);
             TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
             TimerPrincipal.Start();
@@ -419,6 +428,8 @@ namespace Roleplay
         {
             var span = $@"<span style=""color:#1de312;"">Vivo</span>";
 
+            if (x.DataMorte.HasValue)
+                span = $@"<span style=""color:#d12c0f;"">Morto ({x.MotivoMorte})</span>";
             if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
                 span = $@"<span style=""color:#d12c0f;"">Rejeitado</span>";
             else if (x.UsuarioStaffAvaliador == 0)
@@ -429,7 +440,7 @@ namespace Roleplay
 
         private string ObterBotaoListarPersonagens(Personagem x, Usuario u)
         {
-            var opcoes = string.Empty; 
+            var opcoes = string.Empty;
             if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0)
             {
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
@@ -860,7 +871,7 @@ namespace Roleplay
                     p.Dinheiro -= preco.Valor;
                     p.SetDinheiro();
 
-                    strMensagem = $"Você comprou um celular! Seu número é: {p.Celular}";
+                    strMensagem = $"Você comprou um celular! Seu número é: {p.Celular}.";
                     break;
                 case "Rádio Comunicador":
                     if (p?.CanalRadio > -1)
@@ -911,7 +922,7 @@ namespace Roleplay
             }
             else
             {
-                p.Contatos[p.Contatos.IndexOf(contato)].Nome = nome;
+                contato.Nome = nome;
                 player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} editado com sucesso.");
             }
         }

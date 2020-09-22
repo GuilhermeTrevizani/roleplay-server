@@ -1,4 +1,6 @@
-﻿using AltV.Net.Elements.Entities;
+﻿using AltV.Net;
+using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using Roleplay.Models;
 
 namespace Roleplay
@@ -14,6 +16,17 @@ namespace Roleplay
             player.Vehicle.BodyHealth = 1000;
             player.Vehicle.EngineHealth = 1000;
             player.Vehicle.PetrolTankHealth = 1000;
+        }
+
+        [Command("vh")]
+        public void CMD_vh(IPlayer player)
+        {
+            if (!player.IsInVehicle)
+                return;
+
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"BodyHealth: {player.Vehicle.BodyHealth}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"EngineHealth: {player.Vehicle.EngineHealth}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"PetrolTankHealth: {player.Vehicle.PetrolTankHealth}");
         }
 
         [Command("i")]
@@ -59,7 +72,8 @@ namespace Roleplay
         [Command("teste")]
         public void CMD_teste(IPlayer player)
         {
-            player.Emit("character:Edit", "");
+            Alt.CreateCheckpoint(CheckpointType.CylinderCheckerboard, player.Position, 1, 1, new Rgba(255, 255, 255, 255));
+            //player.Emit("character:Edit", "");
         }
     }
 }

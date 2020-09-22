@@ -783,5 +783,51 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"ABRIR MDC");
         }
+
+        [Command("tac", "/tac (canal [0-5])")]
+        public void CMD_tac(IPlayer player, int canal)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                return;
+            }
+
+            if (canal < 0 || canal > 5)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal deve ser entre 0 e 5.");
+                return;
+            }
+
+            if (canal == 0)
+            {
+                foreach (var x in Global.TACVoice)
+                    if (x.HasPlayer(player))
+                        x.RemovePlayer(player);
+
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do TAC.", notify: true);
+                return;
+            }
+
+            foreach (var x in Global.TACVoice)
+            {
+                if (x.HasPlayer(player))
+                {
+                    if (canal == Global.TACVoice.IndexOf(x) + 1)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você já está no TAC {canal}.");
+                        return;
+                    }
+                    else
+                    {
+                        x.RemovePlayer(player);
+                    }
+                }
+            }
+
+            Global.TACVoice[canal-1].AddPlayer(player);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou no TAC {canal}.", notify: true);
+        }
     }
 }
