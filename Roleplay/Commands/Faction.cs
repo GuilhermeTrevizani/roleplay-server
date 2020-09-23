@@ -56,6 +56,7 @@ namespace Roleplay.Commands
                         <th>Nome</th>
                         <th>OOC</th>
                         {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? "<th>Status</th>" : string.Empty)}
+                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? "<th>Distintivo</th>" : string.Empty)}
                     </tr>
                 </thead>
                 <tbody>";
@@ -64,7 +65,7 @@ namespace Roleplay.Commands
             foreach (var x in players)
             {
                 var status = x.IsEmTrabalho ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
-                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}</tr>";
+                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
             }
 
             html += $@"
@@ -214,8 +215,8 @@ namespace Roleplay.Commands
                 target.Player.RemoveAllWeapons();
             }
 
-            target.Faccao = 0;
-            target.Rank = 0;
+            target.Faccao = target.Rank = target.Distintivo = 0;
+            target.IsEmTrabalho = false;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você demitiu {target.Nome} da facção.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} demitiu você da facção.");
 
@@ -274,7 +275,7 @@ namespace Roleplay.Commands
                 p.Player.RemoveAllWeapons();
             }
 
-            p.Faccao = p.Rank = 0;
+            p.Faccao = p.Rank = p.Distintivo = 0;
             p.IsEmTrabalho = false;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu da facção.");
         }
@@ -830,7 +831,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);//, false);
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
 
@@ -847,6 +848,74 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");
+        }
+
+        [Command("distintivo", "/distintivo (ID ou nome) (distintivo)")]
+        public void CMD_distintivo(IPlayer player, string idNome, int distintivo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica && p?.FaccaoBD?.Tipo != TipoFaccao.Governo) || p?.Rank < p?.FaccaoBD?.RankGestor)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (target.Faccao != p.Faccao)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador não pertence a sua facção.");
+                return;
+            }
+
+            if (target.Rank > p.Rank)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador possui um rank maior que o seu.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var per = context.Personagens.FirstOrDefault(x => x.Faccao == p.Faccao && x.Distintivo == distintivo && !x.DataMorte.HasValue && !x.DataExclusao.HasValue);
+            if (per != null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Distintivo {distintivo} está sendo usado por {per.Nome}.");
+                return;
+            }
+
+            target.Distintivo = distintivo;
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o distintivo de {target.Nome} para {distintivo}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu distintivo para {distintivo}.");
+
+            Functions.GravarLog(TipoLog.FaccaoGestor, $"/distintivo {distintivo}", p, target);
+        }
+
+        [Command("mostrardistintivo", "/mostrardistintivo (ID ou nome)")]
+        public void CMD_mostrardistintivo(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Distintivo == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um distintivo.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Distintivo #{p.Distintivo} de {p.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Organização: {p.FaccaoBD.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Cargo: {p.RankBD.Nome}");
+            Functions.SendMessageToNearbyPlayers(player, p == target ? "olha seu próprio distintivo." : $"mostra seu distintivo para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
     }
 }

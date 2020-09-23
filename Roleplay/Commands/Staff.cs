@@ -1339,20 +1339,6 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/lider {fac}", p, target);
         }
 
-        [Command("parametros")]
-        public void CMD_parametros(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, "Parâmetros do Servidor");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Recorde Online: {Global.Parametros.RecordeOnline}");
-        }
-
         [Command("cprop", "/cprop (interior) (valor)")]
         public void CMD_cprop(IPlayer player, int interior, int valor)
         {

@@ -59,6 +59,7 @@ namespace Roleplay.Entities
         public DateTime? DataTerminoPrisao { get; set; } = null;
         public DateTime? DataValidadeLicencaMotorista { get; set; } = null;
         public DateTime? DataRevogacaoLicencaMotorista { get; set; } = null;
+        public int Distintivo { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

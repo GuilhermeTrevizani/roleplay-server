@@ -159,6 +159,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/mdc", "Abre o MDC"),
                         new Comando("Facção Policial", "/tac /t", "Entra/sai do canal de voz TAC"),
                         new Comando("Facção Policial", "/confiscar", "Confisca as armas de um personagem"),
+                        new Comando("Facção Policial", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
@@ -169,17 +170,31 @@ namespace Roleplay.Commands
                         new Comando("Facção Médica", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção Médica", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção Médica", "/uniforme", "Coloca/retira o uniforme de serviço"),
+                        new Comando("Facção Médica", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
+                    });
+                else if (p.FaccaoBD.Tipo == TipoFaccao.Governo)
+                    listaComandos.AddRange(new List<Comando>()
+                    {
+                        new Comando("Facção Governamental", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
                     });
 
                 if (p.Rank >= p.FaccaoBD.RankGestor)
+                {
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Facção Gestor", "/blockf", "Bloqueia/desbloqueia o chat OOC da facção"),
                         new Comando("Facção Gestor", "/convidar", "Convida um personagem para a facção"),
                         new Comando("Facção Gestor", "/rank", "Altera o rank de um personagem na facção"),
                         new Comando("Facção Gestor", "/expulsar", "Expulsa um personagem da facção"),
-                        new Comando("Facção Gestor", "/gov", "Envia um anúncio governamental da facção"),
                     });
+
+                    if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo)
+                        listaComandos.AddRange(new List<Comando>()
+                        {
+                            new Comando("Facção Gestor", "/gov", "Envia um anúncio governamental da facção"),
+                            new Comando("Facção Gestor", "/distintivo", "Atribui um distintivo para um personagem"),
+                        });
+                }
 
                 if (p.Rank >= p.FaccaoBD.RankLider)
                     listaComandos.AddRange(new List<Comando>()
@@ -251,7 +266,6 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/rrank", "Remove um rank da facção"),
                     new Comando("Manager", "/ranks", "Mostra os ranks da facção"),
                     new Comando("Manager", "/lider", "Atribui o personagem como líder de uma facção"),
-                    new Comando("Manager", "/parametros"),
                     new Comando("Manager", "/cprop"),
                     new Comando("Manager", "/rprop"),
                     new Comando("Manager", "/epropvalor"),
