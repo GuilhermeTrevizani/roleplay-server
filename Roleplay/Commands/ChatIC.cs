@@ -33,7 +33,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{p.NomeIC} sussura: {mensagem}", Constants.CorCelularSecundaria);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.NomeIC} sussura: {mensagem}", Constants.CorCelular);
-            Functions.SendMessageToNearbyPlayers(player, $"sussurra algo para {target.NomeIC}.", TipoMensagemJogo.Ame, 5, true);
+            Functions.SendMessageToNearbyPlayers(player, $"sussurra algo para {target.NomeIC}.", TipoMensagemJogo.Ame, 5);
         }
 
         [Command("ame", "/ame (mensagem)", GreedyArg = true)]

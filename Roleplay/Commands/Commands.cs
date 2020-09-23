@@ -42,6 +42,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/timestamp", "Ativa/desativa timestamp do chat"),
                 new Comando("Geral", "/barbearia", "Realiza alterações no cabelo em uma barbearia"),
                 new Comando("Geral", "/roupas", "Realiza alterações nas roupas em uma loja de roupas"),
+                new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -1181,6 +1182,27 @@ namespace Roleplay.Commands
             }
 
             //player.Emit("AbrirLojaRoupas", p.PersonalizacaoDados.Sexo, $"${Global.Parametros.ValorRoupas:N0}", JsonConvert.SerializeObject(p.Roupas));
+        }
+
+        [Command("mostrarid", "/mostrarid (ID ou nome)")]
+        public void CMD_mostrarid(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"ID de {p.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nome: {p.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Sexo: {(p.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher")}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nascimento: {p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)");
+            Functions.SendMessageToNearbyPlayers(player, p == target ? "olha para sua própria ID." : $"mostra sua ID para para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
     }
 }
