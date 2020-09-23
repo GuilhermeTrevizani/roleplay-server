@@ -158,6 +158,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/uniforme", "Coloca/retira o uniforme de serviço"),
                         new Comando("Facção Policial", "/mdc", "Abre o MDC"),
                         new Comando("Facção Policial", "/tac /t", "Entra/sai do canal de voz TAC"),
+                        new Comando("Facção Policial", "/confiscar", "Confisca as armas de um personagem"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()

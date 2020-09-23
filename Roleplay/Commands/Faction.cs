@@ -819,5 +819,34 @@ namespace Roleplay.Commands
             Global.TACVoice[canal - 1].AddPlayer(player);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou no TAC {canal}.", notify: true);
         }
+
+        [Command("confiscar", "/confiscar (ID ou nome)")]
+        public void CMD_confiscar(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);//, false);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
+                return;
+            }
+
+            foreach (var x in target.Armas)
+                target.Player.Emit("RemoveWeapon", x.Arma);
+
+            target.Armas = new List<PersonagemArma>();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");
+        }
     }
 }
