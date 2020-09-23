@@ -20,8 +20,8 @@ namespace Roleplay.Entities
         {
             DeletarIdentificador();
 
-            string nome = string.Empty;
-            string descricao = string.Empty;
+            var nome = string.Empty;
+            var descricao = string.Empty;
             switch (Tipo)
             {
                 case TipoPonto.Banco:
@@ -63,6 +63,10 @@ namespace Roleplay.Entities
                 case TipoPonto.MDC:
                     nome = "MDC";
                     descricao = "Use /mdc";
+                    break;
+                case TipoPonto.DMV:
+                    nome = "DMV";
+                    descricao = $"Use /dmv para comprar ou renover sua licença de motorista";
                     break;
             }
 

@@ -335,37 +335,22 @@ namespace Roleplay
             }
 
             using var context = new DatabaseContext();
-            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == p.Codigo);
-            personagem.Online = online;
-            personagem.Skin = p.Player.Model;
-            personagem.PosX = p.Player.Position.X;
-            personagem.PosY = p.Player.Position.Y;
-            personagem.PosZ = p.Player.Position.Z;
-            personagem.Vida = p.Player.Health;
-            personagem.Colete = p.Player.Armor;
-            personagem.Dimensao = p.Player.Dimension;
-            personagem.TempoConectado = p.TempoConectado;
-            personagem.Faccao = p.Faccao;
-            personagem.Rank = p.Rank;
-            personagem.Dinheiro = p.Dinheiro;
-            personagem.Celular = p.Celular;
-            personagem.Banco = p.Banco;
-            personagem.IPL = JsonConvert.SerializeObject(p.IPLs);
-            personagem.CanalRadio = p.CanalRadio;
-            personagem.CanalRadio2 = p.CanalRadio2;
-            personagem.CanalRadio3 = p.CanalRadio3;
-            personagem.DataTerminoPrisao = p.DataTerminoPrisao;
-            personagem.RotX = p.Player.Rotation.Roll;
-            personagem.RotY = p.Player.Rotation.Pitch;
-            personagem.RotZ = p.Player.Rotation.Yaw;
-            personagem.DataMorte = p.DataMorte;
-            personagem.MotivoMorte = p.MotivoMorte;
-            personagem.Emprego = p.Emprego;
-            personagem.DataUltimoAcesso = DateTime.Now;
-            personagem.IPUltimoAcesso = ObterIP(p.Player);
-            personagem.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
-            personagem.RoupasCivil = p.RoupasCivil;
-            context.Personagens.Update(personagem);
+            p.Online = online;
+            p.Skin = p.Player.Model;
+            p.PosX = p.Player.Position.X;
+            p.PosY = p.Player.Position.Y;
+            p.PosZ = p.Player.Position.Z;
+            p.Vida = p.Player.Health;
+            p.Colete = p.Player.Armor;
+            p.Dimensao = p.Player.Dimension;
+            p.IPL = JsonConvert.SerializeObject(p.IPLs);
+            p.RotX = p.Player.Rotation.Roll;
+            p.RotY = p.Player.Rotation.Pitch;
+            p.RotZ = p.Player.Rotation.Yaw;
+            p.DataUltimoAcesso = DateTime.Now;
+            p.IPUltimoAcesso = ObterIP(p.Player);
+            p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
+            context.Personagens.Update(p);
 
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
             context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensRoupas WHERE Codigo = {p.Codigo}");
@@ -388,8 +373,8 @@ namespace Roleplay
             usuario.Staff = p.UsuarioBD.Staff;
             usuario.TempoTrabalhoAdministrativo = p.UsuarioBD.TempoTrabalhoAdministrativo;
             usuario.QuantidadeSOSAceitos = p.UsuarioBD.QuantidadeSOSAceitos;
-            usuario.DataUltimoAcesso = personagem.DataUltimoAcesso;
-            usuario.IPUltimoAcesso = personagem.IPUltimoAcesso;
+            usuario.DataUltimoAcesso = p.DataUltimoAcesso;
+            usuario.IPUltimoAcesso = p.IPUltimoAcesso;
             usuario.TimeStamp = p.UsuarioBD.TimeStamp;
             context.Usuarios.Update(usuario);
 

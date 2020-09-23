@@ -12,5 +12,6 @@
         public int ValorBarbearia { get; set; } = 0;
         public int ValorRoupas { get; set; } = 0;
         public int SlotsPersonagens { get; set; } = 0;
+        public int ValorLicencaMotorista { get; set; } = 0;
     }
 }

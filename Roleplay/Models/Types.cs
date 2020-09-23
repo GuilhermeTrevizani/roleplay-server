@@ -180,6 +180,7 @@ namespace Roleplay.Models
         Barbearia = 8,
         Uniforme = 9,
         MDC = 10,
+        DMV = 11,
     }
 
     public enum TipoEmprego

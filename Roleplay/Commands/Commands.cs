@@ -43,6 +43,8 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/barbearia", "Realiza alterações no cabelo em uma barbearia"),
                 new Comando("Geral", "/roupas", "Realiza alterações nas roupas em uma loja de roupas"),
                 new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
+                new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
+                new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
                 new Comando("Propriedades", "/entrar"),
                 new Comando("Propriedades", "/sair"),
                 new Comando("Propriedades", "/pvender"),
@@ -1142,7 +1144,7 @@ namespace Roleplay.Commands
 
             if (p.Dinheiro < Global.Parametros.ValorBarbearia)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente! (${Global.Parametros.ValorBarbearia:N0})");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorBarbearia:N0}).");
                 return;
             }
 
@@ -1164,7 +1166,7 @@ namespace Roleplay.Commands
 
             if (p.Dinheiro < Global.Parametros.ValorRoupas)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente! (${Global.Parametros.ValorBarbearia:N0})");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorRoupas:N0}).");
                 return;
             }
 
@@ -1189,7 +1191,65 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nome: {p.Nome}");
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Sexo: {(p.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher")}");
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nascimento: {p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)");
-            Functions.SendMessageToNearbyPlayers(player, p == target ? "olha para sua própria ID." : $"mostra sua ID para para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
+            Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria ID." : $"mostra sua ID para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
+        }
+
+        [Command("dmv")]
+        public void CMD_dmv(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date > DateTime.Now && !p.DataRevogacaoLicencaMotorista.HasValue)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua licença de motorista não vence hoje e não está revogada.");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.DMV && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na DMV.");
+                return;
+            }
+
+            if (p.Dinheiro < Global.Parametros.ValorLicencaMotorista)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorLicencaMotorista:N0}).");
+                return;
+            }
+
+            p.DataValidadeLicencaMotorista = DateTime.Now.AddMonths(6);
+            p.DataRevogacaoLicencaMotorista = null;
+
+            p.Dinheiro -= Global.Parametros.ValorLicencaMotorista;
+            p.SetDinheiro();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou/renovou sua licença de motorista por ${Global.Parametros.ValorLicencaMotorista:N0}. A validade é {p.DataValidadeLicencaMotorista?.ToShortDateString()}.");
+        }
+
+        [Command("mostrarlicenca", "/mostrarlicenca (ID ou nome)")]
+        public void CMD_mostrarlicenca(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (!p.DataValidadeLicencaMotorista.HasValue)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma licença de motorista.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Licença de Motorista de {p.Nome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Validade: {p.DataValidadeLicencaMotorista?.ToShortDateString()}");
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Status: {(p.DataRevogacaoLicencaMotorista.HasValue ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
+            Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria licença de motorista." : $"mostra sua licença de motorista para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
     }
 }

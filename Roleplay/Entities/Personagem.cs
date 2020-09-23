@@ -35,9 +35,9 @@ namespace Roleplay.Entities
         public int TempoConectado { get; set; } = 0;
         public int Faccao { get; set; } = 0;
         public int Rank { get; set; } = 0;
-        public int Dinheiro { get; set; } = 500;
+        public int Dinheiro { get; set; } = 0;
         public int Celular { get; set; } = 0;
-        public int Banco { get; set; } = 0;
+        public int Banco { get; set; } = 1500;
         public string IPL { get; set; } = "[]";
         public int CanalRadio { get; set; } = -1;
         public int CanalRadio2 { get; set; } = 0;
@@ -57,6 +57,8 @@ namespace Roleplay.Entities
         public TipoEtapaPersonalizacao EtapaPersonalizacao { get; set; } = TipoEtapaPersonalizacao.Caracteristicas;
         public DateTime? DataExclusao { get; set; } = null;
         public DateTime? DataTerminoPrisao { get; set; } = null;
+        public DateTime? DataValidadeLicencaMotorista { get; set; } = null;
+        public DateTime? DataRevogacaoLicencaMotorista { get; set; } = null;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
