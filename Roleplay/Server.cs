@@ -652,6 +652,7 @@ namespace Roleplay
                 return;
             }
 
+            historia = historia.Trim();
             if (historia.Length < 500)
             {
                 player.Emit("Server:MostrarErro", $"História deve possuir mais que 500 caracteres ({historia.Length} de 500).");
