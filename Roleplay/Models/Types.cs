@@ -185,7 +185,13 @@ namespace Roleplay.Models
     public enum TipoEmprego
     {
         Nenhum = 0,
+
         Taxista = 1,
+
+        [Display(Name = "Mecânico")]
+        Mecanico = 2,
+
+        Caminhoneiro = 3,
     }
 
     public enum TipoStaff

@@ -13,7 +13,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Timers;
 
 namespace Roleplay
@@ -794,8 +793,7 @@ namespace Roleplay
 
             var duty = Global.PersonagensOnline.Where(x => x.IsEmTrabalho);
             player.Emit("Server:ListarPlayers", Global.NomeServidor, JsonConvert.SerializeObject(personagens),
-                duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial), duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica),
-                duty.Count(x => x.Emprego == TipoEmprego.Taxista));
+                $"Policiais: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial)} | Médicos: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica)} | Taxistas: {duty.Count(x => x.Emprego == TipoEmprego.Taxista)} | Mecânicos: {duty.Count(x => x.Emprego == TipoEmprego.Mecanico)}");
         }
 
         private void ComprarVeiculo(IPlayer player, int tipo, string veiculo, int r1, int g1, int b1, int r2, int g2, int b2)

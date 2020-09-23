@@ -807,13 +807,20 @@ namespace Roleplay.Commands
         public void CMD_sairemprego(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p.Emprego == 0)
+            if (p.Emprego == TipoEmprego.Nenhum)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego.");
                 return;
             }
 
-            p.Emprego = 0;
+            var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
+            if (player.Position.Distance(emp.Posicao) > Constants.DistanciaRP)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está onde você pegou esse emprego.");
+                return;
+            }
+
+            p.Emprego = TipoEmprego.Nenhum;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do seu emprego.");
         }
 
@@ -821,13 +828,13 @@ namespace Roleplay.Commands
         public void CMD_emprego(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p.Emprego > 0)
+            if (p.Emprego != TipoEmprego.Nenhum)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já tem um emprego.");
                 return;
             }
 
-            if (p.FaccaoBD?.Tipo == TipoFaccao.Policial || p.FaccaoBD?.Tipo == TipoFaccao.Medica)
+            if (p.FaccaoBD?.Tipo == TipoFaccao.Policial || p.FaccaoBD?.Tipo == TipoFaccao.Medica || p.FaccaoBD?.Tipo == TipoFaccao.Governo)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode pegar um emprego pois está em uma facção governamental.");
                 return;
