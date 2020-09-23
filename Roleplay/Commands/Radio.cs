@@ -15,12 +15,6 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está preso.");
-                return;
-            }
-
             if (p.TimerFerido != null)
             {
                 Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está gravamente ferido.");

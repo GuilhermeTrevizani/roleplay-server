@@ -8,7 +8,6 @@ namespace Roleplay.Entities
         public DateTime Data { get; set; } = DateTime.Now;
         public int Preso { get; set; } = 0;
         public int Policial { get; set; } = 0;
-        public int Tempo { get; set; } = 0;
-        public int Cela { get; set; } = 0;
+        public DateTime Termino { get; set; } = DateTime.MinValue;
     }
 }

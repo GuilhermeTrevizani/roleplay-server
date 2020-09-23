@@ -2456,7 +2456,6 @@ namespace Roleplay.Commands
             {
                 player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}f, {player.Position.Y.ToString().Replace(",", ".")}f, {player.Position.Z.ToString().Replace(",", ".")}f");
                 player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Rotation.Yaw.ToString().Replace(",", ".")}f");
-                player.Emit("alt:log", $"HEAD ROT: {player.HeadRotation.Roll.ToString().Replace(",", ".")}f, {player.HeadRotation.Pitch.ToString().Replace(",", ".")}f, {player.HeadRotation.Yaw.ToString().Replace(",", ".")}f");
             }
         }
 

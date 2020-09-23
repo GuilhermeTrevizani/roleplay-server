@@ -366,8 +366,8 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {personagem.Nome} por ${valor:N0}. Motivo: {motivo}");
         }
 
-        [Command("prender", "/prender (ID ou nome) (cela [1-3]) (minutos)")]
-        public void CMD_prender(IPlayer player, string idNome, int cela, int minutos)
+        [Command("prender", "/prender (ID ou nome) (minutos)")]
+        public void CMD_prender(IPlayer player, string idNome, int minutos)
         {
             var p = Functions.ObterPersonagem(player);
             if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
@@ -386,12 +386,6 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (target.TempoPrisao > 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador já está preso.");
-                return;
-            }
-
             if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
@@ -404,22 +398,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var pos = new Position();
-            switch (cela)
-            {
-                case 1:
-                    pos = new Position(460.4085f, -994.0992f, 25);
-                    break;
-                case 2:
-                    pos = new Position(460.4085f, -997.7994f, 25);
-                    break;
-                case 3:
-                    pos = new Position(460.4085f, -1001.342f, 25);
-                    break;
-                default:
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Cela deve ser entre 1 e 3.");
-                    break;
-            }
+            target.DataTerminoPrisao = DateTime.Now.AddMinutes(minutos);
 
             using (var context = new DatabaseContext())
             {
@@ -427,16 +406,16 @@ namespace Roleplay.Commands
                 {
                     Preso = target.Codigo,
                     Policial = p.Codigo,
-                    Tempo = minutos,
-                    Cela = cela,
+                    Termino = target.DataTerminoPrisao.Value,
                 });
                 context.SaveChanges();
             }
 
-            target.Player.Position = pos;
-            target.TempoPrisao = minutos;
-            Functions.EnviarMensagemTipoFaccao(TipoFaccao.Policial, $"{p.RankBD.Nome} {p.Nome} prendeu {target.Nome} na cela {cela} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.", true, true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.Nome} prendeu você na cela {cela} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.");
+            target.Player.Position = new Position(433.01538f, -982.25934f, 30.69519f);
+            target.Player.Rotation = new Position(0f, 0f, 1.3852693f);
+            Functions.EnviarMensagemTipoFaccao(TipoFaccao.Policial, $"{p.RankBD.Nome} {p.Nome} prendeu {target.Nome} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.", true, true);
+            Functions.SalvarPersonagem(target, false);
+            target.Player.Kick($"{p.Nome} prendeu você por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.");
         }
 
         [Command("algemar", "/algemar (ID ou nome)")]

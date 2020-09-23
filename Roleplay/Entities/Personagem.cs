@@ -42,7 +42,6 @@ namespace Roleplay.Entities
         public int CanalRadio { get; set; } = -1;
         public int CanalRadio2 { get; set; } = 0;
         public int CanalRadio3 { get; set; } = 0;
-        public int TempoPrisao { get; set; } = 0;
         public float RotX { get; set; } = 0;
         public float RotY { get; set; } = 0;
         public float RotZ { get; set; } = 149.1595f;
@@ -57,6 +56,7 @@ namespace Roleplay.Entities
         public TipoStatusNamechange StatusNamechange { get; set; } = TipoStatusNamechange.Liberado;
         public TipoEtapaPersonalizacao EtapaPersonalizacao { get; set; } = TipoEtapaPersonalizacao.Caracteristicas;
         public DateTime? DataExclusao { get; set; } = null;
+        public DateTime? DataTerminoPrisao { get; set; } = null;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

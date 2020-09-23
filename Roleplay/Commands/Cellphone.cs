@@ -17,7 +17,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0 || p.Algemado)
+            if (p.Algemado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
@@ -56,7 +56,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0 || p.Algemado)
+            if (p.Algemado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
@@ -195,7 +195,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0 || p.Algemado)
+            if (p.Algemado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
@@ -225,7 +225,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0 || p.Algemado)
+            if (p.Algemado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;
@@ -244,7 +244,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.TempoPrisao > 0 || p.Algemado)
+            if (p.Algemado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
                 return;

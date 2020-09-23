@@ -288,17 +288,6 @@ namespace Roleplay
                 p.TempoConectado++;
                 p.DataUltimaVerificacao = DateTime.Now;
 
-                if (p.TempoPrisao > 0)
-                {
-                    p.TempoPrisao--;
-                    if (p.TempoPrisao == 0)
-                    {
-                        p.Player.Position = new Position(432.8367f, -981.7594f, 30.71048f);
-                        p.Player.Rotation = new Rotation(0, 0, 86.37479f);
-                        EnviarMensagem(p.Player, TipoMensagem.Sucesso, $"Seu tempo de prisão acabou e você foi libertado.");
-                    }
-                }
-
                 if (p.TempoConectado % 60 == 0)
                 {
                     var temIncentivoInicial = false;
@@ -365,7 +354,7 @@ namespace Roleplay
             personagem.CanalRadio = p.CanalRadio;
             personagem.CanalRadio2 = p.CanalRadio2;
             personagem.CanalRadio3 = p.CanalRadio3;
-            personagem.TempoPrisao = p.TempoPrisao;
+            personagem.DataTerminoPrisao = p.DataTerminoPrisao;
             personagem.RotX = p.Player.Rotation.Roll;
             personagem.RotY = p.Player.Rotation.Pitch;
             personagem.RotZ = p.Player.Rotation.Yaw;
@@ -485,7 +474,7 @@ namespace Roleplay
             OOC: <strong>{p.UsuarioBD.Nome}</strong> | SocialClub: <strong>{p.Player.SocialClubId}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Namechange: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong><br/>
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
-            Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong> | Tempo de Prisão: <strong>{p.TempoPrisao}</strong><br/>";
+            Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
 
             if (p.UsuarioBD.Staff > 0)
                 html += $"Staff: <strong>{ObterDisplayEnum(p.UsuarioBD.Staff)} [{(int)p.UsuarioBD.Staff}]</strong> | Tempo Serviço Administrativo (minutos): <strong>{p.UsuarioBD.TempoTrabalhoAdministrativo}</strong> | SOSs Aceitos: <strong>{p.UsuarioBD.QuantidadeSOSAceitos}</strong><br/>";
@@ -742,12 +731,6 @@ namespace Roleplay
             if (p.CanalRadio == -1)
             {
                 EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não possui um rádio.");
-                return;
-            }
-
-            if (p.TempoPrisao > 0)
-            {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você está preso.");
                 return;
             }
 

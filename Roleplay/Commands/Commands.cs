@@ -649,12 +649,6 @@ namespace Roleplay.Commands
         public void CMD_transferir(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p.TempoPrisao > 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está preso.");
-                return;
-            }
-
             if (valor <= 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
@@ -1006,25 +1000,11 @@ namespace Roleplay.Commands
             p.Player.Dimension = 0;
             p.Armas = new List<PersonagemArma>();
             p.Player.RemoveAllWeapons();
-
-            var pos = new Position(298.16702f, -584.2286f, 43.24829f);
-            if (p.TempoPrisao > 0)
-            {
-                using var context = new DatabaseContext();
-                var prisao = context.Prisoes.Where(x => x.Preso == p.Codigo).OrderByDescending(x => x.Codigo).FirstOrDefault();
-                if (prisao.Cela == 1)
-                    pos = new Position(460.4085f, -994.0992f, 25);
-                else if (prisao.Cela == 2)
-                    pos = new Position(460.4085f, -997.7994f, 25);
-                else if (prisao.Cela == 3)
-                    pos = new Position(460.4085f, -1001.342f, 25);
-            }
-
             p.Ferimentos = new List<Personagem.Ferimento>();
             p.Player.Emit("Server:CurarPersonagem");
             p.StopAnimation();
             p.Player.Emit("player:toggleFreeze", false);
-            p.Player.Spawn(pos);
+            p.Player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
             p.Player.Health = 200;
             p.Player.Armor = 0;
 

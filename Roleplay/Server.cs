@@ -432,7 +432,9 @@ namespace Roleplay
 
             if (x.DataMorte.HasValue)
                 span = $@"<span style=""color:#d12c0f;"">Morto ({x.MotivoMorte})</span>";
-            if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
+            else if ((x.DataTerminoPrisao ?? DateTime.MinValue) > DateTime.Now)
+                span = $@"<span style=""color:#d12c0f;"">Preso até {x.DataTerminoPrisao}</span>";
+            else if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
                 span = $@"<span style=""color:#d12c0f;"">Rejeitado</span>";
             else if (x.UsuarioStaffAvaliador == 0)
                 span = $@"<span style=""color:#e69215;"">Aguardando Avaliação</span>";
@@ -443,7 +445,7 @@ namespace Roleplay
         private string ObterBotaoListarPersonagens(Personagem x, Usuario u)
         {
             var opcoes = string.Empty;
-            if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0)
+            if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0 && (x.DataTerminoPrisao ?? DateTime.MinValue) < DateTime.Now)
             {
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
                     opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
@@ -478,6 +480,7 @@ namespace Roleplay
             personagem.Online = true;
             personagem.HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash;
             personagem.HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash;
+            personagem.DataTerminoPrisao = null;
             context.Personagens.Update(personagem);
             context.SaveChanges();
 
