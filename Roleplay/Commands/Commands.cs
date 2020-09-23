@@ -786,6 +786,12 @@ namespace Roleplay.Commands
             var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Constants.DistanciaRP);
             if (conce != null)
             {
+                if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date < DateTime.Now.Date || !p.DataRevogacaoLicencaMotorista.HasValue)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma licença de motorista válida.");
+                    return;
+                }
+
                 var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
                 {
                     x.Nome,
@@ -796,7 +802,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma ponto de compra.");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de compra.");
         }
 
         [Command("sairemprego")]
