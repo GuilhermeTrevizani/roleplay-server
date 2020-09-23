@@ -412,7 +412,7 @@ namespace Roleplay
             using var context = new DatabaseContext();
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
                 JsonConvert.SerializeObject(context.Personagens
-                    .Where(x => x.Usuario == p.UsuarioBD.Codigo && x.StatusNamechange != TipoStatusNamechange.Realizado)
+                    .Where(x => x.Usuario == p.UsuarioBD.Codigo && x.StatusNamechange != TipoStatusNamechange.Realizado && !x.DataExclusao.HasValue)
                     .OrderByDescending(x => x.Codigo)
                     .ToList()
                     .Select(x => new

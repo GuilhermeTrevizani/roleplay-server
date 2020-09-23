@@ -1092,12 +1092,13 @@ namespace Roleplay.Commands
                         <th>Cor</th>
                         <th>Rank Gestor</th>
                         <th>Rank Líder</th>
+                        <th>Slots</th>
                     </tr>
                 </thead>
                 <tbody>";
 
             foreach (var x in Global.Faccoes)
-                html += $@"<tr class='pesquisaitem'><td>{x.Codigo}</td><td>{x.Nome}</td><td>{Functions.ObterDisplayEnum(x.Tipo)}</td><td><span style='color:#{x.Cor}'>#{x.Cor}</span></td><td>{Global.Ranks.FirstOrDefault(y => y.Faccao == x.Codigo && y.Codigo == x.RankGestor)?.Nome ?? string.Empty} [{x.RankGestor}]</td><td>{Global.Ranks.FirstOrDefault(y => y.Faccao == x.Codigo && y.Codigo == x.RankLider)?.Nome ?? string.Empty} [{x.RankLider}]</td></tr>";
+                html += $@"<tr class='pesquisaitem'><td>{x.Codigo}</td><td>{x.Nome}</td><td>{Functions.ObterDisplayEnum(x.Tipo)}</td><td><span style='color:#{x.Cor}'>#{x.Cor}</span></td><td>{Global.Ranks.FirstOrDefault(y => y.Faccao == x.Codigo && y.Codigo == x.RankGestor)?.Nome ?? string.Empty} [{x.RankGestor}]</td><td>{Global.Ranks.FirstOrDefault(y => y.Faccao == x.Codigo && y.Codigo == x.RankLider)?.Nome ?? string.Empty} [{x.RankLider}]</td><td>{x.Slots}</td></tr>";
 
             html += $@"
                 </tbody>
@@ -2574,6 +2575,41 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {componente} removido na arma {wep} no armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/rarmicomp {armario} {item.Arma} {componente}", p, null);
+        }
+
+        [Command("efacslots", "/efacslots (código) (slots)")]
+        public void CMD_efacslots(IPlayer player, int codigo, int slots)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == codigo);
+            if (faccao == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {codigo} não existe.");
+                return;
+            }
+
+            if (slots < 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Slots deve ser um valor positivo.");
+                return;
+            }
+
+            faccao.Slots = slots;
+
+            using (var context = new DatabaseContext())
+            {
+                context.Faccoes.Update(faccao);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a quantidade de slots da facção {faccao.Codigo} para {slots}.");
+            Functions.GravarLog(TipoLog.Staff, $"/efacslots {faccao.Codigo} {slots}", p, null);
         }
         #endregion Staff 1337
     }

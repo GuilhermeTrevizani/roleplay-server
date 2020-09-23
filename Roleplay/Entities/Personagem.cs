@@ -56,6 +56,7 @@ namespace Roleplay.Entities
         public string MotivoRejeicao { get; set; } = string.Empty;
         public TipoStatusNamechange StatusNamechange { get; set; } = TipoStatusNamechange.Liberado;
         public TipoEtapaPersonalizacao EtapaPersonalizacao { get; set; } = TipoEtapaPersonalizacao.Caracteristicas;
+        public DateTime? DataExclusao { get; set; } = null;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

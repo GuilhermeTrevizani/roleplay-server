@@ -169,16 +169,16 @@ namespace Roleplay.Models
 
     public enum TipoPonto
     {
-        Banco = 2,
-        ATM = 3,
-        LojaConveniencia = 4,
-        LojaRoupas = 5,
-        SpawnVeiculosFaccao = 6,
-        ApreensaoVeiculos = 7,
-        LiberacaoVeiculos = 8,
-        Barbearia = 9,
-        Uniforme = 10,
-        MDC = 11,
+        Banco = 1,
+        ATM = 2,
+        LojaConveniencia = 3,
+        LojaRoupas = 4,
+        SpawnVeiculosFaccao = 5,
+        ApreensaoVeiculos = 6,
+        LiberacaoVeiculos = 7,
+        Barbearia = 8,
+        Uniforme = 9,
+        MDC = 10,
     }
 
     public enum TipoEmprego

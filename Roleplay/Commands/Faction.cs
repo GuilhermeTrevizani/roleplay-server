@@ -23,7 +23,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.FaccaoBD.IsChatBloqueado)
+            if (p.FaccaoBD.ChatBloqueado)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Chat da facção está bloqueado.");
                 return;
@@ -85,8 +85,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Global.Faccoes[Global.Faccoes.IndexOf(p.FaccaoBD)].IsChatBloqueado = !p.FaccaoBD.IsChatBloqueado;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.FaccaoBD.IsChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.");
+            Global.Faccoes[Global.Faccoes.IndexOf(p.FaccaoBD)].ChatBloqueado = !p.FaccaoBD.ChatBloqueado;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.FaccaoBD.ChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.");
         }
 
         [Command("convidar", "/convidar (ID ou nome)")]
@@ -97,6 +97,17 @@ namespace Roleplay.Commands
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
+            }
+
+            if (p.FaccaoBD.Slots > 0)
+            {
+                using var context = new DatabaseContext();
+                var qtdMembros = context.Personagens.Count(x => x.Faccao == p.Faccao && !x.DataMorte.HasValue && !x.DataExclusao.HasValue);
+                if (qtdMembros >= p.FaccaoBD.Slots)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção atingiu o máximo de slots ({p.FaccaoBD.Slots}).");
+                    return;
+                }
             }
 
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
@@ -826,7 +837,7 @@ namespace Roleplay.Commands
                 }
             }
 
-            Global.TACVoice[canal-1].AddPlayer(player);
+            Global.TACVoice[canal - 1].AddPlayer(player);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou no TAC {canal}.", notify: true);
         }
     }

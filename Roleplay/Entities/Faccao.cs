@@ -11,8 +11,9 @@ namespace Roleplay.Entities
         public string Cor { get; set; } = string.Empty;
         public int RankGestor { get; set; } = 0;
         public int RankLider { get; set; } = 0;
+        public int Slots { get; set; } = 0;
 
         [NotMapped]
-        public bool IsChatBloqueado { get; set; } = false;
+        public bool ChatBloqueado { get; set; } = false;
     }
 }
