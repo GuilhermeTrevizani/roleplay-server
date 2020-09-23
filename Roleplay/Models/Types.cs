@@ -56,6 +56,7 @@ namespace Roleplay.Models
         Morte = 8,
         Arma = 9,
         Namechange = 10,
+        ExclusaoPersonagem = 11,
     }
 
     public enum TipoConvite

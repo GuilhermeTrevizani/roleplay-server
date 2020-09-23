@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Timers;
 
 namespace Roleplay
@@ -55,6 +56,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
             Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
             Alt.OnClient<IPlayer, string>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
+            Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -450,6 +452,7 @@ namespace Roleplay
                     opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
             }
             opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button onclick='selecionarPersonagem({x.Codigo}, true);'>TROCAR NOME</button>" : string.Empty;
+            opcoes += $" <button onclick='deletarPersonagem({x.Codigo});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
             return opcoes;
         }
 
@@ -1260,6 +1263,18 @@ namespace Roleplay
             context.SaveChanges();
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)p.EtapaPersonalizacao);
+        }
+
+        private void DeletarPersonagem(IPlayer player, int codigo)
+        {
+            using var context = new DatabaseContext();
+            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == codigo);
+            personagem.DataExclusao = DateTime.Now;
+            context.Personagens.Update(personagem);
+            context.SaveChanges();
+
+            Functions.GravarLog(TipoLog.ExclusaoPersonagem, string.Empty, personagem, null);
+            ListarPersonagens(player);
         }
         #endregion
     }
