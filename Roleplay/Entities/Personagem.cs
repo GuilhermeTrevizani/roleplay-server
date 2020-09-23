@@ -30,7 +30,6 @@ namespace Roleplay.Entities
         public int Vida { get; set; } = 100;
         public int Colete { get; set; } = 0;
         public long Dimensao { get; set; } = 0;
-        public string Sexo { get; set; } = "M";
         public DateTime DataNascimento { get; set; } = DateTime.MinValue;
         public bool Online { get; set; } = true;
         public int TempoConectado { get; set; } = 0;
@@ -56,6 +55,7 @@ namespace Roleplay.Entities
         public int UsuarioStaffAvaliador { get; set; } = 0;
         public string MotivoRejeicao { get; set; } = string.Empty;
         public TipoStatusNamechange StatusNamechange { get; set; } = TipoStatusNamechange.Liberado;
+        public TipoEtapaPersonalizacao EtapaPersonalizacao { get; set; } = TipoEtapaPersonalizacao.Caracteristicas;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -233,11 +233,65 @@ namespace Roleplay.Entities
 
         public class Personalizacao
         {
-            public int CabeloCor1 { get; set; } = 0;
-            public int CabeloCor2 { get; set; } = 0;
-            public int Barba { get; set; } = 255;
-            public int BarbaCor { get; set; } = 0;
-            public int Maquiagem { get; set; } = 255;
+            public int sex { get; set; } = 1;
+            public int faceFather { get; set; } = 0;
+            public int faceMother { get; set; } = 0;
+            public int skinFather { get; set; } = 0;
+            public int skinMother { get; set; } = 0;
+            public double faceMix { get; set; } = 0.5;
+            public double skinMix { get; set; } = 0.5;
+            public List<double> structure { get; set; } = new List<double> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            public int hair { get; set; } = 4;
+            public int hairColor1 { get; set; } = 1;
+            public int hairColor2 { get; set; } = 5;
+            public HairOverlay hairOverlay { get; set; } = new HairOverlay("multiplayer_overlays", "NG_M_Hair_004");
+            public int facialHair { get; set; } = 0;
+            public int facialHairColor1 { get; set; } = 0;
+            public double facialHairOpacity { get; set; } = 0;
+            public int eyebrows { get; set; } = 0;
+            public double eyebrowsOpacity { get; set; } = 0;
+            public int eyebrowsColor1 { get; set; } = 0;
+            public int eyes { get; set; } = 0;
+            public List<OpacityOverlay> opacityOverlays { get; set; } = new List<OpacityOverlay> { new OpacityOverlay(0), new OpacityOverlay(3), new OpacityOverlay(6), new OpacityOverlay(7), new OpacityOverlay(9), new OpacityOverlay(11) };
+            public List<ColorOverlay> colorOverlays { get; set; } = new List<ColorOverlay> { new ColorOverlay(4), new ColorOverlay(5), new ColorOverlay(8) };
+
+            public class HairOverlay
+            {
+                public HairOverlay(string _collection, string _overlay)
+                {
+                    collection = _collection;
+                    overlay = _overlay;
+                }
+
+                public string collection { get; set; }
+                public string overlay { get; set; }
+            }
+
+            public class OpacityOverlay
+            {
+                public OpacityOverlay(int _id)
+                {
+                    id = _id;
+                }
+
+                public int id { get; set; } = 0;
+                public double opacity { get; set; } = 0;
+                public double value { get; set; } = 0;
+            }
+
+            public class ColorOverlay
+            {
+                public ColorOverlay(int _id)
+                {
+                    id = _id;
+                }
+
+                public int id { get; set; } = 0;
+                public double opacity { get; set; } = 0;
+                public int color1 { get; set; } = 0;
+                public int color12 { get; set; } = 0;
+                public double value { get; set; } = 0;
+            }
         }
     }
 }

@@ -661,7 +661,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
             {
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reiniciará o servidor.");
                 Functions.SalvarPersonagem(pl);
@@ -2455,6 +2455,7 @@ namespace Roleplay.Commands
             {
                 player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}f, {player.Position.Y.ToString().Replace(",", ".")}f, {player.Position.Z.ToString().Replace(",", ".")}f");
                 player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Rotation.Yaw.ToString().Replace(",", ".")}f");
+                player.Emit("alt:log", $"HEAD ROT: {player.HeadRotation.Roll.ToString().Replace(",", ".")}f, {player.HeadRotation.Pitch.ToString().Replace(",", ".")}f, {player.HeadRotation.Yaw.ToString().Replace(",", ".")}f");
             }
         }
 

@@ -58,11 +58,11 @@ namespace RoleplayBOT
                 var x = new EmbedBuilder
                 {
                     Title = $"Aplicação de {app.Nome} [{app.Codigo}]",
+                    Description = app.Historia,
                 };
                 x.AddField("Nome", app.Nome, true);
-                x.AddField("Sexo", app.Sexo == "H" ? "Homem" : "Mulher", true);
+                x.AddField("Sexo", app.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher", true);
                 x.AddField("Nascimento", app.DataNascimento.ToShortDateString(), true);
-                x.AddField("História", app.Historia);
                 x.WithFooter($"Enviada em {app.DataRegistro}");
                 x.Color = Color.DarkRed;
 

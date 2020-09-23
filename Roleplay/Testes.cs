@@ -1,7 +1,7 @@
-﻿using AltV.Net;
-using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Elements.Entities;
+using Newtonsoft.Json;
 using Roleplay.Models;
+using System;
 
 namespace Roleplay
 {
@@ -18,22 +18,6 @@ namespace Roleplay
             player.Vehicle.PetrolTankHealth = 1000;
         }
 
-        [Command("vh")]
-        public void CMD_vh(IPlayer player)
-        {
-            if (!player.IsInVehicle)
-                return;
-
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"BodyHealth: {player.Vehicle.BodyHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"EngineHealth: {player.Vehicle.EngineHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"PetrolTankHealth: {player.Vehicle.PetrolTankHealth}");
-        }
-
-        [Command("i")]
-        public void CMD_i(IPlayer player, string ipl) => player.Emit("Server:RequestIpl", ipl);
-
-        [Command("ri")]
-        public void CMD_ri(IPlayer player, string ipl) => player.Emit("Server:RemoveIpl", ipl);
 
         [Command("v")]
         public void CMD_v(IPlayer player)
@@ -48,6 +32,12 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"PetrolTankHealth: {player.Vehicle.PetrolTankHealth}");
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"DamageData: {player.Vehicle.DamageData}");
         }
+
+        [Command("i")]
+        public void CMD_i(IPlayer player, string ipl) => player.Emit("Server:RequestIpl", ipl);
+
+        [Command("ri")]
+        public void CMD_ri(IPlayer player, string ipl) => player.Emit("Server:RemoveIpl", ipl);
 
         [Command("ca", "/ca (slot) (drawable) (texture)")]
         public void CMD_ca(IPlayer player, int slot, int drawable, int texture)
@@ -72,8 +62,33 @@ namespace Roleplay
         [Command("teste")]
         public void CMD_teste(IPlayer player)
         {
-            Alt.CreateCheckpoint(CheckpointType.CylinderCheckerboard, player.Position, 1, 1, new Rgba(255, 255, 255, 255));
-            //player.Emit("character:Edit", "");
         }
+
+        /*import * as alt from 'alt';
+
+alt.on('character:Edit', handleCharacterEdit);
+alt.on('character:Sync', handleCharacterSync);
+alt.onClient('character:Done', handleDone);
+
+function handleCharacterEdit(player, oldData = null) {
+    if (!player || !player.valid) {
+        return;
+    }
+
+    alt.emitClient(player, 'character:Edit', oldData);
+}
+
+function handleCharacterSync(player, data) {
+    if (!player || !player.valid) {
+        return;
+    }
+
+    alt.emitClient(player, 'character:Sync', data);
+}
+
+function handleDone(player, newData) {
+    alt.emit('character:Done', player, newData);
+}
+*/
     }
 }

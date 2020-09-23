@@ -739,7 +739,7 @@ namespace Roleplay.Commands
             p.SetClothes(3, 0, 0);
             p.SetClothes(7, 0, 0);
 
-            if (p.Sexo == "M")
+            if (p.PersonalizacaoDados.sex == 0)
             {
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                 {
@@ -784,7 +784,7 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"ABRIR MDC");
         }
 
-        [Command("tac", "/tac (canal [0-5])")]
+        [Command("tac", "/tac (canal [0-5])", Alias = "t")]
         public void CMD_tac(IPlayer player, int canal)
         {
             var p = Functions.ObterPersonagem(player);

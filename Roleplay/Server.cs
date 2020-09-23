@@ -32,8 +32,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
             Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
             Alt.OnClient<IPlayer>("ListarPersonagens", ListarPersonagens);
-            Alt.OnClient<IPlayer, int, bool>("SelecionarPersonagem", SelecionarPersonagem);
             Alt.OnClient<IPlayer, int, string, string, string, string, string>("CriarPersonagem", CriarPersonagem);
+            Alt.OnClient<IPlayer, int, bool>("SelecionarPersonagem", SelecionarPersonagem);
             Alt.OnClient<IPlayer>("ListarPlayers", ListarPlayers);
             Alt.OnClient<IPlayer, int, string, int, int, int, int, int, int>("ComprarVeiculo", ComprarVeiculo);
             Alt.OnClient<IPlayer, string>("ComprarConveniencia", ComprarConveniencia);
@@ -54,6 +54,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("ValidarPerguntas", ValidarPerguntas);
             Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
             Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
+            Alt.OnClient<IPlayer, string>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -140,7 +141,7 @@ namespace Roleplay
         public override void OnStop()
         {
             TimerPrincipal?.Stop();
-            foreach (var p in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
                 Functions.SalvarPersonagem(p);
         }
 
@@ -183,7 +184,7 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Morte, JsonConvert.SerializeObject(p.Ferimentos), p,
                 killer is IPlayer playerKiller ? Functions.ObterPersonagem(playerKiller) : null);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "Você foi gravemente ferido! Os médicos deverão chegar em até 3 minutos.");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 3 minutos.");
 
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(180000)
@@ -209,8 +210,8 @@ namespace Roleplay
                 return;
             }
 
-            Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
-            Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
+            Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
+            Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
             timer?.Stop();
         }
 
@@ -350,7 +351,7 @@ namespace Roleplay
 
         private void TimerPrincipal_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (var p in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
                 Functions.SalvarPersonagem(p);
         }
 
@@ -464,11 +465,10 @@ namespace Roleplay
             {
                 var staffer = context.Usuarios.FirstOrDefault(x => x.Codigo == personagem.UsuarioStaffAvaliador);
                 var nome = personagem.Nome.Split(' ');
-                player.Emit("Server:CriarPersonagem", personagem.Codigo, nome.FirstOrDefault(), nome.LastOrDefault(), personagem.Sexo, personagem.DataNascimento.ToShortDateString(), personagem.Historia, personagem.MotivoRejeicao, staffer.Nome);
+                player.Emit("Server:CriarPersonagem", personagem.Codigo, nome.FirstOrDefault(), nome.LastOrDefault(), p.PersonalizacaoDados.sex == 1 ? "H" : "M", personagem.DataNascimento.ToShortDateString(), personagem.Historia, personagem.MotivoRejeicao, staffer.Nome);
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
             personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = Functions.ObterIP(player);
             personagem.SocialClubUltimoAcesso = (long)player.SocialClubId;
@@ -492,7 +492,6 @@ namespace Roleplay
             foreach (var x in Global.TextDraws)
                 x.CriarIdentificador(player);
 
-            player.SetSyncedMetaData("nametag", p.Nome);
             player.Dimension = (int)p.Dimensao;
             p.IPLs = JsonConvert.DeserializeObject<List<string>>(p.IPL);
             p.SetarIPLs();
@@ -522,6 +521,8 @@ namespace Roleplay
                     player.AddWeaponComponent((WeaponModel)x.Arma, c);
             }
 
+            p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+
             if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
             {
                 Global.Parametros.RecordeOnline = Global.PersonagensOnline.Count;
@@ -532,14 +533,26 @@ namespace Roleplay
                     Functions.EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorSucesso}}}{Global.Parametros.RecordeOnline}{{#FFFFFF}}.");
             }
 
-            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao);
-            player.Emit("nametags:Config", true);
-            player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-            player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
-            player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
-            p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
-
             Functions.GravarLog(TipoLog.Entrada, string.Empty, p, null);
+
+            if (personagem.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
+            {
+                player.Dimension = p.ID;
+                player.Spawn(new Position(402.84396f, -996.9758f, -99.01465f));
+                player.Rotation = new Position(0f, 0f, -3.017908f);
+            }
+            else
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
+                player.SetSyncedMetaData("nametag", p.Nome);
+                player.Emit("nametags:Config", true);
+                player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
+                player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
+                player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+            }
+
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)personagem.EtapaPersonalizacao);
+
         }
 
         private void RegistrarUsuario(IPlayer player, string usuario, string email, string senha, string senha2)
@@ -684,12 +697,12 @@ namespace Roleplay
                 return;
             }
 
+            p.PersonalizacaoDados.sex = sexo == "M" ? 1 : 0;
             var personagem = new Personagem()
             {
                 Codigo = codigo,
                 Nome = nomeCompleto,
                 Usuario = p.UsuarioBD.Codigo,
-                Sexo = sexo,
                 DataNascimento = dtNascimento,
                 SocialClubRegistro = (long)player.SocialClubId,
                 SocialClubUltimoAcesso = (long)player.SocialClubId,
@@ -705,6 +718,12 @@ namespace Roleplay
                 UsuarioStaffAvaliador = 0,
                 MotivoRejeicao = string.Empty,
             };
+
+            if (personagemAntigo != null)
+            {
+                personagem.Dinheiro = personagemAntigo.Dinheiro;
+                personagem.Banco = personagemAntigo.Banco;
+            }
 
             if (codigo == 0)
                 context.Personagens.Add(personagem);
@@ -1101,12 +1120,12 @@ namespace Roleplay
         {
             var p = Functions.ObterPersonagem(player);
 
-            p.SetClothes(2, cabelo, 0, false);
+            /*p.SetClothes(2, cabelo, 0, false);
             p.PersonalizacaoDados.CabeloCor1 = cabeloCor1;
             p.PersonalizacaoDados.CabeloCor2 = cabeloCor2;
             p.PersonalizacaoDados.Barba = barba;
             p.PersonalizacaoDados.BarbaCor = barbaCor;
-            p.PersonalizacaoDados.Maquiagem = maquiagem;
+            p.PersonalizacaoDados.Maquiagem = maquiagem;*/
 
             p.Dinheiro -= Global.Parametros.ValorBarbearia;
             p.SetDinheiro();
@@ -1225,6 +1244,21 @@ namespace Roleplay
             context.SaveChanges();
 
             player.Emit("Server:MostrarSucesso", "Sua senha foi alterada com sucesso.");
+        }
+
+        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            p.InformacoesPersonalizacao = strPersonalizacao;
+            p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+            p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Roupas;
+
+            using var context = new DatabaseContext();
+            context.Personagens.Update(p);
+            context.SaveChanges();
+
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)p.EtapaPersonalizacao);
         }
         #endregion
     }

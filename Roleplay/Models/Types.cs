@@ -244,4 +244,11 @@ namespace Roleplay.Models
         Bloqueado = 1,
         Realizado = 2,
     }
+
+    public enum TipoEtapaPersonalizacao
+    {
+        Caracteristicas = 0,
+        Roupas = 1,
+        Concluido = 2,
+    }
 }

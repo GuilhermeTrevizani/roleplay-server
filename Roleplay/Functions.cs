@@ -58,7 +58,6 @@ namespace Roleplay
             return false;
         }
 
-
         public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player.HardwareIdHash);
 
         public static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
@@ -268,6 +267,9 @@ namespace Roleplay
 
         public static void SalvarPersonagem(Personagem p, bool online = true)
         {
+            if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
+                return;
+
             p.Player.SetDateTime(DateTime.Now);
 
             var armas = (p.StringArmas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
@@ -482,7 +484,7 @@ namespace Roleplay
             <div class='box-body'>
             OOC: <strong>{p.UsuarioBD.Nome}</strong> | SocialClub: <strong>{p.Player.SocialClubId}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Namechange: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong><br/>
-            Sexo: <strong>{p.Sexo}</strong> | Nascimento: <strong>{p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)</strong> | Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
+            Sexo: <strong>{(p.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher")}</strong> | Nascimento: <strong>{p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)</strong> | Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
             Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong> | Tempo de Prisão: <strong>{p.TempoPrisao}</strong><br/>";
 
             if (p.UsuarioBD.Staff > 0)
