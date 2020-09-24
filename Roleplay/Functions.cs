@@ -58,7 +58,7 @@ namespace Roleplay
             return false;
         }
 
-        public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player.HardwareIdHash);
+        public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player?.HardwareIdHash);
 
         public static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
         {
@@ -737,7 +737,7 @@ namespace Roleplay
                 return;
             }
 
-            if ((canal == 911 || canal == 912 || canal == 999) && !p.IsEmTrabalho)
+            if (((canal >= 911 && canal <= 940) || canal == 999) && !p.IsEmTrabalho)
             {
                 EnviarMensagem(p.Player, TipoMensagem.Erro, $"Você só pode falar no canal {canal} quando estiver em serviço.");
                 return;
@@ -745,7 +745,7 @@ namespace Roleplay
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.CanalRadio == canal || x.CanalRadio2 == canal || x.CanalRadio3 == canal))
             {
-                if (!pl.IsEmTrabalho && (canal == 911 || canal == 912 || canal == 999))
+                if (!pl.IsEmTrabalho && ((canal >= 911 && canal <= 940) || canal == 999))
                     continue;
 
                 var slotPl = 1;

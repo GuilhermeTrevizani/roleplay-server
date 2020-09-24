@@ -468,10 +468,7 @@ namespace Roleplay.Commands
             }
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.Codigo > 0))
-            {
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, p.FaccaoBD.Nome, $"#{p.FaccaoBD.Cor}");
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem);
-            }
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{{#{p.FaccaoBD.Cor}}}{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}");
         }
 
         [Command("armario")]
@@ -544,24 +541,19 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
+            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
             }
 
+            target.Player.Spawn(target.Player.Position);
+            target.StopAnimation();
             target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;
-
-            if (target.TimerFerido != null)
-            {
-                target.TimerFerido?.Stop();
-                target.TimerFerido = null;
-                target.Player.Emit("player:toggleFreeze", false);
-                target.StopAnimation();
-                target.Player.Armor = 0;
-            }
+            target.TimerFerido?.Stop();
+            target.TimerFerido = null;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");
@@ -797,6 +789,7 @@ namespace Roleplay.Commands
                     if (x.HasPlayer(player))
                         x.RemovePlayer(player);
 
+                Global.GlobalVoice.MutePlayer(player);
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do TAC.", notify: true);
                 return;
             }
@@ -818,6 +811,7 @@ namespace Roleplay.Commands
             }
 
             Global.TACVoice[canal - 1].AddPlayer(player);
+            Global.GlobalVoice.UnmutePlayer(player);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou no TAC {canal}.", notify: true);
         }
 
@@ -912,9 +906,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Distintivo #{p.Distintivo} de {p.Nome}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Organização: {p.FaccaoBD.Nome}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Cargo: {p.RankBD.Nome}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{{#{p.FaccaoBD.Cor}}}Distintivo #{p.Distintivo} de {p.Nome}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome} - {p.RankBD.Nome}");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha seu próprio distintivo." : $"mostra seu distintivo para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
     }

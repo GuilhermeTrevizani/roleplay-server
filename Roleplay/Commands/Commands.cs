@@ -345,7 +345,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Jogadores encontrados com a pesquisa: {idNome}");
             foreach (var pl in personagens)
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{pl.Nome} [{pl.ID}] ({pl.UsuarioBD.Nome})");
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{pl.Nome} [{pl.ID}]");
         }
 
         [Command("aceitar", "/aceitar (tipo)", Alias = "ac")]
@@ -801,7 +801,7 @@ namespace Roleplay.Commands
             var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Constants.DistanciaRP);
             if (conce != null)
             {
-                if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date < DateTime.Now.Date || !p.DataRevogacaoLicencaMotorista.HasValue)
+                if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date < DateTime.Now.Date || p.DataRevogacaoLicencaMotorista.HasValue)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma licença de motorista válida.");
                     return;
@@ -1020,16 +1020,14 @@ namespace Roleplay.Commands
             }
 
             p.TimerFerido = null;
-            p.Player.Dimension = 0;
+            player.Dimension = 0;
+            foreach (var x in p.Armas)
+                player.Emit("RemoveWeapon", x.Arma);
             p.Armas = new List<PersonagemArma>();
-            p.Player.RemoveAllWeapons();
             p.Ferimentos = new List<Personagem.Ferimento>();
-            p.Player.Emit("Server:CurarPersonagem");
-            p.StopAnimation();
-            p.Player.Emit("player:toggleFreeze", false);
-            p.Player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
-            p.Player.Health = 200;
-            p.Player.Armor = 0;
+            player.Emit("Server:CurarPersonagem");
+            player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
+            player.Health = 200;
 
             p.Banco -= Global.Parametros.ValorCustosHospitalares;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o tratamento e foi levado para o hospital. Os custos hospitalares foram ${Global.Parametros.ValorCustosHospitalares:N0}.");
@@ -1055,9 +1053,8 @@ namespace Roleplay.Commands
             p.DataMorte = DateTime.Now;
             p.MotivoMorte = "Aceitou CK";
             Functions.SalvarPersonagem(p, false);
-            player.Kick("Você aceitou o CK no seu personagem.");
-
             Functions.GravarLog(TipoLog.Morte, $"/aceitarck", p, null);
+            player.Kick("Você aceitou o CK no seu personagem.");
         }
 
         [Command("trancar")]
@@ -1208,10 +1205,10 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"ID de {p.Nome}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nome: {p.Nome}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Sexo: {(p.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher")}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Nascimento: {p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"ID de {p.Nome}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Nome: {p.Nome}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Sexo: {(p.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher")}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Nascimento: {p.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - p.DataNascimento).TotalDays / 365):N0} anos)");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria ID." : $"mostra sua ID para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
 
@@ -1222,7 +1219,7 @@ namespace Roleplay.Commands
 
             if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date > DateTime.Now && !p.DataRevogacaoLicencaMotorista.HasValue)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua licença de motorista não vence hoje e não está revogada.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua licença de motorista não vence hoje ou não está revogada.");
                 return;
             }
 
@@ -1267,9 +1264,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Licença de Motorista de {p.Nome}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Validade: {p.DataValidadeLicencaMotorista?.ToShortDateString()}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Status: {(p.DataRevogacaoLicencaMotorista.HasValue ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Licença de Motorista de {p.Nome}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Validade: {p.DataValidadeLicencaMotorista?.ToShortDateString()}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Status: {(p.DataRevogacaoLicencaMotorista.HasValue ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria licença de motorista." : $"mostra sua licença de motorista para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
     }

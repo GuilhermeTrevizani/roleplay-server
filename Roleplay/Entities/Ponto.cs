@@ -66,7 +66,7 @@ namespace Roleplay.Entities
                     break;
                 case TipoPonto.DMV:
                     nome = "DMV";
-                    descricao = $"Use /dmv para comprar ou renover sua licença de motorista";
+                    descricao = $"Use /dmv para comprar ou renovar sua licença de motorista";
                     break;
             }
 

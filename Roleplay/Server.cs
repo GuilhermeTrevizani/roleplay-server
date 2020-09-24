@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Roleplay
@@ -134,6 +135,8 @@ namespace Roleplay
                 Alt.CreateVoiceChannel(false, 0),
             };
 
+            Global.GlobalVoice = Alt.CreateVoiceChannel(false, 10);
+
             TimerPrincipal = new Timer(60000);
             TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
             TimerPrincipal.Start();
@@ -187,6 +190,14 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 3 minutos.");
 
+            AltAsync.Do(async () =>
+            {
+                await Task.Delay(5000);
+                await player.SpawnAsync(player.Position);
+                p.StopAnimation();
+                p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
+            });
+
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(180000)
             {
@@ -194,9 +205,6 @@ namespace Roleplay
             };
             p.TimerFerido.Elapsed += TimerFerido_Elapsed;
             p.TimerFerido.Start();
-            p.Player.Spawn(p.Player.Position);
-            p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
-            p.Player.Emit("player:toggleFreeze", true);
         }
 
         private void TimerFerido_Elapsed(object sender, ElapsedEventArgs e)
@@ -554,10 +562,11 @@ namespace Roleplay
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
                 player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
                 player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+                Global.GlobalVoice.AddPlayer(player);
+                Global.GlobalVoice.MutePlayer(player);
             }
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)personagem.EtapaPersonalizacao);
-
         }
 
         private void RegistrarUsuario(IPlayer player, string usuario, string email, string senha, string senha2)
@@ -854,7 +863,7 @@ namespace Roleplay
             p.Dinheiro -= preco.Valor;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo} por ${preco.Valor:N0}. Use /vspawn {veh.Codigo} para spawnar.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo.ToUpper()} por ${preco.Valor:N0}. Use /vspawn {veh.Codigo} para spawnar.");
             player.Emit("Server:CloseView");
         }
 

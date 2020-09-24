@@ -1,7 +1,8 @@
 ﻿using AltV.Net.Elements.Entities;
-using Newtonsoft.Json;
+using AltV.Net.Enums;
 using Roleplay.Models;
 using System;
+using System.Linq;
 
 namespace Roleplay
 {
@@ -17,7 +18,6 @@ namespace Roleplay
             player.Vehicle.EngineHealth = 1000;
             player.Vehicle.PetrolTankHealth = 1000;
         }
-
 
         [Command("v")]
         public void CMD_v(IPlayer player)
@@ -59,36 +59,65 @@ namespace Roleplay
             p.SetClothes(slot, drawable, texture);
         }
 
-        [Command("teste")]
-        public void CMD_teste(IPlayer player)
+        [Command("janelas")]
+        public void CMD_janelas(IPlayer player, int janela)
         {
+            if (!player.IsInVehicle)
+                return;
+
+            player.Vehicle.SetWindowOpened((byte)janela, !player.Vehicle.IsWindowOpened((byte)janela));
         }
 
-        /*import * as alt from 'alt';
+        [Command("portas")]
+        public void CMD_portas(IPlayer player, int porta, int state)
+        {
+            if (!player.IsInVehicle)
+                return;
 
-alt.on('character:Edit', handleCharacterEdit);
-alt.on('character:Sync', handleCharacterSync);
-alt.onClient('character:Done', handleDone);
+            player.Vehicle.SetDoorState((byte)porta, (byte)state);
+            /*None = 0,
+        Unlocked = 1,
+        Locked = 2,
+        LockoutPlayerOnly = 3,
+        LockPlayerInside = 4,
+        InitiallyLocked = 5,
+        ForceDoorsShut = 6,*/
+            // testar ver se algum abre
 
-function handleCharacterEdit(player, oldData = null) {
-    if (!player || !player.valid) {
-        return;
-    }
+            /*0 = Front Left Door
+            1 = Front Right Door
+            2 = Back Left Door
+            3 = Back Right Door
+            4 = Hood capo
+            5 = Trunk portamalas
+            6 = Trunk2*/
+        }
 
-    alt.emitClient(player, 'character:Edit', oldData);
-}
+        [Command("wc")]
+        public void CMD_wc(IPlayer player, string arma, string componente)
+        {
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
+            if (wep == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
+                return;
+            }
 
-function handleCharacterSync(player, data) {
-    if (!player || !player.valid) {
-        return;
-    }
+            var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
+            if (comp == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}.");
+                return;
+            }
 
-    alt.emitClient(player, 'character:Sync', data);
-}
+            player.AddWeaponComponent(wep, comp.Hash);
+        }
 
-function handleDone(player, newData) {
-    alt.emit('character:Done', player, newData);
-}
-*/
+        [Command("anim")]
+        public void CMD_anim(IPlayer player, string dic, string name)
+        {
+            var p = Functions.ObterPersonagem(player);
+            p.PlayAnimation(dic, name, (int)Constants.AnimationFlags.Loop);
+        }
     }
 }
