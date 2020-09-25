@@ -117,7 +117,7 @@ namespace Roleplay
         public void CMD_anim(IPlayer player, string dic, string name)
         {
             var p = Functions.ObterPersonagem(player);
-            p.PlayAnimation(dic, name, (int)Constants.AnimationFlags.Loop);
+            p.PlayAnimation(dic, name, (int)AnimationFlags.Loop);
         }
     }
 }

@@ -195,7 +195,7 @@ namespace Roleplay
                 await Task.Delay(5000);
                 await player.SpawnAsync(player.Position);
                 p.StopAnimation();
-                p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)Constants.AnimationFlags.Loop);
+                p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
             });
 
             p.TimerFerido?.Stop();

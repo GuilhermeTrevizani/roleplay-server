@@ -244,6 +244,14 @@ namespace Roleplay.Models
         Pulice2,
         Pulice3,
         Pulice4,
+        LSFD,
+        LSFD2,
+        LSFD4,
+        LSFD3,
+        LSFD5,
+        LSFDTruck,
+        LSFDTruck2,
+        LSFDTruck3,
     }
 
     public enum TipoStatusNamechange
@@ -259,4 +267,13 @@ namespace Roleplay.Models
         Roupas = 1,
         Concluido = 2,
     }
+
+    public enum AnimationFlags
+    {
+        Loop = 1 << 0,
+        StopOnLastFrame = 1 << 1,
+        OnlyAnimateUpperBody = 1 << 4,
+        AllowPlayerControl = 1 << 5,
+        Cancellable = 1 << 7
+    };
 }
