@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net.Async;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -414,10 +415,8 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            target.Player.Position = new Position(433.01538f, -982.25934f, 30.69519f);
-            target.Player.Rotation = new Position(0f, 0f, 1.3852693f);
-            Functions.EnviarMensagemTipoFaccao(TipoFaccao.Policial, $"{p.RankBD.Nome} {p.Nome} prendeu {target.Nome} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.", true, true);
             Functions.SalvarPersonagem(target, false);
+            Functions.EnviarMensagemTipoFaccao(TipoFaccao.Policial, $"{p.RankBD.Nome} {p.Nome} prendeu {target.Nome} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.", true, true);
             target.Player.Kick($"{p.Nome} prendeu você por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.");
         }
 
@@ -445,7 +444,7 @@ namespace Roleplay.Commands
 
             if (target.Algemado)
             {
-                target.PlayAnimation("mp_arresting", "idle", (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody | AnimationFlags.AllowPlayerControl));
+                target.PlayAnimation("mp_arresting", "idle", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody));
 
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você algemou {target.NomeIC}.");
                 Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} algemou você.");
