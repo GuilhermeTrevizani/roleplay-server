@@ -152,7 +152,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Veículos de {p.Nome} [{p.Codigo}]");
+            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Veículos de {p.Nome} [{p.Codigo}] ({DateTime.Now})");
             foreach (var v in veiculos)
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo.ToUpper()} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? $"{{{Global.CorSucesso}}}SIM" : $"{{{Global.CorErro}}}NÃO")}{{#FFFFFF}} | Apreendido: {(v.ValorApreensao > 0 ? $"{{{Global.CorSucesso}}}SIM (${v.ValorApreensao:N0})" : $"{{{Global.CorErro}}}NÃO")}");
         }

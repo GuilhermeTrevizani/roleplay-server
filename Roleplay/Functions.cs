@@ -1,7 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -436,7 +435,7 @@ namespace Roleplay
                 <h3>{p.NomeIC} [{p.Codigo}] ({DateTime.Now})<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
             </div>
             <div class='box-body'>
-            OOC: <strong>{p.UsuarioBD.Nome}</strong> | SocialClub: <strong>{p.Player.SocialClubId}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
+            OOC: <strong>{p.UsuarioBD.Nome}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Namechange: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong><br/>
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
             Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
@@ -629,16 +628,15 @@ namespace Roleplay
 
                         var tipoFaccao = p.ExtraLigacao == "LSPD" ? TipoFaccao.Policial : TipoFaccao.Medica;
 
-                        var pos = ObterPosicaoPlayerIC(p);
                         void Enviar911()
                         {
                             var ligacao911 = new Ligacao911()
                             {
                                 Tipo = tipoFaccao,
                                 Celular = p.Celular,
-                                PosX = pos.X,
-                                PosY = pos.Y,
-                                PosZ = pos.Z,
+                                PosX = p.PosicaoIC.X,
+                                PosY = p.PosicaoIC.Y,
+                                PosZ = p.PosicaoIC.Z,
                                 Mensagem = message,
                                 ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
                             };
@@ -814,15 +812,6 @@ namespace Roleplay
                 20 => "Cabeça",
                 _ => "Desconhecida",
             };
-        }
-
-        public static Position ObterPosicaoPlayerIC(Personagem p)
-        {
-            if (p.Dimensao == 0)
-                return p.Player.Position;
-
-            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == p.Dimensao);
-            return new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
         }
 
         public static bool ValidarEmail(string email)

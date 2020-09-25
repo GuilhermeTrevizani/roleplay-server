@@ -431,7 +431,7 @@ namespace Roleplay
                         x.Codigo,
                         x.Nome,
                         Status = ObterStatusListarPersonagens(x),
-                        Opcoes = ObterBotaoListarPersonagens(x, p.UsuarioBD),
+                        Opcoes = ObterOpcoesListarPersonagens(x, p.UsuarioBD),
                     })),
                     Global.Parametros.SlotsPersonagens);
         }
@@ -452,7 +452,7 @@ namespace Roleplay
             return span;
         }
 
-        private string ObterBotaoListarPersonagens(Personagem x, Usuario u)
+        private string ObterOpcoesListarPersonagens(Personagem x, Usuario u)
         {
             var opcoes = string.Empty;
             if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0 && (x.DataTerminoPrisao ?? DateTime.MinValue) < DateTime.Now)

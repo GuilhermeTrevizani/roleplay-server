@@ -1,4 +1,5 @@
-﻿using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Models;
 using System;
@@ -150,10 +151,17 @@ namespace Roleplay.Entities
         public string StringArmas { get; set; }
 
         [NotMapped]
-        public List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
+        public Position PosicaoIC
+        {
+            get
+            {
+                if (Player.Dimension == 0)
+                    return Player.Position;
 
-        [NotMapped]
-        public List<Resposta> Respostas { get; set; } = new List<Resposta>();
+                var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == Player.Dimension);
+                return new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
+            }
+        }
 
         public void SetDinheiro()
         {

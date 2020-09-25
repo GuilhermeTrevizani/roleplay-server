@@ -65,6 +65,7 @@ namespace Roleplay.Models
         VendaPropriedade = 2,
         Revista = 3,
         VendaVeiculo = 4,
+        LocalizacaoCelular = 5,
     }
 
     public enum TipoInterior

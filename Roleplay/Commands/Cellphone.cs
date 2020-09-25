@@ -42,7 +42,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] SMS para {p.ObterNomeContato(numero)}: {mensagem}", Constants.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(player, "envia uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum,  $"[CELULAR] SMS de {target.ObterNomeContato(p.Celular)}: {mensagem}", Constants.CorCelular);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(p.Celular)}: {mensagem}", Constants.CorCelular);
             Functions.SendMessageToNearbyPlayers(target.Player, "recebe uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
         }
 
@@ -89,7 +89,7 @@ namespace Roleplay.Commands
 
             if (numero == 5555555)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum,  $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
                 if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.EmTrabalho) == 0)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Constants.CorCelular);
@@ -123,7 +123,7 @@ namespace Roleplay.Commands
             };
             p.TimerCelular.Elapsed += TimerCelular_Elapsed;
             p.TimerCelular.Start();
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum,  $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Constants.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
         }
@@ -259,6 +259,52 @@ namespace Roleplay.Commands
 
             player.Emit("Server:SetWaypoint", prop.EntradaPosX, prop.EntradaPosY);
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Propriedade {propriedade} foi marcada no GPS.", Constants.CorCelularSecundaria);
+        }
+
+        [Command("localizacao", "/localizacao (número ou nome do contato)", Alias = "loc")]
+        public void CMD_localizacao(IPlayer player, string numeroNomeContato)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((p?.Celular ?? 0) == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
+                return;
+            }
+
+            if (p.Algemado)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
+                return;
+            }
+
+            int.TryParse(numeroNomeContato, out int numero);
+            if (numero == 0)
+                numero = p.Contatos.FirstOrDefault(x => x.Nome.ToLower().Contains(numeroNomeContato.ToLower()))?.Celular ?? 0;
+
+            if (numero == p.Celular)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode enviar uma localização para você mesmo.");
+                return;
+            }
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
+            if (target == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível.");
+                return;
+            }
+
+            var convite = new Convite()
+            {
+                Tipo = TipoConvite.LocalizacaoCelular,
+                Personagem = p.Codigo,
+                Valor = new string[] { p.PosicaoIC.X.ToString(), p.PosicaoIC.Y.ToString() },
+            };
+            target.Convites.RemoveAll(x => x.Tipo == TipoConvite.LocalizacaoCelular);
+            target.Convites.Add(convite);
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você solicitou o envio de uma localização para {target.Nome}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"Solicitou enviar uma localização para você. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
         }
     }
 }

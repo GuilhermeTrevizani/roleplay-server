@@ -63,6 +63,7 @@ namespace Roleplay.Commands
                 new Comando("Celular", "/atender /at", "Atende uma ligação"),
                 new Comando("Celular", " /celular /cel", "Abre o celular"),
                 new Comando("Celular", "/gps", "Traça rota para uma propriedade"),
+                new Comando("Celular", "/localizacao", "Envia sua localização atual para um número"),
                 new Comando("Veículos", "/motor", "Liga/desliga o motor de um veículo"),
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
@@ -516,6 +517,13 @@ namespace Roleplay.Commands
                     Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou o veículo {veh.Codigo} de {target.NomeIC} por ${valorVeh:N0}.");
                     Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"Você vendeu o veículo {veh.Codigo} para {p.NomeIC} por ${valorVeh:N0}.");
                     break;
+                case TipoConvite.LocalizacaoCelular:
+                    float.TryParse(convite.Valor[0], out float posX);
+                    float.TryParse(convite.Valor[1], out float posY);
+
+                    player.Emit("Server:SetWaypoint", posX, posY);
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] A posição recebida foi marcada no GPS.", Constants.CorCelularSecundaria);
+                    break;
             }
 
             p.Convites.RemoveAll(x => x.Tipo == (TipoConvite)tipo);
@@ -524,14 +532,13 @@ namespace Roleplay.Commands
         [Command("recusar", "/recusar (tipo)", Alias = "rc")]
         public void CMD_recusar(IPlayer player, int tipo)
         {
-            var p = Functions.ObterPersonagem(player);
-
             if (!Enum.IsDefined(typeof(TipoConvite), tipo))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo inválido.");
                 return;
             }
 
+            var p = Functions.ObterPersonagem(player);
             var convite = p.Convites.FirstOrDefault(x => x.Tipo == (TipoConvite)tipo);
             if (convite == null)
             {
@@ -558,6 +565,9 @@ namespace Roleplay.Commands
                     break;
                 case TipoConvite.Revista:
                     strPlayer = strTarget = "revista";
+                    break;
+                case TipoConvite.LocalizacaoCelular:
+                    strPlayer = strTarget = "envio de localização";
                     break;
             }
 
