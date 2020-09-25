@@ -17,15 +17,15 @@ namespace Roleplay.Commands
                 return;
             }
 
-            p.IsEmTrabalho = !p.IsEmTrabalho;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço como taxista.");
+            p.EmTrabalho = !p.EmTrabalho;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço como taxista.");
         }
 
         [Command("taxicha", "/taxicha")]
         public void CMD_taxicha(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.Emprego != TipoEmprego.Taxista || !p.IsEmTrabalho)
+            if (p?.Emprego != TipoEmprego.Taxista || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em serviço como taxista.");
                 return;
@@ -53,7 +53,7 @@ namespace Roleplay.Commands
         public void CMD_taxiac(IPlayer player, int chamada)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.Emprego != TipoEmprego.Taxista || !p.IsEmTrabalho)
+            if (p?.Emprego != TipoEmprego.Taxista || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em serviço como taxista.");
                 return;

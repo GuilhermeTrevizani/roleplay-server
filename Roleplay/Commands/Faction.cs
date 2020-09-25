@@ -64,7 +64,7 @@ namespace Roleplay.Commands
             var players = Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao).OrderByDescending(x => x.Rank).ThenBy(x => x.Nome);
             foreach (var x in players)
             {
-                var status = x.IsEmTrabalho ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
+                var status = x.EmTrabalho ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
                 html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
             }
 
@@ -211,12 +211,13 @@ namespace Roleplay.Commands
 
             if (target.FaccaoBD.Tipo == TipoFaccao.Policial)
             {
-                target.Armas = new List<PersonagemArma>();
-                target.Player.RemoveAllWeapons();
+                foreach (var x in p.Armas)
+                    p.Player.Emit("RemoveWeapon", x.Codigo);
+                target.Armas = new List<Personagem.Arma>();
             }
 
             target.Faccao = target.Rank = target.Distintivo = 0;
-            target.IsEmTrabalho = false;
+            target.EmTrabalho = false;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você demitiu {target.Nome} da facção.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} demitiu você da facção.");
 
@@ -227,7 +228,7 @@ namespace Roleplay.Commands
         public void CMD_m(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -246,16 +247,16 @@ namespace Roleplay.Commands
                 return;
             }
 
-            p.IsEmTrabalho = !p.IsEmTrabalho;
+            p.EmTrabalho = !p.EmTrabalho;
 
             if (p?.Faccao == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
             }
             else
             {
                 foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao))
-                    Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.IsEmTrabalho ? "entrou em" : "saiu de")} serviço.", $"#{p.FaccaoBD.Cor}");
+                    Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.", $"#{p.FaccaoBD.Cor}");
             }
         }
 
@@ -271,12 +272,13 @@ namespace Roleplay.Commands
 
             if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
             {
-                p.Armas = new List<PersonagemArma>();
-                p.Player.RemoveAllWeapons();
+                foreach (var x in p.Armas)
+                    p.Player.Emit("RemoveWeapon", x.Codigo);
+                p.Armas = new List<Personagem.Arma>();
             }
 
             p.Faccao = p.Rank = p.Distintivo = 0;
-            p.IsEmTrabalho = false;
+            p.EmTrabalho = false;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu da facção.");
         }
 
@@ -284,7 +286,7 @@ namespace Roleplay.Commands
         public void CMD_multar(IPlayer player, string idNome, int valor, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -327,7 +329,7 @@ namespace Roleplay.Commands
         public void CMD_multaroff(IPlayer player, string nomeCompleto, int valor, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -371,7 +373,7 @@ namespace Roleplay.Commands
         public void CMD_prender(IPlayer player, string idNome, int minutos)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -423,7 +425,7 @@ namespace Roleplay.Commands
         public void CMD_algemar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -510,7 +512,7 @@ namespace Roleplay.Commands
         public void CMD_pegarcolete(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -531,7 +533,7 @@ namespace Roleplay.Commands
         public void CMD_curar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Medica || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Medica || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção médica ou não está em serviço.");
                 return;
@@ -563,7 +565,7 @@ namespace Roleplay.Commands
         public void CMD_fspawn(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
@@ -600,7 +602,7 @@ namespace Roleplay.Commands
         public void CMD_ate(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.IsEmTrabalho)
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
@@ -621,7 +623,7 @@ namespace Roleplay.Commands
         public void CMD_apreender(IPlayer player, string placa, int valor, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -708,7 +710,7 @@ namespace Roleplay.Commands
 
             if (!string.IsNullOrWhiteSpace(p.RoupasCivil))
             {
-                var roupas = JsonConvert.DeserializeObject<List<PersonagemRoupa>>(p.RoupasCivil);
+                var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.RoupasCivil);
                 foreach (var x in roupas)
                     p.SetClothes(x.Slot, x.Drawable, x.Texture);
 
@@ -722,7 +724,7 @@ namespace Roleplay.Commands
             p.SetClothes(3, 0, 0);
             p.SetClothes(7, 0, 0);
 
-            if (p.PersonalizacaoDados.sex == 0)
+            if (p.PersonalizacaoDados.sex == 1)
             {
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                 {
@@ -750,7 +752,7 @@ namespace Roleplay.Commands
         public void CMD_mdc(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -771,7 +773,7 @@ namespace Roleplay.Commands
         public void CMD_tac(IPlayer player, int canal)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -819,7 +821,7 @@ namespace Roleplay.Commands
         public void CMD_confiscar(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.IsEmTrabalho)
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
                 return;
@@ -836,9 +838,9 @@ namespace Roleplay.Commands
             }
 
             foreach (var x in target.Armas)
-                target.Player.Emit("RemoveWeapon", x.Arma);
+                target.Player.Emit("RemoveWeapon", x.Codigo);
 
-            target.Armas = new List<PersonagemArma>();
+            target.Armas = new List<Personagem.Arma>();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");

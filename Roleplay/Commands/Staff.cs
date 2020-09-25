@@ -235,8 +235,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            p.IsEmTrabalhoAdministrativo = !p.IsEmTrabalhoAdministrativo;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.IsEmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.");
+            p.EmTrabalhoAdministrativo = !p.EmTrabalhoAdministrativo;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.");
         }
 
         [Command("listasos")]

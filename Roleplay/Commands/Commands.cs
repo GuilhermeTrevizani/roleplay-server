@@ -451,16 +451,16 @@ namespace Roleplay.Commands
                     if (!string.IsNullOrWhiteSpace(p.StringArmas))
                     {
                         var armas = p.StringArmas.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                        .Select(x => new PersonagemArma()
+                        .Select(x => new Personagem.Arma()
                         {
-                            Arma = long.Parse(x.Split("|")[0]),
+                            Codigo = long.Parse(x.Split("|")[0]),
                             Municao = int.Parse(x.Split("|")[1]),
                         });
 
                         foreach (var x in p.Armas)
                         {
-                            x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
-                            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Arma} | Munição: {x.Municao}");
+                            x.Municao = armas.FirstOrDefault(y => y.Codigo == x.Codigo)?.Municao ?? 0;
+                            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Codigo} | Munição: {x.Municao}");
                         }
                     }
 
@@ -901,7 +901,7 @@ namespace Roleplay.Commands
 
             foreach (var x in players)
             {
-                var status = x.IsEmTrabalhoAdministrativo ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
+                var status = x.EmTrabalhoAdministrativo ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
                 html += $@"<tr class='pesquisaitem'><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td>{status}</td></tr>";
             }
 
@@ -929,7 +929,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var players = Global.PersonagensOnline.Where(x => x.IsEmTrabalhoAdministrativo && x.UsuarioBD?.Staff > 0).ToList();
+            var players = Global.PersonagensOnline.Where(x => x.EmTrabalhoAdministrativo && x.UsuarioBD?.Staff > 0).ToList();
             if (players.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há administradores em serviço.");
@@ -1022,8 +1022,8 @@ namespace Roleplay.Commands
             p.TimerFerido = null;
             player.Dimension = 0;
             foreach (var x in p.Armas)
-                player.Emit("RemoveWeapon", x.Arma);
-            p.Armas = new List<PersonagemArma>();
+                player.Emit("RemoveWeapon", x.Codigo);
+            p.Armas = new List<Personagem.Arma>();
             p.Ferimentos = new List<Personagem.Ferimento>();
             player.Emit("Server:CurarPersonagem");
             player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
@@ -1115,7 +1115,7 @@ namespace Roleplay.Commands
             }
 
             var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
-            if (!p.Armas.Any(x => x.Arma == (long)wep))
+            if (!p.Armas.Any(x => x.Codigo == (long)wep))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está carregando essa arma.");
                 return;
@@ -1131,7 +1131,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (target.Armas.Any(x => x.Arma == (long)wep))
+            if (target.Armas.Any(x => x.Codigo == (long)wep))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "O jogador já está carregando essa arma.");
                 return;

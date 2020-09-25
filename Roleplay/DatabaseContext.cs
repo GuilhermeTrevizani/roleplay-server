@@ -17,10 +17,6 @@ namespace Roleplay
         public DbSet<Parametro> Parametros { get; set; }
         public DbSet<Pergunta> Perguntas { get; set; }
         public DbSet<Personagem> Personagens { get; set; }
-        public DbSet<PersonagemAcessorio> PersonagensAcessorios { get; set; }
-        public DbSet<PersonagemArma> PersonagensArmas { get; set; }
-        public DbSet<PersonagemContato> PersonagensContatos { get; set; }
-        public DbSet<PersonagemRoupa> PersonagensRoupas { get; set; }
         public DbSet<Ponto> Pontos { get; set; }
         public DbSet<Preco> Precos { get; set; }
         public DbSet<Prisao> Prisoes { get; set; }
@@ -45,34 +41,30 @@ namespace Roleplay
             modelBuilder.Entity<Banimento>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Blip>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Faccao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Faccao>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Faccao>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Ligacao911>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Ligacao911>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Ligacao911>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Log>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Log>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Log>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Multa>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Parametro>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Pergunta>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Personagem>().Property(x => x.Emprego).HasConversion(typeof(int));
-            modelBuilder.Entity<PersonagemAcessorio>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable });
-            modelBuilder.Entity<PersonagemArma>().HasKey(x => new { x.Codigo, x.Arma });
-            modelBuilder.Entity<PersonagemContato>().HasKey(x => new { x.Codigo, x.Celular });
-            modelBuilder.Entity<PersonagemRoupa>().HasKey(x => new { x.Codigo, x.Slot, x.Drawable });
+            //modelBuilder.Entity<Personagem>().Property(x => x.Emprego).HasConversion(typeof(int));
             modelBuilder.Entity<Ponto>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Ponto>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Ponto>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Preco>().HasKey(x => new { x.Tipo, x.Nome });
-            modelBuilder.Entity<Preco>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Preco>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Prisao>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Propriedade>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Propriedade>().Property(x => x.Interior).HasConversion(typeof(int));
+            //modelBuilder.Entity<Propriedade>().Property(x => x.Interior).HasConversion(typeof(int));
             modelBuilder.Entity<Punicao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Punicao>().Property(x => x.Tipo).HasConversion(typeof(int));
+            //modelBuilder.Entity<Punicao>().Property(x => x.Tipo).HasConversion(typeof(int));
             modelBuilder.Entity<Rank>().HasKey(x => new { x.Faccao, x.Codigo });
             modelBuilder.Entity<Resposta>().HasKey(x => x.Codigo);
             modelBuilder.Entity<SOS>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Usuario>().Property(x => x.Staff).HasConversion(typeof(int));
+            //modelBuilder.Entity<Usuario>().Property(x => x.Staff).HasConversion(typeof(int));
             modelBuilder.Entity<Veiculo>().HasKey(x => x.Codigo);
         }
     }

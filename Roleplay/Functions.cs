@@ -273,14 +273,14 @@ namespace Roleplay
             p.Player.SetDateTime(DateTime.Now);
 
             var armas = (p.StringArmas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => new PersonagemArma()
+                .Select(x => new Personagem.Arma()
                 {
-                    Arma = long.Parse(x.Split("|")[0]),
+                    Codigo = long.Parse(x.Split("|")[0]),
                     Municao = int.Parse(x.Split("|")[1]),
                 });
 
             foreach (var x in p.Armas)
-                x.Municao = armas.FirstOrDefault(y => y.Arma == x.Arma)?.Municao ?? 0;
+                x.Municao = armas.FirstOrDefault(y => y.Codigo == x.Codigo)?.Municao ?? 0;
 
             var dif = DateTime.Now - p.DataUltimaVerificacao;
             if (dif.TotalMinutes >= 1)
@@ -319,7 +319,7 @@ namespace Roleplay
                     }
                 }
 
-                if (p.IsEmTrabalhoAdministrativo)
+                if (p.EmTrabalhoAdministrativo)
                     p.UsuarioBD.TempoTrabalhoAdministrativo++;
             }
 
@@ -348,35 +348,15 @@ namespace Roleplay
             p.RotY = p.Player.Rotation.Pitch;
             p.RotZ = p.Player.Rotation.Yaw;
             p.DataUltimoAcesso = DateTime.Now;
-            p.IPUltimoAcesso = ObterIP(p.Player);
             p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
+            p.InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas);
+            p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
+            p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
+            p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
             context.Personagens.Update(p);
 
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensContatos WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensRoupas WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensAcessorios WHERE Codigo = {p.Codigo}");
-            context.Database.ExecuteSqlRaw($"DELETE FROM PersonagensArmas WHERE Codigo = {p.Codigo}");
-
-            if (p.Contatos.Count > 0)
-                context.PersonagensContatos.AddRange(p.Contatos);
-
-            if (p.Roupas.Count > 0)
-                context.PersonagensRoupas.AddRange(p.Roupas);
-
-            if (p.Acessorios.Count > 0)
-                context.PersonagensAcessorios.AddRange(p.Acessorios);
-
-            if (p.Armas.Count > 0)
-                context.PersonagensArmas.AddRange(p.Armas);
-
-            var usuario = context.Usuarios.FirstOrDefault(x => x.Codigo == p.UsuarioBD.Codigo);
-            usuario.Staff = p.UsuarioBD.Staff;
-            usuario.TempoTrabalhoAdministrativo = p.UsuarioBD.TempoTrabalhoAdministrativo;
-            usuario.QuantidadeSOSAceitos = p.UsuarioBD.QuantidadeSOSAceitos;
-            usuario.DataUltimoAcesso = p.DataUltimoAcesso;
-            usuario.IPUltimoAcesso = p.IPUltimoAcesso;
-            usuario.TimeStamp = p.UsuarioBD.TimeStamp;
-            context.Usuarios.Update(usuario);
+            p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
+            context.Usuarios.Update(p.UsuarioBD);
 
             context.SaveChanges();
         }
@@ -495,7 +475,7 @@ namespace Roleplay
             var players = Global.PersonagensOnline.Where(x => x.FaccaoBD?.Tipo == tipo);
 
             if (isSomenteParaTrabalho)
-                players = players.Where(x => x.IsEmTrabalho);
+                players = players.Where(x => x.EmTrabalho);
 
             foreach (var pl in players)
                 EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, isCorFaccao ? $"#{pl.FaccaoBD.Cor}" : "#FFFFFF");
@@ -737,7 +717,7 @@ namespace Roleplay
                 return;
             }
 
-            if (((canal >= 911 && canal <= 940) || canal == 999) && !p.IsEmTrabalho)
+            if (((canal >= 911 && canal <= 940) || canal == 999) && !p.EmTrabalho)
             {
                 EnviarMensagem(p.Player, TipoMensagem.Erro, $"Você só pode falar no canal {canal} quando estiver em serviço.");
                 return;
@@ -745,7 +725,7 @@ namespace Roleplay
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.CanalRadio == canal || x.CanalRadio2 == canal || x.CanalRadio3 == canal))
             {
-                if (!pl.IsEmTrabalho && ((canal >= 911 && canal <= 940) || canal == 999))
+                if (!pl.EmTrabalho && ((canal >= 911 && canal <= 940) || canal == 999))
                     continue;
 
                 var slotPl = 1;
@@ -771,7 +751,7 @@ namespace Roleplay
 
         public static void EnviarMensagemEmprego(TipoEmprego tipo, string mensagem, string cor = "#FFFFFF")
         {
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Emprego == tipo && x.IsEmTrabalho))
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.Emprego == tipo && x.EmTrabalho))
                 EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, cor);
         }
 

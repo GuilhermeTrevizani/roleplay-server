@@ -515,23 +515,23 @@ namespace Roleplay
             p.SetDinheiro();
             player.SetWeather(Global.Weather);
 
-            p.Contatos = context.PersonagensContatos.Where(x => x.Codigo == p.Codigo).ToList();
+            p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
 
-            var roupas = context.PersonagensRoupas.Where(x => x.Codigo == p.Codigo).ToList();
+            var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesRoupas);
             foreach (var x in roupas)
                 p.SetClothes(x.Slot, x.Drawable, x.Texture);
 
-            var acessorios = context.PersonagensAcessorios.Where(x => x.Codigo == p.Codigo).ToList();
+            var acessorios = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesAcessorios);
             foreach (var x in acessorios)
                 p.SetAccessories(x.Slot, x.Drawable, x.Texture);
 
-            p.Armas = context.PersonagensArmas.Where(x => x.Codigo == p.Codigo).ToList();
+            p.Armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas);
             foreach (var x in p.Armas)
             {
-                player.GiveWeapon((WeaponModel)x.Arma, x.Municao, false);
-                player.SetWeaponTintIndex((WeaponModel)x.Arma, (byte)x.Pintura);
+                player.GiveWeapon((WeaponModel)x.Codigo, x.Municao, false);
+                player.SetWeaponTintIndex((WeaponModel)x.Codigo, (byte)x.Pintura);
                 foreach (var c in JsonConvert.DeserializeObject<List<uint>>(x.Componentes))
-                    player.AddWeaponComponent((WeaponModel)x.Arma, c);
+                    player.AddWeaponComponent((WeaponModel)x.Codigo, c);
             }
 
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
@@ -713,6 +713,23 @@ namespace Roleplay
             }
 
             p.PersonalizacaoDados.sex = sexo == "M" ? 1 : 0;
+            p.PersonalizacaoDados.structure = new List<double> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            p.PersonalizacaoDados.opacityOverlays = new List<Personagem.Personalizacao.OpacityOverlay> { new Personagem.Personalizacao.OpacityOverlay(0), new Personagem.Personalizacao.OpacityOverlay(3), new Personagem.Personalizacao.OpacityOverlay(6), new Personagem.Personalizacao.OpacityOverlay(7), new Personagem.Personalizacao.OpacityOverlay(9), new Personagem.Personalizacao.OpacityOverlay(11) };
+            p.PersonalizacaoDados.colorOverlays = new List<Personagem.Personalizacao.ColorOverlay> { new Personagem.Personalizacao.ColorOverlay(4), new Personagem.Personalizacao.ColorOverlay(5), new Personagem.Personalizacao.ColorOverlay(8) };
+
+            p.Contatos = new List<Personagem.Contato>()
+            {
+                new Personagem.Contato()
+                {
+                    Celular = 911,
+                    Nome = "Central de Emergência",
+                },
+                new Personagem.Contato()
+                {
+                    Celular = 5555555,
+                    Nome = "Dowtown Cab Co.",
+                },
+            };
             var personagem = new Personagem()
             {
                 Codigo = codigo,
@@ -730,14 +747,14 @@ namespace Roleplay
                 HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                 HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
                 Historia = historia,
-                UsuarioStaffAvaliador = 0,
-                MotivoRejeicao = string.Empty,
+                InformacoesContatos = JsonConvert.SerializeObject(p.Contatos),
             };
 
             if (personagemAntigo != null)
             {
                 personagem.Dinheiro = personagemAntigo.Dinheiro;
                 personagem.Banco = personagemAntigo.Banco;
+                personagem.InformacoesArmas = personagemAntigo.InformacoesArmas;
             }
 
             if (codigo == 0)
@@ -747,31 +764,10 @@ namespace Roleplay
 
             context.SaveChanges();
 
-            if (codigo == 0)
-            {
-                context.PersonagensContatos.AddRange(new List<PersonagemContato>()
-                {
-                    new PersonagemContato()
-                    {
-                        Codigo = personagem.Codigo,
-                        Celular = 911,
-                        Nome = "Central de Emergência",
-                    },
-                    new PersonagemContato()
-                    {
-                        Codigo = personagem.Codigo,
-                        Celular = 5555555,
-                        Nome = "Dowtown Cab Co.",
-                    },
-                });
-                context.SaveChanges();
-            }
-
             if (personagemAntigo != null)
             {
                 Functions.GravarLog(TipoLog.Namechange, string.Empty, personagemAntigo, personagem);
 
-                context.Database.ExecuteSqlRaw($"UPDATE PersonagensArmas SET Codigo = {personagem.Codigo} WHERE Codigo = {personagemAntigo.Codigo}");
                 context.Database.ExecuteSqlRaw($"UPDATE Propriedades SET Personagem = {personagem.Codigo} WHERE Personagem = {personagemAntigo.Codigo}");
                 context.Database.ExecuteSqlRaw($"UPDATE Veiculos SET Personagem = {personagem.Codigo} WHERE Personagem = {personagemAntigo.Codigo}");
 
@@ -803,7 +799,7 @@ namespace Roleplay
             var personagens = Global.PersonagensOnline.Where(x => x.ID > 0).OrderBy(x => x.ID == p.ID ? 0 : 1).ThenBy(x => x.ID)
                 .Select(x => new { x.ID, x.Nome, x.Player.Ping }).ToList();
 
-            var duty = Global.PersonagensOnline.Where(x => x.IsEmTrabalho);
+            var duty = Global.PersonagensOnline.Where(x => x.EmTrabalho);
             player.Emit("Server:ListarPlayers", Global.NomeServidor, JsonConvert.SerializeObject(personagens),
                 $"Policiais: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Policial)} | Médicos: {duty.Count(x => x.FaccaoBD?.Tipo == TipoFaccao.Medica)} | Taxistas: {duty.Count(x => x.Emprego == TipoEmprego.Taxista)} | Mecânicos: {duty.Count(x => x.Emprego == TipoEmprego.Mecanico)}");
         }
@@ -945,9 +941,8 @@ namespace Roleplay
             var contato = p.Contatos.FirstOrDefault(x => x.Celular == celular);
             if (contato == null)
             {
-                p.Contatos.Add(new PersonagemContato()
+                p.Contatos.Add(new Personagem.Contato()
                 {
-                    Codigo = p.Codigo,
                     Nome = nome,
                     Celular = celular
                 });
@@ -1019,10 +1014,9 @@ namespace Roleplay
             foreach (var x in componentes)
                 player.AddWeaponComponent(weapon, x);
 
-            p.Armas.Add(new PersonagemArma()
+            p.Armas.Add(new Personagem.Arma()
             {
-                Codigo = p.Codigo,
-                Arma = arma.Arma,
+                Codigo = arma.Arma,
                 Municao = arma.Municao,
                 Pintura = arma.Pintura,
                 Componentes = arma.Componentes,
@@ -1056,7 +1050,7 @@ namespace Roleplay
                 return;
 
             uint.TryParse(weapon, out uint arma);
-            var wep = p.Armas.FirstOrDefault(x => x.Arma == arma);
+            var wep = p.Armas.FirstOrDefault(x => x.Codigo == arma);
 
             player.Emit("RemoveWeapon", arma);
             p.Armas.Remove(wep);
@@ -1089,9 +1083,9 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
 
             foreach (var x in p.Armas)
-                player.Emit("RemoveWeapon", (uint)x.Arma);
+                player.Emit("RemoveWeapon", (uint)x.Codigo);
 
-            p.Armas = new List<PersonagemArma>();
+            p.Armas = new List<Personagem.Arma>();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você devolveu seus itens no armário.", notify: true);
             Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
@@ -1247,8 +1241,11 @@ namespace Roleplay
         {
             var p = Functions.ObterPersonagem(player);
 
-            p.InformacoesPersonalizacao = strPersonalizacao;
-            p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+            if (sucesso)
+            {
+                p.InformacoesPersonalizacao = strPersonalizacao;
+                p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+            }
 
             if (!barbearia)
             {

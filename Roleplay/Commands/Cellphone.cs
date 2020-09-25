@@ -90,7 +90,7 @@ namespace Roleplay.Commands
             if (numero == 5555555)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum,  $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
-                if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.IsEmTrabalho) == 0)
+                if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.EmTrabalho) == 0)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Constants.CorCelular);
                     return;

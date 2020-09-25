@@ -60,6 +60,10 @@ namespace Roleplay.Entities
         public DateTime? DataValidadeLicencaMotorista { get; set; } = null;
         public DateTime? DataRevogacaoLicencaMotorista { get; set; } = null;
         public int Distintivo { get; set; } = 0;
+        public string InformacoesRoupas { get; set; } = "[]";
+        public string InformacoesAcessorios { get; set; } = "[]";
+        public string InformacoesArmas { get; set; } = "[]";
+        public string InformacoesContatos { get; set; } = "[]";
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -92,7 +96,7 @@ namespace Roleplay.Entities
         public string NomeIC { get => Nome; }
 
         [NotMapped]
-        public List<PersonagemContato> Contatos { get; set; }
+        public List<Contato> Contatos { get; set; } = new List<Contato>();
 
         [NotMapped]
         public int NumeroLigacao { get; set; } = 0;
@@ -107,7 +111,7 @@ namespace Roleplay.Entities
         public TagTimer TimerCelular { get; set; }
 
         [NotMapped]
-        public bool IsEmTrabalho { get; set; } = false;
+        public bool EmTrabalho { get; set; } = false;
 
         [NotMapped]
         public List<string> IPLs { get; set; }
@@ -119,13 +123,13 @@ namespace Roleplay.Entities
         public int AguardandoTipoServico { get; set; } = 0;
 
         [NotMapped]
-        public bool IsEmTrabalhoAdministrativo { get; set; } = false;
+        public bool EmTrabalhoAdministrativo { get; set; } = false;
 
         [NotMapped]
-        public List<PersonagemRoupa> Roupas { get; set; } = new List<PersonagemRoupa>();
+        public List<Roupa> Roupas { get; set; } = new List<Roupa>();
 
         [NotMapped]
-        public List<PersonagemAcessorio> Acessorios { get; set; } = new List<PersonagemAcessorio>();
+        public List<Roupa> Acessorios { get; set; } = new List<Roupa>();
 
         [NotMapped]
         public List<Ferimento> Ferimentos { get; set; } = new List<Ferimento>();
@@ -134,7 +138,7 @@ namespace Roleplay.Entities
         public TagTimer TimerFerido { get; set; } = null;
 
         [NotMapped]
-        public List<PersonagemArma> Armas { get; set; } = new List<PersonagemArma>();
+        public List<Arma> Armas { get; set; } = new List<Arma>();
 
         [NotMapped]
         public string AreaName { get; set; }
@@ -211,7 +215,7 @@ namespace Roleplay.Entities
         public void SetClothes(int slot, int drawable, int texture, bool setar = true)
         {
             Roupas.RemoveAll(x => x.Slot == slot);
-            Roupas.Add(new PersonagemRoupa() { Codigo = Codigo, Slot = slot, Drawable = drawable, Texture = texture });
+            Roupas.Add(new Roupa() { Slot = slot, Drawable = drawable, Texture = texture });
 
             if (setar)
                 Player.Emit("Server:SetClothes", slot, drawable, texture);
@@ -220,7 +224,7 @@ namespace Roleplay.Entities
         public void SetAccessories(int slot, int drawable, int texture, bool setar = true)
         {
             Acessorios.RemoveAll(x => x.Slot == slot);
-            Acessorios.Add(new PersonagemAcessorio() { Codigo = Codigo, Slot = slot, Drawable = drawable, Texture = texture });
+            Acessorios.Add(new Roupa() { Slot = slot, Drawable = drawable, Texture = texture });
 
             if (setar)
                 Player.Emit("Server:SetAccessories", slot, drawable, texture);
@@ -235,6 +239,27 @@ namespace Roleplay.Entities
             public sbyte BodyPart { get; set; } = -2;
         }
 
+        public class Roupa
+        {
+            public int Slot { get; set; }
+            public int Drawable { get; set; }
+            public int Texture { get; set; }
+        }
+
+        public class Arma
+        {
+            public long Codigo { get; set; }
+            public int Municao { get; set; } = 0;
+            public int Pintura { get; set; } = 0;
+            public string Componentes { get; set; } = "[]";
+        }
+
+        public class Contato
+        {
+            public int Celular { get; set; }
+            public string Nome { get; set; }
+        }
+
         public class Personalizacao
         {
             public int sex { get; set; } = 1;
@@ -244,7 +269,7 @@ namespace Roleplay.Entities
             public int skinMother { get; set; } = 0;
             public double faceMix { get; set; } = 0.5;
             public double skinMix { get; set; } = 0.5;
-            public List<double> structure { get; set; } = new List<double> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            public List<double> structure { get; set; } = new List<double>();
             public int hair { get; set; } = 4;
             public int hairColor1 { get; set; } = 1;
             public int hairColor2 { get; set; } = 5;
@@ -256,8 +281,8 @@ namespace Roleplay.Entities
             public double eyebrowsOpacity { get; set; } = 0;
             public int eyebrowsColor1 { get; set; } = 0;
             public int eyes { get; set; } = 0;
-            public List<OpacityOverlay> opacityOverlays { get; set; } = new List<OpacityOverlay> { new OpacityOverlay(0), new OpacityOverlay(3), new OpacityOverlay(6), new OpacityOverlay(7), new OpacityOverlay(9), new OpacityOverlay(11) };
-            public List<ColorOverlay> colorOverlays { get; set; } = new List<ColorOverlay> { new ColorOverlay(4), new ColorOverlay(5), new ColorOverlay(8) };
+            public List<OpacityOverlay> opacityOverlays { get; set; } = new List<OpacityOverlay>();
+            public List<ColorOverlay> colorOverlays { get; set; } = new List<ColorOverlay>();
 
             public class HairOverlay
             {
@@ -293,7 +318,7 @@ namespace Roleplay.Entities
                 public int id { get; set; } = 0;
                 public double opacity { get; set; } = 0;
                 public int color1 { get; set; } = 0;
-                public int color12 { get; set; } = 0;
+                public int color2 { get; set; } = 0;
                 public double value { get; set; } = 0;
             }
         }
