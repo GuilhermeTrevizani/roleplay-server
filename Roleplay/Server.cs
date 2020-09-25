@@ -190,6 +190,8 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 3 minutos.");
 
+            player.SetSyncedMetaData("ferido", true);
+
             AltAsync.Do(async () =>
             {
                 await Task.Delay(5000);

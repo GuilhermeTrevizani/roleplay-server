@@ -262,6 +262,10 @@ namespace Roleplay.Entities
 
         public class Personalizacao
         {
+            /// <summary>
+            /// 0 - Mulher
+            /// 1 - Homem
+            /// </summary>
             public int sex { get; set; } = 1;
             public int faceFather { get; set; } = 0;
             public int faceMother { get; set; } = 0;

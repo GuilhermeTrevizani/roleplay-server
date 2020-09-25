@@ -1019,6 +1019,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            player.SetSyncedMetaData("ferido", false);
             p.TimerFerido = null;
             player.Dimension = 0;
             foreach (var x in p.Armas)

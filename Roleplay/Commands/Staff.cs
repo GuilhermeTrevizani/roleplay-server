@@ -33,7 +33,7 @@ namespace Roleplay.Commands
             p.IPLs = target.IPLs;
             p.SetarIPLs();
             var pos = target.Player.Position;
-            pos.X += 2;
+            pos.X += Constants.DistanciaRP;
             player.Position = pos;
             player.Dimension = target.Player.Dimension;
         }
@@ -56,7 +56,7 @@ namespace Roleplay.Commands
             target.IPLs = p.IPLs;
             target.SetarIPLs();
             var pos = player.Position;
-            pos.X += 2;
+            pos.X += Constants.DistanciaRP;
             target.Player.Position = pos;
             target.Player.Dimension = player.Dimension;
         }
@@ -83,7 +83,7 @@ namespace Roleplay.Commands
             target.IPLs = targetDest.IPLs;
             target.SetarIPLs();
             var pos = targetDest.Player.Position;
-            pos.X += 2;
+            pos.X += Constants.DistanciaRP;
             target.Player.Position = pos;
             target.Player.Dimension = targetDest.Player.Dimension;
 
@@ -191,7 +191,7 @@ namespace Roleplay.Commands
 
             p.LimparIPLs();
             var pos = veh.Vehicle.Position;
-            pos.X += 5;
+            pos.X += Constants.DistanciaRP;
             player.Position = pos;
             player.Dimension = veh.Vehicle.Dimension;
         }
@@ -220,7 +220,7 @@ namespace Roleplay.Commands
             }
 
             var pos = player.Position;
-            pos.X += 5;
+            pos.X += Constants.DistanciaRP;
             veh.Vehicle.Position = pos;
             veh.Vehicle.Dimension = player.Dimension;
         }
@@ -609,6 +609,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            target.Player.SetSyncedMetaData("ferido", false);
             target.Player.Spawn(target.Player.Position);
             target.StopAnimation();
             target.Ferimentos = new List<Personagem.Ferimento>();

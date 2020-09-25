@@ -549,6 +549,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            target.Player.SetSyncedMetaData("ferido", false);
             target.Player.Spawn(target.Player.Position);
             target.StopAnimation();
             target.Ferimentos = new List<Personagem.Ferimento>();
