@@ -47,16 +47,16 @@ namespace Roleplay
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
             Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
-            Alt.OnClient<IPlayer, int, int, int, int, int, int>("ConfirmarBarbearia", ConfirmarBarbearia);
-            Alt.OnClient<IPlayer, string>("ConfirmarLojaRoupas", ConfirmarLojaRoupas);
+            Alt.OnClient<IPlayer>("ConfirmarLojaRoupas", ConfirmarLojaRoupas);
             Alt.OnClient<IPlayer, string>("EnviarEmailConfirmacao", EnviarEmailConfirmacao);
             Alt.OnClient<IPlayer, string>("ValidarTokenConfirmacao", ValidarTokenConfirmacao);
             Alt.OnClient<IPlayer>("ExibirPerguntas", ExibirPerguntas);
             Alt.OnClient<IPlayer, string>("ValidarPerguntas", ValidarPerguntas);
             Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
             Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
-            Alt.OnClient<IPlayer, string>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
+            Alt.OnClient<IPlayer, string, bool, bool>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
             Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
+            Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -1130,26 +1130,9 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}.", notify: true);
         }
 
-        private void ConfirmarBarbearia(IPlayer player, int cabelo, int cabeloCor1, int cabeloCor2, int barba, int barbaCor, int maquiagem)
+        private void ConfirmarLojaRoupas(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-
-            /*p.SetClothes(2, cabelo, 0, false);
-            p.PersonalizacaoDados.CabeloCor1 = cabeloCor1;
-            p.PersonalizacaoDados.CabeloCor2 = cabeloCor2;
-            p.PersonalizacaoDados.Barba = barba;
-            p.PersonalizacaoDados.BarbaCor = barbaCor;
-            p.PersonalizacaoDados.Maquiagem = maquiagem;*/
-
-            p.Dinheiro -= Global.Parametros.ValorBarbearia;
-            p.SetDinheiro();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
-        }
-
-        private void ConfirmarLojaRoupas(IPlayer player, string strRoupas)
-        {
-            var p = Functions.ObterPersonagem(player);
-
             p.Dinheiro -= Global.Parametros.ValorRoupas;
             p.SetDinheiro();
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorRoupas:N0} na loja de roupas.");
@@ -1260,17 +1243,26 @@ namespace Roleplay
             player.Emit("Server:MostrarSucesso", "Sua senha foi alterada com sucesso.");
         }
 
-        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao)
+        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, bool barbearia, bool sucesso)
         {
             var p = Functions.ObterPersonagem(player);
 
             p.InformacoesPersonalizacao = strPersonalizacao;
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
-            p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Roupas;
 
-            using var context = new DatabaseContext();
-            context.Personagens.Update(p);
-            context.SaveChanges();
+            if (!barbearia)
+            {
+                p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Roupas;
+                using var context = new DatabaseContext();
+                context.Personagens.Update(p);
+                context.SaveChanges();
+            }
+            else if (sucesso)
+            {
+                p.Dinheiro -= Global.Parametros.ValorBarbearia;
+                p.SetDinheiro();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
+            }
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)p.EtapaPersonalizacao);
         }
@@ -1286,6 +1278,8 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.ExclusaoPersonagem, string.Empty, personagem, null);
             ListarPersonagens(player);
         }
+
+        private void Chatting(IPlayer player, bool chatting) => player.SetSyncedMetaData("chatting", chatting);
         #endregion
     }
 }

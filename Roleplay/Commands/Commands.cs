@@ -1166,9 +1166,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            /*player.Emit("AbrirBarbearia", p.PersonalizacaoDados.Sexo, $"${Global.Parametros.ValorBarbearia:N0}",
-                p.Roupas.FirstOrDefault(x => x.Slot == 2)?.Drawable ?? 0, p.PersonalizacaoDados.CabeloCor1, p.PersonalizacaoDados.CabeloCor2,
-                p.PersonalizacaoDados.Barba, p.PersonalizacaoDados.BarbaCor, p.PersonalizacaoDados.Maquiagem);*/
+            player.Emit("AbrirBarbearia", p.InformacoesPersonalizacao);
         }
 
         [Command("roupas")]
@@ -1188,7 +1186,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            //player.Emit("AbrirLojaRoupas", p.PersonalizacaoDados.Sexo, $"${Global.Parametros.ValorRoupas:N0}", JsonConvert.SerializeObject(p.Roupas));
+            player.Emit("AbrirLojaRoupas", p.InformacoesPersonalizacao);
         }
 
         [Command("mostrarid", "/mostrarid (ID ou nome)")]
