@@ -253,5 +253,63 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você liberou seu veículo.");
         }
+
+        [Command("porta", "/porta (porta [1-4])", Alias = "p")]
+        public void CMD_porta(IPlayer player, int porta)
+        {
+            if (porta < 1 || porta > 4)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Porta deve ser entre 1 e 4.");
+                return;
+            }
+
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            porta--;
+            veh.StatusPortas[porta] = !veh.StatusPortas[porta];
+            player.Emit("SetVehicleDoorState", veh.Vehicle, porta, veh.StatusPortas[porta]);
+        }
+
+        [Command("capo")]
+        public void CMD_capo(IPlayer player)
+        {
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            veh.StatusPortas[4] = !veh.StatusPortas[4];
+            player.Emit("SetVehicleDoorState", veh.Vehicle, 4, veh.StatusPortas[4]);
+        }
+
+        [Command("portamalas")]
+        public void CMD_portamalas(IPlayer player)
+        {
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            veh.StatusPortas[5] = !veh.StatusPortas[5];
+            player.Emit("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
+        }
     }
 }

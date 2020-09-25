@@ -2,6 +2,7 @@
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Roleplay.Entities
@@ -33,6 +34,17 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }
+
+        /// <summary>
+        /// TRUE: FECHADA
+        /// 0 = Front Left Door
+        /// 1 = Front Right Door
+        /// 2 = Back Left Door
+        /// 3 = Back Right Door
+        /// 4 = Hood
+        /// </summary>
+        [NotMapped]
+        public List<bool> StatusPortas { get; set; } = new List<bool> { true, true, true, true, true, true };
 
         /// <summary>
         /// Nome do personagem que usou o /fspawn

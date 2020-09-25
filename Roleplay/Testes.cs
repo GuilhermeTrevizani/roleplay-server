@@ -59,40 +59,6 @@ namespace Roleplay
             p.SetClothes(slot, drawable, texture);
         }
 
-        [Command("janelas")]
-        public void CMD_janelas(IPlayer player, int janela)
-        {
-            if (!player.IsInVehicle)
-                return;
-
-            player.Vehicle.SetWindowOpened((byte)janela, !player.Vehicle.IsWindowOpened((byte)janela));
-        }
-
-        [Command("portas")]
-        public void CMD_portas(IPlayer player, int porta, int state)
-        {
-            if (!player.IsInVehicle)
-                return;
-
-            player.Vehicle.SetDoorState((byte)porta, (byte)state);
-            /*None = 0,
-        Unlocked = 1,
-        Locked = 2,
-        LockoutPlayerOnly = 3,
-        LockPlayerInside = 4,
-        InitiallyLocked = 5,
-        ForceDoorsShut = 6,*/
-            // testar ver se algum abre
-
-            /*0 = Front Left Door
-            1 = Front Right Door
-            2 = Back Left Door
-            3 = Back Right Door
-            4 = Hood capo
-            5 = Trunk portamalas
-            6 = Trunk2*/
-        }
-
         [Command("wc")]
         public void CMD_wc(IPlayer player, string arma, string componente)
         {
