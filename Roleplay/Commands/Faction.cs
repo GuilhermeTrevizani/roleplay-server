@@ -502,27 +502,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica);
-        }
-
-        [Command("pegarcolete")]
-        public void CMD_pegarcolete(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
-                return;
-            }
-
-            if (!Global.Armarios.Any(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP && x.Faccao == p.Faccao))
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
-                return;
-            }
-
-            player.Armor = 100;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pegou colete.");
+            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial);
         }
 
         [Command("curar", "/curar (ID ou nome)")]
@@ -546,8 +526,11 @@ namespace Roleplay.Commands
             }
 
             target.Player.SetSyncedMetaData("ferido", false);
-            target.Player.Spawn(target.Player.Position);
-            target.StopAnimation();
+            if (target.TimerFerido != null)
+            {
+                target.Player.Spawn(target.Player.Position);
+                target.StopAnimation();
+            }
             target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;

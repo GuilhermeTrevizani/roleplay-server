@@ -57,6 +57,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, bool, bool>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
             Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
             Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
+            Alt.OnClient<IPlayer>("EquiparColeteArmario", EquiparColeteArmario);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -1056,7 +1057,7 @@ namespace Roleplay
                 Preco = $"${Global.Precos.FirstOrDefault(y => y.Tipo == TipoPreco.Armas && y.Nome.ToLower() == ((WeaponModel)x.Arma).ToString().ToLower())?.Valor ?? 0:N0}",
             }).ToList();
 
-            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, $"Você equipou {(WeaponModel)weapon}.");
+            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial, $"Você equipou {(WeaponModel)weapon}.");
             Functions.GravarLog(TipoLog.Arma, $"/armario {JsonConvert.SerializeObject(arma)}", p, null);
         }
 
@@ -1296,6 +1297,12 @@ namespace Roleplay
         }
 
         private void Chatting(IPlayer player, bool chatting) => player.SetSyncedMetaData("chatting", chatting);
+
+        private void EquiparColeteArmario(IPlayer player)
+        {
+            player.Armor = 100;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você equipou um colete.", notify: true);
+        }
         #endregion
     }
 }

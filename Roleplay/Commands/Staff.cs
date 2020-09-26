@@ -584,8 +584,11 @@ namespace Roleplay.Commands
             }
 
             target.Player.SetSyncedMetaData("ferido", false);
-            target.Player.Spawn(target.Player.Position);
-            target.StopAnimation();
+            if (target.TimerFerido != null)
+            {
+                target.Player.Spawn(target.Player.Position);
+                target.StopAnimation();
+            }
             target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
             target.Player.Health = 200;

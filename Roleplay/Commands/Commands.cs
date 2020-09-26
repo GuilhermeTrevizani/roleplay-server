@@ -155,7 +155,6 @@ namespace Roleplay.Commands
                         new Comando("Facção Policial", "/multaroff", "Multa um personagem offline"),
                         new Comando("Facção Policial", "/prender", "Prende um personagem"),
                         new Comando("Facção Policial", "/algemar", "Algema/desalgema um personagem"),
-                        new Comando("Facção Policial", "/pegarcolete", "Pega colete em um armário da facção"),
                         new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção Policial", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção Policial", "/apreender", "Apreende um veículo"),
