@@ -84,7 +84,7 @@ namespace Roleplay.Commands
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
             if (veh.Personagem == p.Codigo)
             {
-                if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Constants.DistanciaRP)
+                if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Global.DistanciaRP)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de sua vaga.");
                     return;
@@ -97,7 +97,7 @@ namespace Roleplay.Commands
 
             if (veh.Faccao == p.Faccao && veh.Faccao > 0)
             {
-                if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+                if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
                     return;
@@ -162,7 +162,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Veiculos
-                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Constants.DistanciaRP)
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(x.Vehicle.Position))
                 .FirstOrDefault();
 
@@ -176,7 +176,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -207,7 +207,7 @@ namespace Roleplay.Commands
         public void CMD_vliberar(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LiberacaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LiberacaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de liberação de veículos apreendidos.");
                 return;

@@ -167,6 +167,8 @@ namespace Roleplay.Models
 
         [Display(Name = "Aviões")]
         Avioes = 6,
+
+        Armas = 7,
     }
 
     public enum TipoPonto

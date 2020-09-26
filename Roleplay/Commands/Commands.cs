@@ -232,7 +232,6 @@ namespace Roleplay.Commands
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
                 listaComandos.AddRange(new List<Comando>()
                 {
-                    new Comando("Game Administrator", "/vida", "Altera a vida de um personagem"),
                     new Comando("Game Administrator", "/colete", "Altera o colete de um personagem"),
                     new Comando("Game Administrator", "/checar", "Checa as informações de um personagem"),
                     new Comando("Game Administrator", "/ban", "Bane um usuário"),
@@ -245,7 +244,7 @@ namespace Roleplay.Commands
                 {
                     new Comando("Lead Administrator", "/ck", "Aplica CK em um personagem"),
                     new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
-                    new Comando("Lead Administrator", "/acurar", "Cura um personagem ferido"),
+                    new Comando("Lead Administrator", "/reviver", "Cura um personagem ferido"),
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                 });
 
@@ -391,7 +390,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono da propriedade não está próximo de você.");
                         return;
@@ -412,7 +411,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ)) > Constants.DistanciaRP)
+                    if (player.Position.Distance(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ)) > Global.DistanciaRP)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo da propriedade.");
                         return;
@@ -441,7 +440,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Solicitante da revista não está próximo de você.");
                         return;
@@ -476,7 +475,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+                    if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Dono do veículo não está próximo de você.");
                         return;
@@ -498,7 +497,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    if (player.Position.Distance(veh.Vehicle.Position) > Constants.DistanciaRP)
+                    if (player.Position.Distance(veh.Vehicle.Position) > Global.DistanciaRP)
                     {
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo.");
                         return;
@@ -525,7 +524,7 @@ namespace Roleplay.Commands
                     float.TryParse(convite.Valor[1], out float posY);
 
                     player.Emit("Server:SetWaypoint", posX, posY);
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] A posição recebida foi marcada no GPS.", Constants.CorCelularSecundaria);
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] A posição recebida foi marcada no GPS.", Global.CorCelularSecundaria);
                     break;
             }
 
@@ -603,7 +602,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -628,7 +627,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -651,7 +650,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
                 return;
@@ -685,7 +684,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP) && p.Celular == 0)
+            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP) && p.Celular == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular.");
                 return;
@@ -719,7 +718,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM.");
                 return;
@@ -749,7 +748,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
                 return;
@@ -773,7 +772,7 @@ namespace Roleplay.Commands
         public void CMD_comprar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaConveniencia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 player.Emit("Server:ComprarConveniencia", JsonConvert.SerializeObject(Global.Precos.Where(x => x.Tipo == TipoPreco.Conveniencia).OrderBy(x => x.Nome).Select(x => new
                 {
@@ -784,7 +783,7 @@ namespace Roleplay.Commands
             }
 
             var prox = Global.Propriedades
-                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
+                .Where(x => x.Personagem == 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
             if (prox != null)
@@ -811,7 +810,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Constants.DistanciaRP);
+            var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Global.DistanciaRP);
             if (conce != null)
             {
                 if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date < DateTime.Now.Date || p.DataRevogacaoLicencaMotorista.HasValue)
@@ -844,7 +843,7 @@ namespace Roleplay.Commands
             }
 
             var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
-            if (player.Position.Distance(emp.Posicao) > Constants.DistanciaRP)
+            if (player.Position.Distance(emp.Posicao) > Global.DistanciaRP)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está onde você pegou esse emprego.");
                 return;
@@ -873,7 +872,7 @@ namespace Roleplay.Commands
             var emprego = TipoEmprego.Nenhum;
             foreach (var c in Global.Empregos)
             {
-                if (emprego == TipoEmprego.Nenhum && player.Position.Distance(c.Posicao) <= Constants.DistanciaRP)
+                if (emprego == TipoEmprego.Nenhum && player.Position.Distance(c.Posicao) <= Global.DistanciaRP)
                     emprego = c.Tipo;
             }
 
@@ -898,7 +897,7 @@ namespace Roleplay.Commands
             }
 
             var html = $@"<div class='box-header with-border'>
-                <h3>{Constants.NomeServidor} • Staff Online<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
+                <h3>{Global.NomeServidor} • Staff Online<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
             </div>
             <div class='box-body'>
             <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os staffers...' />
@@ -982,7 +981,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
@@ -1076,7 +1075,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Propriedades
-                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
+                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -1084,7 +1083,7 @@ namespace Roleplay.Commands
             {
                 prox = Global.Propriedades
                 .Where(x => x.Codigo == player.Dimension
-                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Constants.DistanciaRP)
+                && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
                 .FirstOrDefault();
             }
@@ -1139,7 +1138,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -1168,7 +1167,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma barbearia.");
                 return;
@@ -1188,7 +1187,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma loja de roupas.");
                 return;
@@ -1211,7 +1210,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -1235,7 +1234,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.DMV && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Constants.DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.DMV && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na DMV.");
                 return;
@@ -1270,7 +1269,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;

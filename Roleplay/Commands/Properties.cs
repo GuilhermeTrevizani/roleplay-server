@@ -12,7 +12,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Propriedades
-                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
+                .Where(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -40,7 +40,7 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Propriedades
                 .Where(x => player.Dimension == x.Codigo
-                    && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Constants.DistanciaRP)
+                    && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)))
                 .FirstOrDefault();
 
@@ -66,7 +66,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Propriedades
-                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Constants.DistanciaRP)
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
@@ -80,7 +80,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Constants.DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;

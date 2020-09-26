@@ -1,5 +1,6 @@
 ﻿using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -77,6 +78,9 @@ namespace Roleplay
             }
 
             player.AddWeaponComponent(wep, comp.Hash);
+
+            var preco = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Armas && x.Nome.ToLower() == wep.ToString().ToLower());
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, JsonConvert.SerializeObject(preco));
         }
 
         [Command("anim")]

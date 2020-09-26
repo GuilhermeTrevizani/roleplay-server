@@ -17,6 +17,14 @@ namespace Roleplay
 
         public static string NomeServidor { get; set; } = "Segunda Vida Roleplay";
 
+        public static Position PosicaoPrisao { get; } = new Position(461.7921f, -989.0697f, 24.91488f);
+
+        public static string CorCelular { get; } = "#F0E90D";
+
+        public static string CorCelularSecundaria { get; } = "#F2FF43";
+
+        public static float DistanciaRP { get; } = 2;
+
         public static int MaxPlayers { get; set; }
 
         public static string ConnectionString { get; set; }

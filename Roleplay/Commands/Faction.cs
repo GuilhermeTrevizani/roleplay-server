@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -8,8 +7,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Roleplay.Constants;
-
 namespace Roleplay.Commands
 {
     public class Faction
@@ -323,7 +320,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {target.Nome} por ${valor:N0}. Motivo: {motivo}");
             if (target.Celular > 0)
-                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(911)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", CorCelular);
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(911)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CorCelular);
         }
 
         [Command("multaroff", "/multar (nome completo) (valor) (motivo)", GreedyArg = true)]
@@ -380,7 +377,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (player.Position.Distance(PosicaoPrisao) > DistanciaRP)
+            if (player.Position.Distance(Global.PosicaoPrisao) > Global.DistanciaRP)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no local que as prisões são efetuadas.");
                 return;
@@ -390,7 +387,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -434,7 +431,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -482,7 +479,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
+            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP && x.Faccao == p.Faccao);
             if (armario == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
@@ -497,6 +494,7 @@ namespace Roleplay.Commands
                 x.Municao,
                 x.Estoque,
                 Rank = Global.Ranks.FirstOrDefault(y => y.Faccao == p.Faccao && y.Codigo == x.Rank).Nome,
+                Preco = $"${Global.Precos.FirstOrDefault(y => y.Tipo == TipoPreco.Armas && y.Nome.ToLower() == ((WeaponModel)x.Arma).ToString().ToLower())?.Valor ?? 0:N0}",
             }).ToList();
             if (itens.Count == 0)
             {
@@ -517,8 +515,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP && x.Faccao == p.Faccao);
-            if (armario == null)
+            if (!Global.Armarios.Any(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP && x.Faccao == p.Faccao))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
                 return;
@@ -542,7 +539,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null))
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
@@ -571,7 +568,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP);
             if (ponto == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
@@ -629,7 +626,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.ApreensaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP);
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.ApreensaoVeiculos && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP);
             if (ponto == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em ponto de apreensão de veículos.");
@@ -661,7 +658,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (player.Position.Distance(new Position(veh.Vehicle.Position.X, veh.Vehicle.Position.Y, veh.Vehicle.Position.Z)) > DistanciaRP)
+            if (player.Position.Distance(new Position(veh.Vehicle.Position.X, veh.Vehicle.Position.Y, veh.Vehicle.Position.Z)) > Global.DistanciaRP)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do veículo.");
                 return;
@@ -702,7 +699,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Uniforme && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP))
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Uniforme && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de uniformes.");
                 return;
@@ -758,7 +755,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MDC && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= DistanciaRP)
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MDC && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP)
                 && !(Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle)?.Faccao == p.Faccao
                     && (p.Player.Seat == 1 || p.Player.Seat == 2)))
             {
@@ -831,7 +828,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;
@@ -902,7 +899,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > DistanciaRP || player.Dimension != target.Player.Dimension)
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");
                 return;

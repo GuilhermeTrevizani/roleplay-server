@@ -33,7 +33,7 @@ namespace Roleplay.Commands
             p.IPLs = target.IPLs;
             p.SetarIPLs();
             var pos = target.Player.Position;
-            pos.X += Constants.DistanciaRP;
+            pos.X += Global.DistanciaRP;
             player.Position = pos;
             player.Dimension = target.Player.Dimension;
         }
@@ -56,7 +56,7 @@ namespace Roleplay.Commands
             target.IPLs = p.IPLs;
             target.SetarIPLs();
             var pos = player.Position;
-            pos.X += Constants.DistanciaRP;
+            pos.X += Global.DistanciaRP;
             target.Player.Position = pos;
             target.Player.Dimension = player.Dimension;
         }
@@ -83,7 +83,7 @@ namespace Roleplay.Commands
             target.IPLs = targetDest.IPLs;
             target.SetarIPLs();
             var pos = targetDest.Player.Position;
-            pos.X += Constants.DistanciaRP;
+            pos.X += Global.DistanciaRP;
             target.Player.Position = pos;
             target.Player.Dimension = targetDest.Player.Dimension;
 
@@ -191,7 +191,7 @@ namespace Roleplay.Commands
 
             p.LimparIPLs();
             var pos = veh.Vehicle.Position;
-            pos.X += Constants.DistanciaRP;
+            pos.X += Global.DistanciaRP;
             player.Position = pos;
             player.Dimension = veh.Vehicle.Dimension;
         }
@@ -220,7 +220,7 @@ namespace Roleplay.Commands
             }
 
             var pos = player.Position;
-            pos.X += Constants.DistanciaRP;
+            pos.X += Global.DistanciaRP;
             veh.Vehicle.Position = pos;
             veh.Vehicle.Dimension = player.Dimension;
         }
@@ -340,32 +340,6 @@ namespace Roleplay.Commands
         #endregion Staff 1
 
         #region Game Administrator
-        [Command("vida", "/vida (ID ou nome) (vida)")]
-        public void CMD_vida(IPlayer player, string idNome, int vida)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            if (vida < 1 || vida > 100)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Vida deve ser entre 1 e 100.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            target.Player.Health = (ushort)(vida + 100);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou sua vida para {vida}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a vida de {target.Nome} para {vida}.");
-            Functions.GravarLog(TipoLog.Staff, $"/vida {vida}", p, target);
-        }
-
         [Command("colete", "/colete (ID ou nome) (colete)")]
         public void CMD_colete(IPlayer player, string idNome, int colete)
         {
@@ -589,8 +563,8 @@ namespace Roleplay.Commands
                 x.Player.SetWeather(Global.Weather);
         }
 
-        [Command("acurar", "/acurar (ID ou nome)")]
-        public void CMD_acurar(IPlayer player, string idNome)
+        [Command("reviver", "/reviver (ID ou nome)")]
+        public void CMD_reviver(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
@@ -1075,7 +1049,7 @@ namespace Roleplay.Commands
             }
 
             var html = $@"<div class='box-header with-border'>
-                <h3>{Constants.NomeServidor} • Facções<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
+                <h3>{Global.NomeServidor} • Facções<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
             </div>
             <div class='box-body'>
             <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise as facções...' />

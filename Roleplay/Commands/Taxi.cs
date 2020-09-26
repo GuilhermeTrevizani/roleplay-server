@@ -74,7 +74,7 @@ namespace Roleplay.Commands
 
             player.Emit("Server:SetWaypoint", target.Player.Position.X, target.Player.Position.Y);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você está atendendo a chamada {chamada} e a localização do solicitante foi marcada em seu GPS.");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {p.ObterNomeContato(5555555)}: Nosso taxista {p.Nome} está atendendo sua chamada! Placa: {player.Vehicle.NumberplateText}", Constants.CorCelular);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {p.ObterNomeContato(5555555)}: Nosso taxista {p.Nome} está atendendo sua chamada! Placa: {player.Vehicle.NumberplateText}", Global.CorCelular);
         }
     }
 }

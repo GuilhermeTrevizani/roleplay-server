@@ -124,7 +124,7 @@ namespace Roleplay
             }
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
-            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Constants.PosicaoPrisao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
 
             Global.TACVoice = new List<IVoiceChannel>
             {
@@ -1010,6 +1010,22 @@ namespace Roleplay
                 return;
             }
 
+            if (p.FaccaoBD.Tipo == TipoFaccao.Criminosa)
+            {
+                var preco = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Armas && x.Nome.ToLower() == ((WeaponModel)weapon).ToString().ToLower());
+                if (preco != null)
+                {
+                    if (p.Dinheiro < preco.Valor)
+                    {
+                        player.Emit("Server:MostrarErro", $"Você não possui dinheiro suficiente para fabricar esse item (${preco.Valor:N0}).");
+                        return;
+                    }
+
+                    p.Dinheiro -= preco.Valor;
+                    p.SetDinheiro();
+                }
+            }
+
             player.GiveWeapon(weapon, arma.Municao, false);
             player.SetWeaponTintIndex(weapon, (byte)arma.Pintura);
             var componentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
@@ -1037,6 +1053,7 @@ namespace Roleplay
                 x.Municao,
                 x.Estoque,
                 Rank = Global.Ranks.FirstOrDefault(y => y.Faccao == p.Faccao && y.Codigo == x.Rank).Nome,
+                Preco = $"${Global.Precos.FirstOrDefault(y => y.Tipo == TipoPreco.Armas && y.Nome.ToLower() == ((WeaponModel)x.Arma).ToString().ToLower())?.Valor ?? 0:N0}",
             }).ToList();
 
             player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, $"Você equipou {(WeaponModel)weapon}.");

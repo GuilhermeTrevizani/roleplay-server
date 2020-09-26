@@ -40,9 +40,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] SMS para {p.ObterNomeContato(numero)}: {mensagem}", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] SMS para {p.ObterNomeContato(numero)}: {mensagem}", Global.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(player, "envia uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(p.Celular)}: {mensagem}", Constants.CorCelular);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(p.Celular)}: {mensagem}", Global.CorCelular);
             Functions.SendMessageToNearbyPlayers(target.Player, "recebe uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
         }
 
@@ -82,23 +82,23 @@ namespace Roleplay.Commands
             {
                 p.NumeroLigacao = numero;
                 p.StatusLigacao = TipoStatusLigacao.EmLigacao;
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de emergência, deseja falar com PD, FD ou PDFD?", Constants.CorCelular);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de emergência, deseja falar com PD, FD ou PDFD?", Global.CorCelular);
                 return;
             }
 
             if (numero == 5555555)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
                 if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.EmTrabalho) == 0)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Constants.CorCelular);
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Global.CorCelular);
                     return;
                 }
 
                 p.NumeroLigacao = numero;
                 p.StatusLigacao = TipoStatusLigacao.EmLigacao;
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Downtown Cab Company, para onde deseja ir?", Constants.CorCelular);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Downtown Cab Company, para onde deseja ir?", Global.CorCelular);
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace Roleplay.Commands
 
             if (target.NumeroLigacao > 0 || Global.PersonagensOnline.Any(x => x.NumeroLigacao == target.Celular))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} está ocupado.", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} está ocupado.", Global.CorCelularSecundaria);
                 return;
             }
 
@@ -123,8 +123,8 @@ namespace Roleplay.Commands
             };
             p.TimerCelular.Elapsed += TimerCelular_Elapsed;
             p.TimerCelular.Start();
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Constants.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Global.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
         }
 
@@ -141,7 +141,7 @@ namespace Roleplay.Commands
 
             if (timer.ElapsedCount == 5)
             {
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu após tocar 5 vezes.", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu após tocar 5 vezes.", Global.CorCelularSecundaria);
                 p.LimparLigacao();
                 return;
             }
@@ -149,12 +149,12 @@ namespace Roleplay.Commands
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == p.NumeroLigacao);
             if (target == null)
             {
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu.", Constants.CorCelularSecundaria);
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu.", Global.CorCelularSecundaria);
                 p.LimparLigacao();
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Global.CorCelularSecundaria);
             Functions.SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
         }
 
@@ -178,8 +178,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação.", Constants.CorCelularSecundaria);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target.Celular)}.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação.", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target.Celular)}.", Global.CorCelularSecundaria);
 
             p.LimparLigacao();
             target.LimparLigacao();
@@ -208,8 +208,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida.", Constants.CorCelularSecundaria);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida.", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}.", Global.CorCelularSecundaria);
 
             target.StatusLigacao = TipoStatusLigacao.EmLigacao;
             target.LimparLigacao(true);
@@ -258,7 +258,7 @@ namespace Roleplay.Commands
             }
 
             player.Emit("Server:SetWaypoint", prop.EntradaPosX, prop.EntradaPosY);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Propriedade {propriedade} foi marcada no GPS.", Constants.CorCelularSecundaria);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Propriedade {propriedade} foi marcada no GPS.", Global.CorCelularSecundaria);
         }
 
         [Command("localizacao", "/localizacao (número ou nome do contato)", Alias = "loc")]

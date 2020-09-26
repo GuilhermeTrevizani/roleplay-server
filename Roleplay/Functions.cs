@@ -307,7 +307,7 @@ namespace Roleplay
                     {
                         EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco.");
 
-                        if (p.Faccao > 0)
+                        if (p.Faccao > 0 && p.RankBD.Salario > 0)
                             EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Facção: ${p.RankBD.Salario:N0}");
 
                         if (p.Emprego > 0)
@@ -329,7 +329,7 @@ namespace Roleplay
                 if (pLigando != null)
                 {
                     pLigando.LimparLigacao();
-                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Constants.CorCelularSecundaria);
+                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Global.CorCelularSecundaria);
                 }
             }
 
@@ -469,11 +469,11 @@ namespace Roleplay
                 EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} diz: {mensagem}", "#F0E90D");
         }
 
-        public static void EnviarMensagemTipoFaccao(TipoFaccao tipo, string mensagem, bool isSomenteParaTrabalho, bool isCorFaccao)
+        public static void EnviarMensagemTipoFaccao(TipoFaccao tipo, string mensagem, bool somenteParaEmTrabalho, bool isCorFaccao)
         {
             var players = Global.PersonagensOnline.Where(x => x.FaccaoBD?.Tipo == tipo);
 
-            if (isSomenteParaTrabalho)
+            if (somenteParaEmTrabalho)
                 players = players.Where(x => x.EmTrabalho);
 
             foreach (var pl in players)
@@ -613,18 +613,18 @@ namespace Roleplay
 
                         if (string.IsNullOrWhiteSpace(p.ExtraLigacao))
                         {
-                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Não entendi sua mensagem. Deseja falar com PD, FD ou PDFD?", Constants.CorCelular);
+                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Não entendi sua mensagem. Deseja falar com PD, FD ou PDFD?", Global.CorCelular);
                             return;
                         }
 
                         p.StatusLigacao = TipoStatusLigacao.AguardandoInformacao;
-                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Qual sua emergência?", Constants.CorCelular);
+                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Qual sua emergência?", Global.CorCelular);
                         return;
                     }
 
                     if (p.StatusLigacao == TipoStatusLigacao.AguardandoInformacao)
                     {
-                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas.", Constants.CorCelular);
+                        EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(911)} diz: Nossas unidades foram alertadas.", Global.CorCelular);
 
                         var tipoFaccao = p.ExtraLigacao == "LSPD" ? TipoFaccao.Policial : TipoFaccao.Medica;
 
@@ -664,14 +664,14 @@ namespace Roleplay
                 }
                 else if (p.NumeroLigacao == 5555555)
                 {
-                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram alertados e você receberá um SMS de confirmação.", Constants.CorCelular);
+                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram alertados e você receberá um SMS de confirmação.", Global.CorCelular);
 
                     p.AguardandoTipoServico = (int)TipoEmprego.Taxista;
 
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.Codigo}", Constants.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Constants.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Constants.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Constants.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.Codigo}", Global.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorCelular);
 
                     p.LimparLigacao();
                 }
