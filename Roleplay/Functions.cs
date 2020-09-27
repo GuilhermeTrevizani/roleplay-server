@@ -600,12 +600,12 @@ namespace Roleplay
                 {
                     if (p.StatusLigacao == TipoStatusLigacao.EmLigacao)
                     {
-                        if (message.ToUpper().Contains("LSPD") || message.ToUpper().Contains("PD"))
+                        if (message.ToUpper().Contains("PDFD") || message.ToUpper().Contains("FDPD"))
+                            p.ExtraLigacao = "PDFD";
+                        else if (message.ToUpper().Contains("LSPD") || message.ToUpper().Contains("PD"))
                             p.ExtraLigacao = "LSPD";
                         else if (message.ToUpper().Contains("LSFD") || message.ToUpper().Contains("FD"))
                             p.ExtraLigacao = "LSFD";
-                        else if (message.ToUpper().Contains("PDFD") || message.ToUpper().Contains("FDPD"))
-                            p.ExtraLigacao = "PDFD";
 
                         if (string.IsNullOrWhiteSpace(p.ExtraLigacao))
                         {
