@@ -163,6 +163,21 @@ namespace Roleplay.Entities
             }
         }
 
+        [NotMapped]
+        public int SlotsPersonagens
+        {
+            get
+            {
+                return UsuarioBD.VIP switch
+                {
+                    TipoVIP.Bronze => 3,
+                    TipoVIP.Prata => 4,
+                    TipoVIP.Ouro => 5,
+                    _ => 2,
+                };
+            }
+        }
+
         public void SetDinheiro()
         {
             if (Player != null)

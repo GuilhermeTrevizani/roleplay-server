@@ -30,5 +30,7 @@ namespace Roleplay.Entities
         /// </summary>
         public string TokenConfirmacao { get; set; } = string.Empty;
         public string TokenSenha { get; set; } = string.Empty;
+        public TipoVIP VIP { get; set; } = TipoVIP.Nenhum;
+        public DateTime? DataExpiracaoVIP { get; set; } = null;
     }
 }

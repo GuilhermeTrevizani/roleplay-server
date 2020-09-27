@@ -11,7 +11,6 @@
         public int ValorCustosHospitalares { get; set; } = 0;
         public int ValorBarbearia { get; set; } = 0;
         public int ValorRoupas { get; set; } = 0;
-        public int SlotsPersonagens { get; set; } = 0;
         public int ValorLicencaMotorista { get; set; } = 0;
         public int ValorComponentes { get; set; } = 0;
     }

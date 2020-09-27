@@ -279,4 +279,12 @@ namespace Roleplay.Models
         AllowPlayerControl = 1 << 5,
         Cancellable = 1 << 7
     };
+
+    public enum TipoVIP
+    {
+        Nenhum = 0,
+        Bronze = 1,
+        Prata = 2,
+        Ouro = 3,
+    }
 }

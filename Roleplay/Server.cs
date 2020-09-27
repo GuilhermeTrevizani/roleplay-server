@@ -438,7 +438,7 @@ namespace Roleplay
                         Status = ObterStatusListarPersonagens(x),
                         Opcoes = ObterOpcoesListarPersonagens(x, p.UsuarioBD),
                     })),
-                    Global.Parametros.SlotsPersonagens);
+                    p.SlotsPersonagens);
         }
 
         private string ObterStatusListarPersonagens(Personagem x)
@@ -564,6 +564,8 @@ namespace Roleplay
             else
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
+                if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorAmarelo}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorAmarelo}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
                 player.SetSyncedMetaData("nametag", p.Nome);
                 player.Emit("nametags:Config", true);
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);

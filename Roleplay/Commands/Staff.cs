@@ -376,7 +376,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
             if (target == null)
                 return;
 
@@ -2662,6 +2662,48 @@ namespace Roleplay.Commands
             Global.ArmariosComponentes.Remove(item);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {wc.Name} da arma {wep} removida do armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/rcomp {armario} {item.Arma} {item.Componente}", p, null);
+        }
+
+        [Command("vip", "/vip (usuário) (nível) (meses)")]
+        public void CMD_vip(IPlayer player, int usuario, int nivelVip, int meses)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            if (!Enum.GetValues(typeof(TipoVIP)).Cast<TipoVIP>().Any(x => (int)x == nivelVip))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"VIP {nivelVip} não existe.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var user = context.Usuarios.FirstOrDefault(x => x.Codigo == usuario);
+            if (user == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não existe.");
+                return;
+            }
+
+            var vip = (TipoVIP)nivelVip;
+            user.VIP = vip;
+            user.DataExpiracaoVIP = ((user.DataExpiracaoVIP ?? DateTime.Now) > DateTime.Now ? user.DataExpiracaoVIP.Value : DateTime.Now).AddMonths(meses);
+            context.Usuarios.Update(user);
+            context.SaveChanges();
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Usuario == usuario);
+            if (target != null)
+            {
+                target.UsuarioBD.VIP = user.VIP;
+                target.UsuarioBD.DataExpiracaoVIP = user.DataExpiracaoVIP;
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível VIP para {vip} expirando em {user.DataExpiracaoVIP}.");
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível VIP de {target.UsuarioBD.Nome} para {vip} expirando em {user.DataExpiracaoVIP}.");
+            Functions.GravarLog(TipoLog.Staff, $"/vip {usuario} {vip} {meses}", p, null);
         }
         #endregion Staff 1337
     }
