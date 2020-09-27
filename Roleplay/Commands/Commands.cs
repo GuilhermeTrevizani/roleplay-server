@@ -45,6 +45,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
                 new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
                 new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
+                new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -1267,6 +1268,49 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Validade: {p.DataValidadeLicencaMotorista?.ToShortDateString()}");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Status: {(p.DataRevogacaoLicencaMotorista.HasValue ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria licença de motorista." : $"mostra sua licença de motorista para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
+        }
+
+        [Command("tog", "/tog (tipo)")]
+        public void CMD_tog(IPlayer player, string tipo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            switch (tipo.ToLower())
+            {
+                case "pm":
+                    if (p.UsuarioBD.VIP == TipoVIP.Nenhum)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Opção disponível apenas para VIP.");
+                        return;
+                    }
+
+                    p.UsuarioBD.TogPM = !p.UsuarioBD.TogPM;
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.UsuarioBD.TogPM ? "des" : string.Empty)}ativou as mensagens privadas.", notify: true);
+                    break;
+                case "chatstaff":
+                    if (p.UsuarioBD.Staff == TipoStaff.Nenhum)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na staff.");
+                        return;
+                    }
+
+                    p.UsuarioBD.TogChatStaff = !p.UsuarioBD.TogChatStaff;
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.UsuarioBD.TogChatStaff ? "des" : string.Empty)}ativou as mensagens do chat da staff.", notify: true);
+                    break;
+                case "chatfaccao":
+                    if (p.Faccao == 0)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção.");
+                        return;
+                    }
+
+                    p.UsuarioBD.TogChatFaccao = !p.UsuarioBD.TogChatFaccao;
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.UsuarioBD.TogChatFaccao ? "des" : string.Empty)}ativou as mensagens do chat da facção.", notify: true);
+                    break;
+                default:
+                    Functions.EnviarMensagem(player, TipoMensagem.Titulo, "Opções Disponíveis");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "pm chatstaff chatfaccao");
+                    break;
+            }
         }
     }
 }

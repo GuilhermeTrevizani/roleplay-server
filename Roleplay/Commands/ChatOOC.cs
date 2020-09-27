@@ -12,9 +12,21 @@ namespace Roleplay.Commands
         public void CMD_pm(IPlayer player, string idNome, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
+            if (p.UsuarioBD.TogPM)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está com as mensagens privadas desabilitadas.");
+                return;
+            }
+
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
+
+            if (target.UsuarioBD.TogPM)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador está com as mensagens privadas desabilitadas.");
+                return;
+            }
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( PM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( PM de {p.Nome} [{p.ID}]: {mensagem} ))", Global.CorCelular);

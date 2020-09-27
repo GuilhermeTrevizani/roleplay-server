@@ -33,5 +33,8 @@ namespace Roleplay.Entities
         public TipoVIP VIP { get; set; } = TipoVIP.Nenhum;
         public DateTime? DataExpiracaoVIP { get; set; } = null;
         public bool PossuiNamechangeForum { get; set; } = false;
+        public bool TogPM { get; set; } = false;
+        public bool TogChatStaff { get; set; } = false;
+        public bool TogChatFaccao { get; set; } = false;
     }
 }

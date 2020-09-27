@@ -179,6 +179,9 @@ namespace Roleplay
             {
                 Functions.GravarLog(TipoLog.Saida, reason, p, null);
                 Functions.SalvarPersonagem(p, false);
+
+                foreach (var x in Global.PersonagensOnline.Where(x => x.Player.Dimension == player.Dimension && player.Position.Distance(x.Player.Position) <= 20))
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( {p.Nome} [{p.ID}] {{{Global.CorErro}}}{{#FFFFFF}} saiu do servidor. ))");
             }
 
             Global.PersonagensOnline.RemoveAll(x => x.Player?.HardwareIdHash == player.HardwareIdHash);

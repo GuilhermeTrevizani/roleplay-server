@@ -121,7 +121,13 @@ namespace Roleplay.Commands
                 return;
             }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum))
+            if (p.UsuarioBD.TogChatStaff)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está com o chat da staff desabilitado.");
+                return;
+            }
+
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum && !x.UsuarioBD.TogChatStaff))
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {Functions.ObterDisplayEnum(p.UsuarioBD.Staff)} {p.UsuarioBD.Nome}: {mensagem} ))", "#33EE33");
         }
 
@@ -152,6 +158,12 @@ namespace Roleplay.Commands
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
+
+            if (target.UsuarioBD.Staff <= p.UsuarioBD.Staff)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
 
             using (var context = new DatabaseContext())
             {
@@ -397,6 +409,12 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
+            if (target.UsuarioBD.Staff <= p.UsuarioBD.Staff)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
             using (var context = new DatabaseContext())
             {
                 var ban = new Banimento()
@@ -453,6 +471,12 @@ namespace Roleplay.Commands
             }
 
             var user = context.Usuarios.FirstOrDefault(x => x.Codigo == per.Usuario);
+
+            if (user.Staff <= p.UsuarioBD.Staff)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
 
             var ban = new Banimento()
             {
@@ -1281,6 +1305,12 @@ namespace Roleplay.Commands
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
+
+            if (target.Usuario == 1 && p.Usuario != 1)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
 
             var stf = (TipoStaff)staff;
             target.UsuarioBD.Staff = stf;
@@ -2691,7 +2721,7 @@ namespace Roleplay.Commands
         public void CMD_vip(IPlayer player, int usuario, int nivelVip, int meses)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            if (p.Usuario != 1)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;

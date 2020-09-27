@@ -27,8 +27,14 @@ namespace Roleplay.Commands
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Chat da facção está bloqueado.");
                 return;
             }
+            
+            if (p.UsuarioBD.TogChatFaccao)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está com o chat da facção desabilitado.");
+                return;
+            }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao))
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {p.RankBD.Nome} {p.Nome} [{p.ID}]: {mensagem} ))", $"#{p.FaccaoBD.Cor}");
         }
 
@@ -755,7 +761,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirMDC");
+            player.Emit("Server:AbrirMDC", p.FaccaoBD.Nome);
         }
 
         [Command("tac", "/tac (canal [0-5])", Alias = "t")]
