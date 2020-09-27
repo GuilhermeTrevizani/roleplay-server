@@ -232,7 +232,8 @@ namespace Roleplay.Commands
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Game Administrator", "/colete", "Altera o colete de um personagem"),
-                    new Comando("Game Administrator", "/checar", "Checa as informações de um personagem"),
+                    new Comando("Game Administrator", "/checar", "Checa as informações de um personagem online"),
+                    new Comando("Game Administrator", "/checaroff", "Checa as informações de um personagem offline"),
                     new Comando("Game Administrator", "/ban", "Bane um usuário"),
                     new Comando("Game Administrator", "/unban", "Desbane um usuário"),
                     new Comando("Game Administrator", "/banoff", "Bane um usuário que está offline"),
@@ -342,11 +343,11 @@ namespace Roleplay.Commands
             var personagens = Global.PersonagensOnline.Where(x => x.ID == id || x.Nome.ToLower().Contains(idNome.ToLower())).OrderBy(x => x.ID).ToList();
             if (personagens.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}.");
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Jogadores encontrados com a pesquisa: {idNome}");
+            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Jogadores encontrados com a pesquisa: {idNome}.");
             foreach (var pl in personagens)
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{pl.Nome} [{pl.ID}]");
         }

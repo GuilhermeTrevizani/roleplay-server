@@ -510,6 +510,29 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você desbaniu {usuario}.");
             Functions.GravarLog(TipoLog.Staff, $"/unban {usuario}", p, null);
         }
+
+        [Command("checaroff", "/checaroff (código ou nome do personagem)", GreedyArg = true)]
+        public void CMD_checaroff(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            int.TryParse(idNome, out int codigo);
+            using var context = new DatabaseContext();
+            var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == codigo || x.Nome.ToLower() == idNome.ToLower());
+            if (personagem == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhum personagem encontrado através da pesquisa: {idNome}.");
+                return;
+            }
+
+            personagem.UsuarioBD = context.Usuarios.FirstOrDefault(x => x.Codigo == personagem.Usuario);
+            Functions.MostrarStats(player, personagem);
+        }
         #endregion Staff 2
 
         #region Lead Administrator
