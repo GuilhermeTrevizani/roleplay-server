@@ -643,5 +643,7 @@ namespace Roleplay
         public static List<IVoiceChannel> TACVoice { get; set; }
 
         public static IVoiceChannel GlobalVoice { get; set; }
+
+        public static List<ArmarioComponente> ArmariosComponentes { get; set; } = new List<ArmarioComponente>();
     }
 }

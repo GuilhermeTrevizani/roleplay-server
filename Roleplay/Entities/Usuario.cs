@@ -25,7 +25,6 @@ namespace Roleplay.Entities
         public int TempoTrabalhoAdministrativo { get; set; } = 0;
         public bool TimeStamp { get; set; } = true;
         public long Discord { get; set; } = 0;
-
         /// <summary>
         /// Se estiver em branco, o registro do usuário está confirmado
         /// </summary>

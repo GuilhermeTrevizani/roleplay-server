@@ -302,6 +302,8 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/pos", "Vai até a posição"),
                     new Comando("Manager", "/carmicomp", "Adiciona componentes em um arma de um armário"),
                     new Comando("Manager", "/rarmicomp", "Remove componentes em um arma de um armário"),
+                    new Comando("Manager", "/ccomp", "Adiciona componentes em um armário"),
+                    new Comando("Manager", "/rcomp", "Remove componentes de um armário"),
                 });
 
             var html = $@"<div class='box-header with-border'>

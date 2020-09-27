@@ -7,6 +7,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace Roleplay.Commands
 {
     public class Faction
@@ -479,12 +480,21 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP && x.Faccao == p.Faccao);
+            var armario = Global.Armarios.FirstOrDefault(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP && x.Faccao == p.Faccao && x.Dimensao == player.Dimension);
             if (armario == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum armário da sua facção.");
                 return;
             }
+
+            var componentes = Global.ArmariosComponentes.Where(x => x.Codigo == armario.Codigo).OrderBy(x => x.Arma).ThenBy(x => x.Componente)
+            .Select(x => new
+            {
+                Arma = ((WeaponModel)x.Arma).ToString(),
+                Componente = Global.WeaponComponents.FirstOrDefault(y => y.Weapon == (WeaponModel)x.Arma && y.Hash == x.Componente)?.Name ?? string.Empty,
+                ItemArma = x.Arma,
+                ItemComponente = x.Componente,
+            }).ToList();
 
             var itens = Global.ArmariosItens.Where(x => x.Codigo == armario.Codigo).OrderBy(x => x.Rank).ThenBy(x => x.Arma)
             .Select(x => new
@@ -496,13 +506,17 @@ namespace Roleplay.Commands
                 Rank = Global.Ranks.FirstOrDefault(y => y.Faccao == p.Faccao && y.Codigo == x.Rank).Nome,
                 Preco = $"${Global.Precos.FirstOrDefault(y => y.Tipo == TipoPreco.Armas && y.Nome.ToLower() == ((WeaponModel)x.Arma).ToString().ToLower())?.Valor ?? 0:N0}",
             }).ToList();
-            if (itens.Count == 0)
+
+            if (itens.Count == 0 && componentes.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "O armário não possui itens.");
                 return;
             }
 
-            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial);
+            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, 
+                JsonConvert.SerializeObject(itens), JsonConvert.SerializeObject(componentes), 
+                p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial, 
+                $"${Global.Parametros.ValorComponentes:N0}");
         }
 
         [Command("curar", "/curar (ID ou nome)")]
@@ -746,7 +760,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"ABRIR MDC");
+            player.Emit("Server:AbrirMDC");
         }
 
         [Command("tac", "/tac (canal [0-5])", Alias = "t")]

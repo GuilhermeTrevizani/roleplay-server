@@ -751,7 +751,7 @@ namespace Roleplay.Commands
                 blip.CriarIdentificador(x.Player);
 
             Global.Blips.Add(blip);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} criado com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} criado.");
             Functions.GravarLog(TipoLog.Staff, $"/cblip {blip.Codigo}", p, null);
         }
 
@@ -779,7 +779,7 @@ namespace Roleplay.Commands
                 blip.DeletarIdentificador(x.Player);
 
             Global.Blips.Remove(blip);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} removido com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Blip {blip.Codigo} removido.");
             Functions.GravarLog(TipoLog.Staff, $"/rblip {blip.Codigo}", p, null);
         }
 
@@ -1358,7 +1358,7 @@ namespace Roleplay.Commands
             prop.CriarIdentificador();
 
             Global.Propriedades.Add(prop);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} criada com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} criada.");
             Functions.GravarLog(TipoLog.Staff, $"/cprop {prop.Codigo} {prop.Valor}", p, null);
         }
 
@@ -1391,7 +1391,7 @@ namespace Roleplay.Commands
             prop.DeletarIdentificador();
 
             Global.Propriedades.Remove(prop);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} removida com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Propriedade {prop.Codigo} removida.");
             Functions.GravarLog(TipoLog.Staff, $"/rprop {prop.Codigo}", p, null);
         }
 
@@ -1614,7 +1614,7 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} criado/editado com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} criado/editado.");
             Functions.GravarLog(TipoLog.Staff, $"/cpreco {tipo} {nome} {valor}", p, null);
         }
 
@@ -1643,7 +1643,7 @@ namespace Roleplay.Commands
             }
 
             Global.Precos.Remove(preco);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} removido com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Preço com tipo {Functions.ObterDisplayEnum(tp)} ({tipo}) e nome {nome} removido.");
             Functions.GravarLog(TipoLog.Staff, $"/rpreco {tipo} {nome}", p, null);
         }
 
@@ -1683,7 +1683,7 @@ namespace Roleplay.Commands
             ponto.CriarIdentificador();
 
             Global.Pontos.Add(ponto);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} criado com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} criado.");
             Functions.GravarLog(TipoLog.Staff, $"/cponto {ponto.Codigo}", p, null);
         }
 
@@ -1709,7 +1709,7 @@ namespace Roleplay.Commands
             ponto.DeletarIdentificador();
 
             Global.Pontos.Remove(ponto);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} removido com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} removido.");
             Functions.GravarLog(TipoLog.Staff, $"/rponto {ponto.Codigo}", p, null);
         }
 
@@ -1837,7 +1837,7 @@ namespace Roleplay.Commands
             armario.CriarIdentificador();
 
             Global.Armarios.Add(armario);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} criado com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} criado.");
             Functions.GravarLog(TipoLog.Staff, $"/carm {armario.Codigo} {faccao}", p, null);
         }
 
@@ -1868,7 +1868,7 @@ namespace Roleplay.Commands
 
             Global.Armarios.Remove(armario);
             Global.ArmariosItens.RemoveAll(x => x.Codigo == armario.Codigo);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} removido com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Armário {armario.Codigo} removido.");
             Functions.GravarLog(TipoLog.Staff, $"/rarm {armario.Codigo}", p, null);
         }
 
@@ -2014,7 +2014,7 @@ namespace Roleplay.Commands
             }
 
             Global.ArmariosItens.Add(item);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} criada no armário {armario} com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} adicionada no armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/carmi {armario} {item.Arma}", p, null);
         }
 
@@ -2055,7 +2055,7 @@ namespace Roleplay.Commands
             }
 
             Global.ArmariosItens.Remove(item);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} removida do armário {armario} com sucesso.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} removida do armário {armario}.");
             Functions.GravarLog(TipoLog.Staff, $"/rarmi {armario} {item.Arma}", p, null);
         }
 
@@ -2568,6 +2568,110 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a quantidade de slots da facção {faccao.Codigo} para {slots}.");
             Functions.GravarLog(TipoLog.Staff, $"/efacslots {faccao.Codigo} {slots}", p, null);
+        }
+
+        [Command("ccomp", "/ccomp (armário) (arma) (componente)")]
+        public void CMD_ccomp(IPlayer player, int armario, string arma, string componente)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var arm = Global.Armarios.FirstOrDefault(x => x.Codigo == armario);
+            if (arm == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe.");
+                return;
+            }
+
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
+            if (wep == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
+                return;
+            }
+
+            var wc = Global.WeaponComponents.FirstOrDefault(x => x.Weapon == wep && x.Name.ToLower() == componente.ToLower());
+            if (wc == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe.");
+                return;
+            }
+
+            if (Global.ArmariosComponentes.Any(x => x.Codigo == armario && x.Arma == (long)wep && x.Componente == wc.Hash))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {wc.Name} da arma {wep} já existe no armário {armario}.");
+                return;
+            }
+
+            var item = new ArmarioComponente()
+            {
+                Codigo = armario,
+                Arma = (long)wep,
+                Componente = wc.Hash,
+            };
+
+            using (var context = new DatabaseContext())
+            {
+                context.ArmariosComponentes.Add(item);
+                context.SaveChanges();
+            }
+
+            Global.ArmariosComponentes.Add(item);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {wc.Name} da arma {wep} adicionado no armário {armario}.");
+            Functions.GravarLog(TipoLog.Staff, $"/ccomp {armario} {item.Arma} {item.Componente}", p, null);
+        }
+
+        [Command("rcomp", "/rcomp (armário) (arma) (componente)")]
+        public void CMD_rcomp(IPlayer player, int armario, string arma, string componente)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var arm = Global.Armarios.FirstOrDefault(x => x.Codigo == armario);
+            if (arm == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Armário {armario} não existe.");
+                return;
+            }
+
+            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
+            if (wep == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
+                return;
+            }
+
+            var wc = Global.WeaponComponents.FirstOrDefault(x => x.Weapon == wep && x.Name.ToLower() == componente.ToLower());
+            if (wc == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe.");
+                return;
+            }
+
+            var item = Global.ArmariosComponentes.FirstOrDefault(x => x.Codigo == armario && x.Arma == (long)wep && x.Componente == wc.Hash);
+            if (item == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {wc.Name} da arma {wep} não existe no armário {armario}.");
+                return;
+            }
+
+            using (var context = new DatabaseContext())
+            {
+                context.ArmariosComponentes.Remove(item);
+                context.SaveChanges();
+            }
+
+            Global.ArmariosComponentes.Remove(item);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Componente {wc.Name} da arma {wep} removida do armário {armario}.");
+            Functions.GravarLog(TipoLog.Staff, $"/rcomp {armario} {item.Arma} {item.Componente}", p, null);
         }
         #endregion Staff 1337
     }

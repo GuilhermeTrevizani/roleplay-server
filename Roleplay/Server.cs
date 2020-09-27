@@ -58,6 +58,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
             Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
             Alt.OnClient<IPlayer>("EquiparColeteArmario", EquiparColeteArmario);
+            Alt.OnClient<IPlayer, uint, uint>("PegarComponenteArmario", PegarComponenteArmario);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -112,6 +113,9 @@ namespace Roleplay
 
                 Global.Respostas = context.Respostas.ToList();
                 Console.WriteLine($"Respostas: {Global.Respostas.Count}");
+
+                Global.ArmariosComponentes = context.ArmariosComponentes.ToList();
+                Console.WriteLine($"ArmariosComponentes: {Global.ArmariosComponentes.Count}");
             }
 
             foreach (var c in Global.Concessionarias)
@@ -1000,14 +1004,14 @@ namespace Roleplay
             var arma = Global.ArmariosItens.FirstOrDefault(x => x.Codigo == armario && x.Arma == weapon);
             if ((arma?.Estoque ?? 0) == 0)
             {
-                player.Emit("Server:MostrarErro", $"O item não possui estoque.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O item não possui estoque.", notify: true);
                 return;
             }
 
             var p = Functions.ObterPersonagem(player);
             if (p.Rank < arma.Rank)
             {
-                player.Emit("Server:MostrarErro", $"Você não possui autorização para pegar o item.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para pegar o item.", notify: true);
                 return;
             }
 
@@ -1018,7 +1022,7 @@ namespace Roleplay
                 {
                     if (p.Dinheiro < preco.Valor)
                     {
-                        player.Emit("Server:MostrarErro", $"Você não possui dinheiro suficiente para fabricar esse item (${preco.Valor:N0}).");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente para fabricar esse item (${preco.Valor:N0}).", notify: true);
                         return;
                     }
 
@@ -1029,8 +1033,8 @@ namespace Roleplay
 
             player.GiveWeapon(weapon, arma.Municao, false);
             player.SetWeaponTintIndex(weapon, (byte)arma.Pintura);
-            var componentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
-            foreach (var x in componentes)
+            var armaComponentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
+            foreach (var x in armaComponentes)
                 player.AddWeaponComponent(weapon, x);
 
             p.Armas.Add(new Personagem.Arma()
@@ -1046,6 +1050,15 @@ namespace Roleplay
             context.ArmariosItens.Update(arma);
             context.SaveChanges();
 
+            var componentes = Global.ArmariosComponentes.Where(x => x.Codigo == armario).OrderBy(x => x.Arma).ThenBy(x => x.Componente)
+            .Select(x => new
+            {
+                Arma = ((WeaponModel)x.Arma).ToString(),
+                Componente = Global.WeaponComponents.FirstOrDefault(y => y.Weapon == (WeaponModel)x.Arma && y.Hash == x.Componente)?.Name ?? string.Empty,
+                ItemArma = x.Arma,
+                ItemComponente = x.Componente,
+            }).ToList();
+
             var itens = Global.ArmariosItens.Where(x => x.Codigo == armario).OrderBy(x => x.Rank).ThenBy(x => x.Arma)
             .Select(x => new
             {
@@ -1057,7 +1070,8 @@ namespace Roleplay
                 Preco = $"${Global.Precos.FirstOrDefault(y => y.Tipo == TipoPreco.Armas && y.Nome.ToLower() == ((WeaponModel)x.Arma).ToString().ToLower())?.Valor ?? 0:N0}",
             }).ToList();
 
-            player.Emit("Server:AtualizarArmario", armario, p.FaccaoBD.Nome, JsonConvert.SerializeObject(itens), p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial, $"Você equipou {(WeaponModel)weapon}.");
+            player.Emit("Server:AtualizarArmario", JsonConvert.SerializeObject(itens), JsonConvert.SerializeObject(componentes));
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você equipou {(WeaponModel)weapon}.", notify: true);
             Functions.GravarLog(TipoLog.Arma, $"/armario {JsonConvert.SerializeObject(arma)}", p, null);
         }
 
@@ -1106,6 +1120,7 @@ namespace Roleplay
                 player.Emit("RemoveWeapon", (uint)x.Codigo);
 
             p.Armas = new List<Personagem.Arma>();
+            player.Armor = 0;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você devolveu seus itens no armário.", notify: true);
             Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
@@ -1302,6 +1317,22 @@ namespace Roleplay
         {
             player.Armor = 100;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você equipou um colete.", notify: true);
+        }
+
+        private void PegarComponenteArmario(IPlayer player, uint arma, uint componente)
+        {
+            var p = Functions.ObterPersonagem(player);
+            p.Dinheiro -= Global.Parametros.ValorComponentes;
+            p.SetDinheiro();
+
+            var pArma = p.Armas.FirstOrDefault(x => x.Codigo == arma);
+            var componentes = JsonConvert.DeserializeObject<List<uint>>(pArma.Componentes);
+            componentes.Add(componente);
+            pArma.Componentes = JsonConvert.SerializeObject(componentes);
+
+            var wc = Global.WeaponComponents.FirstOrDefault(x => x.Weapon == (WeaponModel)arma && x.Hash == componente);
+            player.AddWeaponComponent(arma, componente);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você equipou {wc?.Name} na arma {(WeaponModel)arma}.", notify: true);
         }
         #endregion
     }
