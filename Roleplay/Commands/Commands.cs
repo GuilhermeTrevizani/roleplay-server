@@ -304,6 +304,7 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/ccomp", "Adiciona componentes em um armário"),
                     new Comando("Manager", "/rcomp", "Remove componentes de um armário"),
                     new Comando("Manager", "/vip", "Adiciona VIP para um usuário"),
+                    new Comando("Manager", "/ncforum", "Remove o namechange do fórum de um usuário"),
                 });
 
             var html = $@"

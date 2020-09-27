@@ -2691,6 +2691,7 @@ namespace Roleplay.Commands
             var vip = (TipoVIP)nivelVip;
             user.VIP = vip;
             user.DataExpiracaoVIP = ((user.DataExpiracaoVIP ?? DateTime.Now) > DateTime.Now ? user.DataExpiracaoVIP.Value : DateTime.Now).AddMonths(meses);
+            user.PossuiNamechange = user.PossuiNamechangeForum = true;
             context.Usuarios.Update(user);
             context.SaveChanges();
 
@@ -2699,11 +2700,45 @@ namespace Roleplay.Commands
             {
                 target.UsuarioBD.VIP = user.VIP;
                 target.UsuarioBD.DataExpiracaoVIP = user.DataExpiracaoVIP;
+                target.UsuarioBD.PossuiNamechange = target.UsuarioBD.PossuiNamechangeForum = true;
                 Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível VIP para {vip} expirando em {user.DataExpiracaoVIP}.");
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível VIP de {target.UsuarioBD.Nome} para {vip} expirando em {user.DataExpiracaoVIP}.");
             Functions.GravarLog(TipoLog.Staff, $"/vip {usuario} {vip} {meses}", p, null);
+        }
+
+        [Command("ncforum", "/ncforum (usuário)")]
+        public void CMD_ncforum(IPlayer player, int usuario)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var user = context.Usuarios.FirstOrDefault(x => x.Codigo == usuario);
+            if (user == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não existe.");
+                return;
+            }
+
+            user.PossuiNamechangeForum = false;
+            context.Usuarios.Update(user);
+            context.SaveChanges();
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Usuario == usuario);
+            if (target != null)
+            {
+                target.UsuarioBD.PossuiNamechangeForum = false;
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} debitou seu namechange do fórum.");
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você debitou o namechange do fórum de {target.UsuarioBD.Nome}.");
+            Functions.GravarLog(TipoLog.Staff, $"/ncforum {usuario}", p, null);
         }
         #endregion Staff 1337
     }
