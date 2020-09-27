@@ -51,7 +51,7 @@ namespace Roleplay
                 var staff = context.Usuarios.FirstOrDefault(x => x.Codigo == ban.UsuarioStaff)?.Nome;
                 var strBan = ban.Expiracao == null ? " permanentemente." : $". Seu banimento expira em: {ban.Expiracao?.ToString()}";
 
-                player.Emit("Server:BaseHTML", $"Você está banido{strBan}<br/>Data: <strong>{ban.Data}</strong><br/>Motivo: <strong>{ban.Motivo}</strong><br/>Staffer: <strong>{staff}</strong>");
+                player.Emit("Server:BaseHTML", GerarBaseHTML("Banimento", $"Você está banido{strBan}<br/>Data: <strong>{ban.Data}</strong><br/>Motivo: <strong>{ban.Motivo}</strong><br/>Staffer: <strong>{staff}</strong>"));
             }
 
             return false;
@@ -431,11 +431,7 @@ namespace Roleplay
 
         public static void MostrarStats(IPlayer player, Personagem p)
         {
-            var html = $@"<div class='box-header with-border'>
-                <h3>{p.NomeIC} [{p.Codigo}] ({DateTime.Now})<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            OOC: <strong>{p.UsuarioBD.Nome}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
+            var html = $@"OOC: <strong>{p.UsuarioBD.Nome}</strong> | Registro: <strong>{p.DataRegistro}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Namechange: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong><br/>
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>
             Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
@@ -456,9 +452,7 @@ namespace Roleplay
                     html += $"Código: <strong>{prop.Codigo}</strong> | Valor: <strong>${prop.Valor:N0}</strong><br/>";
             }
 
-            html += "</div>";
-
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", GerarBaseHTML($"{p.NomeIC} [{p.Codigo}] ({DateTime.Now})", html));
         }
 
         public static void EnviarMensagemCelular(Personagem p, Personagem target, string mensagem)
@@ -897,6 +891,23 @@ namespace Roleplay
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
             return new string(Enumerable.Repeat(chars, tamanho).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string GerarBaseHTML(string titulo, string body)
+        {
+            return $@"<div class='panel panel-bordered panel-primary' style='width:60%;text-align:left;display:inline-block;margin-top:3%;'>
+            <div class='panel-heading'>
+                <div class='panel-control'>
+                    <button class='btn btn-default' onclick='closeView();'>
+                        Fechar
+                    </button>
+                </div>
+                <h3 class='panel-title'>{titulo}</h3>
+            </div>
+            <div class='panel-body'>
+            {body}
+            </div>
+            </div>";
         }
     }
 }

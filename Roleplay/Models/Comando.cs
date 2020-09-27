@@ -2,7 +2,7 @@
 {
     public class Comando
     {
-        public Comando(string categoria, string nome, string descricao = "")
+        public Comando(string categoria, string nome, string descricao)
         {
             Categoria = categoria;
             Nome = nome;

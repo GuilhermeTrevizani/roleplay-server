@@ -42,12 +42,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>{p.FaccaoBD.Nome} • Membros Online<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os membros...' />
-            <br/><table class='table table-bordered table-striped'>
+            var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os membros...' /><br/>
+            <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>Rank</th>
@@ -63,16 +59,15 @@ namespace Roleplay.Commands
             var players = Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao).OrderByDescending(x => x.Rank).ThenBy(x => x.Nome);
             foreach (var x in players)
             {
-                var status = x.EmTrabalho ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
+                var status = x.EmTrabalho ? $"<span class='label' style='background-color:{Global.CorSucesso}'>EM SERVIÇO</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>FORA DE SERVIÇO</span>";
                 html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
             }
 
             html += $@"
                 </tbody>
-            </table>
-            </div>";
+            </table>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{p.FaccaoBD.Nome} • Membros Online", html));
         }
 
         [Command("blockf")]

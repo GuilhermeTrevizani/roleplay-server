@@ -713,8 +713,8 @@ namespace Roleplay.Commands
             }
         }
 
-        [Command("pixar", "/pixar (tipo [1-2])")]
-        public void CMD_pixar(IPlayer player, int tipo)
+        [Command("pichar", "/pichar (tipo [1-2])")]
+        public void CMD_pichar(IPlayer player, int tipo)
         {
             var p = Functions.ObterPersonagem(player);
             if (p == null)

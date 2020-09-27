@@ -1051,12 +1051,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>{Global.NomeServidor} • Facções<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise as facções...' />
-            <br/><table class='table table-bordered table-striped'>
+            var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise as facções...' /><br/>
+            <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -1075,10 +1071,9 @@ namespace Roleplay.Commands
 
             html += $@"
                 </tbody>
-            </table>
-            </div>";
+            </table>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • Faccções", html));
         }
 
         [Command("crank", "/crank (facção) (salário) (nome)", GreedyArg = true)]
@@ -1223,12 +1218,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>{faction.Nome} • Ranks<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os ranks...' />
-            <br/><table class='table table-bordered table-striped'>
+            var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os ranks...' /><br/>
+            <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -1243,10 +1234,9 @@ namespace Roleplay.Commands
 
             html += $@"
                 </tbody>
-            </table>
-            </div>";
+            </table>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{faction.Nome} • Ranks", html));
         }
 
         [Command("setstaff", "/setstaff (ID ou nome) (nível)")]

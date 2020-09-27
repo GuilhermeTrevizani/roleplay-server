@@ -26,12 +26,12 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/id", "Procura o ID de um personagem"),
                 new Comando("Geral", "/aceitar /ac", "Aceita um convite"),
                 new Comando("Geral", "/recusar /rc", "Recusa um convite"),
-                new Comando("Geral", "/pagar"),
-                new Comando("Geral", "/revistar"),
-                new Comando("Geral", "/multas"),
+                new Comando("Geral", "/pagar", "Transfere dinheiro da carteira para um personagem"),
+                new Comando("Geral", "/revistar", "Solicita uma revista em um personagem"),
+                new Comando("Geral", "/multas", "Visualiza suas multas pendentes"),
                 new Comando("Geral", "/comprar", "Compra um veículo, propriedade ou item"),
                 new Comando("Geral", "/skin", "Compra roupas"),
-                new Comando("Geral", "/emprego"),
+                new Comando("Geral", "/emprego", "Pega um emprego"),
                 new Comando("Geral", "/staff", "Lista os membros da staff que estão online"),
                 new Comando("Geral", "/sos", "Envia solicitação de ajuda aos administradores em serviço"),
                 new Comando("Geral", "/ferimentos", "Visualiza os ferimentos de um personagem"),
@@ -45,16 +45,16 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
                 new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
                 new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
-                new Comando("Propriedades", "/entrar"),
-                new Comando("Propriedades", "/sair"),
-                new Comando("Propriedades", "/pvender"),
-                new Comando("Chat IC", "/me"),
-                new Comando("Chat IC", "/do"),
-                new Comando("Chat IC", "/g"),
-                new Comando("Chat IC", "/baixo"),
-                new Comando("Chat IC", "/s"),
-                new Comando("Chat IC", "/ame"),
-                new Comando("Chat IC", "/ado"),
+                new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
+                new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
+                new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
+                new Comando("Chat IC", "/me", "Interpretação de ações de um personagem"),
+                new Comando("Chat IC", "/do", "Interpretação do ambiente"),
+                new Comando("Chat IC", "/g", "Grita"),
+                new Comando("Chat IC", "/baixo", "Fala baixo"),
+                new Comando("Chat IC", "/s", "Sussura"),
+                new Comando("Chat IC", "/ame", "Interpretação de ações de um personagem"),
+                new Comando("Chat IC", "/ado", "Interpretação do ambiente"),
                 new Comando("Chat OOC", "/b", "Chat OOC local"),
                 new Comando("Chat OOC", "/pm", "Chat OOC privado"),
                 new Comando("Celular", "/sms", "Envia um SMS"),
@@ -80,38 +80,38 @@ namespace Roleplay.Commands
                 new Comando("Animações", "/stopanim /sa","Para as animações"),
                 new Comando("Animações", "/crossarms", "Cruza os braços"),
                 new Comando("Animações", "/handsup /hs", "Levanta as mãos"),
-                new Comando("Animações", "/smoke"),
-                new Comando("Animações", "/lean"),
-                new Comando("Animações", "/police"),
-                new Comando("Animações", "/incar"),
-                new Comando("Animações", "/pushups"),
-                new Comando("Animações", "/situps"),
-                new Comando("Animações", "/blunt"),
-                new Comando("Animações", "/afishing"),
-                new Comando("Animações", "/acop"),
-                new Comando("Animações", "/idle"),
-                new Comando("Animações", "/barra"),
-                new Comando("Animações", "/kneel"),
-                new Comando("Animações", "/revistarc"),
-                new Comando("Animações", "/ajoelhar"),
-                new Comando("Animações", "/drink"),
-                new Comando("Animações", "/morto"),
-                new Comando("Animações", "/gsign"),
-                new Comando("Animações", "/hurry"),
-                new Comando("Animações", "/cair"),
-                new Comando("Animações", "/wsup"),
-                new Comando("Animações", "/render"),
-                new Comando("Animações", "/mirar"),
-                new Comando("Animações", "/sentar"),
-                new Comando("Animações", "/dormir"),
-                new Comando("Animações", "/pixar"),
-                new Comando("Animações", "/sexo"),
-                new Comando("Animações", "/jogado"),
-                new Comando("Animações", "/reparando"),
-                new Comando("Animações", "/luto"),
-                new Comando("Animações", "/bar"),
-                new Comando("Animações", "/necessidades"),
-                new Comando("Animações", "/meth"),
+                new Comando("Animações", "/smoke", "Fuma"),
+                new Comando("Animações", "/lean", "Encosta"),
+                new Comando("Animações", "/police", "Faz gestos policiais"),
+                new Comando("Animações", "/incar", "Faz animações dentro de um veículo"),
+                new Comando("Animações", "/pushups", "Faz flexões"),
+                new Comando("Animações", "/situps", "Faz abdominais"),
+                new Comando("Animações", "/blunt", "Fuma"),
+                new Comando("Animações", "/afishing", "Pesca"),
+                new Comando("Animações", "/acop", "Segura o cinto"),
+                new Comando("Animações", "/idle", "Fica ocioso"),
+                new Comando("Animações", "/barra", "Faz barras"),
+                new Comando("Animações", "/kneel", "Ajoelha"),
+                new Comando("Animações", "/revistarc", "Revista ajoelhado"),
+                new Comando("Animações", "/ajoelhar", "Ajoelha"),
+                new Comando("Animações", "/drink", "Segura o copo"),
+                new Comando("Animações", "/morto", "Cai no chão"),
+                new Comando("Animações", "/gsign", "Sinais com as mãos"),
+                new Comando("Animações", "/hurry", "Chama"),
+                new Comando("Animações", "/cair", "Cai"),
+                new Comando("Animações", "/wsup", "Cumprimenta"),
+                new Comando("Animações", "/render", "Rende"),
+                new Comando("Animações", "/mirar", "Mira"),
+                new Comando("Animações", "/sentar", "Senta"),
+                new Comando("Animações", "/dormir", "Dorme"),
+                new Comando("Animações", "/pichar", "Picha"),
+                new Comando("Animações", "/sexo", "Safadeza"),
+                new Comando("Animações", "/jogado", "Fica jogado no chão"),
+                new Comando("Animações", "/reparando", "Apoia em um capô"),
+                new Comando("Animações", "/luto", "Segura os pulsos"),
+                new Comando("Animações", "/bar", "Escora em um balcão"),
+                new Comando("Animações", "/necessidades", "Faz o número 2"),
+                new Comando("Animações", "/meth", "Cheira cocaína"),
                 new Comando("Animações", "/mijar", "Mija"),
                 new Comando("Rádio", "/canal", "Troca os canais de rádio"),
                 new Comando("Rádio", "/r", "Fala no canal de rádio principal"),
@@ -268,31 +268,30 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/rrank", "Remove um rank da facção"),
                     new Comando("Manager", "/ranks", "Mostra os ranks da facção"),
                     new Comando("Manager", "/lider", "Atribui o personagem como líder de uma facção"),
-                    new Comando("Manager", "/cprop"),
-                    new Comando("Manager", "/rprop"),
-                    new Comando("Manager", "/epropvalor"),
-                    new Comando("Manager", "/epropint"),
-                    new Comando("Manager", "/eproppos"),
-                    new Comando("Manager", "/irblip"),
-                    new Comando("Manager", "/irprop"),
-                    new Comando("Manager", "/cpreco"),
-                    new Comando("Manager", "/rpreco"),
-                    new Comando("Manager", "/cponto"),
-                    new Comando("Manager", "/rponto"),
-                    new Comando("Manager", "/irponto"),
-                    new Comando("Manager", "/eranksalario"),
-                    new Comando("Manager", "/carm"),
-                    new Comando("Manager", "/earmpos"),
-                    new Comando("Manager", "/earmfac"),
-                    new Comando("Manager", "/rarm"),
-                    new Comando("Manager", "/irarm"),
-                    new Comando("Manager", "/carmi"),
-                    new Comando("Manager", "/rarmi"),
-                    new Comando("Manager", "/earmimun"),
-                    new Comando("Manager", "/earminrank"),
-                    new Comando("Manager", "/earminest"),
-                    new Comando("Manager", "/irarm"),
-                    new Comando("Manager", "/eblipinativo"),
+                    new Comando("Manager", "/cprop", "Cria uma propriedade"),
+                    new Comando("Manager", "/rprop", "Remove uma propriedade"),
+                    new Comando("Manager", "/epropvalor", "Altera o valor de uma propriedade"),
+                    new Comando("Manager", "/epropint", "Altera o interior de uma propriedade"),
+                    new Comando("Manager", "/eproppos", "Altera a posição de entrada de uma propriedade"),
+                    new Comando("Manager", "/irblip", "Vai até um blip"),
+                    new Comando("Manager", "/irprop", "Vai até uma propriedade"),
+                    new Comando("Manager", "/cpreco", "Cria/edita um preço"),
+                    new Comando("Manager", "/rpreco", "Remove um preço"),
+                    new Comando("Manager", "/cponto", "Cria um ponto"),
+                    new Comando("Manager", "/rponto", "Remove um ponto"),
+                    new Comando("Manager", "/irponto", "Vai até um ponto"),
+                    new Comando("Manager", "/eranksalario", "Altera o salário de um rank"),
+                    new Comando("Manager", "/carm", "Cria um armário"),
+                    new Comando("Manager", "/earmpos", "Altera a posição de um armário"),
+                    new Comando("Manager", "/earmfac", "Altera a facção de um armário"),
+                    new Comando("Manager", "/rarm", "Remove um armário"),
+                    new Comando("Manager", "/carmi", "Adiciona uma arma em um armário"),
+                    new Comando("Manager", "/rarmi", "Remove uma arma de um armário"),
+                    new Comando("Manager", "/earmimun", "Altera a munição de uma arma no armário"),
+                    new Comando("Manager", "/earminrank", "Altera o rank de uma arma no armário"),
+                    new Comando("Manager", "/earminest", "Altera o estoque de uma arma no armário"),
+                    new Comando("Manager", "/irarm", "Vai até um armário"),
+                    new Comando("Manager", "/eblipinativo", "Ativa/desativa um blip"),
                     new Comando("Manager", "/cveh", "Cria um veículo"),
                     new Comando("Manager", "/rveh", "Remove um veículo"),
                     new Comando("Manager", "/evehcor", "Edita as cores de um veículo"),
@@ -306,12 +305,10 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/rcomp", "Remove componentes de um armário"),
                 });
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>Lista de Comandos<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os comandos...' />
-            <br/><table class='table table-bordered table-striped'>
+            var html = $@"
+            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os comandos...' /><br/>
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+                <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>Categoria</th>
@@ -330,7 +327,7 @@ namespace Roleplay.Commands
             </table>
             </div>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • Lista de Comandos", html));
         }
 
         [Command("stats")]
@@ -897,12 +894,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>{Global.NomeServidor} • Staff Online<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os staffers...' />
-            <br/><table class='table table-bordered table-striped'>
+            var html = $@"<table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>Rank</th>
@@ -914,16 +906,13 @@ namespace Roleplay.Commands
 
             foreach (var x in players)
             {
-                var status = x.EmTrabalhoAdministrativo ? "<span style='color:#6EB469'>EM SERVIÇO</span>" : "<span style='color:#FF6A4D'>FORA DE SERVIÇO</span>";
-                html += $@"<tr class='pesquisaitem'><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td>{status}</td></tr>";
+                var status = x.EmTrabalhoAdministrativo ? $"<span class='label' style='background-color:{Global.CorSucesso}'>EM SERVIÇO</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>FORA DE SERVIÇO</span>";
+                html += $@"<tr><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td>{status}</td></tr>";
             }
 
-            html += $@"
-                </tbody>
-            </table>
-            </div>";
+            html += $@"</tbody></table>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • Staff Online", html));
         }
 
         [Command("sos", "/sos (mensagem)", GreedyArg = true)]
@@ -988,11 +977,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<div class='box-header with-border'>
-                <h3>Ferimentos de {target.NomeIC}<span onclick='closeView()' class='pull-right label label-danger'>X</span></h3> 
-            </div>
-            <div class='box-body'>
-            <table class='table table-bordered table-striped'>
+            var html = $@"<table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>Data</th>
@@ -1010,10 +995,9 @@ namespace Roleplay.Commands
 
             html += $@"
                 </tbody>
-            </table>
-            </div>";
+            </table>";
 
-            player.Emit("Server:BaseHTML", html);
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.NomeIC}", html));
         }
 
         [Command("aceitartratamento")]

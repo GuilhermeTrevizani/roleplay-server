@@ -60,29 +60,6 @@ namespace Roleplay
             p.SetClothes(slot, drawable, texture);
         }
 
-        [Command("wc")]
-        public void CMD_wc(IPlayer player, string arma, string componente)
-        {
-            var wep = Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().FirstOrDefault(x => x.ToString().ToLower() == arma.ToLower());
-            if (wep == 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {arma} não existe.");
-                return;
-            }
-
-            var comp = Global.WeaponComponents.FirstOrDefault(x => x.Name.ToLower() == componente.ToLower() && x.Weapon == wep);
-            if (comp == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Componente {componente} não existe para a arma {wep}.");
-                return;
-            }
-
-            player.AddWeaponComponent(wep, comp.Hash);
-
-            var preco = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Armas && x.Nome.ToLower() == wep.ToString().ToLower());
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, JsonConvert.SerializeObject(preco));
-        }
-
         [Command("anim")]
         public void CMD_anim(IPlayer player, string dic, string name)
         {
