@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay;
 using Roleplay.Models;
@@ -50,8 +51,11 @@ namespace RoleplayBOT
 
                 if (user.Staff == TipoStaff.Nenhum)
                     return ReplyAsync($"Você não é da staff. :thinking:");
-                
-                var app = context.Personagens.FirstOrDefault(x => x.UsuarioStaffAvaliador == 0);
+
+                var app = context.Personagens.FromSqlRaw(@"SELECT per.* FROM Personagens per
+                INNER JOIN Usuarios usu ON per.Usuario = usu.Codigo
+                WHERE per.UsuarioStaffAvaliador = 0
+                ORDER BY usu.VIP DESC").FirstOrDefault();
                 if (app == null)
                     return ReplyAsync("Não temos aplicações aguardando avaliação. :smiling_face_with_3_hearts:");
 
