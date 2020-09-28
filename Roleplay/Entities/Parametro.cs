@@ -13,5 +13,6 @@
         public int ValorRoupas { get; set; } = 0;
         public int ValorLicencaMotorista { get; set; } = 0;
         public int ValorComponentes { get; set; } = 0;
+        public int ValorCombustivel { get; set; } = 0;
     }
 }

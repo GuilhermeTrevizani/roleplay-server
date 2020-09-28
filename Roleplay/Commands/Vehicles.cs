@@ -1,5 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
+using AltV.Net.Enums;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -22,6 +23,12 @@ namespace Roleplay.Commands
             if (veh.Personagem != p.Codigo && (veh.Faccao != p.Faccao || veh.Faccao == 0))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
+                return;
+            }
+
+            if (veh.Combustivel == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não possui combustível.");
                 return;
             }
 
@@ -162,7 +169,8 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Veiculos
-                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Global.DistanciaRP)
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(x.Vehicle.Position) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension)
                 .OrderBy(x => player.Position.Distance(x.Vehicle.Position))
                 .FirstOrDefault();
 
@@ -263,7 +271,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension
+                && x.Vehicle.LockState == VehicleLockState.Unlocked)
                 .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
                 .FirstOrDefault();
 
@@ -281,7 +291,9 @@ namespace Roleplay.Commands
         [Command("capo")]
         public void CMD_capo(IPlayer player)
         {
-            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension
+                && x.Vehicle.LockState == VehicleLockState.Unlocked)
                 .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
                 .FirstOrDefault();
 
@@ -298,7 +310,9 @@ namespace Roleplay.Commands
         [Command("portamalas")]
         public void CMD_portamalas(IPlayer player)
         {
-            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension
+                && x.Vehicle.LockState == VehicleLockState.Unlocked)
                 .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
                 .FirstOrDefault();
 
@@ -310,6 +324,36 @@ namespace Roleplay.Commands
 
             veh.StatusPortas[5] = !veh.StatusPortas[5];
             player.Emit("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
+        }
+
+        [Command("abastecer")]
+        public void CMD_abastecer(IPlayer player)
+        {
+            if (player.IsInVehicle)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você deve estar fora do veículo.");
+                return;
+            }
+
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension
+                && x.Vehicle.LockState == VehicleLockState.Unlocked)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            if (veh.Combustivel == veh.TanqueCombustivel)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está com tanque cheio.");
+                return;
+            }
+
+            player.Emit("Server:Abastecer", veh.Codigo);
         }
     }
 }

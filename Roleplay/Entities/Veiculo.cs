@@ -2,8 +2,11 @@
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Roleplay.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Roleplay.Entities
 {
@@ -30,10 +33,16 @@ namespace Roleplay.Entities
         public int EngineHealth { get; set; } = 1000;
         public int Livery { get; set; } = 0;
         public int ValorApreensao { get; set; } = 0;
-        public int Combustivel { get; set; } = 100;
+        public int Combustivel { get; set; } = 0;
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }
+
+        /// <summary>
+        /// Nome do personagem que usou o /fspawn
+        /// </summary>
+        [NotMapped]
+        public string NomeEncarregado { get; set; }
 
         /// <summary>
         /// TRUE: FECHADA
@@ -46,11 +55,28 @@ namespace Roleplay.Entities
         [NotMapped]
         public List<bool> StatusPortas { get; set; } = new List<bool> { true, true, true, true, true, true };
 
-        /// <summary>
-        /// Nome do personagem que usou o /fspawn
-        /// </summary>
         [NotMapped]
-        public string NomeEncarregado { get; set; }
+        public int TanqueCombustivel { get; set; } = 100;
+
+        [NotMapped]
+        public string CombustivelHUD
+        {
+            get
+            {
+                var combustivel = "COMBUSTÍVEL: ";
+                var porcentagem = Convert.ToInt32(Convert.ToDecimal(Combustivel) / Convert.ToDecimal(TanqueCombustivel) * 100);
+                if (porcentagem > 50)
+                    combustivel += "~g~";
+                else if (porcentagem > 20)
+                    combustivel += "~o~";
+                else
+                    combustivel += "~r~";
+                return $"{combustivel}{porcentagem}%";
+            }
+        }
+
+        [NotMapped]
+        public VehicleInfo Info { get => Global.VehicleInfos.FirstOrDefault(x => x.Name.ToLower() == Modelo.ToLower()); }
 
         public void Spawnar()
         {
@@ -63,6 +89,8 @@ namespace Roleplay.Entities
             Vehicle.PrimaryColorRgb = new Rgba((byte)Cor1R, (byte)Cor1G, (byte)Cor1B, 255);
             Vehicle.SecondaryColorRgb = new Rgba((byte)Cor2R, (byte)Cor2G, (byte)Cor2B, 255);
             Vehicle.Livery = (byte)Livery;
+            if (!Global.VeiculosSemCombustivel.Contains(Info?.Class ?? string.Empty))
+                Vehicle.SetSyncedMetaData("combustivel", CombustivelHUD);
             Global.Veiculos.Add(this);
         }
 

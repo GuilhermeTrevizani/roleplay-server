@@ -2277,6 +2277,7 @@ namespace Roleplay.Commands
                 Cor2B = b2,
                 Modelo = modelo,
             };
+            veiculo.Combustivel = veiculo.TanqueCombustivel;
 
             using (var context = new DatabaseContext())
             {

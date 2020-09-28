@@ -29,6 +29,7 @@ namespace Roleplay
             Alt.OnPlayerDead += OnPlayerDead;
             Alt.OnWeaponDamage += OnWeaponDamage;
             Alt.OnPlayerDamage += OnPlayerDamage;
+            Alt.OnPlayerEnterVehicle += OnPlayerEnterVehicle;
             Alt.OnClient<IPlayer, string>("OnPlayerChat", OnPlayerChat);
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
             Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
@@ -61,6 +62,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, uint, uint>("PegarComponenteArmario", PegarComponenteArmario);
             Alt.OnClient<IPlayer, int>("LigarContatoCelular", LigarContatoCelular);
             Alt.OnClient<IPlayer, int>("EnviarLocalizacaoContatoCelular", EnviarLocalizacaoContatoCelular);
+            Alt.OnClient<IPlayer, int>("AbastecerVeiculo", AbastecerVeiculo);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -68,6 +70,7 @@ namespace Roleplay
             var config = JsonConvert.DeserializeObject<Configuracao>(File.ReadAllText("settings.json"));
             Global.MaxPlayers = config.MaxPlayers;
             Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
+            Global.VehicleInfos = JsonConvert.DeserializeObject<List<VehicleInfo>>(File.ReadAllText("vehicles.json"));
 
             using (var context = new DatabaseContext())
             {
@@ -147,6 +150,11 @@ namespace Roleplay
             TimerPrincipal = new Timer(60000);
             TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
             TimerPrincipal.Start();
+        }
+
+        private void OnPlayerEnterVehicle(IVehicle vehicle, IPlayer player, byte seat)
+        {
+            player.Emit("vehicle:setVehicleEngineOn", vehicle, vehicle.EngineOn);
         }
 
         public override void OnStop()
@@ -372,8 +380,20 @@ namespace Roleplay
 
         private void TimerPrincipal_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
-                Functions.SalvarPersonagem(p);
+            foreach (var x in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
+                Functions.SalvarPersonagem(x);
+
+            foreach (var x in Global.Veiculos.Where(x => x.Vehicle.EngineOn && x.Combustivel > 0 && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty)))
+            {
+                x.Combustivel--;
+                x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
+                if (x.Combustivel == 0)
+                {
+                    x.Vehicle.EngineOn = false;
+                    if (x.Vehicle.Driver != null)
+                        x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                }
+            }
         }
 
         #region Server
@@ -863,6 +883,7 @@ namespace Roleplay
                 RotY = concessionaria.RotacaoSpawn.Y,
                 RotZ = concessionaria.RotacaoSpawn.Z,
             };
+            veh.Combustivel = veh.TanqueCombustivel;
 
             using (var context = new DatabaseContext())
             {
@@ -1343,6 +1364,27 @@ namespace Roleplay
         private void LigarContatoCelular(IPlayer player, int celular) => Functions.LigarCelular(player, celular.ToString());
 
         private void EnviarLocalizacaoContatoCelular(IPlayer player, int celular) => Functions.EnviarLocalizacaoCelular(player, celular.ToString());
+
+        private void AbastecerVeiculo(IPlayer player, int veiculo)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
+
+            var combustivelNecessario = veh.TanqueCombustivel - veh.Combustivel;
+            var valor = combustivelNecessario * Global.Parametros.ValorCombustivel;
+            if (valor > p.Dinheiro)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
+                return;
+            }
+
+            veh.Combustivel = veh.TanqueCombustivel;
+
+            p.Dinheiro -= valor;
+            p.SetDinheiro();
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+        }
         #endregion
     }
 }

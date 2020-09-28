@@ -645,5 +645,9 @@ namespace Roleplay
         public static IVoiceChannel GlobalVoice { get; set; }
 
         public static List<ArmarioComponente> ArmariosComponentes { get; set; } = new List<ArmarioComponente>();
+
+        public static List<string> VeiculosSemCombustivel { get; set; } = new List<string> { "BOAT", "CYCLE", "PLANE", "HELICOPTER", "TRAILER", "TRAINS" };
+
+        public static List<VehicleInfo> VehicleInfos { get; set; } = new List<VehicleInfo>();
     }
 }
