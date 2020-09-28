@@ -642,10 +642,10 @@ namespace Roleplay.Commands
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.Nome}.", notify: true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} curou você.", notify: true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você reviveu {target.Nome}.", notify: true);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);
 
-            Functions.GravarLog(TipoLog.Staff, $"/acurar", p, target);
+            Functions.GravarLog(TipoLog.Staff, $"/reviver", p, target);
         }
 
         [Command("bloquearnc", "/bloquearnc (ID ou nome)")]
