@@ -911,5 +911,165 @@ namespace Roleplay
             </div>
             </div>";
         }
+
+        public static void LigarCelular(IPlayer player, string numeroNomeContato)
+        {
+            player.Emit("Server:CloseView");
+
+            var p = ObterPersonagem(player);
+            if ((p?.Celular ?? 0) == 0)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
+                return;
+            }
+
+            if (p.Algemado)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
+                return;
+            }
+
+            if (p.NumeroLigacao > 0 || Global.PersonagensOnline.Any(x => x.NumeroLigacao == p.Celular))
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você está em uma ligação.");
+                return;
+            }
+
+            int.TryParse(numeroNomeContato, out int numero);
+            if (numero == 0)
+                numero = p.Contatos.FirstOrDefault(x => x.Nome.ToLower().Contains(numeroNomeContato.ToLower()))?.Celular ?? 0;
+
+            if (numero == p.Celular)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode ligar para você mesmo.");
+                return;
+            }
+
+            if (numero == 911)
+            {
+                p.NumeroLigacao = numero;
+                p.StatusLigacao = TipoStatusLigacao.EmLigacao;
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de emergência, deseja falar com PD, FD ou PDFD?", Global.CorCelular);
+                return;
+            }
+
+            if (numero == 5555555)
+            {
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+                if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Taxista && x.EmTrabalho) == 0)
+                {
+                    EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Global.CorCelular);
+                    return;
+                }
+
+                p.NumeroLigacao = numero;
+                p.StatusLigacao = TipoStatusLigacao.EmLigacao;
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Downtown Cab Company, para onde deseja ir?", Global.CorCelular);
+                return;
+            }
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
+            if (target == null)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível.");
+                return;
+            }
+
+            if (target.NumeroLigacao > 0 || Global.PersonagensOnline.Any(x => x.NumeroLigacao == target.Celular))
+            {
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} está ocupado.", Global.CorCelularSecundaria);
+                return;
+            }
+
+            p.NumeroLigacao = numero;
+            p.StatusLigacao = TipoStatusLigacao.Nenhum;
+            p.TimerCelular = new TagTimer(8000)
+            {
+                Tag = p.Codigo,
+            };
+            p.TimerCelular.Elapsed += TimerCelular_Elapsed;
+            p.TimerCelular.Start();
+            EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+            EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Global.CorCelularSecundaria);
+            SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
+        }
+
+        private static void TimerCelular_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var timer = (TagTimer)sender;
+            timer.ElapsedCount++;
+            var p = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == (int)timer.Tag);
+            if (p == null)
+            {
+                timer?.Stop();
+                return;
+            }
+
+            if (timer.ElapsedCount == 5)
+            {
+                EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu após tocar 5 vezes.", Global.CorCelularSecundaria);
+                p.LimparLigacao();
+                return;
+            }
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == p.NumeroLigacao);
+            if (target == null)
+            {
+                EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {p.ObterNomeContato(p.NumeroLigacao)} caiu.", Global.CorCelularSecundaria);
+                p.LimparLigacao();
+                return;
+            }
+
+            EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(p.Celular)}. (/at ou /des)", Global.CorCelularSecundaria);
+            SendMessageToNearbyPlayers(target.Player, $"O celular de {target.NomeIC} está tocando.", TipoMensagemJogo.Do, 5, true);
+        }
+
+        public static void EnviarLocalizacaoCelular(IPlayer player, string numeroNomeContato)
+        {
+            player.Emit("Server:CloseView");
+
+            var p = ObterPersonagem(player);
+            if ((p?.Celular ?? 0) == 0)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
+                return;
+            }
+
+            if (p.Algemado)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar o celular agora.");
+                return;
+            }
+
+            int.TryParse(numeroNomeContato, out int numero);
+            if (numero == 0)
+                numero = p.Contatos.FirstOrDefault(x => x.Nome.ToLower().Contains(numeroNomeContato.ToLower()))?.Celular ?? 0;
+
+            if (numero == p.Celular)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode enviar uma localização para você mesmo.");
+                return;
+            }
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
+            if (target == null)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Número indisponível.");
+                return;
+            }
+
+            var convite = new Convite()
+            {
+                Tipo = TipoConvite.LocalizacaoCelular,
+                Personagem = p.Codigo,
+                Valor = new string[] { p.PosicaoIC.X.ToString(), p.PosicaoIC.Y.ToString() },
+            };
+            target.Convites.RemoveAll(x => x.Tipo == TipoConvite.LocalizacaoCelular);
+            target.Convites.Add(convite);
+
+            EnviarMensagem(player, TipoMensagem.Sucesso, $"Você solicitou o envio de uma localização para {target.Nome}.");
+            EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"Solicitou enviar uma localização para você. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
+        }
     }
 }

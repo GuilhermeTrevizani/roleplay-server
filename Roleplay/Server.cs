@@ -59,6 +59,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
             Alt.OnClient<IPlayer>("EquiparColeteArmario", EquiparColeteArmario);
             Alt.OnClient<IPlayer, uint, uint>("PegarComponenteArmario", PegarComponenteArmario);
+            Alt.OnClient<IPlayer, int>("LigarContatoCelular", LigarContatoCelular);
+            Alt.OnClient<IPlayer, int>("EnviarLocalizacaoContatoCelular", EnviarLocalizacaoContatoCelular);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -824,20 +826,20 @@ namespace Roleplay
 
             if (string.IsNullOrWhiteSpace(veiculo))
             {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Verifique se todos os campos foram preenchidos corretamente.", notify: true);
                 return;
             }
 
             var preco = Global.Precos.FirstOrDefault(x => x.Tipo == (TipoPreco)tipo && x.Nome.ToLower() == veiculo.ToLower());
             if (preco == null)
             {
-                player.Emit("Server:MostrarErro", "Veículo não está disponível para compra.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está disponível para compra.", notify: true);
                 return;
             }
 
             if (p.Dinheiro < preco.Valor)
             {
-                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.", notify: true);
                 return;
             }
 
@@ -878,13 +880,11 @@ namespace Roleplay
         private void ComprarConveniencia(IPlayer player, string nome)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-                return;
 
             var preco = Global.Precos.FirstOrDefault(x => x.Nome == nome && x.Tipo == TipoPreco.Conveniencia);
             if (p.Dinheiro < preco.Valor)
             {
-                player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.", notify: true);
                 return;
             }
 
@@ -892,9 +892,9 @@ namespace Roleplay
             switch (nome)
             {
                 case "Celular":
-                    if (p?.Celular > 0)
+                    if (p.Celular > 0)
                     {
-                        player.Emit("Server:MostrarErro", "Você já possui um celular.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um celular.", notify: true);
                         return;
                     }
 
@@ -915,9 +915,9 @@ namespace Roleplay
                     strMensagem = $"Você comprou um celular! Seu número é: {p.Celular}.";
                     break;
                 case "Rádio Comunicador":
-                    if (p?.CanalRadio > -1)
+                    if (p.CanalRadio > -1)
                     {
-                        player.Emit("Server:MostrarErro", "Você já possui um rádio comunicador.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um rádio comunicador.", notify: true);
                         return;
                     }
 
@@ -929,7 +929,7 @@ namespace Roleplay
                     break;
             }
 
-            player.Emit("Server:MostrarSucesso", strMensagem);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, strMensagem, notify: true);
         }
 
         private void AdicionarContatoCelular(IPlayer player, string nome, int celular)
@@ -940,13 +940,13 @@ namespace Roleplay
 
             if (string.IsNullOrWhiteSpace(nome) || celular == 0)
             {
-                player.Emit("Server:MostrarErro", "Verifique se os campos foram preenchidos corretamente.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Verifique se os campos foram preenchidos corretamente.", notify: true);
                 return;
             }
 
             if (nome.Length > 25)
             {
-                player.Emit("Server:MostrarErro", "Nome não pode ter mais que 25 caracteres.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Nome não pode ter mais que 25 caracteres.", notify: true);
                 return;
             }
 
@@ -958,12 +958,14 @@ namespace Roleplay
                     Nome = nome,
                     Celular = celular
                 });
-                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} adicionado com sucesso.");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Contato {celular} adicionado.", notify: true);
+                player.Emit("Server:AtualizarCelular", p.Celular, JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()));
             }
             else
             {
                 contato.Nome = nome;
-                player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Contato {celular} editado com sucesso.");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Contato {celular} editado.", notify: true);
+                player.Emit("Server:AtualizarCelular", p.Celular, JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()));
             }
         }
 
@@ -974,21 +976,19 @@ namespace Roleplay
                 return;
 
             p.Contatos.RemoveAll(x => x.Celular == celular);
-            player.Emit("Server:AtualizarCelular", JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()), $"Celular {celular} removido dos contatos.");
+            player.Emit("Server:AtualizarCelular", p.Celular, JsonConvert.SerializeObject(p.Contatos.OrderBy(x => x.Nome).ToList()));
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Contato {celular} removido.", notify: true);
         }
 
         private void PagarMulta(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-                return;
-
             using (var context = new DatabaseContext())
             {
                 var multa = context.Multas.FirstOrDefault(x => x.Codigo == codigo);
                 if (p.Dinheiro < multa.Valor)
                 {
-                    player.Emit("Server:MostrarErro", "Você não possui dinheiro suficiente.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${multa.Valor:N0}).", notify: true);
                     return;
                 }
 
@@ -1274,7 +1274,7 @@ namespace Roleplay
             context.Usuarios.Update(user);
             context.SaveChanges();
 
-            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada com sucesso.");
+            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
         }
 
         private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, bool barbearia, bool sucesso)
@@ -1339,6 +1339,10 @@ namespace Roleplay
             player.AddWeaponComponent(arma, componente);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você equipou {wc?.Name} na arma {(WeaponModel)arma}.", notify: true);
         }
+
+        private void LigarContatoCelular(IPlayer player, int celular) => Functions.LigarCelular(player, celular.ToString());
+
+        private void EnviarLocalizacaoContatoCelular(IPlayer player, int celular) => Functions.EnviarLocalizacaoCelular(player, celular.ToString());
         #endregion
     }
 }
