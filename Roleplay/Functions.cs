@@ -269,8 +269,6 @@ namespace Roleplay
             if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
                 return;
 
-            p.Player.SetDateTime(DateTime.Now);
-
             var armas = (p.StringArmas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => new Personagem.Arma()
                 {
@@ -280,47 +278,6 @@ namespace Roleplay
 
             foreach (var x in p.Armas)
                 x.Municao = armas.FirstOrDefault(y => y.Codigo == x.Codigo)?.Municao ?? 0;
-
-            var dif = DateTime.Now - p.DataUltimaVerificacao;
-            if (dif.TotalMinutes >= 1)
-            {
-                p.TempoConectado++;
-                p.DataUltimaVerificacao = DateTime.Now;
-
-                if (p.TempoConectado % 60 == 0)
-                {
-                    var temIncentivoInicial = false;
-                    var salario = 0;
-                    if (p.Faccao > 0)
-                        salario += p.RankBD.Salario;
-                    else if (p.Emprego > 0)
-                        salario += Global.Parametros.ValorIncentivoGovernamental;
-
-                    if (Convert.ToInt32(p.TempoConectado / 60) <= Global.Parametros.HorasIncentivoInicial)
-                    {
-                        temIncentivoInicial = true;
-                        salario += Global.Parametros.ValorIncentivoInicial;
-                    }
-
-                    p.Banco += salario;
-                    if (salario > 0)
-                    {
-                        EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado no banco.");
-
-                        if (p.Faccao > 0 && p.RankBD.Salario > 0)
-                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Facção: ${p.RankBD.Salario:N0}");
-
-                        if (p.Emprego > 0)
-                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Governamental: ${Global.Parametros.ValorIncentivoGovernamental:N0}");
-
-                        if (temIncentivoInicial)
-                            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Inicial: ${Global.Parametros.ValorIncentivoInicial:N0}");
-                    }
-                }
-
-                if (p.EmTrabalhoAdministrativo)
-                    p.UsuarioBD.TempoTrabalhoAdministrativo++;
-            }
 
             if (!online && p.Celular > 0)
             {
@@ -436,7 +393,7 @@ namespace Roleplay
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>";
 
             if (p.Player != null)
-                html += $@"Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{p.Player.Health - 100}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
+                html += $@"Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{(p.Player.Health > 100 ? p.Player.Health - 100 : p.Player.Health)}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
 
             if (p.UsuarioBD.Staff > 0)
                 html += $"Staff: <strong>{ObterDisplayEnum(p.UsuarioBD.Staff)} [{(int)p.UsuarioBD.Staff}]</strong> | Tempo Serviço Administrativo (minutos): <strong>{p.UsuarioBD.TempoTrabalhoAdministrativo}</strong> | SOSs Aceitos: <strong>{p.UsuarioBD.QuantidadeSOSAceitos}</strong><br/>";

@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -129,20 +130,6 @@ namespace Roleplay.Commands
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum && !x.UsuarioBD.TogChatStaff))
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {Functions.ObterDisplayEnum(p.UsuarioBD.Staff)} {p.UsuarioBD.Nome}: {mensagem} ))", "#33EE33");
-        }
-
-        [Command("o", "/o (mensagem)", GreedyArg = true)]
-        public void CMD_o(IPlayer player, string mensagem)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            foreach (var pl in Global.PersonagensOnline)
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {p.UsuarioBD.Nome}: {mensagem} ))", "#AAC4E5");
         }
 
         [Command("kick", "/kick (ID ou nome) (motivo)", GreedyArg = true)]
@@ -352,8 +339,8 @@ namespace Roleplay.Commands
         #endregion Staff 1
 
         #region Game Administrator
-        [Command("colete", "/colete (ID ou nome) (colete)")]
-        public void CMD_colete(IPlayer player, string idNome, int colete)
+        [Command("o", "/o (mensagem)", GreedyArg = true)]
+        public void CMD_o(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
@@ -362,20 +349,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (colete < 1 || colete > 100)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Colete deve ser entre 1 e 100.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            target.Player.Armor = (ushort)colete;
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu colete para {colete}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o colete de {target.Nome} para {colete}.");
-            Functions.GravarLog(TipoLog.Staff, $"/colete {colete}", p, target);
+            foreach (var pl in Global.PersonagensOnline)
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {p.UsuarioBD.Nome}: {mensagem} ))", "#AAC4E5");
         }
 
         [Command("checar", "/checar (ID ou nome)")]
@@ -638,7 +613,7 @@ namespace Roleplay.Commands
             }
             target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
-            target.Player.Health = 200;
+            target.Player.Health = target.Player.MaxHealth;
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
 
@@ -2235,8 +2210,8 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/earmiest {armario} {item.Arma} {estoque}", p, null);
         }
 
-        [Command("cveh", "/cveh (modelo) (facção) (r1) (g1) (b1) (r2) (g2) (b2)")]
-        public void CMD_cveh(IPlayer player, string modelo, int faccao, int r1, int g1, int b1, int r2, int g2, int b2)
+        [Command("cveh", "/cveh (modelo) (facção)")]
+        public void CMD_cveh(IPlayer player, string modelo, int faccao)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
@@ -2269,12 +2244,6 @@ namespace Roleplay.Commands
                 RotZ = player.Rotation.Yaw,
                 Faccao = faccao,
                 Placa = Functions.GerarPlacaVeiculo(),
-                Cor1R = r1,
-                Cor1G = g1,
-                Cor1B = b1,
-                Cor2R = r2,
-                Cor2G = g2,
-                Cor2B = b2,
                 Modelo = modelo,
             };
             veiculo.Combustivel = veiculo.TanqueCombustivel;
@@ -2286,7 +2255,7 @@ namespace Roleplay.Commands
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
-            Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
+            Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao}", p, null);
         }
 
         [Command("rveh", "/rveh (código)")]
@@ -2793,6 +2762,69 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você debitou o namechange do fórum de {target.UsuarioBD.Nome}.");
             Functions.GravarLog(TipoLog.Staff, $"/ncforum {usuario}", p, null);
+        }
+
+        [Command("eponto", "/eponto (código)")]
+        public void CMD_eponto(IPlayer player, int codigo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Codigo == codigo);
+            if (ponto == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Ponto {codigo} não existe.");
+                return;
+            }
+
+            if (ponto.Tipo != TipoPonto.Entrada)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Somente pontos de entrada podem ser editados.");
+                return;
+            }
+
+            ponto.Configuracoes = JsonConvert.SerializeObject(player.Position);
+
+            using (var context = new DatabaseContext())
+            {
+                context.Pontos.Update(ponto);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Ponto {ponto.Codigo} editado.");
+            Functions.GravarLog(TipoLog.Staff, $"/eponto {ponto.Codigo}", p, null);
+        }
+
+        [Command("jetpack")]
+        public void CMD_jetpack(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            if (player.IsInVehicle)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando em um veículo.");
+                return;
+            }
+
+            if (player.Dimension != 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando em outra dimensão.");
+                return;
+            }
+
+            var veh = Alt.CreateVehicle(VehicleModel.Thruster, player.Position, player.Rotation);
+            veh.ManualEngineControl = false;
+            veh.EngineOn = true;
+            player.Emit("setPedIntoVehicle", veh, -1);
         }
         #endregion Staff 1337
     }

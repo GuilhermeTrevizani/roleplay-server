@@ -219,7 +219,6 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/trazer", "Traz um personagem"),
                     new Comando("Moderator", "/tp", "Teleporta um personagem para outro"),
                     new Comando("Moderator", "/vw", "Altera o VW de um personagem"),
-                    new Comando("Moderator", "/o", "Chat OOC Global"),
                     new Comando("Moderator", "/a", "Chat administrativo"),
                     new Comando("Moderator", "/kick", "Expulsa um personagem"),
                     new Comando("Moderator", "/irveh", "Vai a um veículo"),
@@ -233,7 +232,7 @@ namespace Roleplay.Commands
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
                 listaComandos.AddRange(new List<Comando>()
                 {
-                    new Comando("Game Administrator", "/colete", "Altera o colete de um personagem"),
+                    new Comando("Game Administrator", "/o", "Chat OOC Global"),
                     new Comando("Game Administrator", "/checar", "Checa as informações de um personagem online"),
                     new Comando("Game Administrator", "/checaroff", "Checa as informações de um personagem offline"),
                     new Comando("Game Administrator", "/ban", "Bane um usuário"),
@@ -308,6 +307,8 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/rcomp", "Remove componentes de um armário"),
                     new Comando("Manager", "/vip", "Adiciona VIP para um usuário"),
                     new Comando("Manager", "/ncforum", "Remove o namechange do fórum de um usuário"),
+                    new Comando("Manager", "/eponto", "Edita um ponto"),
+                    new Comando("Manager", "/jetpack", "Cria um jetpack"),
                 });
 
             var html = $@"
@@ -1030,7 +1031,7 @@ namespace Roleplay.Commands
             p.Ferimentos = new List<Personagem.Ferimento>();
             player.Emit("Server:CurarPersonagem");
             player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
-            player.Health = 200;
+            player.Health = player.MaxHealth;
 
             p.Banco -= Global.Parametros.ValorCustosHospitalares;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o tratamento e foi levado para o hospital. Os custos hospitalares foram ${Global.Parametros.ValorCustosHospitalares:N0}.");

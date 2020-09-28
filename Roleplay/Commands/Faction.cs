@@ -27,7 +27,7 @@ namespace Roleplay.Commands
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Chat da facção está bloqueado.");
                 return;
             }
-            
+
             if (p.UsuarioBD.TogChatFaccao)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está com o chat da facção desabilitado.");
@@ -514,9 +514,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome, 
-                JsonConvert.SerializeObject(itens), JsonConvert.SerializeObject(componentes), 
-                p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial, 
+            player.Emit("Server:AbrirArmario", armario.Codigo, p.FaccaoBD.Nome,
+                JsonConvert.SerializeObject(itens), JsonConvert.SerializeObject(componentes),
+                p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica, p.FaccaoBD.Tipo == TipoFaccao.Policial,
                 $"${Global.Parametros.ValorComponentes:N0}");
         }
 
@@ -548,7 +548,7 @@ namespace Roleplay.Commands
             }
             target.Ferimentos = new List<Personagem.Ferimento>();
             target.Player.Emit("Server:CurarPersonagem");
-            target.Player.Health = 200;
+            target.Player.Health = target.Player.MaxHealth;
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
 
@@ -762,6 +762,7 @@ namespace Roleplay.Commands
             }
 
             player.Emit("Server:AbrirMDC", p.FaccaoBD.Nome);
+            Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
         }
 
         [Command("tac", "/tac (canal [0-5])", Alias = "t")]

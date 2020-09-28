@@ -68,6 +68,10 @@ namespace Roleplay.Entities
                     nome = "DMV";
                     descricao = $"Use /dmv para comprar ou renovar sua licença de motorista";
                     break;
+                case TipoPonto.Entrada:
+                    nome = "Entrada";
+                    descricao = "Use /entrar";
+                    break;
             }
 
             TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);

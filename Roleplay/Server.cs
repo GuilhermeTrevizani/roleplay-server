@@ -20,7 +20,8 @@ namespace Roleplay
 {
     public class Server : AsyncResource
     {
-        Timer TimerPrincipal { get; set; }
+        Timer TimerSegundo { get; set; }
+        Timer TimerSalvar { get; set; }
 
         public override void OnStart()
         {
@@ -30,6 +31,7 @@ namespace Roleplay
             Alt.OnWeaponDamage += OnWeaponDamage;
             Alt.OnPlayerDamage += OnPlayerDamage;
             Alt.OnPlayerEnterVehicle += OnPlayerEnterVehicle;
+            Alt.OnPlayerLeaveVehicle += OnPlayerLeaveVehicle;
             Alt.OnClient<IPlayer, string>("OnPlayerChat", OnPlayerChat);
             Alt.OnClient<IPlayer, string, string, string, string>("RegistrarUsuario", RegistrarUsuario);
             Alt.OnClient<IPlayer, string, string>("EntrarUsuario", EntrarUsuario);
@@ -147,9 +149,25 @@ namespace Roleplay
 
             Global.GlobalVoice = Alt.CreateVoiceChannel(false, 10);
 
-            TimerPrincipal = new Timer(60000);
-            TimerPrincipal.Elapsed += TimerPrincipal_Elapsed;
-            TimerPrincipal.Start();
+            TimerSegundo = new Timer(1000);
+            TimerSegundo.Elapsed += TimerSegundo_Elapsed;
+            TimerSegundo.Start();
+
+            TimerSalvar = new Timer(60000);
+            TimerSalvar.Elapsed += TimerSalvar_Elapsed;
+            TimerSalvar.Start();
+        }
+
+        private void OnPlayerLeaveVehicle(IVehicle vehicle, IPlayer player, byte seat)
+        {
+            if (vehicle.Model == (uint)VehicleModel.Thruster)
+            {
+                AltAsync.Do(async () =>
+                {
+                    await Task.Delay(5000);
+                    vehicle.Remove();
+                });
+            }
         }
 
         private void OnPlayerEnterVehicle(IVehicle vehicle, IPlayer player, byte seat)
@@ -159,7 +177,8 @@ namespace Roleplay
 
         public override void OnStop()
         {
-            TimerPrincipal?.Stop();
+            TimerSegundo?.Stop();
+            TimerSalvar?.Stop();
             foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
                 Functions.SalvarPersonagem(p);
         }
@@ -378,22 +397,77 @@ namespace Roleplay
             p.Ferimentos.Add(ferimento);
         }
 
-        private void TimerPrincipal_Elapsed(object sender, ElapsedEventArgs e)
+        private void TimerSegundo_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (var x in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
-                Functions.SalvarPersonagem(x);
+            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
+            {
+                p.Player.SetDateTime(DateTime.Now);
+
+                var dif = DateTime.Now - p.DataUltimaVerificacao;
+                if (dif.TotalMinutes >= 1)
+                {
+                    p.TempoConectado++;
+                    p.DataUltimaVerificacao = DateTime.Now;
+
+                    if (p.TempoConectado % 60 == 0)
+                    {
+                        var temIncentivoInicial = false;
+                        var salario = 0;
+                        if (p.Faccao > 0)
+                            salario += p.RankBD.Salario;
+                        else if (p.Emprego > 0)
+                            salario += Global.Parametros.ValorIncentivoGovernamental;
+
+                        if (Convert.ToInt32(p.TempoConectado / 60) <= Global.Parametros.HorasIncentivoInicial)
+                        {
+                            temIncentivoInicial = true;
+                            salario += Global.Parametros.ValorIncentivoInicial;
+                        }
+
+                        p.Banco += salario;
+                        if (salario > 0)
+                        {
+                            Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado na sua conta bancária.");
+
+                            if (p.Faccao > 0 && p.RankBD.Salario > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário {p.FaccaoBD.Nome}: ${p.RankBD.Salario:N0}");
+
+                            if (p.Emprego > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Governamental: ${Global.Parametros.ValorIncentivoGovernamental:N0}");
+
+                            if (temIncentivoInicial)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Inicial: ${Global.Parametros.ValorIncentivoInicial:N0}");
+                        }
+                    }
+
+                    if (p.EmTrabalhoAdministrativo)
+                        p.UsuarioBD.TempoTrabalhoAdministrativo++;
+                }
+            }
 
             foreach (var x in Global.Veiculos.Where(x => x.Vehicle.EngineOn && x.Combustivel > 0 && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty)))
             {
-                x.Combustivel--;
-                x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
-                if (x.Combustivel == 0)
+                var dif = DateTime.Now - x.DataUltimaVerificacao;
+                if (dif.TotalMinutes >= 1)
                 {
-                    x.Vehicle.EngineOn = false;
-                    if (x.Vehicle.Driver != null)
-                        x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                    x.DataUltimaVerificacao = DateTime.Now;
+
+                    x.Combustivel--;
+                    x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
+                    if (x.Combustivel == 0)
+                    {
+                        x.Vehicle.EngineOn = false;
+                        if (x.Vehicle.Driver != null)
+                            x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                    }
                 }
             }
+        }
+
+        private void TimerSalvar_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            foreach (var x in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
+                Functions.SalvarPersonagem(x);
         }
 
         #region Server
@@ -541,7 +615,7 @@ namespace Roleplay
             p.IPLs = JsonConvert.DeserializeObject<List<string>>(p.IPL);
             p.SetarIPLs();
             player.SetDateTime(DateTime.Now);
-            player.Health = (ushort)(p.Vida + 100);
+            player.Health = (ushort)p.Vida;
             player.Armor = (ushort)p.Colete;
             player.Model = (uint)p.Skin;
             p.SetDinheiro();

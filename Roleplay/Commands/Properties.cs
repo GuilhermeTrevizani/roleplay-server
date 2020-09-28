@@ -1,5 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
+using Newtonsoft.Json;
 using Roleplay.Models;
 using System.Linq;
 
@@ -16,22 +17,39 @@ namespace Roleplay.Commands
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
 
-            if (prox == null)
+            if (prox != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma entrada.");
+                if (!prox.Aberta)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada.");
+                    return;
+                }
+
+                p.IPLs = Functions.ObterIPLsPorInterior(prox.Interior);
+                p.SetarIPLs();
+                player.Dimension = prox.Codigo;
+                player.Position = new Position(prox.SaidaPosX, prox.SaidaPosY, prox.SaidaPosZ);
                 return;
             }
 
-            if (!prox.Aberta)
+            var proxEntrada = Global.Pontos
+                .Where(x=> x.Tipo == TipoPonto.Entrada && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP)
+                .OrderBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)))
+                .FirstOrDefault();
+            if (proxEntrada != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "A porta está trancada.");
+                if (string.IsNullOrWhiteSpace(proxEntrada.Configuracoes))
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "O ponto de entrada não está configurado.");
+                    return;
+                }
+
+                player.Dimension = 0;
+                player.Position = JsonConvert.DeserializeObject<Position>(proxEntrada.Configuracoes);
                 return;
             }
 
-            p.IPLs = Functions.ObterIPLsPorInterior(prox.Interior);
-            p.SetarIPLs();
-            player.Dimension = prox.Codigo;
-            player.Position = new Position(prox.SaidaPosX, prox.SaidaPosY, prox.SaidaPosZ);
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma entrada.");
         }
 
         [Command("sair")]

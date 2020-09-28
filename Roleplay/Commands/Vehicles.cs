@@ -20,18 +20,19 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh.Personagem != p.Codigo && (veh.Faccao != p.Faccao || veh.Faccao == 0))
+            if (veh?.Personagem != p.Codigo && (veh?.Faccao != p.Faccao || veh?.Faccao == 0))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
                 return;
             }
 
-            if (veh.Combustivel == 0)
+            if (veh?.Combustivel == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não possui combustível.");
                 return;
             }
 
+            veh.DataUltimaVerificacao = DateTime.Now;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", notify: true);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
@@ -53,7 +54,7 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh.Personagem != p.Codigo)
+            if (veh?.Personagem != p.Codigo)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
@@ -89,7 +90,7 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh.Personagem == p.Codigo)
+            if (veh?.Personagem == p.Codigo)
             {
                 if (player.Vehicle.Position.Distance(new Position(veh.PosX, veh.PosY, veh.PosZ)) > Global.DistanciaRP)
                 {
@@ -102,7 +103,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Faccao == p.Faccao && veh.Faccao > 0)
+            if (veh?.Faccao == p.Faccao && veh?.Faccao > 0)
             {
                 if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
                 {

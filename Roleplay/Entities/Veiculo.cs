@@ -20,12 +20,12 @@ namespace Roleplay.Entities
         public float RotX { get; set; } = 0;
         public float RotY { get; set; } = 0;
         public float RotZ { get; set; } = 0;
-        public int Cor1R { get; set; } = 0;
-        public int Cor1G { get; set; } = 0;
-        public int Cor1B { get; set; } = 0;
-        public int Cor2R { get; set; } = 0;
-        public int Cor2G { get; set; } = 0;
-        public int Cor2B { get; set; } = 0;
+        public int Cor1R { get; set; } = 255;
+        public int Cor1G { get; set; } = 255;
+        public int Cor1B { get; set; } = 255;
+        public int Cor2R { get; set; } = 255;
+        public int Cor2G { get; set; } = 255;
+        public int Cor2B { get; set; } = 255;
         public int Personagem { get; set; } = 0;
         public string Placa { get; set; } = string.Empty;
         public int Faccao { get; set; } = 0;
@@ -77,6 +77,9 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public VehicleInfo Info { get => Global.VehicleInfos.FirstOrDefault(x => x.Name.ToLower() == Modelo.ToLower()); }
+
+        [NotMapped]
+        public DateTime DataUltimaVerificacao { get; set; }
 
         public void Spawnar()
         {

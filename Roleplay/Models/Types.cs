@@ -184,6 +184,7 @@ namespace Roleplay.Models
         Uniforme = 9,
         MDC = 10,
         DMV = 11,
+        Entrada = 12,
     }
 
     public enum TipoEmprego
