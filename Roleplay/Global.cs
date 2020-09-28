@@ -93,9 +93,9 @@ namespace Roleplay
             {
                 Nome = "Concessionária de Aviões",
                 Tipo = TipoPreco.Avioes,
-                PosicaoCompra = new Position(1725.616f, 3291.571f, 41.19078f),
-                PosicaoSpawn = new Position(1712.708f, 3252.634f, 41.67871f),
-                RotacaoSpawn = new Position(0, 0, 122.1655f),
+                PosicaoCompra = new Position(-941.34064f, -2954.8748f, 13.9296875f),
+                PosicaoSpawn = new Position(-979.5824f, -2996.3472f, 13.457886f),
+                RotacaoSpawn = new Position(0f, 0f, 1.046875f),
             },
         };
 
