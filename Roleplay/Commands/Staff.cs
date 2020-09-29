@@ -411,7 +411,7 @@ namespace Roleplay.Commands
                 return;
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.Cor}}}{p.Nome} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.Nome} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
         }
         #endregion Moderator
 

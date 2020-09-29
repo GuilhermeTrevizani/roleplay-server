@@ -6,6 +6,7 @@ using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Roleplay.Commands
@@ -41,6 +42,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
                 new Comando("Geral", "/timestamp", "Ativa/desativa timestamp do chat"),
                 new Comando("Geral", "/barbearia", "Realiza alterações no cabelo em uma barbearia"),
+                new Comando("Geral", "/maquiagem", "Realiza alterações na maquiagem em uma barbearia"),
                 new Comando("Geral", "/roupas", "Realiza alterações nas roupas em uma loja de roupas"),
                 new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
                 new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
@@ -1173,7 +1175,40 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("AbrirBarbearia", p.InformacoesPersonalizacao);
+            var dias = 21;
+            if (p.UsuarioBD.VIP == TipoVIP.Ouro)
+                dias = 7;
+            else if (p.UsuarioBD.VIP == TipoVIP.Prata)
+                dias = 14;
+
+            var cooldown = (p.DataUltimoUsoBarbearia ?? DateTime.MinValue).AddDays(dias);
+            if (cooldown > DateTime.Now)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O uso da barbearia estará disponível em {cooldown}.");
+                return;
+            }
+
+            player.Emit("AbrirBarbeariaMaquiagem", p.InformacoesPersonalizacao, 1);
+        }
+
+        [Command("maquiagem")]
+        public void CMD_maquiagem(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Barbearia && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma barbearia.");
+                return;
+            }
+
+            if (p.Dinheiro < Global.Parametros.ValorBarbearia)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorBarbearia:N0}).");
+                return;
+            }
+
+            player.Emit("AbrirBarbeariaMaquiagem", p.InformacoesPersonalizacao, 2);
         }
 
         [Command("roupas")]

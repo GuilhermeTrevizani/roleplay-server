@@ -65,6 +65,7 @@ namespace Roleplay.Entities
         public string InformacoesAcessorios { get; set; } = "[]";
         public string InformacoesArmas { get; set; } = "[]";
         public string InformacoesContatos { get; set; } = "[]";
+        public DateTime? DataUltimoUsoBarbearia { get; set; } = null;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -191,7 +192,7 @@ namespace Roleplay.Entities
         public List<string> IPLsSpec { get; set; } = new List<string>();
 
         [NotMapped]
-        public string Cor
+        public string CorStaff
         {
             get
             {

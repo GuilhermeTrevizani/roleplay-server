@@ -54,7 +54,7 @@ namespace Roleplay.Entities
                     break;
                 case TipoPonto.Barbearia:
                     nome = "Barbearia";
-                    descricao = "Use /barbearia";
+                    descricao = "Use /barbearia ou /maquiagem";
                     break;
                 case TipoPonto.Uniforme:
                     nome = "Uniforme";

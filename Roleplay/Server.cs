@@ -57,7 +57,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("ValidarPerguntas", ValidarPerguntas);
             Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
             Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
-            Alt.OnClient<IPlayer, string, bool, bool>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
+            Alt.OnClient<IPlayer, string, int, bool>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
             Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
             Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
             Alt.OnClient<IPlayer>("EquiparColeteArmario", EquiparColeteArmario);
@@ -1378,7 +1378,7 @@ namespace Roleplay
             player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
         }
 
-        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, bool barbearia, bool sucesso)
+        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, int barbearia, bool sucesso)
         {
             var p = Functions.ObterPersonagem(player);
 
@@ -1388,7 +1388,7 @@ namespace Roleplay
                 p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
             }
 
-            if (!barbearia)
+            if (barbearia == 0)
             {
                 p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Roupas;
                 using var context = new DatabaseContext();
@@ -1397,6 +1397,9 @@ namespace Roleplay
             }
             else if (sucesso)
             {
+                if (barbearia == 1)
+                    p.DataUltimoUsoBarbearia = DateTime.Now;
+
                 p.Dinheiro -= Global.Parametros.ValorBarbearia;
                 p.SetDinheiro();
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
