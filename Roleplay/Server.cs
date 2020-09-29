@@ -56,7 +56,6 @@ namespace Roleplay
             Alt.OnClient<IPlayer>("ExibirPerguntas", ExibirPerguntas);
             Alt.OnClient<IPlayer, string>("ValidarPerguntas", ValidarPerguntas);
             Alt.OnClient<IPlayer, string, string>("EnviarEmailAlterarSenha", EnviarEmailAlterarSenha);
-            Alt.OnClient<IPlayer, int, string, string, string>("AlterarSenhaRecuperacao", AlterarSenhaRecuperacao);
             Alt.OnClient<IPlayer, string, int, bool>("ConfirmarPersonalizacao", ConfirmarPersonalizacao);
             Alt.OnClient<IPlayer, int>("DeletarPersonagem", DeletarPersonagem);
             Alt.OnClient<IPlayer, bool>("Chatting", Chatting);
@@ -65,6 +64,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("LigarContatoCelular", LigarContatoCelular);
             Alt.OnClient<IPlayer, int>("EnviarLocalizacaoContatoCelular", EnviarLocalizacaoContatoCelular);
             Alt.OnClient<IPlayer, int>("AbastecerVeiculo", AbastecerVeiculo);
+            Alt.OnClient<IPlayer>("OnPlayerConnectLogin", OnPlayerConnectLogin);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -195,6 +195,13 @@ namespace Roleplay
                 || x.HardwareIdHash == (long)player.HardwareIdHash
                 || x.HardwareIdExHash == (long)player.HardwareIdExHash)))
                 return;
+
+            OnPlayerConnectLogin(player);
+        }
+
+        private void OnPlayerConnectLogin(IPlayer player)
+        {
+            using var context = new DatabaseContext();
 
             player.Emit("Server:Login", context.Usuarios.FirstOrDefault(x => (x.SocialClubRegistro == (long)player.SocialClubId && x.SocialClubRegistro != 0)
                 || x.HardwareIdHashRegistro == (long)player.HardwareIdHash
@@ -487,7 +494,7 @@ namespace Roleplay
 
             var senhaCriptografada = Functions.Criptografar(senha);
             using var context = new DatabaseContext();
-            var user = context.Usuarios.FirstOrDefault(x => x.Nome == usuario && x.Senha == senhaCriptografada);
+            var user = context.Usuarios.FirstOrDefault(x => x.Nome.ToLower() == usuario.ToLower() && x.Senha == senhaCriptografada);
             if (user == null)
             {
                 player.Emit("Server:MostrarErro", "Usuário ou senha inválidos.");
@@ -548,17 +555,15 @@ namespace Roleplay
 
         private string ObterStatusListarPersonagens(Personagem x)
         {
-            var span = $@"<span style=""color:#1de312;"">Vivo</span>";
-
+            var span = $@"<span class=""label"" style=""background-color:{Global.CorSucesso};"">Vivo</span>";
             if (x.DataMorte.HasValue)
-                span = $@"<span style=""color:#d12c0f;"">Morto ({x.MotivoMorte})</span>";
+                span = $@"<span class=""label"" style=""background-color:{Global.CorErro};"">Morto ({x.MotivoMorte})</span>";
             else if ((x.DataTerminoPrisao ?? DateTime.MinValue) > DateTime.Now)
-                span = $@"<span style=""color:#d12c0f;"">Preso até {x.DataTerminoPrisao}</span>";
+                span = $@"<span class=""label"" style=""background-color:{Global.CorErro};"">Preso até {x.DataTerminoPrisao}</span>";
             else if (!string.IsNullOrWhiteSpace(x.MotivoRejeicao))
-                span = $@"<span style=""color:#d12c0f;"">Rejeitado</span>";
+                span = $@"<span class=""label"" style=""background-color:{Global.CorErro};"">Rejeitado</span>";
             else if (x.UsuarioStaffAvaliador == 0)
-                span = $@"<span style=""color:#e69215;"">Aguardando Avaliação</span>";
-
+                span = $@"<span class=""label"" style=""background-color:#f0972b;"">Aguardando Avaliação</span>";
             return span;
         }
 
@@ -568,12 +573,12 @@ namespace Roleplay
             if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0 && (x.DataTerminoPrisao ?? DateTime.MinValue) < DateTime.Now)
             {
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
-                    opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
+                    opcoes = $"<button class='btn btn-success' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
                 else
-                    opcoes = $"<button onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
+                    opcoes = $"<button class='btn btn-default' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
             }
-            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button onclick='selecionarPersonagem({x.Codigo}, true);'>TROCAR NOME</button>" : string.Empty;
-            opcoes += $" <button onclick='deletarPersonagem({x.Codigo});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
+            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button class='btn btn-default' onclick='selecionarPersonagem({x.Codigo}, true);'>ALTERAR NOME</button>" : string.Empty;
+            opcoes += $" <button class='btn btn-danger' onclick='deletarPersonagem({x.Codigo});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
             return opcoes;
         }
 
@@ -731,15 +736,15 @@ namespace Roleplay
                     return;
                 }
 
-                if (context.Usuarios.Any(x => x.Nome == usuario))
+                if (context.Usuarios.Any(x => x.Nome.ToLower() == usuario.ToLower()))
                 {
                     player.Emit("Server:MostrarErro", $"Usuário {usuario} já existe.");
                     return;
                 }
 
-                if (context.Usuarios.Any(x => x.Email == email))
+                if (context.Usuarios.Any(x => x.Email.ToLower() == email.ToLower()))
                 {
-                    player.Emit("Server:MostrarErro", $"Email {email} já está sendo utilizado.");
+                    player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
                     return;
                 }
 
@@ -1290,8 +1295,13 @@ namespace Roleplay
             }
 
             var p = Functions.ObterPersonagem(player);
-
             using var context = new DatabaseContext();
+            if (context.Usuarios.Any(x => x.Email.ToLower() == email.ToLower() && x.Codigo != p.UsuarioBD.Codigo))
+            {
+                player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
+                return;
+            }
+
             p.UsuarioBD.Email = email;
             context.Usuarios.Update(p.UsuarioBD);
             context.SaveChanges();
@@ -1343,41 +1353,18 @@ namespace Roleplay
         private void EnviarEmailAlterarSenha(IPlayer player, string usuario, string email)
         {
             using var context = new DatabaseContext();
-            var user = context.Usuarios.Where(x => x.Nome == usuario && x.Email == email).FirstOrDefault();
+            var user = context.Usuarios.Where(x => x.Nome.ToLower() == usuario.ToLower() && x.Email.ToLower() == email.ToLower()).FirstOrDefault();
             if (user != null)
             {
-                user.TokenSenha = Functions.GerarStringAleatoria(25);
+                var senha = Functions.GerarStringAleatoria(10);
+                user.Senha = Functions.Criptografar(senha);
                 context.Usuarios.Update(user);
                 context.SaveChanges();
 
-                Functions.EnviarEmail(email, "Recuperação da Senha", $"Seu token para alteração de senha é <strong>{user.TokenSenha}</strong>.");
+                Functions.EnviarEmail(email, "Recuperação da Senha", $"Sua nova senha é <strong>{senha}</strong>. Lembre-se de alterar em seu próximo acesso.");
             }
 
-            player.Emit("Server:EsqueciMinhaSenha", user?.Codigo ?? 0);
-        }
-
-        private void AlterarSenhaRecuperacao(IPlayer player, int codigo, string token, string senha, string senha2)
-        {
-            using var context = new DatabaseContext();
-            var user = context.Usuarios.Where(x => x.Codigo == codigo && x.TokenSenha == token && !string.IsNullOrWhiteSpace(x.TokenSenha)).FirstOrDefault();
-            if (user == null)
-            {
-                player.Emit("Server:Login");
-                return;
-            }
-
-            if (senha != senha2)
-            {
-                player.Emit("Server:MostrarErro", "Senhas não são iguais.");
-                return;
-            }
-
-            user.TokenSenha = string.Empty;
-            user.Senha = Functions.Criptografar(senha);
-            context.Usuarios.Update(user);
-            context.SaveChanges();
-
-            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
+            player.Emit("Server:MostrarSucesso", "Caso o usuário e o e-mail correspondam, o e-mail será enviado. Verifique também sua caixa de lixo eletrônico.");
         }
 
         private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, int barbearia, bool sucesso)

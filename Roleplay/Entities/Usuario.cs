@@ -29,7 +29,6 @@ namespace Roleplay.Entities
         /// Se estiver em branco, o registro do usuário está confirmado
         /// </summary>
         public string TokenConfirmacao { get; set; } = string.Empty;
-        public string TokenSenha { get; set; } = string.Empty;
         public TipoVIP VIP { get; set; } = TipoVIP.Nenhum;
         public DateTime? DataExpiracaoVIP { get; set; } = null;
         public bool PossuiNamechangeForum { get; set; } = false;
