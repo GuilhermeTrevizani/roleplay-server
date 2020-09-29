@@ -641,6 +641,32 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/ck {motivo}", p, target);
         }
 
+        [Command("unck", "/unck (personagem)")]
+        public void CMD_ck(IPlayer player, int personagem)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var per = context.Personagens.FirstOrDefault(x => x.Codigo == personagem);
+            if (per == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {personagem} não existe.");
+                return;
+            }
+
+            per.DataMorte = null;
+            per.MotivoMorte = string.Empty;
+            context.Personagens.Update(per);
+            context.SaveChanges();
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu o CK do personagem {per.Nome}.");
+            Functions.GravarLog(TipoLog.Staff, $"/unck {personagem}", p, null);
+        }
+
         [Command("tempo", "/tempo (tempo)")]
         public void CMD_tempo(IPlayer player, int tempo)
         {
