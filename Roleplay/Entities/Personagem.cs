@@ -66,6 +66,7 @@ namespace Roleplay.Entities
         public string InformacoesArmas { get; set; } = "[]";
         public string InformacoesContatos { get; set; } = "[]";
         public DateTime? DataUltimoUsoBarbearia { get; set; } = null;
+        public int PecasVeiculares { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -214,6 +215,9 @@ namespace Roleplay.Entities
 
             if (numero == 5555555)
                 return "Downtown Cab Company";
+
+            if (numero == 7777777)
+                return "Central de Mecânicos";
 
             var contato = Contatos.FirstOrDefault(x => x.Celular == numero);
             return contato == null ? $"#{numero}" : $"{contato.Nome} #{numero}";

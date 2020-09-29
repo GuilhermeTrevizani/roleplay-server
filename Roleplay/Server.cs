@@ -68,6 +68,8 @@ namespace Roleplay
             Alt.OnClient<IPlayer>("PunicoesAdministrativas", PunicoesAdministrativas);
             Alt.OnClient<IPlayer, string>("AlterarEmail", AlterarEmail);
             Alt.OnClient<IPlayer, string, string, string>("AlterarSenha", AlterarSenha);
+            Alt.OnClient<IPlayer, int, int, int, bool>("UsarATM", UsarATM);
+            Alt.OnClient<IPlayer, int, int, int, int, int, int, int, int>("PintarVeiculo", PintarVeiculo);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -175,7 +177,17 @@ namespace Roleplay
 
         private void OnPlayerEnterVehicle(IVehicle vehicle, IPlayer player, byte seat)
         {
-            player.Emit("vehicle:setVehicleEngineOn", vehicle, vehicle.EngineOn);
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == vehicle);
+            if (veh != null)
+            {
+                player.Emit("vehicle:setVehicleEngineOn", vehicle, vehicle.EngineOn);
+
+                if (!veh.HealthSetado)
+                {
+                    player.Emit("vehicle:setVehicleEngineHealth", vehicle, veh.EngineHealth);
+                    veh.HealthSetado = true;
+                }
+            }
         }
 
         public override void OnStop()
@@ -839,19 +851,6 @@ namespace Roleplay
             p.PersonalizacaoDados.opacityOverlays = new List<Personagem.Personalizacao.OpacityOverlay> { new Personagem.Personalizacao.OpacityOverlay(0), new Personagem.Personalizacao.OpacityOverlay(3), new Personagem.Personalizacao.OpacityOverlay(6), new Personagem.Personalizacao.OpacityOverlay(7), new Personagem.Personalizacao.OpacityOverlay(9), new Personagem.Personalizacao.OpacityOverlay(11) };
             p.PersonalizacaoDados.colorOverlays = new List<Personagem.Personalizacao.ColorOverlay> { new Personagem.Personalizacao.ColorOverlay(4), new Personagem.Personalizacao.ColorOverlay(5), new Personagem.Personalizacao.ColorOverlay(8) };
 
-            p.Contatos = new List<Personagem.Contato>()
-            {
-                new Personagem.Contato()
-                {
-                    Celular = 911,
-                    Nome = "Central de Emergência",
-                },
-                new Personagem.Contato()
-                {
-                    Celular = 5555555,
-                    Nome = "Dowtown Cab Co.",
-                },
-            };
             var personagem = new Personagem()
             {
                 Codigo = codigo,
@@ -869,7 +868,6 @@ namespace Roleplay
                 HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                 HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
                 Historia = historia,
-                InformacoesContatos = JsonConvert.SerializeObject(p.Contatos),
             };
 
             if (personagemAntigo != null)
@@ -1020,10 +1018,7 @@ namespace Roleplay
                         } while (p.Celular == 0);
                     }
 
-                    p.Dinheiro -= preco.Valor;
-                    p.SetDinheiro();
-
-                    strMensagem = $"Você comprou um celular! Seu número é: {p.Celular}.";
+                    strMensagem = $"Você comprou um celular. Seu número é: {p.Celular}.";
                     break;
                 case "Rádio Comunicador":
                     if (p.CanalRadio > -1)
@@ -1033,12 +1028,18 @@ namespace Roleplay
                     }
 
                     p.CanalRadio = p.CanalRadio2 = p.CanalRadio3 = 0;
-                    p.Dinheiro -= preco.Valor;
-                    p.SetDinheiro();
 
                     strMensagem = $"Você comprou um rádio comunicador.";
                     break;
+                case "Peça Veicular":
+                    p.PecasVeiculares++;
+
+                    strMensagem = $"Você comprou uma peça veicular.";
+                    break;
             }
+
+            p.Dinheiro -= preco.Valor;
+            p.SetDinheiro();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, strMensagem, notify: true);
         }
@@ -1546,6 +1547,66 @@ namespace Roleplay
             context.SaveChanges();
 
             player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
+        }
+
+        private void UsarATM(IPlayer player, int tipo, int target, int valor, bool sucesso)
+        {
+            if (!sucesso)
+            {
+                if (tipo == 1)
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular.");
+                else
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM.");
+
+                return;
+            }
+
+            if (tipo == 1)
+                Functions.CMDTransferir(player, target, valor);
+            else
+                Functions.CMDSacar(player, valor);
+        }
+
+        private void PintarVeiculo(IPlayer player, int veiculo, int tipo, int r1, int g1, int b1, int r2, int g2, int b2)
+        {
+            player.Emit("Server:CloseView");
+
+            var p = Functions.ObterPersonagem(player);
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
+            if (tipo == 1)
+            {
+                if (veh == null)
+                    return;
+
+                veh.Vehicle.PrimaryColorRgb = new Rgba((byte)r1, (byte)g1, (byte)b1, 255);
+                veh.Vehicle.SecondaryColorRgb = new Rgba((byte)r2, (byte)g2, (byte)b2, 255);
+
+                p.PecasVeiculares--;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pintou o veículo e usou uma peça veicular.");
+            }
+            else
+            {
+                if (veh != null)
+                    return;
+
+                using (var context = new DatabaseContext())
+                    veh = context.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
+
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas para {r1} {g1} {b1} {r2} {g2} {b2}.");
+                Functions.GravarLog(TipoLog.Staff, $"/evehcor {veh.Codigo} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
+            }
+
+            using (var context = new DatabaseContext())
+            {
+                veh.Cor1R = r1;
+                veh.Cor1G = g1;
+                veh.Cor1B = b1;
+                veh.Cor2R = r2;
+                veh.Cor2G = g2;
+                veh.Cor2B = b2;
+                context.Veiculos.Update(veh);
+                context.SaveChanges();
+            }
         }
         #endregion
     }

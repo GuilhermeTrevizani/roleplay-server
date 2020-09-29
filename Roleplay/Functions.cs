@@ -390,7 +390,7 @@ namespace Roleplay
         {
             var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | Último Acesso: <strong>{p.DataUltimoAcesso}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Namechange: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong> | Namechange Fórum: <strong>{(p.UsuarioBD.PossuiNamechangeForum ? "SIM" : "NÃO")}</strong><br/>
-            Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong><br/>";
+            Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong> | Peças Veiculares: <strong>{p.PecasVeiculares:N0}</strong><br/>";
 
             if (p.Player != null)
                 html += $@"Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{(p.Player.Health > 100 ? p.Player.Health - 100 : p.Player.Health)}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
@@ -617,14 +617,27 @@ namespace Roleplay
                 }
                 else if (p.NumeroLigacao == 5555555)
                 {
-                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram alertados e você receberá um SMS de confirmação.", Global.CorCelular);
+                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(5555555)} diz: Nossos taxistas em serviço foram avisados e você receberá um SMS de confirmação.", Global.CorCelular);
 
                     p.AguardandoTipoServico = (int)TipoEmprego.Taxista;
 
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.Codigo}", Global.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelular);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorCelular);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.ID}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorAmarelo);
+
+                    p.LimparLigacao();
+                }
+                else if (p.NumeroLigacao == 7777777)
+                {
+                    EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(7777777)} diz: Nossos mecânicos em serviço foram avisados e você receberá um SMS de confirmação.", Global.CorCelular);
+
+                    p.AguardandoTipoServico = (int)TipoEmprego.Mecanico;
+
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Central de Mecânicos | Solicitação de Mecânico {{#FFFFFF}}#{p.ID}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"De: {{#FFFFFF}}{p.Celular}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Mensagem: {{#FFFFFF}}{message}", Global.CorAmarelo);
 
                     p.LimparLigacao();
                 }
@@ -926,6 +939,21 @@ namespace Roleplay
                 return;
             }
 
+            if (numero == 7777777)
+            {
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você está ligando para {p.ObterNomeContato(numero)}.", Global.CorCelularSecundaria);
+                if (Global.PersonagensOnline.Count(x => x.Emprego == TipoEmprego.Mecanico && x.EmTrabalho) == 0)
+                {
+                    EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Desculpe, não temos nenhum mecânico em serviço no momento.", Global.CorCelular);
+                    return;
+                }
+
+                p.NumeroLigacao = numero;
+                p.StatusLigacao = TipoStatusLigacao.EmLigacao;
+                EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] {p.ObterNomeContato(numero)} diz: Central de Mecânicos, como podemos ajudar?", Global.CorCelular);
+                return;
+            }
+
             var target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == numero && numero > 0);
             if (target == null)
             {
@@ -1027,6 +1055,33 @@ namespace Roleplay
 
             EnviarMensagem(player, TipoMensagem.Sucesso, $"Você solicitou o envio de uma localização para {target.Nome}.");
             EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"Solicitou enviar uma localização para você. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
+        }
+
+        public static void CMDTransferir(IPlayer player, int codigoTarget, int valor)
+        {
+            var p = ObterPersonagem(player);
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigoTarget);
+            if (target == null)
+                return;
+
+            p.Banco -= valor;
+            target.Banco += valor;
+
+            EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.Nome} transferiu ${valor:N0} para você.");
+            EnviarMensagem(player, TipoMensagem.Sucesso, $"Você transferiu ${valor:N0} para {target.Nome}.");
+            GravarLog(TipoLog.Dinheiro, $"/transferir {valor}", p, target);
+        }
+
+        public static void CMDSacar(IPlayer player, int valor)
+        {
+            var p = ObterPersonagem(player);
+
+            p.Banco -= valor;
+            p.Dinheiro += valor;
+            p.SetDinheiro();
+
+            EnviarMensagem(player, TipoMensagem.Sucesso, $"Você sacou ${valor:N0}.");
+            GravarLog(TipoLog.Dinheiro, $"/sacar {valor}", p, null);
         }
     }
 }

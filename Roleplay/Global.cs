@@ -106,6 +106,11 @@ namespace Roleplay
                 Tipo = TipoEmprego.Taxista,
                 Posicao = new Position(895.0308f, -179.1359f, 74.70036f),
             },
+            new Emprego()
+            {
+                Tipo = TipoEmprego.Mecanico,
+                Posicao = new Position(-1148.2417f, -1999.5297f, 13.171387f),
+            },
         };
 
         public static List<SOS> SOSs { get; set; } = new List<SOS>();

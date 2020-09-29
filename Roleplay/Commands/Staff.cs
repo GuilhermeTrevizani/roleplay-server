@@ -2381,7 +2381,7 @@ namespace Roleplay.Commands
             using (var context = new DatabaseContext())
             {
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-                if (veh.Faccao == 0)
+                if ((veh?.Faccao ?? 0) == 0)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;
@@ -2395,8 +2395,8 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/rveh {veh.Codigo}", p, null);
         }
 
-        [Command("evehcor", "/evehcor (código) (r1) (g1) (b1) (r2) (g2) (b2)")]
-        public void CMD_evehcor(IPlayer player, int codigo, int r1, int g1, int b1, int r2, int g2, int b2)
+        [Command("evehcor", "/evehcor (código)")]
+        public void CMD_evehcor(IPlayer player, int codigo)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
@@ -2415,24 +2415,14 @@ namespace Roleplay.Commands
             using (var context = new DatabaseContext())
             {
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-                if (veh.Faccao == 0)
+                if ((veh?.Faccao ?? 0) == 0)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;
                 }
-
-                veh.Cor1R = r1;
-                veh.Cor1G = g1;
-                veh.Cor1B = b1;
-                veh.Cor2R = r2;
-                veh.Cor2G = g2;
-                veh.Cor2B = b2;
-                context.Veiculos.Update(veh);
-                context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Cores do veículo {veh.Codigo} alteradas para {r1} {g1} {b1} {r2} {g2} {b2}.");
-            Functions.GravarLog(TipoLog.Staff, $"/evehcor {veh.Codigo} {r1} {g1} {b1} {r2} {g2} {b2}", p, null);
+            player.Emit("Server:PintarVeiculo", veh.Codigo, 2);
         }
 
         [Command("evehlivery", "/evehlivery (código) (livery)")]
@@ -2455,7 +2445,7 @@ namespace Roleplay.Commands
             using (var context = new DatabaseContext())
             {
                 veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-                if (veh.Faccao == 0)
+                if ((veh?.Faccao ?? 0) == 0)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} não pertence a uma facção.");
                     return;

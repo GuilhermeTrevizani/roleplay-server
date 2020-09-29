@@ -1,37 +1,18 @@
 ﻿using AltV.Net.Elements.Entities;
-using AltV.Net.Enums;
-using Newtonsoft.Json;
 using Roleplay.Models;
-using System;
-using System.Linq;
 
 namespace Roleplay
 {
     public class Testes
     {
-        [Command("fix")]
-        public void CMD_fix(IPlayer player)
+        [Command("neon")]
+        public void CMD_neon(IPlayer player)
         {
             if (!player.IsInVehicle)
                 return;
 
-            player.Vehicle.BodyHealth = 1000;
-            player.Vehicle.EngineHealth = 1000;
-            player.Vehicle.PetrolTankHealth = 1000;
-        }
-
-        [Command("v")]
-        public void CMD_v(IPlayer player)
-        {
-            if (!player.IsInVehicle)
-                return;
-
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Engine: {player.Vehicle.EngineOn}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"EngineHealth: {player.Vehicle.EngineHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"BodyHealth: {player.Vehicle.BodyHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"BodyAdditionalHealth: {player.Vehicle.BodyAdditionalHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"PetrolTankHealth: {player.Vehicle.PetrolTankHealth}");
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"DamageData: {player.Vehicle.DamageData}");
+            player.Vehicle.NeonColor = new AltV.Net.Data.Rgba(85, 45, 58, 255);
+            player.Vehicle.SetNeonActive(true, true, true, true);
         }
 
         [Command("i")]

@@ -6,7 +6,6 @@ using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Roleplay.Commands
@@ -129,14 +128,16 @@ namespace Roleplay.Commands
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Emprego", "/sairemprego", "Sai do emprego"),
+                    new Comando("Emprego", "/duty", "Entra/sai de serviço"),
                 });
 
-                if (p.Emprego == TipoEmprego.Taxista)
+                if (p.Emprego == TipoEmprego.Taxista || p.Emprego == TipoEmprego.Mecanico)
                     listaComandos.AddRange(new List<Comando>()
                     {
-                        new Comando("Emprego", "/taxiduty", "Entra ou sai de serviço como taxista"),
-                        new Comando("Emprego", "/taxicha", "Exibe as chamadas aguardando taxistas"),
-                        new Comando("Emprego", "/taxiac", "Atende uma chamada de taxista"),
+                        new Comando("Emprego", "/chamadas", "Exibe as chamadas aguardando resposta"),
+                        new Comando("Emprego", "/atcha", "Atende uma chamada"),
+                        new Comando("Emprego", "/reparar", "Conserta um veículo"),
+                        new Comando("Emprego", "/pintar", "Pinta um veículo"),
                     });
             }
 
@@ -253,6 +254,7 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
                     new Comando("Lead Administrator", "/reviver", "Cura um personagem ferido"),
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
+                    new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
@@ -694,15 +696,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP) && p.Celular == 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM ou não possui um celular.");
-                return;
-            }
-
             if (p.Banco < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui essa quantia em sua conta bancária.");
                 return;
             }
 
@@ -710,12 +706,13 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            p.Banco -= valor;
-            target.Banco += valor;
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP) && p.Celular == 0)
+            {
+                player.Emit("Server:UsarATM", 1, target.Codigo, valor);
+                return;
+            }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.Nome} transferiu para você ${valor:N0}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você transferiu ${valor:N0} para {target.Nome}.");
-            Functions.GravarLog(TipoLog.Dinheiro, $"/transferir {valor}", p, target);
+            Functions.CMDTransferir(player, target.Codigo, valor);
         }
 
         [Command("sacar", "/sacar (valor)")]
@@ -728,24 +725,19 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!Global.Pontos.Any(x => (x.Tipo == TipoPonto.Banco || x.Tipo == TipoPonto.ATM) && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco/ATM.");
-                return;
-            }
-
             if (p.Banco < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente no banco.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui essa quantia em sua conta bancária.");
                 return;
             }
 
-            p.Banco -= valor;
-            p.Dinheiro += valor;
-            p.SetDinheiro();
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                player.Emit("Server:UsarATM", 2, 0, valor);
+                return;
+            }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você sacou ${valor:N0}.");
-            Functions.GravarLog(TipoLog.Dinheiro, $"/sacar {valor}", p, null);
+            Functions.CMDSacar(player, valor);
         }
 
         [Command("depositar", "/depositar (valor)")]
@@ -840,60 +832,6 @@ namespace Roleplay.Commands
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de compra.");
-        }
-
-        [Command("sairemprego")]
-        public void CMD_sairemprego(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p.Emprego == TipoEmprego.Nenhum)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego.");
-                return;
-            }
-
-            var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
-            if (player.Position.Distance(emp.Posicao) > Global.DistanciaRP)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está onde você pegou esse emprego.");
-                return;
-            }
-
-            p.Emprego = TipoEmprego.Nenhum;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do seu emprego.");
-        }
-
-        [Command("emprego")]
-        public void CMD_emprego(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p.Emprego != TipoEmprego.Nenhum)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já tem um emprego.");
-                return;
-            }
-
-            if (p.FaccaoBD?.Tipo == TipoFaccao.Policial || p.FaccaoBD?.Tipo == TipoFaccao.Medica || p.FaccaoBD?.Tipo == TipoFaccao.Governo)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode pegar um emprego pois está em uma facção governamental.");
-                return;
-            }
-
-            var emprego = TipoEmprego.Nenhum;
-            foreach (var c in Global.Empregos)
-            {
-                if (emprego == TipoEmprego.Nenhum && player.Position.Distance(c.Posicao) <= Global.DistanciaRP)
-                    emprego = c.Tipo;
-            }
-
-            if (emprego == TipoEmprego.Nenhum)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum local de emprego.");
-                return;
-            }
-
-            p.Emprego = emprego;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pegou o emprego {Functions.ObterDisplayEnum(emprego)}.");
         }
 
         [Command("staff")]
