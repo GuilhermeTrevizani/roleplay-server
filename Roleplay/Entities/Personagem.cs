@@ -178,6 +178,34 @@ namespace Roleplay.Entities
             }
         }
 
+        [NotMapped]
+        public Position? PosicaoSpec { get; set; } = null;
+
+        [NotMapped]
+        public int DimensaoSpec { get; set; } = 0;
+
+        [NotMapped]
+        public int IDSpec { get; set; } = 0;
+
+        [NotMapped]
+        public List<string> IPLsSpec { get; set; } = new List<string>();
+
+        [NotMapped]
+        public string Cor
+        {
+            get
+            {
+                return UsuarioBD.Staff switch
+                {
+                    TipoStaff.Moderator => "#804000",
+                    TipoStaff.GameAdministrator => "#40BFFF",
+                    TipoStaff.LeadAdministrator => "#00AA00",
+                    TipoStaff.Manager => "#CC4545",
+                    _ => "#000000",
+                };
+            }
+        }
+
         public void SetDinheiro()
         {
             if (Player != null)
@@ -251,6 +279,38 @@ namespace Roleplay.Entities
 
             if (setar)
                 Player.Emit("Server:SetAccessories", slot, drawable, texture);
+        }
+
+        public void SetPosition(Position position, bool spawn)
+        {
+            if (spawn)
+                Player.Spawn(position);
+            else
+                Player.Position = position;
+
+            foreach (var x in Global.PersonagensOnline.Where(x => x.IDSpec == ID))
+            {
+                x.LimparIPLs();
+                x.IPLs = IPLs;
+                x.SetarIPLs();
+                x.Player.Dimension = Player.Dimension;
+                x.SetPosition(new Position(position.X, position.Y, position.Z + 5), true);
+                x.Player.Emit("SpectatePlayer", Player);
+            }
+        }
+
+        public void Unspectate()
+        {
+            LimparIPLs();
+            IPLs = IPLsSpec;
+            SetarIPLs();
+            Player.Dimension = DimensaoSpec;
+            Player.SetSyncedMetaData("nametag", NomeIC);
+            SetPosition(PosicaoSpec.Value, true);
+            PosicaoSpec = null;
+            DimensaoSpec = IDSpec = 0;
+            IPLsSpec = new List<string>();
+            Player.Emit("UnspectatePlayer");
         }
 
         public class Ferimento

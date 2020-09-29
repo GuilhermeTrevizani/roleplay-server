@@ -28,7 +28,7 @@ namespace Roleplay.Commands
                 p.IPLs = Functions.ObterIPLsPorInterior(prox.Interior);
                 p.SetarIPLs();
                 player.Dimension = prox.Codigo;
-                player.Position = new Position(prox.SaidaPosX, prox.SaidaPosY, prox.SaidaPosZ);
+                p.SetPosition(new Position(prox.SaidaPosX, prox.SaidaPosY, prox.SaidaPosZ), false);
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace Roleplay.Commands
                 }
 
                 player.Dimension = 0;
-                player.Position = JsonConvert.DeserializeObject<Position>(proxEntrada.Configuracoes);
+                p.SetPosition(JsonConvert.DeserializeObject<Position>(proxEntrada.Configuracoes), false);
                 return;
             }
 
@@ -76,7 +76,7 @@ namespace Roleplay.Commands
 
             p.LimparIPLs();
             player.Dimension = 0;
-            player.Position = new Position(prox.EntradaPosX, prox.EntradaPosY, prox.EntradaPosZ);
+            p.SetPosition(new Position(prox.EntradaPosX, prox.EntradaPosY, prox.EntradaPosZ), false);
         }
 
         [Command("pvender", "/pvender (ID ou nome) (valor)")]
@@ -120,7 +120,7 @@ namespace Roleplay.Commands
             target.Convites.Add(convite);
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você ofereceu sua propriedade {prox.Codigo} para {target.NomeIC} por ${valor:N0}.");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você a propriedade {prox.Codigo} por ${valor:N0}. (/ac {convite.Tipo} para aceitar ou /rc {convite.Tipo} para recusar)");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você a propriedade {prox.Codigo} por ${valor:N0}. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
 
             Functions.GravarLog(TipoLog.Venda, $"/pvender {prox.Codigo} {valor}", p, target);
         }

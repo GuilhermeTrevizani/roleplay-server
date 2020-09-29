@@ -57,7 +57,7 @@ namespace Roleplay.Commands
                 new Comando("Chat IC", "/ame", "Interpretação de ações de um personagem"),
                 new Comando("Chat IC", "/ado", "Interpretação do ambiente"),
                 new Comando("Chat OOC", "/b", "Chat OOC local"),
-                new Comando("Chat OOC", "/pm", "Chat OOC privado"),
+                new Comando("Chat OOC", "/pm", "Envia uma mensagem privada"),
                 new Comando("Celular", "/sms", "Envia um SMS"),
                 new Comando("Celular", "/desligar /des", "Desliga a ligação"),
                 new Comando("Celular", "/ligar", "Liga para um número"),
@@ -227,6 +227,9 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/listasos", "Lista os SOSs pendentes"),
                     new Comando("Moderator", "/aj", "Aceita um SOS"),
                     new Comando("Moderator", "/rj", "Rejeita um SOS"),
+                    new Comando("Moderator", "/spec", "Observa um personagem"),
+                    new Comando("Moderator", "/specoff", "Para de observar um personagem"),
+                    new Comando("Moderator", "/apm", "Envia uma mensagem privada administrativa"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
@@ -1030,7 +1033,7 @@ namespace Roleplay.Commands
             p.Armas = new List<Personagem.Arma>();
             p.Ferimentos = new List<Personagem.Ferimento>();
             player.Emit("Server:CurarPersonagem");
-            player.Spawn(new Position(298.16702f, -584.2286f, 43.24829f));
+            p.SetPosition(new Position(298.16702f, -584.2286f, 43.24829f), true);
             player.Health = player.MaxHealth;
 
             p.Banco -= Global.Parametros.ValorCustosHospitalares;

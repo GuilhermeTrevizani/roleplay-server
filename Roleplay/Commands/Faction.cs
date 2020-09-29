@@ -543,7 +543,7 @@ namespace Roleplay.Commands
             target.Player.SetSyncedMetaData("ferido", false);
             if (target.TimerFerido != null)
             {
-                target.Player.Spawn(target.Player.Position);
+                target.SetPosition(target.Player.Position, true);
                 target.StopAnimation();
             }
             target.Ferimentos = new List<Personagem.Ferimento>();

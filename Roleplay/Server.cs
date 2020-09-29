@@ -206,6 +206,12 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
             if (p?.Codigo > 0)
             {
+                if (p.PosicaoSpec.HasValue)
+                    p.Unspectate();
+
+                foreach (var x in Global.PersonagensOnline.Where(x => x.IDSpec == p.ID))
+                    x.Unspectate();
+
                 Functions.GravarLog(TipoLog.Saida, reason, p, null);
                 Functions.SalvarPersonagem(p, false);
 
@@ -657,7 +663,7 @@ namespace Roleplay
             if (personagem.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
             {
                 player.Dimension = p.ID;
-                player.Spawn(new Position(402.84396f, -996.9758f, -99.01465f));
+                p.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), true);
                 player.Rotation = new Position(0f, 0f, -3.017908f);
             }
             else
@@ -668,7 +674,7 @@ namespace Roleplay
                 player.SetSyncedMetaData("nametag", p.Nome);
                 player.Emit("nametags:Config", true);
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-                player.Spawn(new Position(p.PosX, p.PosY, p.PosZ));
+                p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
                 player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
                 Global.GlobalVoice.AddPlayer(player);
                 Global.GlobalVoice.MutePlayer(player);
@@ -1454,10 +1460,12 @@ namespace Roleplay
             }
 
             veh.Combustivel = veh.TanqueCombustivel;
+            veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
 
             p.Dinheiro -= valor;
             p.SetDinheiro();
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+            Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
         }
         #endregion
     }

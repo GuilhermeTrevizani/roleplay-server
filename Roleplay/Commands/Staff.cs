@@ -35,7 +35,7 @@ namespace Roleplay.Commands
             p.SetarIPLs();
             var pos = target.Player.Position;
             pos.X += Global.DistanciaRP;
-            player.Position = pos;
+            p.SetPosition(pos, false);
             player.Dimension = target.Player.Dimension;
         }
 
@@ -58,7 +58,7 @@ namespace Roleplay.Commands
             target.SetarIPLs();
             var pos = player.Position;
             pos.X += Global.DistanciaRP;
-            target.Player.Position = pos;
+            target.SetPosition(pos, false);
             target.Player.Dimension = player.Dimension;
         }
 
@@ -85,7 +85,7 @@ namespace Roleplay.Commands
             target.SetarIPLs();
             var pos = targetDest.Player.Position;
             pos.X += Global.DistanciaRP;
-            target.Player.Position = pos;
+            target.SetPosition(pos, false);
             target.Player.Dimension = targetDest.Player.Dimension;
 
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} teleportou você para {targetDest.Nome}.");
@@ -191,7 +191,7 @@ namespace Roleplay.Commands
             p.LimparIPLs();
             var pos = veh.Vehicle.Position;
             pos.X += Global.DistanciaRP;
-            player.Position = pos;
+            p.SetPosition(pos, false);
             player.Dimension = veh.Vehicle.Dimension;
         }
 
@@ -336,7 +336,84 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} rejeitou seu SOS.");
         }
-        #endregion Staff 1
+
+        [Command("spec", "/spec (ID ou nome)")]
+        public void CMD_spec(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            if (target == null)
+                return;
+
+            if (target.PosicaoSpec.HasValue)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador está observando outro jogador.");
+                return;
+            }
+
+            if (!p.PosicaoSpec.HasValue)
+            {
+                p.PosicaoSpec = player.Position;
+                p.DimensaoSpec = player.Dimension;
+                p.IPLsSpec = p.IPLs;
+
+                foreach (var x in Global.PersonagensOnline.Where(x => x.IDSpec == p.ID))
+                    x.Unspectate();
+            }
+
+            p.LimparIPLs();
+            p.IPLs = target.IPLs;
+            p.SetarIPLs();
+            p.IDSpec = target.ID;
+            player.Dimension = target.Player.Dimension;
+            p.SetPosition(new Position(target.Player.Position.X, target.Player.Position.Y, target.Player.Position.Z + 5), true);
+            player.SetSyncedMetaData("nametag", string.Empty);
+            player.Emit("SpectatePlayer", target.Player);
+        }
+
+        [Command("specoff")]
+        public void CMD_specoff(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            if (!p.PosicaoSpec.HasValue)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está observando um jogador.");
+                return;
+            }
+
+            p.Unspectate();
+        }
+
+        [Command("apm", "/apm (ID ou nome) (mensagem)", GreedyArg = true)]
+        public void CMD_apm(IPlayer player, string idNome, string mensagem)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator || !p.EmTrabalhoAdministrativo)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando ou não está em serviço administrativo.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            if (target == null)
+                return;
+
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.Cor}}}{p.Nome} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
+        }
+        #endregion Moderator
 
         #region Game Administrator
         [Command("o", "/o (mensagem)", GreedyArg = true)]
@@ -608,7 +685,7 @@ namespace Roleplay.Commands
             target.Player.SetSyncedMetaData("ferido", false);
             if (target.TimerFerido != null)
             {
-                target.Player.Spawn(target.Player.Position);
+                target.SetPosition(target.Player.Position, true);
                 target.StopAnimation();
             }
             target.Ferimentos = new List<Personagem.Ferimento>();
@@ -1543,8 +1620,8 @@ namespace Roleplay.Commands
             }
 
             p.LimparIPLs();
-            player.Dimension = 0;
-            player.Position = new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
+            player.Dimension = (int)prop.Dimensao;
+            p.SetPosition(new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ), false);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até a propriedade {prop.Codigo}.");
         }
 
@@ -1567,7 +1644,7 @@ namespace Roleplay.Commands
 
             p.LimparIPLs();
             player.Dimension = 0;
-            player.Position = new Position(blip.PosX, blip.PosY, blip.PosZ);
+            p.SetPosition(new Position(blip.PosX, blip.PosY, blip.PosZ), false);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você foi até o blip {blip.Codigo}.");
         }
 
@@ -1750,7 +1827,7 @@ namespace Roleplay.Commands
 
             p.LimparIPLs();
             player.Dimension = 0;
-            player.Position = new Position(ponto.PosX, ponto.PosY, ponto.PosZ);
+            p.SetPosition(new Position(ponto.PosX, ponto.PosY, ponto.PosZ), false);
         }
 
         [Command("eranksalario", "/eranksalario (facção) (código) (salário)")]
@@ -1986,7 +2063,7 @@ namespace Roleplay.Commands
                 p.SetarIPLs();
             }
 
-            player.Position = new Position(armario.PosX, armario.PosY, armario.PosZ);
+            p.SetPosition(new Position(armario.PosX, armario.PosY, armario.PosZ), false);
         }
 
         [Command("carmi", "/carmi (armário) (arma)")]
@@ -2441,7 +2518,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Position = new Position(x, y, z);
+            p.SetPosition(new Position(x, y, z), false);
 
             Functions.GravarLog(TipoLog.Staff, $"/pos {x} {y} {z}", p, null);
         }
