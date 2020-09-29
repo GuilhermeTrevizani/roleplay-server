@@ -322,7 +322,7 @@ namespace Roleplay.Commands
             <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
                 <table class='table table-bordered table-striped'>
                 <thead>
-                    <tr>
+                    <tr class='bg-dark'>
                         <th>Categoria</th>
                         <th>Comando</th>
                         <th>Descrição</th>
@@ -908,7 +908,7 @@ namespace Roleplay.Commands
 
             var html = $@"<table class='table table-bordered table-striped'>
                 <thead>
-                    <tr>
+                    <tr class='bg-dark'>
                         <th>Rank</th>
                         <th>Staffer</th>
                         <th>Status</th>

@@ -65,6 +65,9 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("EnviarLocalizacaoContatoCelular", EnviarLocalizacaoContatoCelular);
             Alt.OnClient<IPlayer, int>("AbastecerVeiculo", AbastecerVeiculo);
             Alt.OnClient<IPlayer>("OnPlayerConnectLogin", OnPlayerConnectLogin);
+            Alt.OnClient<IPlayer>("PunicoesAdministrativas", PunicoesAdministrativas);
+            Alt.OnClient<IPlayer, string>("AlterarEmail", AlterarEmail);
+            Alt.OnClient<IPlayer, string, string, string>("AlterarSenha", AlterarSenha);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -575,9 +578,9 @@ namespace Roleplay
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
                     opcoes = $"<button class='btn btn-success' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
                 else
-                    opcoes = $"<button class='btn btn-default' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
+                    opcoes = $"<button class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
             }
-            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button class='btn btn-default' onclick='selecionarPersonagem({x.Codigo}, true);'>ALTERAR NOME</button>" : string.Empty;
+            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, true);'>ALTERAR NOME</button>" : string.Empty;
             opcoes += $" <button class='btn btn-danger' onclick='deletarPersonagem({x.Codigo});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
             return opcoes;
         }
@@ -1458,6 +1461,91 @@ namespace Roleplay
             p.SetDinheiro();
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
             Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
+        }
+
+        private void PunicoesAdministrativas(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            using var context = new DatabaseContext();
+            var sql = $@"SELECT pun.*, per.Nome NomePersonagem, usu.Nome NomeUsuarioStaff
+            FROM Punicoes pun
+            INNER JOIN Personagens per ON pun.Personagem = per.Codigo
+            INNER JOIN Usuarios usu ON pun.UsuarioStaff = usu.Codigo
+            WHERE per.Usuario = {p.UsuarioBD.Codigo}
+            ORDER BY pun.Codigo DESC";
+            var punicoes = context.PunicoesAdministrativas.FromSqlRaw(sql).ToList();
+
+            player.Emit("Server:PunicoesAdministrativas", p.UsuarioBD.Nome, DateTime.Now.ToString(),
+                JsonConvert.SerializeObject(punicoes.Select(x => new
+                {
+                    Personagem = x.NomePersonagem,
+                    Data = x.Data.ToString(),
+                    Tipo = x.Tipo.ToString(),
+                    Duracao = x.Tipo == TipoPunicao.Ban ? (x.Duracao > 0 ? $"{x.Duracao} dia{(x.Duracao != 1 ? "s" : string.Empty)}" : "Permanente") : string.Empty,
+                    Staffer = x.NomeUsuarioStaff,
+                    x.Motivo,
+                })));
+        }
+
+        private void AlterarEmail(IPlayer player, string email)
+        {
+            if (email.Length > 100)
+            {
+                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
+                return;
+            }
+
+            if (!Functions.ValidarEmail(email))
+            {
+                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            using var context = new DatabaseContext();
+            if (context.Usuarios.Any(x => x.Email.ToLower() == email.ToLower()))
+            {
+                player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
+                return;
+            }
+
+            p.UsuarioBD.TokenConfirmacao = new Random().Next(111111, 999999).ToString();
+            p.UsuarioBD.Email = email;
+            context.Usuarios.Update(p.UsuarioBD);
+            context.SaveChanges();
+
+            Functions.EnviarEmail(email, "Confirmação de E-mail", $"Você alterou seu e-mail. Seu token de confirmação é <strong>{p.UsuarioBD.TokenConfirmacao}</strong>.");
+            player.Emit("Server:ConfirmacaoRegistro", p.UsuarioBD.Nome, p.UsuarioBD.Email);
+        }
+
+        private void AlterarSenha(IPlayer player, string senhaAntiga, string novaSenha, string novaSenha2)
+        {
+            if (string.IsNullOrWhiteSpace(senhaAntiga) || string.IsNullOrWhiteSpace(novaSenha) || string.IsNullOrWhiteSpace(novaSenha2))
+            {
+                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
+                return;
+            }
+
+            if (novaSenha != novaSenha2)
+            {
+                player.Emit("Server:MostrarErro", "Novas senhas não são iguais.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            if (Functions.Criptografar(senhaAntiga) != p.UsuarioBD.Senha)
+            {
+                player.Emit("Server:MostrarErro", "Sua senha atual não confere.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            p.UsuarioBD.Senha = Functions.Criptografar(novaSenha);
+            context.Usuarios.Update(p.UsuarioBD);
+            context.SaveChanges();
+
+            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
         }
         #endregion
     }

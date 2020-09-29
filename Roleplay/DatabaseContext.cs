@@ -29,6 +29,9 @@ namespace Roleplay
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Veiculo> Veiculos { get; set; }
 
+        // Não representam tabelas exatas no banco de dados
+        public DbSet<PunicaoAdministrativa> PunicoesAdministrativas { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql(Global.ConnectionString);
@@ -59,6 +62,9 @@ namespace Roleplay
             modelBuilder.Entity<SOS>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Veiculo>().HasKey(x => x.Codigo);
+
+            // Não representam tabelas exatas no banco de dados
+            modelBuilder.Entity<PunicaoAdministrativa>().HasKey(x => x.Codigo);
         }
     }
 }

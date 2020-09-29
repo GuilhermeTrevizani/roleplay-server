@@ -51,7 +51,7 @@ namespace Roleplay.Commands
             var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os membros...' /><br/>
             <table class='table table-bordered table-striped'>
                 <thead>
-                    <tr>
+                    <tr class='bg-dark'>
                         <th>Rank</th>
                         <th>ID</th>
                         <th>Nome</th>
@@ -534,7 +534,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null))
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null && target.Player.Health == target.Player.MaxHealth))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;

@@ -676,7 +676,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null)
+            if (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null && target.Player.Health == target.Player.MaxHealth)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
                 return;
