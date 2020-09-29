@@ -86,8 +86,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Global.Faccoes[Global.Faccoes.IndexOf(p.FaccaoBD)].ChatBloqueado = !p.FaccaoBD.ChatBloqueado;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(!p.FaccaoBD.ChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.");
+            p.FaccaoBD.ChatBloqueado = !p.FaccaoBD.ChatBloqueado;
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(!p.FaccaoBD.ChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.", $"#{p.FaccaoBD.Cor}");
         }
 
         [Command("convidar", "/convidar (ID ou nome)")]
@@ -255,7 +256,7 @@ namespace Roleplay.Commands
             }
             else
             {
-                foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao))
+                foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
                     Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.", $"#{p.FaccaoBD.Cor}");
             }
         }
@@ -275,6 +276,7 @@ namespace Roleplay.Commands
                 foreach (var x in p.Armas)
                     p.Player.Emit("RemoveWeapon", x.Codigo);
                 p.Armas = new List<Personagem.Arma>();
+                player.Armor = 0;
             }
 
             p.Faccao = p.Rank = p.Distintivo = 0;
