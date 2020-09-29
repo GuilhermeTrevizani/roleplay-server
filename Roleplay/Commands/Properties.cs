@@ -1,5 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay.Models;
 using System.Linq;
@@ -123,6 +124,47 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} ofereceu para você a propriedade {prox.Codigo} por ${valor:N0}. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
 
             Functions.GravarLog(TipoLog.Venda, $"/pvender {prox.Codigo} {valor}", p, target);
+        }
+
+        [Command("liberarprop", "/liberarprop (código)")]
+        public void CMD_liberarprop(IPlayer player, int codigo)
+        {
+            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
+            if ((prop?.Personagem ?? 0) == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"A propriedade {codigo} não possui um dono.");
+                return;
+            }
+
+            if (Global.PersonagensOnline.Any(x => x.Codigo == prop.Personagem))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O dono da propriedade está online.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var sql = $@"SELECT per.*
+            FROM Personagens per
+            INNER JOIN Usuarios usu ON per.Usuario = usu.Codigo
+            WHERE per.Codigo = {prop.Personagem} 
+            AND DATEDIFF(now(), per.DataUltimoAcesso) > (CASE usu.VIP WHEN 3 THEN 21 WHEN 2 THEN 14 ELSE 7 END)";
+            var dono = context.Personagens.FromSqlRaw(sql).FirstOrDefault();
+            if (dono == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O dono da propriedade não está inativo.");
+                return;
+            }
+
+            sql = $"UPDATE Personagens SET Banco = Banco + {prop.Valor} WHERE Codigo = {prop.Personagem}";
+            context.Database.ExecuteSqlRaw(sql);
+
+            prop.Personagem = 0;
+            prop.CriarIdentificador();
+
+            context.Propriedades.Update(prop);
+            context.SaveChanges();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A propriedade {codigo} está disponível para compra.");
         }
     }
 }

@@ -910,7 +910,9 @@ namespace Roleplay
             if (p == null)
                 return;
 
-            var personagens = Global.PersonagensOnline.Where(x => x.ID > 0).OrderBy(x => x.ID == p.ID ? 0 : 1).ThenBy(x => x.ID)
+            var personagens = Global.PersonagensOnline
+                .Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido)
+                .OrderBy(x => x.ID == p.ID ? 0 : 1).ThenBy(x => x.ID)
                 .Select(x => new { x.ID, x.Nome, x.Player.Ping }).ToList();
 
             var duty = Global.PersonagensOnline.Where(x => x.EmTrabalho);

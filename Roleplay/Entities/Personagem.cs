@@ -192,20 +192,14 @@ namespace Roleplay.Entities
         public List<string> IPLsSpec { get; set; } = new List<string>();
 
         [NotMapped]
-        public string CorStaff
+        public string CorStaff => UsuarioBD.Staff switch
         {
-            get
-            {
-                return UsuarioBD.Staff switch
-                {
-                    TipoStaff.Moderator => "#804000",
-                    TipoStaff.GameAdministrator => "#40BFFF",
-                    TipoStaff.LeadAdministrator => "#00AA00",
-                    TipoStaff.Manager => "#CC4545",
-                    _ => "#000000",
-                };
-            }
-        }
+            TipoStaff.Moderator => "#804000",
+            TipoStaff.GameAdministrator => "#40BFFF",
+            TipoStaff.LeadAdministrator => "#00AA00",
+            TipoStaff.Manager => "#CC4545",
+            _ => "#000000",
+        };
 
         public void SetDinheiro()
         {

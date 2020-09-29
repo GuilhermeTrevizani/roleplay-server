@@ -51,6 +51,7 @@ namespace Roleplay.Commands
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
+                new Comando("Propriedades", "/liberarprop", "Libera uma propriedade de um personagem inativo"),
                 new Comando("Chat IC", "/me", "Interpretação de ações de um personagem"),
                 new Comando("Chat IC", "/do", "Interpretação do ambiente"),
                 new Comando("Chat IC", "/g", "Grita"),
