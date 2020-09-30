@@ -70,6 +70,9 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string, string>("AlterarSenha", AlterarSenha);
             Alt.OnClient<IPlayer, int, int, int, bool>("UsarATM", UsarATM);
             Alt.OnClient<IPlayer, int, int, int, int, int, int, int, int>("PintarVeiculo", PintarVeiculo);
+            Alt.OnClient<IPlayer, string>("MDCPesquisarPessoa", MDCPesquisarPessoa);
+            Alt.OnClient<IPlayer, string>("MDCPesquisarVeiculo", MDCPesquisarVeiculo);
+            Alt.OnClient<IPlayer, string>("MDCPesquisarPropriedade", MDCPesquisarPropriedade);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -78,6 +81,7 @@ namespace Roleplay
             Global.MaxPlayers = config.MaxPlayers;
             Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
             Global.VehicleInfos = JsonConvert.DeserializeObject<List<VehicleInfo>>(File.ReadAllText("vehicles.json"));
+            Global.Development = config.Development;
 
             using (var context = new DatabaseContext())
             {
@@ -152,7 +156,7 @@ namespace Roleplay
                 Alt.CreateVoiceChannel(false, 0),
             };
 
-            Global.GlobalVoice = Alt.CreateVoiceChannel(false, 10);
+            Global.GlobalVoice = Alt.CreateVoiceChannel(true, 10);
 
             TimerSegundo = new Timer(1000);
             TimerSegundo.Elapsed += TimerSegundo_Elapsed;
@@ -439,32 +443,25 @@ namespace Roleplay
 
                     if (p.TempoConectado % 60 == 0)
                     {
-                        var temIncentivoInicial = false;
                         var salario = 0;
+                        var salarioEmprego = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Empregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
                         if (p.Faccao > 0)
                             salario += p.RankBD.Salario;
                         else if (p.Emprego > 0)
-                            salario += Global.Parametros.ValorIncentivoGovernamental;
+                            salario += salarioEmprego;
 
-                        if (Convert.ToInt32(p.TempoConectado / 60) <= Global.Parametros.HorasIncentivoInicial)
-                        {
-                            temIncentivoInicial = true;
-                            salario += Global.Parametros.ValorIncentivoInicial;
-                        }
+                        salario *= Global.Parametros.Paycheck;
 
                         p.Banco += salario;
                         if (salario > 0)
                         {
-                            Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado na sua conta bancária.");
+                            Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado na sua conta bancária. {(Global.Parametros.Paycheck > 1 ? $"(PAYCHECK {Global.Parametros.Paycheck}x)" : string.Empty)}");
 
                             if (p.Faccao > 0 && p.RankBD.Salario > 0)
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário {p.FaccaoBD.Nome}: ${p.RankBD.Salario:N0}");
 
-                            if (p.Emprego > 0)
-                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Governamental: ${Global.Parametros.ValorIncentivoGovernamental:N0}");
-
-                            if (temIncentivoInicial)
-                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Incentivo Inicial: ${Global.Parametros.ValorIncentivoInicial:N0}");
+                            if (salarioEmprego > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Emprego: ${salarioEmprego:N0}");
                         }
                     }
 
@@ -1607,6 +1604,21 @@ namespace Roleplay
                 context.Veiculos.Update(veh);
                 context.SaveChanges();
             }
+        }
+
+        private void MDCPesquisarPessoa(IPlayer player, string pesquisa)
+        {
+
+        }
+
+        private void MDCPesquisarVeiculo(IPlayer player, string pesquisa)
+        {
+
+        }
+
+        private void MDCPesquisarPropriedade(IPlayer player, string pesquisa)
+        {
+
         }
         #endregion
     }

@@ -170,6 +170,8 @@ namespace Roleplay.Models
         Avioes = 6,
 
         Armas = 7,
+
+        Empregos = 8,
     }
 
     public enum TipoPonto

@@ -7,5 +7,6 @@
         public string DBUser { get; set; }
         public string DBPassword { get; set; }
         public int MaxPlayers { get; set; }
+        public bool Development { get; set; }
     }
 }

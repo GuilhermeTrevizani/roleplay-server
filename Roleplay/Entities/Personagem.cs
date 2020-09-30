@@ -38,7 +38,7 @@ namespace Roleplay.Entities
         public int Rank { get; set; } = 0;
         public int Dinheiro { get; set; } = 0;
         public int Celular { get; set; } = 0;
-        public int Banco { get; set; } = 1500;
+        public int Banco { get; set; } = 3500;
         public string IPL { get; set; } = "[]";
         public int CanalRadio { get; set; } = -1;
         public int CanalRadio2 { get; set; } = 0;

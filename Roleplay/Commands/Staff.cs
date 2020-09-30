@@ -1705,9 +1705,18 @@ namespace Roleplay.Commands
             var tp = (TipoPreco)tipo;
             if (tp == TipoPreco.CarrosMotos)
             {
-                if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == nome.ToLower()))
+                if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == nome.ToLower())
+                    && !Enum.GetValues(typeof(ModeloVeiculo)).Cast<ModeloVeiculo>().Any(x => x.ToString().ToLower() == nome.ToLower()))
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Modelo {nome} não existe.");
+                    return;
+                }
+            }
+            else if (tp == TipoPreco.Empregos)
+            {
+                if (!Global.Empregos.Any(x => x.Tipo.ToString().ToLower() == nome.ToLower()))
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Emprego {nome} não existe.");
                     return;
                 }
             }
@@ -2922,7 +2931,33 @@ namespace Roleplay.Commands
             veh.ManualEngineControl = false;
             veh.EngineOn = true;
             player.Emit("setPedIntoVehicle", veh, -1);
+            Functions.GravarLog(TipoLog.Staff, "/jetpack", p, null);
         }
-        #endregion Staff 1337
+
+        [Command("param", "/param (parâmetro) (valor)")]
+        public void CMD_param(IPlayer player, string parametro, int valor)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var prop = typeof(Parametro).GetProperties().FirstOrDefault(x => x.Name.ToLower() == parametro.ToLower()
+                && x.Name.ToLower() != "codigo" && x.Name.ToLower() != "recordeonline");
+            if (prop == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Não existe nenhum parâmetro com o nome {parametro}.");
+                return;
+            }
+
+            prop.SetValue(Global.Parametros, valor);
+            using var context = new DatabaseContext();
+            context.Database.ExecuteSqlRaw($"UPDATE Parametros SET {parametro.ToUpper()} = {valor}");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"O parâmetro {parametro.ToUpper()} foi alterado para {valor}.");
+            Functions.GravarLog(TipoLog.Staff, $"/param {parametro} {valor}", p, null);
+        }
+        #endregion Manager
     }
 }

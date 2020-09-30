@@ -654,5 +654,7 @@ namespace Roleplay
         public static List<string> VeiculosSemCombustivel { get; set; } = new List<string> { "BOAT", "CYCLE", "PLANE", "HELICOPTER", "TRAILER", "TRAINS" };
 
         public static List<VehicleInfo> VehicleInfos { get; set; } = new List<VehicleInfo>();
+
+        public static bool Development { get; set; }
     }
 }

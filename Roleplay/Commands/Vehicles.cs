@@ -358,8 +358,8 @@ namespace Roleplay.Commands
             player.Emit("Server:Abastecer", veh.Codigo);
         }
 
-        [Command("vplaca", "/vplaca (código do veículo) (placa)")]
-        public void CMD_vplaca(IPlayer player, int codigo, string placa)
+        [Command("mudarplaca", "/mudarplaca (código do veículo) (placa)")]
+        public void CMD_mudarplaca(IPlayer player, int codigo, string placa)
         {
             var p = Functions.ObterPersonagem(player);
             if (!p.UsuarioBD.PossuiPlateChange)

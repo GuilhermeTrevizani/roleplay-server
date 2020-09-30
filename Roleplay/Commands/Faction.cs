@@ -435,6 +435,12 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
+            if (target.TimerFerido != null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador está ferido.");
+                return;
+            }
+
             if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você.");

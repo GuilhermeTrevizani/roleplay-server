@@ -5,14 +5,12 @@
         public int Codigo { get; set; }
         public int RecordeOnline { get; set; } = 0;
         public int ValorVagaVeiculo { get; set; } = 0;
-        public int ValorIncentivoGovernamental { get; set; } = 0;
-        public int HorasIncentivoInicial { get; set; } = 0;
-        public int ValorIncentivoInicial { get; set; } = 0;
         public int ValorCustosHospitalares { get; set; } = 0;
         public int ValorBarbearia { get; set; } = 0;
         public int ValorRoupas { get; set; } = 0;
         public int ValorLicencaMotorista { get; set; } = 0;
         public int ValorComponentes { get; set; } = 0;
         public int ValorCombustivel { get; set; } = 0;
+        public int Paycheck { get; set; } = 1;
     }
 }

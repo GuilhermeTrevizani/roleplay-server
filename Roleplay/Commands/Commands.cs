@@ -78,7 +78,7 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/capo", "Abre/fecha o capô de um veículo"),
                 new Comando("Veículos", "/porta", "Abre/fecha a porta de um veículo"),
                 new Comando("Veículos", "/abastecer", "Abastece um veículo"),
-                new Comando("Veículos", "/vplaca", "Altera a placa de um veículo"),
+                new Comando("Veículos", "/mudarplaca", "Altera a placa de um veículo"),
                 new Comando("Banco", "/depositar", "Deposita dinheiro no banco"),
                 new Comando("Banco", "/sacar", "Saca dinheiro do banco"),
                 new Comando("Banco", "/transferir", "Transfere dinheiro para outro personagem"),
@@ -323,6 +323,7 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/ncforum", "Remove o namechange do fórum de um usuário"),
                     new Comando("Manager", "/eponto", "Edita um ponto"),
                     new Comando("Manager", "/jetpack", "Cria um jetpack"),
+                    new Comando("Manager", "/param", "Edita um parâmetro do servidor"),
                 });
 
             var html = $@"
