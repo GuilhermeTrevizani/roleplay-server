@@ -18,7 +18,7 @@ namespace RoleplayBOT
         {
             try
             {
-                if (!((SocketGuildUser)Context.User).Roles.Any(x => x.Id == 755123158591340786))
+                if (!((SocketGuildUser)Context.User).Roles.Any(x => x.Id == GlobalConfig.RoleManagementId))
                     return ReplyAsync($"Só Management pode executar esse comando. :thinking:");
 
                 using var context = new DatabaseContext();
@@ -35,7 +35,7 @@ namespace RoleplayBOT
             catch (Exception ex)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(ex));
-                return ReplyAsync("Não consegui recuperar as informações da minha base de dados. A culpa é do sistema!");
+                return ReplyAsync("Não consegui recuperar as informações da minha base de dados.");
             }
         }
 
@@ -76,7 +76,7 @@ namespace RoleplayBOT
             catch (Exception ex)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(ex));
-                return ReplyAsync("Não consegui recuperar as informações da minha base de dados. A culpa é do sistema!");
+                return ReplyAsync("Não consegui recuperar as informações da minha base de dados.");
             }
         }
 
@@ -101,12 +101,16 @@ namespace RoleplayBOT
                 context.Update(app);
                 context.SaveChanges();
 
+                var usuarioPersonagem = context.Usuarios.FirstOrDefault(x => x.Codigo == app.Usuario);
+
+                Functions.EnviarEmail(usuarioPersonagem.Email, $"Aplicação de {app.Nome} Aceita", $"A aplicação do seu personagem <strong>{app.Nome}</strong> foi aceita.");
+
                 return ReplyAsync($"Você aceitou a aplicação {app.Nome} [{app.Codigo}].");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(ex));
-                return ReplyAsync("Não consegui recuperar as informações da minha base de dados. A culpa é do sistema!");
+                return ReplyAsync("Não consegui recuperar as informações da minha base de dados.");
             }
         }
 
@@ -135,12 +139,16 @@ namespace RoleplayBOT
                 context.Update(app);
                 context.SaveChanges();
 
+                var usuarioPersonagem = context.Usuarios.FirstOrDefault(x => x.Codigo == app.Usuario);
+
+                Functions.EnviarEmail(usuarioPersonagem.Email, $"Aplicação de {app.Nome} Negada", $"A aplicação do seu personagem <strong>{app.Nome}</strong> foi negada. Motivo: {motivo}");
+                
                 return ReplyAsync($"Você negou a aplicação {app.Nome} [{app.Codigo}].");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(ex));
-                return ReplyAsync("Não consegui recuperar as informações da minha base de dados. A culpa é do sistema!");
+                return ReplyAsync("Não consegui recuperar as informações da minha base de dados.");
             }
         }
     }

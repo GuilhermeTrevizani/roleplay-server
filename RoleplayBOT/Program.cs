@@ -16,7 +16,6 @@ namespace RoleplayBOT
     class Program
     {
         DiscordSocketClient Client { get; set; }
-        ulong GuildId { get; } = 750692435532972063;
 
         static void Main(string[] args)
         {
@@ -38,7 +37,7 @@ namespace RoleplayBOT
                 services.GetRequiredService<CommandService>().Log += LogAsync;
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
-                await Client.LoginAsync(TokenType.Bot, "NzU2MTE0MTU3ODA3NTk5Njc4.X2NILw.VqMigsgJ8hLK_xnoxINniJCICmw");
+                await Client.LoginAsync(TokenType.Bot, GlobalConfig.TokenBot);
                 await Client.StartAsync();
 
                 await Task.Delay(Timeout.Infinite);
@@ -47,20 +46,20 @@ namespace RoleplayBOT
 
         private async Task Client_Ready()
         {
-            await Client.SetGameAsync($"{Client.GetGuild(GuildId)?.Users.Count} jogadores", type: ActivityType.Listening);
-        }
-
-        private async Task Client_UserLeft(SocketGuildUser arg)
-        {
-            var totalJogadores = Client.GetGuild(GuildId)?.Users.Count;
-            await (Client.GetChannel(756116408605081621) as SocketTextChannel).SendMessageAsync($"{arg.Mention} saiu do servidor. Total de jogadores: {totalJogadores}");
-            await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
+            await Client.SetGameAsync($"{Client.GetGuild(GlobalConfig.GuildId)?.Users.Count} jogadores", type: ActivityType.Listening);
         }
 
         private async Task Client_UserJoined(SocketGuildUser arg)
         {
-            var totalJogadores = Client.GetGuild(GuildId)?.Users.Count;
-            await (Client.GetChannel(755585494775103548) as SocketTextChannel).SendMessageAsync($"{arg.Mention} entrou no servidor. Total de jogadores: {totalJogadores}");
+            var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
+            await (Client.GetChannel(GlobalConfig.UserJoinedChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} entrou no servidor. Total de jogadores: {totalJogadores}");
+            await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
+        }
+
+        private async Task Client_UserLeft(SocketGuildUser arg)
+        {
+            var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
+            await (Client.GetChannel(GlobalConfig.UserLeftChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} saiu do servidor. Total de jogadores: {totalJogadores}");
             await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
         }
 
