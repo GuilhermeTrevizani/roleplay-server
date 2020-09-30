@@ -17,6 +17,7 @@ namespace Roleplay.Entities
         public float SaidaPosY { get; set; } = 0;
         public float SaidaPosZ { get; set; } = 0;
         public long Dimensao { get; set; } = 0;
+        public string Endereco { get; set; } = string.Empty;
 
         [NotMapped]
         public TextDraw TextLabel { get; set; }

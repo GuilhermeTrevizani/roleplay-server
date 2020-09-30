@@ -1468,6 +1468,7 @@ namespace Roleplay.Commands
                 SaidaPosY = saida.Y,
                 SaidaPosZ = saida.Z,
                 Dimensao = player.Dimension,
+                Endereco = $"{p.AreaName} - {p.ZoneName}",
             };
 
             using (var context = new DatabaseContext())
@@ -1539,15 +1540,15 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].Valor = valor;
+            prop.Valor = valor;
 
             using (var context = new DatabaseContext())
             {
-                context.Propriedades.Update(Global.Propriedades[Global.Propriedades.IndexOf(prop)]);
+                context.Propriedades.Update(prop);
                 context.SaveChanges();
             }
 
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
+            prop.CriarIdentificador();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o valor da propriedade {prop.Codigo} para {valor}.");
             Functions.GravarLog(TipoLog.Staff, $"/epropvalor {prop.Codigo} {valor}", p, null);
@@ -1577,18 +1578,16 @@ namespace Roleplay.Commands
             }
 
             var pos = Functions.ObterPosicaoPorInterior((TipoInterior)interior);
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].Interior = (TipoInterior)interior;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].SaidaPosX = pos.X;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].SaidaPosY = pos.Y;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].SaidaPosZ = pos.Z;
+            prop.Interior = (TipoInterior)interior;
+            prop.SaidaPosX = pos.X;
+            prop.SaidaPosY = pos.Y;
+            prop.SaidaPosZ = pos.Z;
 
             using (var context = new DatabaseContext())
             {
-                context.Propriedades.Update(Global.Propriedades[Global.Propriedades.IndexOf(prop)]);
+                context.Propriedades.Update(prop);
                 context.SaveChanges();
             }
-
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou o interior da propriedade {prop.Codigo} para {interior}.");
             Functions.GravarLog(TipoLog.Staff, $"/epropinterior {prop.Codigo} {interior}", p, null);
@@ -1611,18 +1610,19 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].EntradaPosX = player.Position.X;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].EntradaPosY = player.Position.Y;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].EntradaPosZ = player.Position.Z;
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].Dimensao = player.Dimension;
+            prop.EntradaPosX = player.Position.X;
+            prop.EntradaPosY = player.Position.Y;
+            prop.EntradaPosZ = player.Position.Z;
+            prop.Dimensao = player.Dimension;
+            prop.Endereco = $"{p.AreaName} - {p.ZoneName}";
 
             using (var context = new DatabaseContext())
             {
-                context.Propriedades.Update(Global.Propriedades[Global.Propriedades.IndexOf(prop)]);
+                context.Propriedades.Update(prop);
                 context.SaveChanges();
             }
 
-            Global.Propriedades[Global.Propriedades.IndexOf(prop)].CriarIdentificador();
+            prop.CriarIdentificador();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você editou a posição da propriedade {prop.Codigo} para sua posição atual (X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}).");
             Functions.GravarLog(TipoLog.Staff, $"/eproppos {prop.Codigo} X: {player.Position.X} Y: {player.Position.Y} Z: {player.Position.Z} D: {player.Dimension}", p, null);
