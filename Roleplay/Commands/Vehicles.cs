@@ -1,6 +1,7 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -355,6 +356,45 @@ namespace Roleplay.Commands
             }
 
             player.Emit("Server:Abastecer", veh.Codigo);
+        }
+
+        [Command("vplaca", "/vplaca (código do veículo) (placa)")]
+        public void CMD_vplaca(IPlayer player, int codigo, string placa)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (!p.UsuarioBD.PossuiPlateChange)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma troca de placa.");
+                return;
+            }
+
+            if (Global.Veiculos.Any(x => x.Codigo == codigo))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {codigo} está spawnado.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh?.Personagem != p.Codigo)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não é o proprietário do veículo {codigo}.");
+                return;
+            }
+
+            if (context.Veiculos.Any(x => x.Placa.ToUpper() == placa.ToUpper()))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Já existe um veículo com a placa {placa.ToUpper()}.");
+                return;
+            }
+
+            p.UsuarioBD.PossuiPlateChange = false;
+            veh.Placa = placa.ToUpper();
+            context.Veiculos.Update(veh);
+            context.SaveChanges();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a placa do veículo {codigo} para {veh.Placa}.");
+            Functions.GravarLog(TipoLog.PlateChange, $"/vplaca {codigo} {placa}", p, null);
         }
     }
 }

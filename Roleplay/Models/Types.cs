@@ -57,6 +57,7 @@ namespace Roleplay.Models
         Arma = 9,
         Namechange = 10,
         ExclusaoPersonagem = 11,
+        PlateChange = 12,
     }
 
     public enum TipoConvite

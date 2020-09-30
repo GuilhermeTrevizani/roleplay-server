@@ -78,6 +78,7 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/capo", "Abre/fecha o capô de um veículo"),
                 new Comando("Veículos", "/porta", "Abre/fecha a porta de um veículo"),
                 new Comando("Veículos", "/abastecer", "Abastece um veículo"),
+                new Comando("Veículos", "/vplaca", "Altera a placa de um veículo"),
                 new Comando("Banco", "/depositar", "Deposita dinheiro no banco"),
                 new Comando("Banco", "/sacar", "Saca dinheiro do banco"),
                 new Comando("Banco", "/transferir", "Transfere dinheiro para outro personagem"),
@@ -136,8 +137,13 @@ namespace Roleplay.Commands
                     {
                         new Comando("Emprego", "/chamadas", "Exibe as chamadas aguardando resposta"),
                         new Comando("Emprego", "/atcha", "Atende uma chamada"),
-                        new Comando("Emprego", "/reparar", "Conserta um veículo"),
-                        new Comando("Emprego", "/pintar", "Pinta um veículo"),
+                    });
+
+                if (p.Emprego == TipoEmprego.Mecanico)
+                    listaComandos.AddRange(new List<Comando>()
+                    {
+                        new Comando("Emprego", "/chamadas", "Exibe as chamadas aguardando resposta"),
+                        new Comando("Emprego", "/atcha", "Atende uma chamada"),
                     });
             }
 

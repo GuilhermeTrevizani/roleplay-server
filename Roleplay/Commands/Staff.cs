@@ -2808,6 +2808,8 @@ namespace Roleplay.Commands
             user.VIP = vip;
             user.DataExpiracaoVIP = ((user.DataExpiracaoVIP ?? DateTime.Now) > DateTime.Now ? user.DataExpiracaoVIP.Value : DateTime.Now).AddMonths(meses);
             user.PossuiNamechange = user.PossuiNamechangeForum = true;
+            if (vip == TipoVIP.Prata || vip == TipoVIP.Ouro)
+                user.PossuiPlateChange = true;
             context.Usuarios.Update(user);
             context.SaveChanges();
 
@@ -2816,7 +2818,9 @@ namespace Roleplay.Commands
             {
                 target.UsuarioBD.VIP = user.VIP;
                 target.UsuarioBD.DataExpiracaoVIP = user.DataExpiracaoVIP;
-                target.UsuarioBD.PossuiNamechange = target.UsuarioBD.PossuiNamechangeForum = true;
+                target.UsuarioBD.PossuiNamechange = user.PossuiNamechange;
+                target.UsuarioBD.PossuiNamechangeForum = user.PossuiNamechangeForum;
+                target.UsuarioBD.PossuiPlateChange = user.PossuiPlateChange;
                 Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível VIP para {vip} expirando em {user.DataExpiracaoVIP}.");
             }
 
