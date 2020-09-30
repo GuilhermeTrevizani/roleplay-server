@@ -85,9 +85,9 @@ namespace Roleplay
             {
                 Nome = "Concessionária Industrial",
                 Tipo = TipoPreco.Industrial,
-                PosicaoCompra = new Position(473.9496f, -1951.891f, 24.6132f),
-                PosicaoSpawn = new Position(468.1417f, -1957.425f, 24.72257f),
-                RotacaoSpawn = new Position(0, 0, 208.0628f),
+                PosicaoCompra = new Position(967.7275f, -1829.3539f, 31.234375f),
+                PosicaoSpawn = new Position(970.2066f, -1816.4044f, 30.610962f),
+                RotacaoSpawn = new Position(0f, 0f, 1.484375f),
             },
             new Concessionaria()
             {
