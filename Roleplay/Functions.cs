@@ -408,7 +408,7 @@ namespace Roleplay
             {
                 html += $"<h4>Propriedades</h4>";
                 foreach (var prop in p.Propriedades)
-                    html += $"Código: <strong>{prop.Codigo}</strong> | Valor: <strong>${prop.Valor:N0}</strong><br/>";
+                    html += $"Código: <strong>{prop.Codigo}</strong> | Endereço: <strong>{prop.Endereco}</strong> | Valor: <strong>${prop.Valor:N0}</strong><br/>";
             }
 
             player.Emit("Server:BaseHTML", GerarBaseHTML($"{p.NomeIC} [{p.Codigo}] ({DateTime.Now})", html));
@@ -591,6 +591,7 @@ namespace Roleplay
                                 PosY = p.PosicaoIC.Y,
                                 PosZ = p.PosicaoIC.Z,
                                 Mensagem = message,
+                                Localizacao = $"{p.AreaName} - {p.ZoneName}",
                                 ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
                             };
                             using var context = new DatabaseContext();

@@ -14,6 +14,7 @@ namespace Roleplay.Entities
         public float PosY { get; set; }
         public float PosZ { get; set; }
         public string Mensagem { get; set; }
+        public string Localizacao { get; set; }
 
         [NotMapped]
         public int ID { get; set; }
