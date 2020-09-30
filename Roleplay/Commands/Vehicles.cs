@@ -1,7 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
-using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -42,15 +41,10 @@ namespace Roleplay.Commands
         public void CMD_vcomprarvaga(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p.Dinheiro < Global.Parametros.ValorVagaVeiculo)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente.");
-                return;
-            }
 
             if (!player.IsInVehicle || player.Vehicle?.Driver != player)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no banco de motorista de um veículo.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o motorista de um veículo.");
                 return;
             }
 
@@ -61,12 +55,25 @@ namespace Roleplay.Commands
                 return;
             }
 
+            var valor = Global.Parametros.ValorVagaVeiculo;
+            if (!veh.Estacionou 
+                || Global.Propriedades.Any(x => x.Personagem == p.Codigo 
+                    && player.Vehicle.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 25))
+                        valor = 0;
+
+            if (p.Dinheiro < valor)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
+                return;
+            }
+
             veh.PosX = player.Vehicle.Position.X;
             veh.PosY = player.Vehicle.Position.Y;
             veh.PosZ = player.Vehicle.Position.Z;
             veh.RotX = player.Vehicle.Rotation.Roll;
             veh.RotY = player.Vehicle.Rotation.Pitch;
             veh.RotZ = player.Vehicle.Rotation.Yaw;
+            veh.Estacionou = true;
 
             using (var context = new DatabaseContext())
             {
@@ -74,10 +81,16 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            p.Dinheiro -= Global.Parametros.ValorVagaVeiculo;
-            p.SetDinheiro();
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou uma vaga por ${Global.Parametros.ValorVagaVeiculo:N0}.", notify: true);
+            if (valor > 0)
+            {
+                p.Dinheiro -= valor;
+                p.SetDinheiro();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a posição de estacionar seu veículo por ${valor:N0}.", notify: true);
+            }
+            else
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a posição de estacionar seu veículo.", notify: true);
+            }
         }
 
         [Command("vestacionar")]

@@ -35,6 +35,7 @@ namespace Roleplay.Entities
         public int ValorApreensao { get; set; } = 0;
         public int Combustivel { get; set; } = 0;
         public string Danos { get; set; } = "{}";
+        public bool Estacionou { get; set; } = false;
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }
