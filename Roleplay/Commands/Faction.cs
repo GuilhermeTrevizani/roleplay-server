@@ -34,8 +34,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {p.RankBD.Nome} {p.Nome} [{p.ID}]: {mensagem} ))", $"#{p.FaccaoBD.Cor}");
+            Functions.EnviarMensagemFaccao(p, $"(( {p.RankBD.Nome} {p.Nome} [{p.ID}]: {mensagem} ))");
         }
 
         [Command("membros")]
@@ -87,8 +86,7 @@ namespace Roleplay.Commands
             }
 
             p.FaccaoBD.ChatBloqueado = !p.FaccaoBD.ChatBloqueado;
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(!p.FaccaoBD.ChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.", $"#{p.FaccaoBD.Cor}");
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} {(!p.FaccaoBD.ChatBloqueado ? "des" : string.Empty)}bloqueou o chat da facção.");
         }
 
         [Command("convidar", "/convidar (ID ou nome)")]
@@ -178,9 +176,7 @@ namespace Roleplay.Commands
             }
 
             target.Rank = rank;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o rank de {target.Nome} para {rk.Nome} ({rk.Codigo}).");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu rank para {rk.Nome} ({rk.Codigo}).");
-
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} alterou o rank de {target.Nome} para {rk.Nome}.");
             Functions.GravarLog(TipoLog.FaccaoGestor, $"/rank {rank}", p, target);
         }
 
@@ -215,13 +211,12 @@ namespace Roleplay.Commands
                 foreach (var x in p.Armas)
                     p.Player.Emit("RemoveWeapon", x.Codigo);
                 target.Armas = new List<Personagem.Arma>();
+                target.Player.Armor = 0;
             }
 
             target.Faccao = target.Rank = target.Distintivo = 0;
             target.EmTrabalho = false;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você demitiu {target.Nome} da facção.");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} demitiu você da facção.");
-
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} expulsou {target.Nome} da facção.");
             Functions.GravarLog(TipoLog.FaccaoGestor, "/expulsar", p, target);
         }
 
@@ -251,14 +246,9 @@ namespace Roleplay.Commands
             p.EmTrabalho = !p.EmTrabalho;
 
             if (p?.Faccao == 0)
-            {
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
-            }
             else
-            {
-                foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
-                    Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.", $"#{p.FaccaoBD.Cor}");
-            }
+                Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
         }
 
         [Command("sairfaccao")]
@@ -279,9 +269,9 @@ namespace Roleplay.Commands
                 player.Armor = 0;
             }
 
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} saiu da facção.");
             p.Faccao = p.Rank = p.Distintivo = 0;
             p.EmTrabalho = false;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu da facção.");
         }
 
         [Command("multar", "/multar (ID ou nome) (valor) (motivo)", GreedyArg = true)]
@@ -476,7 +466,7 @@ namespace Roleplay.Commands
             }
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.Codigo > 0))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{{#{p.FaccaoBD.Cor}}}{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}");
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}", p.FaccaoBD.Cor);
         }
 
         [Command("armario")]
@@ -692,7 +682,7 @@ namespace Roleplay.Commands
 
             veh.Despawnar();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você apreendeu o veículo com a placa {placa.ToUpper()} por ${valor:N0}.");
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} apreendeu o veículo de placa {placa.ToUpper()} por ${valor:N0}.");
         }
 
         [Command("uniforme")]

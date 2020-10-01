@@ -181,28 +181,24 @@ namespace Roleplay
 
         public static void EnviarMensagem(IPlayer player, TipoMensagem tipoMensagem, string mensagem, string cor = "#FFFFFF", bool notify = false)
         {
-            var gradient = new int[3];
             var icone = string.Empty;
             var type = "info";
 
             if (tipoMensagem == TipoMensagem.Sucesso)
             {
                 cor = Global.CorSucesso;
-                gradient = new int[] { 110, 180, 105 };
                 icone = "check";
                 type = "success";
             }
             else if (tipoMensagem == TipoMensagem.Erro || tipoMensagem == TipoMensagem.Punicao)
             {
                 cor = Global.CorErro;
-                gradient = new int[] { 255, 106, 77 };
                 icone = "alert";
                 type = "danger";
             }
             else if (tipoMensagem == TipoMensagem.Titulo)
             {
                 cor = "#B0B0B0";
-                gradient = new int[] { 176, 176, 176 };
                 icone = "info";
             }
 
@@ -220,7 +216,7 @@ namespace Roleplay
             if (matches.Count > 0)
                 mensagem += "</span>";
 
-            player.Emit("chat:sendMessage", mensagem, cor, tipoMensagem == TipoMensagem.Nenhum ? null : gradient, icone);
+            player.Emit("chat:sendMessage", mensagem, cor, icone);
         }
 
         public static Personagem ObterPersonagemPorIdNome(IPlayer player, string idNome, bool isPodeProprioPlayer = true)
@@ -422,7 +418,7 @@ namespace Roleplay
                 EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} diz: {mensagem}", "#F0E90D");
         }
 
-        public static void EnviarMensagemTipoFaccao(TipoFaccao tipo, string mensagem, bool somenteParaEmTrabalho, bool isCorFaccao)
+        public static void EnviarMensagemTipoFaccao(TipoFaccao tipo, string mensagem, bool somenteParaEmTrabalho, bool corFaccao)
         {
             var players = Global.PersonagensOnline.Where(x => x.FaccaoBD?.Tipo == tipo);
 
@@ -430,7 +426,7 @@ namespace Roleplay
                 players = players.Where(x => x.EmTrabalho);
 
             foreach (var pl in players)
-                EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, isCorFaccao ? $"#{pl.FaccaoBD.Cor}" : "#FFFFFF");
+                EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, corFaccao ? $"#{pl.FaccaoBD.Cor}" : "#FFFFFF");
         }
 
         public static string GerarPlacaVeiculo()
@@ -1083,6 +1079,12 @@ namespace Roleplay
 
             EnviarMensagem(player, TipoMensagem.Sucesso, $"Você sacou ${valor:N0}.");
             GravarLog(TipoLog.Dinheiro, $"/sacar {valor}", p, null);
+        }
+
+        public static void EnviarMensagemFaccao(Personagem p, string mensagem)
+        {
+            foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
+                EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, $"#{p.FaccaoBD.Cor}");
         }
     }
 }

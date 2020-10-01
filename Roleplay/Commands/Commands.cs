@@ -398,9 +398,7 @@ namespace Roleplay.Commands
                     p.Faccao = faccao;
                     p.Rank = rank;
 
-                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o convite para entrar na facção.");
-                    if (target != null)
-                        Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.Nome} aceitou seu convite para entrar na facção.");
+                    Functions.EnviarMensagemFaccao(p, $"{p.Nome} entrou na facção.");
                     break;
                 case TipoConvite.VendaPropriedade:
                     if (target == null)
