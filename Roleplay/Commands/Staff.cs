@@ -367,6 +367,7 @@ namespace Roleplay.Commands
                     x.Unspectate();
             }
 
+            player.CurrentWeapon = (uint)WeaponModel.Fist;
             p.LimparIPLs();
             p.IPLs = target.IPLs;
             p.SetarIPLs();
