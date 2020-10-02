@@ -75,7 +75,6 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/motor", "Liga/desliga o motor de um veículo"),
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
-                new Comando("Veículos", "/vspawn", "Spawna um veículo"),
                 new Comando("Veículos", "/vlista", "Mostra seus veículos"),
                 new Comando("Veículos", "/vvender", "Vende um veículo para outro personagem"),
                 new Comando("Veículos", "/vliberar", "Libera um veículo apreendido"),

@@ -70,6 +70,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string, string, string>("AlterarSenha", AlterarSenha);
             Alt.OnClient<IPlayer, int, int, int, bool>("UsarATM", UsarATM);
             Alt.OnClient<IPlayer, int, int, int, int, int, int, int, int>("PintarVeiculo", PintarVeiculo);
+            Alt.OnClient<IPlayer, int>("SpawnarVeiculo", SpawnarVeiculo);
             Alt.OnClient<IPlayer, string>("MDCPesquisarPessoa", MDCPesquisarPessoa);
             Alt.OnClient<IPlayer, string>("MDCPesquisarVeiculo", MDCPesquisarVeiculo);
             Alt.OnClient<IPlayer, string>("MDCPesquisarPropriedade", MDCPesquisarPropriedade);
@@ -1615,6 +1616,29 @@ namespace Roleplay
                 context.Veiculos.Update(veh);
                 context.SaveChanges();
             }
+        }
+
+        private void SpawnarVeiculo(IPlayer player, int codigo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (Global.Veiculos.Any(x => x.Codigo == codigo))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado.", notify: true);
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            if (veh.ValorApreensao > 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está apreendido.", notify: true);
+                return;
+            }
+
+            veh.Spawnar();
+            player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo.", notify: true);
+            player.Emit("Server:CloseView");
         }
 
         private void MDCPesquisarPessoa(IPlayer player, string pesquisa)

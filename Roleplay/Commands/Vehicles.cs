@@ -1,6 +1,7 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -133,50 +134,27 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
         }
 
-        [Command("vspawn", "/vspawn (código do veículo)")]
-        public void CMD_vspawn(IPlayer player, int codigo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (Global.Veiculos.Any(x => x.Codigo == codigo))
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo já está spawnado.");
-                return;
-            }
-
-            using var context = new DatabaseContext();
-            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-            if (veh?.Personagem != p.Codigo)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
-                return;
-            }
-
-            if (veh.ValorApreensao > 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo está apreendido.");
-                return;
-            }
-
-            veh.Spawnar();
-            player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo.", notify: true);
-        }
-
         [Command("vlista")]
         public void CMD_vlista(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             using var context = new DatabaseContext();
-            var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList();
+            var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList()
+                .Select(x => new
+                {
+                    x.Codigo,
+                    Modelo = x.Modelo.ToUpper(),
+                    x.Placa,
+                    Spawnado = Global.Veiculos.Any(y => y.Codigo == x.Codigo) ? $"<span class='label' style='background-color:{Global.CorSucesso}'>SIM</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>NÃO</span>",
+                    Apreendido = x.ValorApreensao > 0 ? $"<span class='label' style='background-color:{Global.CorSucesso}'>SIM (${x.ValorApreensao:N0})</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>NÃO</span>",
+                }).ToList();
             if (veiculos.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui veículos.");
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Veículos de {p.Nome} [{p.Codigo}] ({DateTime.Now})");
-            foreach (var v in veiculos)
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Código: {v.Codigo} | Modelo: {v.Modelo.ToUpper()} | Placa: {v.Placa} | Spawnado: {(Global.Veiculos.Any(x => x.Codigo == v.Codigo) ? $"{{{Global.CorSucesso}}}SIM" : $"{{{Global.CorErro}}}NÃO")}{{#FFFFFF}} | Apreendido: {(v.ValorApreensao > 0 ? $"{{{Global.CorSucesso}}}SIM (${v.ValorApreensao:N0})" : $"{{{Global.CorErro}}}NÃO")}");
+            player.Emit("Server:SpawnarVeiculos", $"Veículos de {p.Nome} [{p.Codigo}] ({DateTime.Now})", JsonConvert.SerializeObject(veiculos));
         }
 
         [Command("vvender", "/vvender (ID ou nome) (valor)")]
