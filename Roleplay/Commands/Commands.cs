@@ -7,7 +7,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Roleplay.Commands
 {
@@ -23,6 +22,7 @@ namespace Roleplay.Commands
             var listaComandos = new List<Comando>()
             {
                 new Comando("Teclas", "F2", "Jogadores online"),
+                new Comando("Teclas", "F7", "Habilita/desabilita a HUD"),
                 new Comando("Geral", "/stats", "Mostra as informações do seu personagem"),
                 new Comando("Geral", "/id", "Procura o ID de um personagem"),
                 new Comando("Geral", "/aceitar /ac", "Aceita um convite"),
