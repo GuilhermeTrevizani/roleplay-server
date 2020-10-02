@@ -104,5 +104,22 @@ namespace Roleplay.Commands
 
             Functions.GravarLog(TipoLog.Staff, $"/bloquearnc", p, target);
         }
+
+        [Command("limparchat")]
+        public void CMD_limparchat(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+                x.Player.Emit("chat:clearMessages");
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você limpou o chat de todos os personagens.", notify: true);
+            Functions.GravarLog(TipoLog.Staff, $"/limparchat", p, null);
+        }
     }
 }

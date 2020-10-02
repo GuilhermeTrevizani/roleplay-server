@@ -50,6 +50,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
                 new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
+                new Comando("Geral", "/limparmeuchat", "Limpa o seu chat"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -264,6 +265,7 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
+                    new Comando("Lead Administrator", "/limparchat", "Limpa o chat de todos os personagens"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
@@ -1305,5 +1307,8 @@ namespace Roleplay.Commands
 
         [Command("telapreta")]
         public void CMD_telapreta(IPlayer player) => player.Emit("chat:toggleTelaPreta");
+
+        [Command("limparmeuchat")]
+        public void CMD_limparmeuchat(IPlayer player) => player.Emit("chat:clearMessages");
     }
 }
