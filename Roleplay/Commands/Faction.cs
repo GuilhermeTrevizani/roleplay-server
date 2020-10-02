@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -911,6 +912,34 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{{#{p.FaccaoBD.Cor}}}Distintivo #{p.Distintivo} de {p.Nome}");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome} - {p.RankBD.Nome}");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha seu próprio distintivo." : $"mostra seu distintivo para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
+        }
+
+        [Command("freparar")]
+        public void CMD_freparar(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
+                return;
+            }
+
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP);
+            if (ponto == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
+                return;
+            }
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
+            if ((veh?.Faccao ?? 0) == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não pertence a facção.");
+                return;
+            }
+
+            Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
         }
     }
 }

@@ -15,5 +15,8 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public bool ChatBloqueado { get; set; } = false;
+
+        [NotMapped]
+        public bool Governamental { get => Tipo == TipoFaccao.Policial || Tipo == TipoFaccao.Medica || Tipo == TipoFaccao.Governo; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Roleplay.Models;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("vehicle:setVehicleFixed", veh.Vehicle);
+            Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
             p.PecasVeiculares--;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você reparou o veículo e usou uma peça veicular.");
         }

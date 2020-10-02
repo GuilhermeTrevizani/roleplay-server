@@ -148,6 +148,8 @@ namespace Roleplay.Commands
                     {
                         new Comando("Emprego", "/chamadas", "Exibe as chamadas aguardando resposta"),
                         new Comando("Emprego", "/atcha", "Atende uma chamada"),
+                        new Comando("Emprego", "/pintar", "Pinta um veículo"),
+                        new Comando("Emprego", "/reparar", "Conserta um veículo"),
                     });
             }
 
@@ -161,40 +163,39 @@ namespace Roleplay.Commands
                     new Comando("Facção", "/armario", "Usa o armário da facção"),
                 });
 
+                if (p.FaccaoBD.Governamental)
+                    listaComandos.AddRange(new List<Comando>()
+                    {
+                        new Comando("Facção", "/fspawn", "Spawna veículos da facção"),
+                        new Comando("Facção", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
+                        new Comando("Facção", "/freparar", "Conserta veículos da facção"),
+                    });
+
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
-                        new Comando("Facção Policial", "/m", "Megafone"),
-                        new Comando("Facção Policial", "/duty", "Entra/sai de trabalho"),
-                        new Comando("Facção Policial", "/multar", "Multa um personagem online"),
-                        new Comando("Facção Policial", "/multaroff", "Multa um personagem offline"),
-                        new Comando("Facção Policial", "/prender", "Prende um personagem"),
-                        new Comando("Facção Policial", "/algemar", "Algema/desalgema um personagem"),
-                        new Comando("Facção Policial", "/fspawn", "Spawna veículos da facção"),
-                        new Comando("Facção Policial", "/ate", "Atende uma ligação 911"),
-                        new Comando("Facção Policial", "/apreender", "Apreende um veículo"),
-                        new Comando("Facção Policial", "/uniforme", "Coloca/retira o uniforme de serviço"),
-                        new Comando("Facção Policial", "/mdc", "Abre o MDC"),
-                        new Comando("Facção Policial", "/tac /t", "Entra/sai do canal de voz TAC"),
-                        new Comando("Facção Policial", "/confiscar", "Confisca as armas de um personagem"),
-                        new Comando("Facção Policial", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
+                        new Comando("Facção", "/m", "Megafone"),
+                        new Comando("Facção", "/duty", "Entra/sai de trabalho"),
+                        new Comando("Facção", "/multar", "Multa um personagem online"),
+                        new Comando("Facção", "/multaroff", "Multa um personagem offline"),
+                        new Comando("Facção", "/prender", "Prende um personagem"),
+                        new Comando("Facção", "/algemar", "Algema/desalgema um personagem"),
+                        new Comando("Facção", "/ate", "Atende uma ligação 911"),
+                        new Comando("Facção", "/apreender", "Apreende um veículo"),
+                        new Comando("Facção", "/uniforme", "Coloca/retira o uniforme de serviço"),
+                        new Comando("Facção", "/mdc", "Abre o MDC"),
+                        new Comando("Facção", "/tac /t", "Entra/sai do canal de voz TAC"),
+                        new Comando("Facção", "/confiscar", "Confisca as armas de um personagem"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
-                        new Comando("Facção Médica", "/duty", "Entra/sai de trabalho"),
-                        new Comando("Facção Médica", "/curar", "Cura um personagem ferido"),
-                        new Comando("Facção Médica", "/fspawn", "Spawna veículos da facção"),
-                        new Comando("Facção Médica", "/ate", "Atende uma ligação 911"),
-                        new Comando("Facção Médica", "/uniforme", "Coloca/retira o uniforme de serviço"),
-                        new Comando("Facção Médica", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
-                    });
-                else if (p.FaccaoBD.Tipo == TipoFaccao.Governo)
-                    listaComandos.AddRange(new List<Comando>()
-                    {
-                        new Comando("Facção Governamental", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
+                        new Comando("Facção", "/duty", "Entra/sai de trabalho"),
+                        new Comando("Facção", "/curar", "Cura um personagem ferido"),
+                        new Comando("Facção", "/ate", "Atende uma ligação 911"),
+                        new Comando("Facção", "/uniforme", "Coloca/retira o uniforme de serviço"),
                     });
 
                 if (p.Rank >= p.FaccaoBD.RankGestor)

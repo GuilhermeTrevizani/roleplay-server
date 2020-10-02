@@ -678,7 +678,7 @@ namespace Roleplay
                 context.SaveChanges();
 
                 foreach (var u in Global.PersonagensOnline)
-                    Functions.EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorSucesso}}}{Global.Parametros.RecordeOnline}{{#FFFFFF}}.");
+                    Functions.EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorPrincipal}}}{Global.Parametros.RecordeOnline}{{#FFFFFF}}.");
             }
 
             Functions.GravarLog(TipoLog.Entrada, string.Empty, p, null);
@@ -877,6 +877,7 @@ namespace Roleplay
                 HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                 HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
                 Historia = historia,
+                Vida = player.MaxHealth,
             };
 
             if (personagemAntigo != null)

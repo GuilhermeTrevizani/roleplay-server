@@ -38,7 +38,7 @@ namespace Roleplay.Entities
                     break;
                 case TipoPonto.SpawnVeiculosFaccao:
                     nome = "Spawn de Veículos da Facção";
-                    descricao = "Use /fspawn ou /vestacionar";
+                    descricao = "Use /fspawn, /vestacionar ou /freparar";
                     break;
                 case TipoPonto.ApreensaoVeiculos:
                     nome = "Apreensão de Veículos";
