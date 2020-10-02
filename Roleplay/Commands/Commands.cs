@@ -7,6 +7,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Roleplay.Commands
 {
@@ -47,6 +48,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
                 new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
                 new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
+                new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -1296,5 +1298,8 @@ namespace Roleplay.Commands
                     break;
             }
         }
+
+        [Command("horas")]
+        public void CMD_horas(IPlayer player) => player.Emit("displayAdvancedNotification", $"SV-RP | {DateTime.Now}");
     }
 }
