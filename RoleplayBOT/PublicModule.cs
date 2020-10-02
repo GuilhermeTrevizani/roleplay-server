@@ -66,7 +66,7 @@ namespace RoleplayBOT
                 };
                 x.AddField("Nome", app.Nome, true);
                 x.AddField("Sexo", app.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher", true);
-                x.AddField("Nascimento", app.DataNascimento.ToShortDateString(), true);
+                x.AddField("Nascimento", $"{app.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - app.DataNascimento).TotalDays / 365):N0} anos)", true);
                 x.WithFooter($"Enviada em {app.DataRegistro}");
                 x.Color = Color.DarkRed;
 
