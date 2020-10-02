@@ -49,6 +49,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
                 new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
                 new Comando("Geral", "/horas", "Exibe o horário"),
+                new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -1301,5 +1302,8 @@ namespace Roleplay.Commands
 
         [Command("horas")]
         public void CMD_horas(IPlayer player) => player.Emit("displayAdvancedNotification", $"SV-RP | {DateTime.Now}");
+
+        [Command("telapreta")]
+        public void CMD_telapreta(IPlayer player) => player.Emit("chat:toggleTelaPreta");
     }
 }
