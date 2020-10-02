@@ -257,6 +257,12 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Morte, JsonConvert.SerializeObject(p.Ferimentos), p,
                 killer is IPlayer playerKiller ? Functions.ObterPersonagem(playerKiller) : null);
 
+            foreach (var x in Global.TACVoice)
+                if (x.HasPlayer(player))
+                    x.RemovePlayer(player);
+
+            Global.GlobalVoice.MutePlayer(player);
+
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 3 minutos.");
 
             player.SetSyncedMetaData("ferido", true);

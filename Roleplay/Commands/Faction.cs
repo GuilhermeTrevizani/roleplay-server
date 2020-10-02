@@ -779,6 +779,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (p.TimerFerido != null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está gravamente ferido.");
+                return;
+            }
+
             if (canal == 0)
             {
                 foreach (var x in Global.TACVoice)
