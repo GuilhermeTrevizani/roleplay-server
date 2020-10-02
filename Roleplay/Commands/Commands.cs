@@ -55,6 +55,7 @@ namespace Roleplay.Commands
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
                 new Comando("Propriedades", "/liberarprop", "Libera uma propriedade de um personagem inativo"),
+                new Comando("Propriedades", "/abandonar", "Abandona uma propriedade"),
                 new Comando("Chat IC", "/me", "Interpretação de ações de um personagem"),
                 new Comando("Chat IC", "/do", "Interpretação do ambiente"),
                 new Comando("Chat IC", "/g", "Grita"),
@@ -859,7 +860,7 @@ namespace Roleplay.Commands
                     <tr class='bg-dark'>
                         <th>Rank</th>
                         <th>Staffer</th>
-                        <th>Status</th>
+                        <th class='text-center'>Status</th>
                     </tr>
                 </thead>
                 <tbody>";
@@ -867,7 +868,7 @@ namespace Roleplay.Commands
             foreach (var x in players)
             {
                 var status = x.EmTrabalhoAdministrativo ? $"<span class='label' style='background-color:{Global.CorSucesso}'>EM SERVIÇO</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>FORA DE SERVIÇO</span>";
-                html += $@"<tr><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td>{status}</td></tr>";
+                html += $@"<tr><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td class='text-center'>{status}</td></tr>";
             }
 
             html += $@"</tbody></table>";

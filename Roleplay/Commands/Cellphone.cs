@@ -63,17 +63,20 @@ namespace Roleplay.Commands
             if (target == null && p.NumeroLigacao > 0)
                 target = Global.PersonagensOnline.FirstOrDefault(x => x.Celular == p.NumeroLigacao);
 
-            if (target == null)
+            if (target == null && p.NumeroLigacao == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Seu celular não está tocando ou você não está uma ligação.");
                 return;
             }
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação.", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target.Celular)}.", Global.CorCelularSecundaria);
+            if (target != null)
+            {
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] {target.ObterNomeContato(p.Celular)} desligou a ligação.", Global.CorCelularSecundaria);
+                target.LimparLigacao();
+            }
 
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target != null ? target.Celular : p.NumeroLigacao)}.", Global.CorCelularSecundaria);
             p.LimparLigacao();
-            target.LimparLigacao();
         }
 
         [Command("atender", Alias = "at")]

@@ -11,9 +11,11 @@ namespace Roleplay
     {
         public static string CorSucesso { get; set; } = "#6EB469";
 
-        public static string CorAmarelo { get; set; } = "#FEBD0C";
+        public static string CorPrincipal { get; set; } = "#AE6AB2";
 
         public static string CorErro { get; set; } = "#FF6A4D";
+
+        public static Rgba RgbaPrincipal { get; set; } = new Rgba(174, 106, 178, 255);
 
         public static string NomeServidor { get; set; } = "Segunda Vida Roleplay";
 

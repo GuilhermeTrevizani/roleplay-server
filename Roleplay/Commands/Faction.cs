@@ -55,7 +55,7 @@ namespace Roleplay.Commands
                         <th>ID</th>
                         <th>Nome</th>
                         <th>OOC</th>
-                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? "<th>Status</th>" : string.Empty)}
+                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? "<th class='text-center'>Status</th>" : string.Empty)}
                         {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? "<th>Distintivo</th>" : string.Empty)}
                     </tr>
                 </thead>
@@ -65,7 +65,7 @@ namespace Roleplay.Commands
             foreach (var x in players)
             {
                 var status = x.EmTrabalho ? $"<span class='label' style='background-color:{Global.CorSucesso}'>EM SERVIÇO</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>FORA DE SERVIÇO</span>";
-                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
+                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td class='text-center'>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
             }
 
             html += $@"

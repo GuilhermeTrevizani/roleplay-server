@@ -618,10 +618,10 @@ namespace Roleplay
 
                     p.AguardandoTipoServico = (int)TipoEmprego.Taxista;
 
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.ID}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.ID}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorCelularSecundaria);
 
                     p.LimparLigacao();
                 }
@@ -631,10 +631,10 @@ namespace Roleplay
 
                     p.AguardandoTipoServico = (int)TipoEmprego.Mecanico;
 
-                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Central de Mecânicos | Solicitação de Mecânico {{#FFFFFF}}#{p.ID}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"De: {{#FFFFFF}}{p.Celular}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorAmarelo);
-                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Mensagem: {{#FFFFFF}}{message}", Global.CorAmarelo);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Central de Mecânicos | Solicitação de Mecânico {{#FFFFFF}}#{p.ID}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Mensagem: {{#FFFFFF}}{message}", Global.CorCelularSecundaria);
 
                     p.LimparLigacao();
                 }

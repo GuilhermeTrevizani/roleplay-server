@@ -70,7 +70,7 @@ namespace Roleplay.Entities
                     break;
             }
 
-            TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, Global.RgbaPrincipal, 0);
         }
 
         public void DeletarIdentificador() => Functions.RemoverTextDraw(TextLabel);

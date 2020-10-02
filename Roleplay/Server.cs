@@ -135,17 +135,17 @@ namespace Roleplay
             }
 
             foreach (var c in Global.Concessionarias)
-                Functions.CriarTextDraw($"{c.Nome}\n~w~Use /comprar", c.PosicaoCompra, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+                Functions.CriarTextDraw($"{c.Nome}\n~w~Use /comprar", c.PosicaoCompra, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
             Console.WriteLine($"Concessionarias: {Global.Concessionarias.Count}");
 
             foreach (var c in Global.Empregos)
             {
                 var nome = Functions.ObterDisplayEnum(c.Tipo);
-                Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+                Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
             }
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
-            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, new Rgba(254, 189, 12, 255), 0);
+            Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
 
             Global.TACVoice = new List<IVoiceChannel>
             {
@@ -321,7 +321,7 @@ namespace Roleplay
                     .FirstOrDefault();
                 if (method == null)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"O comando {{{Global.CorAmarelo}}}{message}{{#FFFFFF}} não existe. Digite {{{Global.CorAmarelo}}}/ajuda{{#FFFFFF}} para visualizar os comandos disponíveis.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"O comando {{{Global.CorPrincipal}}}{message}{{#FFFFFF}} não existe. Digite {{{Global.CorPrincipal}}}/ajuda{{#FFFFFF}} para visualizar os comandos disponíveis.");
                     return;
                 }
 
@@ -377,7 +377,7 @@ namespace Roleplay
 
                 if (methodParams.Length != arr.Count)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Os parâmetros do comando não foram informados corretamente. Use: {{{Global.CorAmarelo}}}{command.HelpText}");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Os parâmetros do comando não foram informados corretamente. Use: {{{Global.CorPrincipal}}}{command.HelpText}");
                     return;
                 }
 
@@ -590,7 +590,7 @@ namespace Roleplay
             if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0 && (x.DataTerminoPrisao ?? DateTime.MinValue) < DateTime.Now)
             {
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
-                    opcoes = $"<button class='btn btn-success' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
+                    opcoes = $"<button class='btn btn-primary' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
                 else
                     opcoes = $"<button class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
             }
@@ -689,9 +689,9 @@ namespace Roleplay
             }
             else
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorAmarelo}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorAmarelo}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
                 if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorAmarelo}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorAmarelo}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
                 player.SetSyncedMetaData("nametag", p.Nome);
                 player.Emit("nametags:Config", true);
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);

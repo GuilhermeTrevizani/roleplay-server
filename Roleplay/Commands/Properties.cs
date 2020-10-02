@@ -34,7 +34,7 @@ namespace Roleplay.Commands
             }
 
             var proxEntrada = Global.Pontos
-                .Where(x=> x.Tipo == TipoPonto.Entrada && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP)
+                .Where(x => x.Tipo == TipoPonto.Entrada && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)))
                 .FirstOrDefault();
             if (proxEntrada != null)
@@ -88,7 +88,6 @@ namespace Roleplay.Commands
                 .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
                 .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
                 .FirstOrDefault();
-
             if (prox == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade sua.");
@@ -126,13 +125,17 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Venda, $"/pvender {prox.Codigo} {valor}", p, target);
         }
 
-        [Command("liberarprop", "/liberarprop (código)")]
-        public void CMD_liberarprop(IPlayer player, int codigo)
+        [Command("liberarprop")]
+        public void CMD_liberarprop(IPlayer player)
         {
-            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == codigo);
-            if ((prop?.Personagem ?? 0) == 0)
+            var p = Functions.ObterPersonagem(player);
+            var prop = Global.Propriedades
+               .Where(x => x.Personagem != 0 && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
+               .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
+               .FirstOrDefault();
+            if (prop == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"A propriedade {codigo} não possui um dono.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de uma propriedade com dono.");
                 return;
             }
 
@@ -155,16 +158,39 @@ namespace Roleplay.Commands
                 return;
             }
 
-            sql = $"UPDATE Personagens SET Banco = Banco + {prop.Valor} WHERE Codigo = {prop.Personagem}";
-            context.Database.ExecuteSqlRaw(sql);
-
             prop.Personagem = 0;
             prop.CriarIdentificador();
 
             context.Propriedades.Update(prop);
             context.SaveChanges();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A propriedade {codigo} está disponível para compra.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A propriedade {prop.Codigo} agora está disponível para compra.");
+            Functions.GravarLog(TipoLog.Venda, $"/liberarprop {prop.Codigo}", p, null);
+        }
+
+        [Command("abandonar")]
+        public void CMD_abandonar(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            var prop = Global.Propriedades
+                .Where(x => x.Personagem == p.Codigo && player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= Global.DistanciaRP)
+                .OrderBy(x => player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)))
+                .FirstOrDefault();
+            if (prop == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhuma propriedade sua.");
+                return;
+            }
+
+            prop.Personagem = 0;
+            prop.CriarIdentificador();
+
+            using var context = new DatabaseContext();
+            context.Propriedades.Update(prop);
+            context.SaveChanges();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abandonou a propriedade {prop.Codigo}.");
+            Functions.GravarLog(TipoLog.Venda, $"/abandonar {prop.Codigo}", p, null);
         }
     }
 }
