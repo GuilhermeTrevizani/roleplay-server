@@ -251,6 +251,7 @@ namespace Roleplay.Commands
                     new Comando("Game Administrator", "/ban", "Bane um usuário"),
                     new Comando("Game Administrator", "/unban", "Desbane um usuário"),
                     new Comando("Game Administrator", "/banoff", "Bane um usuário que está offline"),
+                    new Comando("Game Administrator", "/reviver", "Cura um personagem ferido"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.LeadAdministrator)
@@ -258,7 +259,6 @@ namespace Roleplay.Commands
                 {
                     new Comando("Lead Administrator", "/ck", "Aplica CK em um personagem"),
                     new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
-                    new Comando("Lead Administrator", "/reviver", "Cura um personagem ferido"),
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
                 });
@@ -267,7 +267,7 @@ namespace Roleplay.Commands
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Manager", "/gmx", "Salva todas as informações do servidor para reiniciá-lo"),
-                    new Comando("Manager", "/proximo", "Lista os itens que estão próximos"),
+                    new Comando("Manager", "/proximo /prox", "Lista os itens que estão próximos"),
                     new Comando("Manager", "/cblip", "Cria um blip"),
                     new Comando("Manager", "/rblip", "Remove um blip"),
                     new Comando("Manager", "/setstaff", "Altera o nível de staff de um usuário"),

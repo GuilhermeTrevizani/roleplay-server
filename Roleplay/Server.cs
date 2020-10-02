@@ -553,7 +553,6 @@ namespace Roleplay
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
                 JsonConvert.SerializeObject(context.Personagens
                     .Where(x => x.Usuario == p.UsuarioBD.Codigo && x.StatusNamechange != TipoStatusNamechange.Realizado && !x.DataExclusao.HasValue)
-                    .OrderByDescending(x => x.Codigo)
                     .ToList()
                     .Select(x => new
                     {
@@ -680,8 +679,7 @@ namespace Roleplay
             if (personagem.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
             {
                 player.Dimension = p.ID;
-                p.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), true);
-                player.Rotation = new Position(0f, 0f, -3.017908f);
+                p.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), false);
             }
             else
             {
@@ -693,6 +691,7 @@ namespace Roleplay
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
                 p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
                 player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+                player.SetSyncedMetaData("id", p.ID);
                 Global.GlobalVoice.AddPlayer(player);
                 Global.GlobalVoice.MutePlayer(player);
             }
@@ -801,6 +800,12 @@ namespace Roleplay
             if (historia.Length < 500)
             {
                 player.Emit("Server:MostrarErro", $"História deve possuir mais que 500 caracteres ({historia.Length} de 500).");
+                return;
+            }
+
+            if (historia.Length > 2048)
+            {
+                player.Emit("Server:MostrarErro", $"História deve possuir 2048 caracteres ou menos ({historia.Length} de 2048).");
                 return;
             }
 
