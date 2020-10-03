@@ -30,15 +30,15 @@ namespace Roleplay.Commands
 
             target.DataMorte = DateTime.Now;
             target.MotivoMorte = motivo;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aplicou CK no personagem {target.Nome}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} aplicou CK no personagem {target.Nome}. Motivo: {motivo}", false);
             target.Player.Kick($"{p.UsuarioBD.Nome} aplicou CK no seu personagem. Motivo: {motivo}");
 
             Functions.GravarLog(TipoLog.Staff, $"/ck {motivo}", p, target);
         }
 
         [Command("unck", "/unck (personagem)")]
-        public void CMD_ck(IPlayer player, int personagem)
+        public void CMD_unck(IPlayer player, int personagem)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
@@ -59,7 +59,7 @@ namespace Roleplay.Commands
             per.MotivoMorte = string.Empty;
             context.Personagens.Update(per);
             context.SaveChanges();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu o CK do personagem {per.Nome}.");
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} removeu o CK do personagem {per.Nome}.", true);
             Functions.GravarLog(TipoLog.Staff, $"/unck {personagem}", p, null);
         }
 
@@ -80,6 +80,7 @@ namespace Roleplay.Commands
             }
 
             Global.Weather = (WeatherType)tempo;
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} alterou o tempo para {Global.Weather}.", true);
             foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
                 x.Player.SetWeather(Global.Weather);
         }
@@ -105,8 +106,8 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/bloquearnc", p, target);
         }
 
-        [Command("limparchat")]
-        public void CMD_limparchat(IPlayer player)
+        [Command("limparchatgeral")]
+        public void CMD_limparchatgeral(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
@@ -118,10 +119,10 @@ namespace Roleplay.Commands
             foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
             {
                 x.Player.Emit("chat:clearMessages");
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} limpou o chat de todos.", notify: true);
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} limpou o chat de todos.", notify: true);
             }
 
-            Functions.GravarLog(TipoLog.Staff, $"/limparchat", p, null);
+            Functions.GravarLog(TipoLog.Staff, $"/limparchatgeral", p, null);
         }
     }
 }

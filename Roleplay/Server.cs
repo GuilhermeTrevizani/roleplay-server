@@ -285,7 +285,7 @@ namespace Roleplay
                     await player.SpawnAsync(player.Position);
                     p.StopAnimation();
                     p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
-                    player.Emit("Server:ToggleFerido", true);
+                    await player.EmitAsync("Server:ToggleFerido", true);
                 }
             });
         }
@@ -405,8 +405,10 @@ namespace Roleplay
             if (p == null)
                 return false;
 
-            if (p.Ferido)
+            if (player.IsDead || p.TimerFerido != null)
                 return false;
+
+            var attacker = Functions.ObterPersonagem(player);
 
             p.Ferimentos.Add(new Personagem.Ferimento()
             {
@@ -414,7 +416,7 @@ namespace Roleplay
                 Arma = weapon,
                 Dano = damage,
                 BodyPart = (sbyte)bodyPart,
-                CodigoAttacker = Functions.ObterPersonagem(player)?.Codigo ?? 0,
+                Attacker = attacker != null ? $"{attacker.Codigo} - {attacker.Nome}" : string.Empty,
             });
 
             return true;
@@ -429,7 +431,7 @@ namespace Roleplay
             if (p == null)
                 return;
 
-            if (p.Ferido)
+            if (player.IsDead || p.TimerFerido != null)
                 return;
 
             var ferimento = new Personagem.Ferimento()
@@ -439,10 +441,14 @@ namespace Roleplay
                 Dano = damage,
             };
 
+            Personagem pAttacker = null;
             if (attacker is IPlayer playerAttacker)
-                ferimento.CodigoAttacker = Functions.ObterPersonagem(playerAttacker)?.Codigo ?? 0;
+                pAttacker = Functions.ObterPersonagem(playerAttacker);
             else if (attacker is IVehicle vehicleAttacker)
-                ferimento.CodigoAttacker = Functions.ObterPersonagem(vehicleAttacker.Driver)?.Codigo ?? 0;
+                pAttacker = Functions.ObterPersonagem(vehicleAttacker.Driver);
+
+            if (pAttacker != null)
+                ferimento.Attacker = $"{pAttacker.Codigo} - {pAttacker.Nome}";
 
             p.Ferimentos.Add(ferimento);
         }
@@ -626,7 +632,6 @@ namespace Roleplay
                 return;
             }
 
-            personagem.DataUltimoAcesso = DateTime.Now;
             personagem.IPUltimoAcesso = Functions.ObterIP(player);
             personagem.SocialClubUltimoAcesso = (long)player.SocialClubId;
             personagem.ID = Functions.ObterNovoID();
@@ -711,6 +716,7 @@ namespace Roleplay
                 player.SetSyncedMetaData("id", p.ID);
                 Global.GlobalVoice.AddPlayer(player);
                 Global.GlobalVoice.MutePlayer(player);
+                p.DataUltimoAcesso = DateTime.Now;
             }
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)personagem.EtapaPersonalizacao);
@@ -1475,13 +1481,20 @@ namespace Roleplay
                 return;
             }
 
-            veh.Combustivel = veh.TanqueCombustivel;
-            veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
-
-            p.Dinheiro -= valor;
-            p.SetDinheiro();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
-            Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
+            player.Emit("Server:freezeEntityPosition", true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
+            AltAsync.Do(async () =>
+            {
+                await Task.Delay(5000);
+                veh.DataUltimaVerificacao = DateTime.Now;
+                veh.Combustivel = veh.TanqueCombustivel;
+                veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+                p.Dinheiro -= valor;
+                p.SetDinheiro();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+                Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
+                player.Emit("Server:freezeEntityPosition", false);
+            });
         }
 
         private void PunicoesAdministrativas(IPlayer player)
@@ -1598,11 +1611,18 @@ namespace Roleplay
                 if (veh == null)
                     return;
 
-                veh.Vehicle.PrimaryColorRgb = new Rgba((byte)r1, (byte)g1, (byte)b1, 255);
-                veh.Vehicle.SecondaryColorRgb = new Rgba((byte)r2, (byte)g2, (byte)b2, 255);
-
-                p.PecasVeiculares--;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pintou o veículo e usou uma peça veicular.");
+                player.Emit("Server:freezeEntityPosition", true);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
+                AltAsync.Do(async () =>
+                {
+                    await Task.Delay(5000);
+                    await veh.Vehicle.SetPrimaryColorRgbAsync(new Rgba((byte)r1, (byte)g1, (byte)b1, 255));
+                    await veh.Vehicle.SetSecondaryColorRgbAsync(new Rgba((byte)r2, (byte)g2, (byte)b2, 255));
+                    p.PecasVeiculares--;
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pintou o veículo e usou uma peça veicular.");
+                    Functions.SendMessageToNearbyPlayers(player, "pinta o veículo.", TipoMensagemJogo.Ame, 10);
+                    player.Emit("Server:freezeEntityPosition", false);
+                });
             }
             else
             {

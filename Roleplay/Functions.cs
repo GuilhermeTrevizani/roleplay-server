@@ -545,6 +545,12 @@ namespace Roleplay
             if (string.IsNullOrWhiteSpace(message) || p == null)
                 return;
 
+            if (p.Player.IsDead || p.TimerFerido != null)
+            {
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não pode falar pois está gravemente ferido.");
+                return;
+            }
+
             if (p.StatusLigacao > 0)
             {
                 EnviarMensagemCelular(p, Global.PersonagensOnline.FirstOrDefault(x => x.Celular == p.NumeroLigacao), message);
@@ -1085,6 +1091,16 @@ namespace Roleplay
         {
             foreach (var pl in Global.PersonagensOnline.Where(x => x.Faccao == p.Faccao && !x.UsuarioBD.TogChatFaccao))
                 EnviarMensagem(pl.Player, TipoMensagem.Nenhum, mensagem, $"#{p.FaccaoBD.Cor}");
+        }
+
+        public static void EnviarMensagemStaff(string mensagem, bool somenteParaStaff)
+        {
+            var players = Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido).ToList();
+            if (somenteParaStaff)
+                players = players.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum).ToList();
+
+            foreach (var x in players)
+                EnviarMensagem(x.Player, TipoMensagem.Nenhum, mensagem, Global.CorErro);
         }
     }
 }

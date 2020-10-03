@@ -52,7 +52,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
                 new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
-                new Comando("Geral", "/limparmeuchat", "Limpa o seu chat"),
+                new Comando("Geral", "/limparchat", "Limpa o seu chat"),
                 new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
                 new Comando("Geral", "/mecurar", "Trata os ferimentos em um hospital"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
@@ -249,6 +249,7 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/spec", "Observa um personagem"),
                     new Comando("Moderator", "/specoff", "Para de observar um personagem"),
                     new Comando("Moderator", "/apm", "Envia uma mensagem privada administrativa"),
+                    new Comando("Moderator", "/aferimentos", "Visualiza os ferimentos de um personagem"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
@@ -270,7 +271,7 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/tempo", "Altera o tempo"),
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
-                    new Comando("Lead Administrator", "/limparchat", "Limpa o chat de todos os personagens"),
+                    new Comando("Lead Administrator", "/limparchatgeral", "Limpa o chat de todos os personagens"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
@@ -836,12 +837,6 @@ namespace Roleplay.Commands
             var conce = Global.Concessionarias.FirstOrDefault(x => player.Position.Distance(x.PosicaoCompra) <= Global.DistanciaRP);
             if (conce != null)
             {
-                if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date < DateTime.Now.Date || p.DataRevogacaoLicencaMotorista.HasValue)
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma licença de motorista válida.");
-                    return;
-                }
-
                 var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
                 {
                     Nome = x.Nome.ToUpper(),
@@ -944,11 +939,12 @@ namespace Roleplay.Commands
 
             if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não possui ferimentos.");
                 return;
             }
 
-            var html = $@"<table class='table table-bordered table-striped'>
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+                <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
                         <th>Data</th>
@@ -966,7 +962,8 @@ namespace Roleplay.Commands
 
             html += $@"
                 </tbody>
-            </table>";
+            </table>
+            </div>";
 
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.NomeIC}", html));
         }
@@ -1317,8 +1314,8 @@ namespace Roleplay.Commands
         [Command("telapreta")]
         public void CMD_telapreta(IPlayer player) => player.Emit("chat:toggleTelaPreta");
 
-        [Command("limparmeuchat")]
-        public void CMD_limparmeuchat(IPlayer player) => player.Emit("chat:clearMessages");
+        [Command("limparchat")]
+        public void CMD_limparchat(IPlayer player) => player.Emit("chat:clearMessages");
 
         [Command("dl")]
         public void CMD_dl(IPlayer player)

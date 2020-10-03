@@ -90,9 +90,9 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            var strBan = dias == 0 ? "permanentemente" : $"por {dias} dia{(dias > 1 ? "s" : string.Empty)}";
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você baniu {target.UsuarioBD.Nome} ({target.Nome}) {strBan}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
+            var strBan = dias == 0 ? "permanentemente" : $"por {dias} dia{(dias > 1 ? "s" : string.Empty)}";
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} baniu {target.UsuarioBD.Nome} ({target.Nome}) {strBan}. Motivo: {motivo}", false);
             target.Player.Kick($"{p.UsuarioBD.Nome} baniu você {strBan}. Motivo: {motivo}");
         }
 

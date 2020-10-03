@@ -160,8 +160,8 @@ namespace Roleplay.Commands
                 context.SaveChanges();
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você kickou {target.Nome}. Motivo: {motivo}");
             Functions.SalvarPersonagem(target, false);
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} kickou {target.Nome}. Motivo: {motivo}", false);
             target.Player.Kick($"{p.UsuarioBD.Nome} kickou você. Motivo: {motivo}");
         }
 
@@ -290,7 +290,7 @@ namespace Roleplay.Commands
 
             p.UsuarioBD.QuantidadeSOSAceitos++;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).");
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} aceitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).", true);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} aceitou seu SOS.");
         }
 
@@ -327,7 +327,7 @@ namespace Roleplay.Commands
             context.SaveChanges();
             Global.SOSs.Remove(sos);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).");
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).", true);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} rejeitou seu SOS.");
         }
 
@@ -407,6 +407,52 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.Nome} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
+        }
+
+        [Command("aferimentos", "/aferimentos (ID ou nome)")]
+        public void CMD_aferimentos(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (target.Ferimentos.Count == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não possui ferimentos.");
+                return;
+            }
+
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+            <table class='table table-bordered table-striped'>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Arma</th>
+                        <th>Dano</th>
+                        <th>Parte do Corpo</th>
+                        <th>Autor</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+            foreach (var x in target.Ferimentos)
+            {
+                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.Arma}</td><td>{x.Dano}</td><td>{Functions.ObterParteCorpo(x.BodyPart)}</td><td>{x.Attacker}</td></tr>";
+            }
+
+            html += $@"
+                </tbody>
+            </table>
+            </div>";
+
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.Nome}", html));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -8,6 +9,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -938,8 +940,15 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
-            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
+            player.Emit("Server:freezeEntityPosition", true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
+            AltAsync.Do(async () =>
+            {
+                await Task.Delay(5000);
+                Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
+                Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
+                player.Emit("Server:freezeEntityPosition", false);
+            });
         }
     }
 }

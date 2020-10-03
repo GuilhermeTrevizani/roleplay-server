@@ -27,7 +27,7 @@ namespace Roleplay.Commands
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
             {
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reiniciará o servidor.");
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.UsuarioBD.Nome} salvou as informações do servidor.", Global.CorErro);
                 Functions.SalvarPersonagem(pl);
             }
         }
