@@ -99,6 +99,9 @@ namespace Roleplay.Entities
             Vehicle.PrimaryColorRgb = new Rgba((byte)Cor1R, (byte)Cor1G, (byte)Cor1B, 255);
             Vehicle.SecondaryColorRgb = new Rgba((byte)Cor2R, (byte)Cor2G, (byte)Cor2B, 255);
             Vehicle.Livery = (byte)Livery;
+            Vehicle.SetSyncedMetaData("id", Codigo);
+            Vehicle.SetSyncedMetaData("placa", Placa);
+            Vehicle.SetSyncedMetaData("modelo", Modelo.ToUpper());
             if (!Global.VeiculosSemCombustivel.Contains(Info?.Class ?? string.Empty))
                 Vehicle.SetSyncedMetaData("combustivel", CombustivelHUD);
 

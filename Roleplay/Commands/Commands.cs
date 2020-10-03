@@ -51,6 +51,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
                 new Comando("Geral", "/limparmeuchat", "Limpa o seu chat"),
+                new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -1319,5 +1320,13 @@ namespace Roleplay.Commands
 
         [Command("limparmeuchat")]
         public void CMD_limparmeuchat(IPlayer player) => player.Emit("chat:clearMessages");
+
+        [Command("dl")]
+        public void CMD_dl(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            p.DL = !p.DL;
+            player.Emit("dl:Config", p.DL);
+        }
     }
 }

@@ -202,6 +202,9 @@ namespace Roleplay.Entities
             _ => "#000000",
         };
 
+        [NotMapped]
+        public bool DL { get; set; } = false;
+
         public void SetDinheiro()
         {
             if (Player != null)
