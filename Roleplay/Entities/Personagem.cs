@@ -67,6 +67,7 @@ namespace Roleplay.Entities
         public string InformacoesContatos { get; set; } = "[]";
         public DateTime? DataUltimoUsoBarbearia { get; set; } = null;
         public int PecasVeiculares { get; set; } = 0;
+        public DateTime? DataUltimoUsoAnuncio { get; set; } = null;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

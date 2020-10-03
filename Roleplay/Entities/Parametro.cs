@@ -13,5 +13,6 @@
         public int ValorCombustivel { get; set; } = 0;
         public int Paycheck { get; set; } = 1;
         public int ValorLicencaMotoristaRenovacao { get; set; } = 0;
+        public int ValorAnuncio { get; set; } = 0;
     }
 }

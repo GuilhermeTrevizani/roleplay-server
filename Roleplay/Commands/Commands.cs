@@ -49,7 +49,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/mostrarid", "Mostra a identidade para um personagem"),
                 new Comando("Geral", "/dmv", "Compra/renova a licença de motorista"),
                 new Comando("Geral", "/mostrarlicenca", "Mostra a licença de motorista para um personagem"),
-                new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao)"),
+                new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao anuncio)"),
                 new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
                 new Comando("Geral", "/limparchat", "Limpa o seu chat"),
@@ -76,6 +76,7 @@ namespace Roleplay.Commands
                 new Comando("Celular", " /celular /cel", "Abre o celular"),
                 new Comando("Celular", "/gps", "Traça rota para uma propriedade"),
                 new Comando("Celular", "/localizacao", "Envia sua localização atual para um número"),
+                new Comando("Celular", "/an", "Faz um anúncio"),
                 new Comando("Veículos", "/motor", "Liga/desliga o motor de um veículo"),
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
@@ -1301,9 +1302,13 @@ namespace Roleplay.Commands
                     p.UsuarioBD.TogChatFaccao = !p.UsuarioBD.TogChatFaccao;
                     Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.UsuarioBD.TogChatFaccao ? "des" : string.Empty)}ativou as mensagens do chat da facção.", notify: true);
                     break;
+                case "anuncio":
+                    p.UsuarioBD.TogAnuncio = !p.UsuarioBD.TogAnuncio;
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.UsuarioBD.TogAnuncio ? "des" : string.Empty)}ativou as mensagens de anúncios.", notify: true);
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Titulo, "Opções Disponíveis");
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "pm chatstaff chatfaccao");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, "pm chatstaff chatfaccao anuncio");
                     break;
             }
         }

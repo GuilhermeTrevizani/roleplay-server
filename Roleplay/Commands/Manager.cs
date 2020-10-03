@@ -2218,6 +2218,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (valor <= 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor deve ser mair que 0.");
+                return;
+            }
+
             var prop = typeof(Parametro).GetProperties().FirstOrDefault(x => x.Name.ToLower() == parametro.ToLower()
                 && x.Name.ToLower() != "codigo" && x.Name.ToLower() != "recordeonline");
             if (prop == null)

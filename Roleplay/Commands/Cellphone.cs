@@ -1,6 +1,7 @@
 ﻿using AltV.Net.Elements.Entities;
 using Newtonsoft.Json;
 using Roleplay.Models;
+using System;
 using System.Linq;
 
 namespace Roleplay.Commands
@@ -157,5 +158,48 @@ namespace Roleplay.Commands
 
         [Command("localizacao", "/localizacao (número ou nome do contato)", Alias = "loc")]
         public void CMD_localizacao(IPlayer player, string numeroNomeContato) => Functions.EnviarLocalizacaoCelular(player, numeroNomeContato);
+
+        [Command("an", "/an (mensagem)", GreedyArg = true)]
+        public void CMD_an(IPlayer player, string mensagem)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((p?.Celular ?? 0) == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui um celular.");
+                return;
+            }
+
+            if (p.Ferido)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está ferido.");
+                return;
+            }
+
+            if (p.Dinheiro < Global.Parametros.ValorAnuncio)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorAnuncio:N0}).");
+                return;
+            }
+
+            var segundos = 120;
+            if (p.UsuarioBD.VIP == TipoVIP.Ouro)
+                segundos = 30;
+            else if (p.UsuarioBD.VIP == TipoVIP.Prata)
+                segundos = 60;
+
+            var cooldown = (p.DataUltimoUsoAnuncio ?? DateTime.MinValue).AddSeconds(segundos);
+            if (cooldown > DateTime.Now)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O uso da central de anúncios estará disponível em {cooldown}.");
+                return;
+            }
+
+            p.DataUltimoUsoAnuncio = DateTime.Now;
+            p.Dinheiro -= Global.Parametros.ValorAnuncio;
+            p.SetDinheiro();
+
+            foreach (var x in Global.PersonagensOnline.Where(x => !x.UsuarioBD.TogAnuncio))
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"[CENTRAL DE ANÚNCIOS] {mensagem}", "#8EBE59");
+        }
     }
 }
