@@ -404,6 +404,12 @@ namespace Roleplay.Commands
                     p.Faccao = faccao;
                     p.Rank = rank;
 
+                    if (p.FaccaoBD?.Governamental ?? false)
+                    {
+                        p.Emprego = TipoEmprego.Nenhum;
+                        p.EmTrabalho = false;
+                    }
+
                     Functions.EnviarMensagemFaccao(p, $"{p.Nome} entrou na facção.");
                     break;
                 case TipoConvite.VendaPropriedade:
@@ -834,11 +840,11 @@ namespace Roleplay.Commands
 
                 var veiculos = Global.Precos.Where(x => x.Tipo == conce.Tipo).OrderBy(x => x.Nome).Select(x => new
                 {
-                    x.Nome,
+                    Nome = x.Nome.ToUpper(),
                     Preco = $"${x.Valor:N0}",
                 }).ToList();
 
-                player.Emit("Server:ComprarVeiculo", (int)conce.Tipo, JsonConvert.SerializeObject(veiculos));
+                player.Emit("Server:ComprarVeiculo", conce.Nome, (int)conce.Tipo, JsonConvert.SerializeObject(veiculos));
                 return;
             }
 
@@ -978,6 +984,7 @@ namespace Roleplay.Commands
             }
 
             player.SetSyncedMetaData("ferido", false);
+            p.StopAnimation();
             p.TimerFerido = null;
             player.Dimension = 0;
             foreach (var x in p.Armas)
@@ -1219,19 +1226,20 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.Dinheiro < Global.Parametros.ValorLicencaMotorista)
+            var valor = p.DataValidadeLicencaMotorista.HasValue ? Global.Parametros.ValorLicencaMotoristaRenovacao : Global.Parametros.ValorLicencaMotorista;
+            if (p.Dinheiro < valor)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorLicencaMotorista:N0}).");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
                 return;
             }
 
             p.DataValidadeLicencaMotorista = DateTime.Now.AddMonths(6);
             p.DataRevogacaoLicencaMotorista = null;
 
-            p.Dinheiro -= Global.Parametros.ValorLicencaMotorista;
+            p.Dinheiro -= valor;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou/renovou sua licença de motorista por ${Global.Parametros.ValorLicencaMotorista:N0}. A validade é {p.DataValidadeLicencaMotorista?.ToShortDateString()}.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou/renovou sua licença de motorista por ${valor:N0}. A validade é {p.DataValidadeLicencaMotorista?.ToShortDateString()}.");
         }
 
         [Command("mostrarlicenca", "/mostrarlicenca (ID ou nome)")]

@@ -230,7 +230,7 @@ namespace Roleplay.Commands
                 target.StopAnimation();
             }
             target.Ferimentos = new List<Personagem.Ferimento>();
-            target.Player.Emit("Server:CurarPersonagem");
+            target.Player.Emit("Server:ToggleFerido", false);
             target.Player.Health = target.Player.MaxHealth;
             target.TimerFerido?.Stop();
             target.TimerFerido = null;

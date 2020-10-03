@@ -25,9 +25,9 @@ namespace Roleplay.Entities
         public long HardwareIdHashUltimoAcesso { get; set; } = 0;
         public long HardwareIdExHashUltimoAcesso { get; set; } = 0;
         public long Skin { get; set; } = (long)PedModel.FreemodeMale01;
-        public float PosX { get; set; } = 128.4853f;
-        public float PosY { get; set; } = -1737.086f;
-        public float PosZ { get; set; } = 30.11018f;
+        public float PosX { get; set; } = 265.66153f;
+        public float PosY { get; set; } = -1205.723f;
+        public float PosZ { get; set; } = 29.279907f;
         public int Vida { get; set; } = 100;
         public int Colete { get; set; } = 0;
         public long Dimensao { get; set; } = 0;
@@ -45,7 +45,7 @@ namespace Roleplay.Entities
         public int CanalRadio3 { get; set; } = 0;
         public float RotX { get; set; } = 0;
         public float RotY { get; set; } = 0;
-        public float RotZ { get; set; } = 149.1595f;
+        public float RotZ { get; set; } = 3.0673819f;
         public DateTime? DataMorte { get; set; } = null;
         public string MotivoMorte { get; set; } = string.Empty;
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;

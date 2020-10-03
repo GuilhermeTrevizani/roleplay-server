@@ -153,8 +153,8 @@ namespace Roleplay.Models
 
     public enum TipoPreco
     {
-        [Display(Name = "Carros e Motos")]
-        CarrosMotos = 1,
+        [Display(Name = "Luxury Autos")]
+        LuxuryAutos = 1,
 
         [Display(Name = "Conveniência")]
         Conveniencia = 2,
@@ -172,6 +172,26 @@ namespace Roleplay.Models
         Armas = 7,
 
         Empregos = 8,
+
+        Bicicletas = 9,
+
+        [Display(Name = "Sanders Motorcycles Dealership")]
+        SandersMotorcyclesDealership = 10,
+
+        [Display(Name = "Premium Deluxe Motorsport")]
+        PremiumDeluxeMotorsport = 11,
+
+        [Display(Name = "Dinka Oriental Autos")]
+        DinkaOrientalAutos = 12,
+
+        [Display(Name = "Benefactor Euro Cars")]
+        BenefactorEuroCars = 13,
+
+        [Display(Name = "Albany & Declasse Autos")]
+        AlbanyDeclasseAutos = 14,
+
+        [Display(Name = "VAPID")]
+        VAPID = 15,
     }
 
     public enum TipoPonto
@@ -198,7 +218,7 @@ namespace Roleplay.Models
         [Display(Name = "Mecânico")]
         Mecanico = 2,
 
-        Caminhoneiro = 3,
+        Lixeiro = 3,
     }
 
     public enum TipoStaff

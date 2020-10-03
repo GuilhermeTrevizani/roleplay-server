@@ -61,11 +61,11 @@ namespace Roleplay
         {
             new Concessionaria()
             {
-                Nome = "Concessionária de Carros e Motos",
-                Tipo = TipoPreco.CarrosMotos,
-                PosicaoCompra = new Position(-56.637363f, -1099.0286f, 26.415405f),
-                PosicaoSpawn = new Position(-60.224174f, -1106.1494f, 25.909912f),
-                RotacaoSpawn = new Position(-0.015625f, 0, 1.203125f),
+                Nome = "Luxury Autos",
+                Tipo = TipoPreco.LuxuryAutos,
+                PosicaoCompra = new Position(-802.7736f, -224.05714f, 37.216064f),
+                PosicaoSpawn = new Position(-768.9363f, -243.6f, 36.744263f),
+                RotacaoSpawn = new Position(0f, 0f, -2.75f),
             },
             new Concessionaria()
             {
@@ -99,6 +99,62 @@ namespace Roleplay
                 PosicaoSpawn = new Position(-979.5824f, -2996.3472f, 13.457886f),
                 RotacaoSpawn = new Position(0f, 0f, 1.046875f),
             },
+            new Concessionaria()
+            {
+                Nome = "Concessionária de Bicicletas",
+                Tipo = TipoPreco.Bicicletas,
+                PosicaoCompra = new Position(-1108.4572f, -1693.5824f, 4.359009f),
+                PosicaoSpawn = new Position(-1103.9341f, -1690.5363f, 3.8198242f),
+                RotacaoSpawn = new Position(0f, 0.015625f, 0.59375f),
+            },
+            new Concessionaria()
+            {
+                Nome = "Sanders Motorcycles Dealership",
+                Tipo = TipoPreco.SandersMotorcyclesDealership,
+                PosicaoCompra = new Position(268.73407f, -1155.455f, 29.279907f),
+                PosicaoSpawn = new Position(255.13846f, -1155.9165f, 28.774414f),
+                RotacaoSpawn = new Position(0f, -0.015625f, 1.578125f),
+            },
+            new Concessionaria()
+            {
+                Nome = "Premium Deluxe Motorsport",
+                Tipo = TipoPreco.PremiumDeluxeMotorsport,
+                PosicaoCompra = new Position(-56.096703f, -1099.3978f, 26.415405f),
+                PosicaoSpawn = new Position(-57.81099f, -1107.6263f, 25.96045f),
+                RotacaoSpawn = new Position(0f, 0f, 1.25f),
+            },
+            new Concessionaria()
+            {
+                Nome = "Dinka Oriental Autos",
+                Tipo = TipoPreco.DinkaOrientalAutos,
+                PosicaoCompra = new Position(-903.7978f, -225.08571f, 40.013184f),
+                PosicaoSpawn = new Position(-903.33624f, -241.7011f, 39.238037f),
+                RotacaoSpawn = new Position(0.0625f, 0f, 2.609375f),
+            },
+            new Concessionaria()
+            {
+                Nome = "Benefactor Euro Cars",
+                Tipo = TipoPreco.BenefactorEuroCars,
+                PosicaoCompra = new Position(-69.00659f, 63.65275f, 71.87622f),
+                PosicaoSpawn = new Position(-72.42198f, 84.5011f, 71f),
+                RotacaoSpawn = new Position(0f, 0f, 1.15625f),
+            },
+            new Concessionaria()
+            {
+                Nome = "Albany & Declasse Autos",
+                Tipo = TipoPreco.AlbanyDeclasseAutos,
+                PosicaoCompra = new Position(-40.826374f, -1674.4484f, 29.46521f),
+                PosicaoSpawn = new Position(-24.474724f, -1678.3912f, 28.976562f),
+                RotacaoSpawn = new Position(0f, 0f, 2.078125f),
+            },
+            new Concessionaria()
+            {
+                Nome = "VAPID",
+                Tipo = TipoPreco.VAPID,
+                PosicaoCompra = new Position(-202.14066f, -1158.6329f, 23.80371f),
+                PosicaoSpawn = new Position(-222.14505f, -1161.9956f, 22.539917f),
+                RotacaoSpawn = new Position(0f, 0f, 0f),
+            },
         };
 
         public static List<Emprego> Empregos { get; set; } = new List<Emprego>()
@@ -112,6 +168,11 @@ namespace Roleplay
             {
                 Tipo = TipoEmprego.Mecanico,
                 Posicao = new Position(-1148.2417f, -1999.5297f, 13.171387f),
+            },
+            new Emprego()
+            {
+                Tipo = TipoEmprego.Lixeiro,
+                Posicao = new Position(-355.18683f, -1513.411f, 27.712769f),
             },
         };
 
@@ -283,7 +344,7 @@ namespace Roleplay
             new WeaponComponent(WeaponModel.SMGMkII, "HollowPointRounds", 0x3A1BD6FA),
             new WeaponComponent(WeaponModel.SMGMkII, "FullMetalJacketRounds", 0xB5A715F),
             new WeaponComponent(WeaponModel.SMGMkII, "Flashlight", 0x7BC4CDDC),
-            new WeaponComponent(WeaponModel.SMGMkII, "HolographicSight", 0x9FDB5652), 
+            new WeaponComponent(WeaponModel.SMGMkII, "HolographicSight", 0x9FDB5652),
             new WeaponComponent(WeaponModel.SMGMkII, "SmallScope", 0xE502AB6B),
             new WeaponComponent(WeaponModel.SMGMkII, "MediumScope", 0x3DECC7DA),
             new WeaponComponent(WeaponModel.SMGMkII, "Suppressor", 0xC304849A),

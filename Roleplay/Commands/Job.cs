@@ -38,7 +38,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.FaccaoBD?.Tipo == TipoFaccao.Policial || p.FaccaoBD?.Tipo == TipoFaccao.Medica || p.FaccaoBD?.Tipo == TipoFaccao.Governo)
+            if (p.FaccaoBD?.Governamental ?? false)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode pegar um emprego pois está em uma facção governamental.");
                 return;

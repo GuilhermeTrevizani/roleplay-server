@@ -693,6 +693,8 @@ namespace Roleplay.Commands
 
             target.Faccao = fac;
             target.Rank = faccao.RankLider;
+            target.Emprego = TipoEmprego.Nenhum;
+            target.EmTrabalho = false;
 
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} te deu a liderança da facção {faccao.Nome} [{faccao.Codigo}].");
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você deu a liderança da facção {faccao.Nome} [{faccao.Codigo}] para {target.Nome}.");
@@ -967,12 +969,11 @@ namespace Roleplay.Commands
             }
 
             var tp = (TipoPreco)tipo;
-            if (tp == TipoPreco.CarrosMotos)
+            if (tp == TipoPreco.Armas)
             {
-                if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == nome.ToLower())
-                    && !Enum.GetValues(typeof(ModeloVeiculo)).Cast<ModeloVeiculo>().Any(x => x.ToString().ToLower() == nome.ToLower()))
+                if (!Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().Any(x => x.ToString().ToLower() == nome.ToLower()))
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Modelo {nome} não existe.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {nome} não existe.");
                     return;
                 }
             }
@@ -981,6 +982,15 @@ namespace Roleplay.Commands
                 if (!Global.Empregos.Any(x => x.Tipo.ToString().ToLower() == nome.ToLower()))
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Emprego {nome} não existe.");
+                    return;
+                }
+            }
+            else if (tp != TipoPreco.Conveniencia)
+            {
+                if (!Enum.GetValues(typeof(VehicleModel)).Cast<VehicleModel>().Any(x => x.ToString().ToLower() == nome.ToLower())
+                    && !Enum.GetValues(typeof(ModeloVeiculo)).Cast<ModeloVeiculo>().Any(x => x.ToString().ToLower() == nome.ToLower()))
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Veículo {nome} não existe.");
                     return;
                 }
             }

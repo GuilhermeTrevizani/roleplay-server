@@ -57,10 +57,10 @@ namespace Roleplay.Commands
             }
 
             var valor = Global.Parametros.ValorVagaVeiculo;
-            if (!veh.Estacionou 
-                || Global.Propriedades.Any(x => x.Personagem == p.Codigo 
+            if (!veh.Estacionou
+                || Global.Propriedades.Any(x => x.Personagem == p.Codigo
                     && player.Vehicle.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= 25))
-                        valor = 0;
+                valor = 0;
 
             if (p.Dinheiro < valor)
             {
@@ -346,6 +346,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            veh.DataUltimaVerificacao = DateTime.Now;
             player.Emit("Server:Abastecer", veh.Codigo);
         }
 

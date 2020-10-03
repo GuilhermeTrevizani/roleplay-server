@@ -116,9 +116,11 @@ namespace Roleplay.Commands
             }
 
             foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            {
                 x.Player.Emit("chat:clearMessages");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} limpou o chat de todos.", notify: true);
+            }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você limpou o chat de todos os personagens.", notify: true);
             Functions.GravarLog(TipoLog.Staff, $"/limparchat", p, null);
         }
     }

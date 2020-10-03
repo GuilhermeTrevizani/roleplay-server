@@ -56,8 +56,8 @@ namespace Roleplay.Commands
                         <th>ID</th>
                         <th>Nome</th>
                         <th>OOC</th>
-                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? "<th class='text-center'>Status</th>" : string.Empty)}
-                        {(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? "<th>Distintivo</th>" : string.Empty)}
+                        {(p.FaccaoBD.Governamental ? "<th class='text-center'>Status</th>" : string.Empty)}
+                        {(p.FaccaoBD.Governamental ? "<th>Distintivo</th>" : string.Empty)}
                     </tr>
                 </thead>
                 <tbody>";
@@ -66,7 +66,7 @@ namespace Roleplay.Commands
             foreach (var x in players)
             {
                 var status = x.EmTrabalho ? $"<span class='label' style='background-color:{Global.CorSucesso}'>EM SERVIÇO</span>" : $"<span class='label' style='background-color:{Global.CorErro}'>FORA DE SERVIÇO</span>";
-                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica ? $"<td class='text-center'>{status}</td>" : string.Empty)}{(p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
+                html += $@"<tr class='pesquisaitem'><td>{x.RankBD.Nome}</td><td>{x.ID}</td><td>{x.Nome}</td><td>{x.UsuarioBD.Nome}</td>{(p.FaccaoBD.Governamental ? $"<td class='text-center'>{status}</td>" : string.Empty)}{(p.FaccaoBD.Governamental ? $"<td>{x.Distintivo}</td>" : string.Empty)}</tr>";
             }
 
             html += $@"
@@ -546,7 +546,7 @@ namespace Roleplay.Commands
                 target.StopAnimation();
             }
             target.Ferimentos = new List<Personagem.Ferimento>();
-            target.Player.Emit("Server:CurarPersonagem");
+            target.Player.Emit("Server:ToggleFerido", false);
             target.Player.Health = target.Player.MaxHealth;
             target.TimerFerido?.Stop();
             target.TimerFerido = null;
@@ -559,7 +559,7 @@ namespace Roleplay.Commands
         public void CMD_fspawn(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.EmTrabalho)
+            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
@@ -851,7 +851,7 @@ namespace Roleplay.Commands
         public void CMD_distintivo(IPlayer player, string idNome, int distintivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica && p?.FaccaoBD?.Tipo != TipoFaccao.Governo) || p?.Rank < p?.FaccaoBD?.RankGestor)
+            if (!(p?.FaccaoBD?.Governamental ?? false) || p?.Rank < p?.FaccaoBD?.RankGestor)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;

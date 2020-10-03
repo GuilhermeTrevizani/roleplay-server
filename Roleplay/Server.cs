@@ -185,7 +185,8 @@ namespace Roleplay
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == vehicle);
             if (veh != null)
             {
-                player.Emit("vehicle:setVehicleEngineOn", vehicle, vehicle.EngineOn);
+                if (veh.Combustivel == 0 && vehicle.EngineOn)
+                    player.Emit("vehicle:setVehicleEngineOn", vehicle, false);
 
                 if (!veh.HealthSetado)
                 {
@@ -268,14 +269,6 @@ namespace Roleplay
 
             player.SetSyncedMetaData("ferido", true);
 
-            AltAsync.Do(async () =>
-            {
-                await Task.Delay(5000);
-                await player.SpawnAsync(player.Position);
-                p.StopAnimation();
-                p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
-            });
-
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(180000)
             {
@@ -283,6 +276,18 @@ namespace Roleplay
             };
             p.TimerFerido.Elapsed += TimerFerido_Elapsed;
             p.TimerFerido.Start();
+
+            AltAsync.Do(async () =>
+            {
+                await Task.Delay(5000);
+                if (player.IsDead)
+                {
+                    await player.SpawnAsync(player.Position);
+                    p.StopAnimation();
+                    p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
+                    player.Emit("Server:ToggleFerido", true);
+                }
+            });
         }
 
         private void TimerFerido_Elapsed(object sender, ElapsedEventArgs e)
@@ -488,7 +493,6 @@ namespace Roleplay
                     x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
                     if (x.Combustivel == 0)
                     {
-                        x.Vehicle.EngineOn = false;
                         if (x.Vehicle.Driver != null)
                             x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
                     }
@@ -992,7 +996,7 @@ namespace Roleplay
             p.Dinheiro -= preco.Valor;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo.ToUpper()} por ${preco.Valor:N0}. Use /vspawn {veh.Codigo} para spawnar.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo.ToUpper()} por ${preco.Valor:N0}.");
             player.Emit("Server:CloseView");
         }
 

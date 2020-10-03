@@ -24,7 +24,7 @@
     <PackageReference Include="AltV.Net" Version="1.38.4" />
     <PackageReference Include="AltV.Net.Async" Version="1.38.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.2" />
   </ItemGroup>
 
   <ItemGroup>
