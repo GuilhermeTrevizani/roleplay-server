@@ -265,12 +265,12 @@ namespace Roleplay
 
             Global.GlobalVoice.MutePlayer(player);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 3 minutos.");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 5 minutos.");
 
             player.SetSyncedMetaData("ferido", true);
 
             p.TimerFerido?.Stop();
-            p.TimerFerido = new TagTimer(180000)
+            p.TimerFerido = new TagTimer(300000)
             {
                 Tag = p.Codigo,
             };
@@ -405,6 +405,9 @@ namespace Roleplay
             if (p == null)
                 return false;
 
+            if (p.Ferido)
+                return false;
+
             p.Ferimentos.Add(new Personagem.Ferimento()
             {
                 Data = DateTime.Now,
@@ -424,6 +427,9 @@ namespace Roleplay
 
             var p = Functions.ObterPersonagem(player);
             if (p == null)
+                return;
+
+            if (p.Ferido)
                 return;
 
             var ferimento = new Personagem.Ferimento()

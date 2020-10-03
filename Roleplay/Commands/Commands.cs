@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net.Async;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -52,6 +54,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
                 new Comando("Geral", "/limparmeuchat", "Limpa o seu chat"),
                 new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
+                new Comando("Geral", "/mecurar", "Trata os ferimentos em um hospital"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -984,17 +987,13 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.SetSyncedMetaData("ferido", false);
-            p.StopAnimation();
-            p.TimerFerido = null;
             player.Dimension = 0;
+            p.Curar();
+
             foreach (var x in p.Armas)
                 player.Emit("RemoveWeapon", x.Codigo);
             p.Armas = new List<Personagem.Arma>();
-            p.Ferimentos = new List<Personagem.Ferimento>();
-            player.Emit("Server:CurarPersonagem");
             p.SetPosition(new Position(298.16702f, -584.2286f, 43.24829f), true);
-            player.Health = player.MaxHealth;
 
             p.Banco -= Global.Parametros.ValorCustosHospitalares;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o tratamento e foi levado para o hospital. Os custos hospitalares foram ${Global.Parametros.ValorCustosHospitalares:N0}.");
@@ -1327,6 +1326,42 @@ namespace Roleplay.Commands
             var p = Functions.ObterPersonagem(player);
             p.DL = !p.DL;
             player.Emit("dl:Config", p.DL);
+        }
+
+        [Command("mecurar")]
+        public void CMD_mecurar(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (!p.Ferido)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está ferido.");
+                return;
+            }
+
+            var valor = Global.Parametros.ValorCustosHospitalares / 2;
+            if (p.Dinheiro < valor)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.MeCurar && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um hospital.");
+                return;
+            }
+
+            player.Emit("Server:freezeEntityPosition", true);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
+            AltAsync.Do(async () =>
+            {
+                await Task.Delay(5000);
+                p.Curar();
+                p.Dinheiro -= valor;
+                p.SetDinheiro();
+                player.Emit("Server:freezeEntityPosition", false);
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você tratou seus ferimentos por ${valor:N0}.");
+            });
         }
     }
 }

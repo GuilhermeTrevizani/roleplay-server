@@ -205,6 +205,9 @@ namespace Roleplay.Entities
         [NotMapped]
         public bool DL { get; set; } = false;
 
+        [NotMapped]
+        public bool Ferido => Ferimentos.Count > 0 || Player.IsDead || TimerFerido != null || Player.Health != Player.MaxHealth;
+
         public void SetDinheiro()
         {
             if (Player != null)
@@ -313,6 +316,21 @@ namespace Roleplay.Entities
             DimensaoSpec = IDSpec = 0;
             IPLsSpec = new List<string>();
             Player.Emit("UnspectatePlayer");
+        }
+
+        public void Curar()
+        {
+            Player.SetSyncedMetaData("ferido", false);
+            if (TimerFerido != null)
+            {
+                SetPosition(Player.Position, true);
+                StopAnimation();
+            }
+            Ferimentos = new List<Ferimento>();
+            Player.Emit("Server:ToggleFerido", false);
+            Player.Health = Player.MaxHealth;
+            TimerFerido?.Stop();
+            TimerFerido = null;
         }
 
         public class Ferimento

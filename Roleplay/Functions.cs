@@ -528,7 +528,7 @@ namespace Roleplay
                 return false;
             }
 
-            if (p.TimerFerido != null)
+            if (p.Ferido)
             {
                 EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação ferido.");
                 return false;

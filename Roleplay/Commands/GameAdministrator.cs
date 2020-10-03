@@ -2,7 +2,6 @@
 using Roleplay.Entities;
 using Roleplay.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Roleplay.Commands
@@ -217,23 +216,13 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null && target.Player.Health == target.Player.MaxHealth)
+            if (!target.Ferido)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
                 return;
             }
 
-            target.Player.SetSyncedMetaData("ferido", false);
-            if (target.TimerFerido != null)
-            {
-                target.SetPosition(target.Player.Position, true);
-                target.StopAnimation();
-            }
-            target.Ferimentos = new List<Personagem.Ferimento>();
-            target.Player.Emit("Server:ToggleFerido", false);
-            target.Player.Health = target.Player.MaxHealth;
-            target.TimerFerido?.Stop();
-            target.TimerFerido = null;
+            target.Curar();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você reviveu {target.Nome}.", notify: true);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);

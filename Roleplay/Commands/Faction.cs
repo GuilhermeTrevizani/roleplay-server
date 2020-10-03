@@ -533,7 +533,7 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || (target.Ferimentos.Count == 0 && !target.Player.IsDead && target.TimerFerido == null && target.Player.Health == target.Player.MaxHealth))
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || !target.Ferido)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo ou não está ferido.");
                 return;
