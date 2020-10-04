@@ -8,6 +8,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -828,6 +829,7 @@ namespace Roleplay.Commands
                 {
                     Nome = x.Nome.ToUpper(),
                     Preco = $"${x.Valor:N0}",
+                    Exibicao = Global.VehicleInfos.FirstOrDefault(y => y.Name.ToLower() == x.Nome.ToLower())?.DisplayName ?? string.Empty,
                 }).ToList();
 
                 player.Emit("Server:ComprarVeiculo", conce.Nome, (int)conce.Tipo, JsonConvert.SerializeObject(veiculos));
