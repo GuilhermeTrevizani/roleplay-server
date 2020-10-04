@@ -199,7 +199,7 @@ namespace Roleplay.Commands
             p.SetDinheiro();
 
             foreach (var x in Global.PersonagensOnline.Where(x => !x.UsuarioBD.TogAnuncio))
-                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"[CENTRAL DE ANÚNCIOS] {mensagem}", "#8EBE59");
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"[CENTRAL DE ANÚNCIOS] {mensagem} | Contato: {p.Celular}", "#8EBE59");
         }
     }
 }

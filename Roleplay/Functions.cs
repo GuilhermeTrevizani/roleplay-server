@@ -265,16 +265,6 @@ namespace Roleplay
             if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
                 return;
 
-            var armas = (p.StringArmas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(x => new Personagem.Arma()
-                {
-                    Codigo = long.Parse(x.Split("|")[0]),
-                    Municao = int.Parse(x.Split("|")[1]),
-                });
-
-            foreach (var x in p.Armas)
-                x.Municao = armas.FirstOrDefault(y => y.Codigo == x.Codigo)?.Municao ?? 0;
-
             if (!online && p.Celular > 0)
             {
                 p.LimparLigacao();

@@ -247,7 +247,7 @@ namespace Roleplay
                         if (salario != 0)
                         {
                             Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Pagamento de {p.Nome} {(Global.Parametros.Paycheck > 1 ? $"(PAYCHECK {Global.Parametros.Paycheck}x)" : string.Empty)}");
-                            
+
                             if (p.Faccao > 0 && p.RankBD.Salario > 0)
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário {p.FaccaoBD.Nome}: {{{Global.CorSucesso}}}+ ${p.RankBD.Salario:N0}");
 
@@ -742,26 +742,6 @@ namespace Roleplay
             p.SetDinheiro();
             player.SetWeather(Global.Weather);
             p.DataUltimaVerificacao = DateTime.Now;
-
-            p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
-
-            var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesRoupas);
-            foreach (var x in roupas)
-                p.SetClothes(x.Slot, x.Drawable, x.Texture);
-
-            var acessorios = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesAcessorios);
-            foreach (var x in acessorios)
-                p.SetAccessories(x.Slot, x.Drawable, x.Texture);
-
-            p.Armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas);
-            foreach (var x in p.Armas)
-            {
-                player.GiveWeapon((WeaponModel)x.Codigo, x.Municao, false);
-                player.SetWeaponTintIndex((WeaponModel)x.Codigo, (byte)x.Pintura);
-                foreach (var c in JsonConvert.DeserializeObject<List<uint>>(x.Componentes))
-                    player.AddWeaponComponent((WeaponModel)x.Codigo, c);
-            }
-
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
 
             if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
@@ -783,6 +763,20 @@ namespace Roleplay
             }
             else
             {
+                p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
+
+                var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesRoupas);
+                foreach (var x in roupas)
+                    p.SetClothes(x.Slot, x.Drawable, x.Texture);
+
+                var acessorios = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesAcessorios);
+                foreach (var x in acessorios)
+                    p.SetAccessories(x.Slot, x.Drawable, x.Texture);
+
+                var armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas);
+                foreach (var x in armas)
+                    p.DarArma((WeaponModel)x.Codigo, x.Municao, x.Pintura, x.Componentes, false);
+
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
                 if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
                     Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
@@ -1140,6 +1134,96 @@ namespace Roleplay
 
                     strMensagem = $"Você comprou uma peça veicular.";
                     break;
+                case "Galão de Combustível":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.JerryCan))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um galão de combustível.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.JerryCan, 2000);
+                    strMensagem = $"Você comprou um galão de gasolina.";
+                    break;
+                case "Soco Inglês":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.BrassKnuckles))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um soco inglês.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.BrassKnuckles, 1);
+                    strMensagem = $"Você comprou um soco inglês.";
+                    break;
+                case "Garrafa":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.BrokenBottle))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma garrafa.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.BrokenBottle, 1);
+                    strMensagem = $"Você comprou uma garrafa.";
+                    break;
+                case "Pé de Cabra":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.Crowbar))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um pé de cabra.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.Crowbar, 1);
+                    strMensagem = $"Você comprou um pé de cabra.";
+                    break;
+                case "Taco de Golfe":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.GolfClub))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um taco de golfe.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.GolfClub, 1);
+                    strMensagem = $"Você comprou um taco de golfe.";
+                    break;
+                case "Martelo":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.Hammer))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um martelo.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.Hammer, 1);
+                    strMensagem = $"Você comprou um martelo.";
+                    break;
+                case "Chave para Tubos":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.PipeWrench))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma chave para tubos.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.PipeWrench, 1);
+                    strMensagem = $"Você comprou uma chave para tubos.";
+                    break;
+                case "Taco de Baseball":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.BaseballBat))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um taco de baseball.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.BaseballBat, 1);
+                    strMensagem = $"Você comprou um taco de baseball.";
+                    break;
+                case "Bola de Baseball":
+                    if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.Baseball))
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma bola de baseball.", notify: true);
+                        return;
+                    }
+
+                    p.DarArma(WeaponModel.Baseball, 1);
+                    strMensagem = $"Você comprou uma bola de baseball.";
+                    break;
             }
 
             p.Dinheiro -= preco.Valor;
@@ -1252,19 +1336,7 @@ namespace Roleplay
                 }
             }
 
-            player.GiveWeapon(weapon, arma.Municao, false);
-            player.SetWeaponTintIndex(weapon, (byte)arma.Pintura);
-            var armaComponentes = JsonConvert.DeserializeObject<List<uint>>(arma.Componentes);
-            foreach (var x in armaComponentes)
-                player.AddWeaponComponent(weapon, x);
-
-            p.Armas.Add(new Personagem.Arma()
-            {
-                Codigo = arma.Arma,
-                Municao = arma.Municao,
-                Pintura = arma.Pintura,
-                Componentes = arma.Componentes,
-            });
+            p.DarArma((WeaponModel)weapon, arma.Municao, arma.Pintura, arma.Componentes);
 
             arma.Estoque--;
             using var context = new DatabaseContext();
@@ -1307,19 +1379,11 @@ namespace Roleplay
             uint.TryParse(weapon, out uint arma);
             var wep = p.Armas.FirstOrDefault(x => x.Codigo == arma);
 
-            player.Emit("RemoveWeapon", arma);
-            p.Armas.Remove(wep);
+            p.RemoverArma(arma);
+            target.DarArma((WeaponModel)arma, municao, wep.Pintura, wep.Componentes);
 
-            wep.Codigo = target.Codigo;
-            target.Player.GiveWeapon(arma, municao, true);
-            target.Player.SetWeaponTintIndex(arma, (byte)wep.Pintura);
-            var componentes = JsonConvert.DeserializeObject<List<uint>>(wep.Componentes);
-            foreach (var x in componentes)
-                target.Player.AddWeaponComponent(arma, x);
-            target.Armas.Add(wep);
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você deu {(WeaponModel)arma} com {municao} de munição para {target.NomeIC}.");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} te deu {(WeaponModel)arma} com {municao} de munição.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entregou {(WeaponModel)arma} com {municao} de munição para {target.NomeIC}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} te entregou {(WeaponModel)arma} com {municao} de munição.");
             Functions.GravarLog(TipoLog.Arma, $"/entregararma {arma}", p, target);
         }
 
@@ -1328,7 +1392,26 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
             p.AreaName = areaName;
             p.ZoneName = zoneName;
-            p.StringArmas = armas;
+
+            var weapons = (armas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => new Personagem.Arma()
+                {
+                    Codigo = long.Parse(x.Split("|")[0]),
+                    Municao = int.Parse(x.Split("|")[1]),
+                });
+
+            var armasRemover = new List<Personagem.Arma>();
+            foreach (var x in p.Armas)
+            {
+                var wep = weapons.FirstOrDefault(y => y.Codigo == x.Codigo);
+                if (wep == null)
+                    armasRemover.Add(x);
+                else
+                    x.Municao = wep?.Municao ?? 0;
+            }
+
+            foreach (var x in armasRemover)
+                p.Armas.Remove(x);
         }
 
         private void SetVehicleMeta(IPlayer player, IVehicle vehicle, string meta, object value) => vehicle.SetStreamSyncedMetaData(meta, value);
@@ -1338,13 +1421,11 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
 
             foreach (var x in p.Armas)
-                player.Emit("RemoveWeapon", (uint)x.Codigo);
+                p.RemoverArma(x.Codigo);
 
-            p.Armas = new List<Personagem.Arma>();
             player.Armor = 0;
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você devolveu seus itens no armário.", notify: true);
-            Functions.GravarLog(TipoLog.Arma, $"/armario DevolverItensArmario", p, null);
         }
 
         private void SpawnarVeiculoFaccao(IPlayer player, int codigoPonto, int veiculo)

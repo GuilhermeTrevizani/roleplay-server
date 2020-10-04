@@ -841,10 +841,8 @@ namespace Roleplay.Commands
             }
 
             foreach (var x in target.Armas)
-                target.Player.Emit("RemoveWeapon", x.Codigo);
-
-            target.Armas = new List<Personagem.Arma>();
-
+                target.RemoverArma(x.Codigo);
+            
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");
         }

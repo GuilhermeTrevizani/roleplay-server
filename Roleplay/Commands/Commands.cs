@@ -486,22 +486,8 @@ namespace Roleplay.Commands
                     Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Celular: {p.Celular} | Dinheiro: ${p.Dinheiro:N0}");
                     if (p.CanalRadio > -1)
                         Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Canal Rádio 1: {p.CanalRadio} | Canal Rádio 2: {p.CanalRadio2} | Canal Rádio 3: {p.CanalRadio3}");
-                    if (!string.IsNullOrWhiteSpace(p.StringArmas))
-                    {
-                        var armas = p.StringArmas.Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
-                        .Select(x => new Personagem.Arma()
-                        {
-                            Codigo = long.Parse(x.Split("|")[0]),
-                            Municao = int.Parse(x.Split("|")[1]),
-                        });
-
-                        foreach (var x in p.Armas)
-                        {
-                            x.Municao = armas.FirstOrDefault(y => y.Codigo == x.Codigo)?.Municao ?? 0;
-                            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Codigo} | Munição: {x.Municao}");
-                        }
-                    }
-
+                    foreach (var x in p.Armas)
+                        Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Arma: {(WeaponModel)x.Codigo} | Munição: {x.Municao}");
                     break;
                 case TipoConvite.VendaVeiculo:
                     if (target == null)
@@ -1095,7 +1081,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (target.Armas.Any(x => x.Codigo == (long)wep))
+            if (target.Armas.Any(x => x.Codigo == (long)wep && x.Municao > 0))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "O jogador já está carregando essa arma.");
                 return;

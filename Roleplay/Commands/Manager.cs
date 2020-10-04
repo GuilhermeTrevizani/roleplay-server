@@ -1033,7 +1033,7 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/cpreco {tipo} {nome} {valor}", p, null);
         }
 
-        [Command("rpreco", "/rpreco (tipo) (nome)")]
+        [Command("rpreco", "/rpreco (tipo) (nome)", GreedyArg = true)]
         public void CMD_rpreco(IPlayer player, int tipo, string nome)
         {
             var p = Functions.ObterPersonagem(player);
@@ -1784,7 +1784,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            item.Pintura = pintura;
+            item.Pintura = (byte)pintura;
 
             using (var context = new DatabaseContext())
             {

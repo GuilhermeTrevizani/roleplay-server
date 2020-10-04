@@ -1,6 +1,7 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
@@ -146,9 +147,6 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public string ZoneName { get; set; }
-
-        [NotMapped]
-        public string StringArmas { get; set; }
 
         [NotMapped]
         public Position PosicaoIC
@@ -319,6 +317,31 @@ namespace Roleplay.Entities
             TimerFerido = null;
         }
 
+        public void DarArma(WeaponModel weapon, int municao, byte pintura = 0, string components = "[]", bool selectWeapon = true)
+        {
+            Player.GiveWeapon(weapon, municao, selectWeapon);
+            Player.SetWeaponTintIndex(weapon, pintura);
+
+            var armaComponentes = JsonConvert.DeserializeObject<List<uint>>(components);
+            foreach (var x in components)
+                Player.AddWeaponComponent(weapon, x);
+
+            Armas.RemoveAll(x => x.Codigo == (long)weapon);
+            Armas.Add(new Arma()
+            {
+                Codigo = (long)weapon,
+                Municao = municao,
+                Pintura = pintura,
+                Componentes = components,
+            });
+        }
+
+        public void RemoverArma(long weapon)
+        {
+            Armas.RemoveAll(x => x.Codigo == weapon);
+            Player.Emit("RemoveWeapon", weapon);
+        }
+
         public class Ferimento
         {
             public DateTime Data { get; set; } = DateTime.Now;
@@ -339,7 +362,7 @@ namespace Roleplay.Entities
         {
             public long Codigo { get; set; }
             public int Municao { get; set; } = 0;
-            public int Pintura { get; set; } = 0;
+            public byte Pintura { get; set; } = 0;
             public string Componentes { get; set; } = "[]";
         }
 

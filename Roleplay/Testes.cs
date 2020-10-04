@@ -24,7 +24,7 @@ namespace Roleplay
                 return;
             }
 
-            player.GiveWeapon(wep, 100, true);
+            player.GiveWeapon(wep, 2000, true);
         }
 
         [Command("int", "/int (código)")]
