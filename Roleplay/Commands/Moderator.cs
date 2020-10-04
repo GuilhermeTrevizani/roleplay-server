@@ -248,11 +248,25 @@ namespace Roleplay.Commands
                 return;
             }
 
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+            <table class='table table-bordered table-striped'>
+                <thead>
+                    <tr class='bg-dark'>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Personagem</th>
+                        <th>Usuário</th>
+                        <th>Mensagem</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
             foreach (var x in Global.SOSs.OrderBy(x => x.Data))
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"SOS de {x.NomePersonagem} [{x.IDPersonagem}] ({x.NomeUsuario}) | {x.Data}");
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, x.Mensagem);
-            }
+                html += $@"<tr><td>{x.IDPersonagem}</td><td>{x.Data}</td><td>{x.NomePersonagem}</td><td>{x.NomeUsuario}</td><td>{x.Mensagem}</td></tr>";
+
+            html += $@"</tbody></table></div>";
+
+            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • SOS", html));
         }
 
         [Command("aj", "/aj (código)")]
@@ -294,8 +308,8 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} aceitou seu SOS.");
         }
 
-        [Command("rj", "/rj (código)")]
-        public void CMD_rj(IPlayer player, int codigo)
+        [Command("rj", "/rj (código) (motivo)", GreedyArg = true)]
+        public void CMD_rj(IPlayer player, int codigo, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
@@ -321,6 +335,7 @@ namespace Roleplay.Commands
             sos.DataResposta = DateTime.Now;
             sos.UsuarioStaff = p.UsuarioBD.Codigo;
             sos.TipoResposta = TipoRespostaSOS.Rejeitado;
+            sos.MotivoRejeicao = motivo;
 
             using var context = new DatabaseContext();
             context.SOSs.Update(sos);
@@ -328,7 +343,7 @@ namespace Roleplay.Commands
             Global.SOSs.Remove(sos);
 
             Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).", true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} rejeitou seu SOS.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Erro, $"{p.UsuarioBD.Nome} rejeitou seu SOS. Motivo: {motivo}");
         }
 
         [Command("spec", "/spec (ID ou nome)")]

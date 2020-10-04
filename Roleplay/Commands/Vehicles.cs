@@ -1,12 +1,10 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {

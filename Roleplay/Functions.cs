@@ -315,10 +315,16 @@ namespace Roleplay
 
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)
         {
+            var p = ObterPersonagem(player);
+            if (p.Player.IsDead || p.TimerFerido != null)
+            {
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está gravemente ferido.");
+                return;
+            }
+
             if (type == TipoMensagemJogo.Radio)
                 excludePlayer = true;
 
-            var p = ObterPersonagem(player);
             var distanceGap = range / 5;
 
             var targetList = Global.PersonagensOnline.Where(x => x.Player != null && x.Player.Dimension == player.Dimension).Select(x => x.Player).ToList();
@@ -528,7 +534,7 @@ namespace Roleplay
                 return false;
             }
 
-            if (p.Ferido)
+            if (p.TimerFerido != null)
             {
                 EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação ferido.");
                 return false;

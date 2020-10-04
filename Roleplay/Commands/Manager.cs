@@ -678,26 +678,37 @@ namespace Roleplay.Commands
                 return;
 
             var faccao = Global.Faccoes.FirstOrDefault(x => x.Codigo == fac);
-            if (faccao == null)
+            if (faccao == null && fac != 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Facção {fac} não existe.");
                 return;
             }
 
-            var rk = Global.Ranks.FirstOrDefault(x => x.Faccao == fac && x.Codigo == faccao.RankLider);
-            if (rk == null)
+            if (fac != 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank líder ({faccao.RankLider}) da facção {fac} não existe.");
-                return;
+                if (!Global.Ranks.Any(x => x.Faccao == fac && x.Codigo == faccao.RankLider))
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Rank líder ({faccao.RankLider}) da facção {fac} não existe.");
+                    return;
+                }
             }
 
             target.Faccao = fac;
-            target.Rank = faccao.RankLider;
+            target.Rank = faccao?.RankLider ?? 0;
             target.Emprego = TipoEmprego.Nenhum;
             target.EmTrabalho = false;
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} te deu a liderança da facção {faccao.Nome} [{faccao.Codigo}].");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você deu a liderança da facção {faccao.Nome} [{faccao.Codigo}] para {target.Nome}.");
+            if (fac != 0)
+            {
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} te deu a liderança da facção {faccao.Nome} [{faccao.Codigo}].");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você deu a liderança da facção {faccao.Nome} [{faccao.Codigo}] para {target.Nome}.");
+            }
+            else
+            {
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} removeu você da liderança da facção.");
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você removeu {target.Nome} da liderança da facção.");
+            }
+
             Functions.GravarLog(TipoLog.Staff, $"/lider {fac}", p, target);
         }
 

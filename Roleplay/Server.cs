@@ -9,6 +9,7 @@ using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Roleplay
     {
         Timer TimerSegundo { get; set; }
         Timer TimerSalvar { get; set; }
+        BackgroundWorker BackgroundWorkerSegundo { get; set; }
 
         public override void OnStart()
         {
@@ -166,6 +168,122 @@ namespace Roleplay
             TimerSalvar = new Timer(60000);
             TimerSalvar.Elapsed += TimerSalvar_Elapsed;
             TimerSalvar.Start();
+
+            BackgroundWorkerSegundo = new BackgroundWorker()
+            {
+                WorkerSupportsCancellation = true
+            };
+            BackgroundWorkerSegundo.DoWork += BackgroundWorkerSegundo_DoWork;
+        }
+
+        private void BackgroundWorkerSegundo_DoWork(object sender, DoWorkEventArgs e)
+        {
+            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
+            {
+                p.Player.SetDateTime(DateTime.Now);
+
+                var dif = DateTime.Now - p.DataUltimaVerificacao;
+                if (dif.TotalMinutes >= 1)
+                {
+                    p.DataUltimaVerificacao = DateTime.Now;
+                    p.TempoConectado++;
+
+                    if (p.TempoConectado % 60 == 0)
+                    {
+                        if (p.EmTrabalhoAdministrativo)
+                            p.UsuarioBD.TempoTrabalhoAdministrativo++;
+
+                        var salario = 0;
+
+                        var valorImpostoPropriedade = 0;
+                        var valorImpostoVeiculo = 0;
+
+                        using var context = new DatabaseContext();
+                        var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList();
+                        if (p.Propriedades.Count > 0 || veiculos.Count > 0)
+                        {
+                            var porcentagemImpostoPropriedade = 0.0015M;
+                            var porcentagemImpostoVeiculo = 0.001M;
+                            switch (p.UsuarioBD.VIP)
+                            {
+                                case TipoVIP.Bronze:
+                                    porcentagemImpostoPropriedade = 0.0013M;
+                                    porcentagemImpostoVeiculo = 0.0007M;
+                                    break;
+                                case TipoVIP.Prata:
+                                    porcentagemImpostoPropriedade = 0.001M;
+                                    porcentagemImpostoVeiculo = 0.0005M;
+                                    break;
+                                case TipoVIP.Ouro:
+                                    porcentagemImpostoPropriedade = 0.0008M;
+                                    porcentagemImpostoVeiculo = 0.0003M;
+                                    break;
+                            }
+
+                            foreach (var x in p.Propriedades)
+                                valorImpostoPropriedade += Convert.ToInt32(Convert.ToDecimal(x.Valor) * porcentagemImpostoPropriedade);
+
+                            foreach (var x in veiculos)
+                                valorImpostoVeiculo += Convert.ToInt32(Convert.ToDecimal(Global.Precos.FirstOrDefault(y => y.Veiculo && y.Nome.ToLower() == x.Modelo.ToLower())?.Valor ?? 0) * porcentagemImpostoVeiculo);
+                        }
+
+                        var salarioEmprego = 0;
+                        if (p.Faccao > 0)
+                        {
+                            salario += p.RankBD.Salario;
+                        }
+                        else if (p.Emprego > 0)
+                        {
+                            salarioEmprego = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Empregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
+                            salario += salarioEmprego;
+                        }
+
+                        salario -= valorImpostoPropriedade;
+                        salario -= valorImpostoVeiculo;
+
+                        salario *= Global.Parametros.Paycheck;
+
+                        p.Banco += salario;
+                        if (salario != 0)
+                        {
+                            Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Pagamento de {p.Nome} {(Global.Parametros.Paycheck > 1 ? $"(PAYCHECK {Global.Parametros.Paycheck}x)" : string.Empty)}");
+                            
+                            if (p.Faccao > 0 && p.RankBD.Salario > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário {p.FaccaoBD.Nome}: {{{Global.CorSucesso}}}+ ${p.RankBD.Salario:N0}");
+
+                            if (salarioEmprego > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Emprego: {{{Global.CorSucesso}}}+ ${salarioEmprego:N0}");
+
+                            if (valorImpostoPropriedade > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Imposto Propriedades: {{{Global.CorErro}}}- ${valorImpostoPropriedade:N0}");
+
+                            if (valorImpostoVeiculo > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Imposto Veículos: {{{Global.CorErro}}}- ${valorImpostoVeiculo:N0}");
+
+                            Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Total: {{{(salario >= 0 ? Global.CorSucesso : Global.CorErro)}}}${salario:N0}");
+                        }
+                    }
+                }
+            }
+
+            foreach (var x in Global.Veiculos.Where(x => x.Vehicle.EngineOn
+                && x.Combustivel > 0
+                && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty)))
+            {
+                var dif = DateTime.Now - x.DataUltimaVerificacao;
+                if (dif.TotalMinutes >= 1)
+                {
+                    x.DataUltimaVerificacao = DateTime.Now;
+
+                    x.Combustivel--;
+                    x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
+                    if (x.Combustivel == 0)
+                    {
+                        if (x.Vehicle.Driver != null)
+                            x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                    }
+                }
+            }
         }
 
         private void OnPlayerLeaveVehicle(IVehicle vehicle, IPlayer player, byte seat)
@@ -200,6 +318,7 @@ namespace Roleplay
         {
             TimerSegundo?.Stop();
             TimerSalvar?.Stop();
+            BackgroundWorkerSegundo.CancelAsync();
             foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
                 Functions.SalvarPersonagem(p);
         }
@@ -455,61 +574,8 @@ namespace Roleplay
 
         private void TimerSegundo_Elapsed(object sender, ElapsedEventArgs e)
         {
-            foreach (var p in Global.PersonagensOnline.Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido))
-            {
-                p.Player.SetDateTime(DateTime.Now);
-
-                var dif = DateTime.Now - p.DataUltimaVerificacao;
-                if (dif.TotalMinutes >= 1)
-                {
-                    p.TempoConectado++;
-                    p.DataUltimaVerificacao = DateTime.Now;
-
-                    if (p.TempoConectado % 60 == 0)
-                    {
-                        var salario = 0;
-                        var salarioEmprego = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Empregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
-                        if (p.Faccao > 0)
-                            salario += p.RankBD.Salario;
-                        else if (p.Emprego > 0)
-                            salario += salarioEmprego;
-
-                        salario *= Global.Parametros.Paycheck;
-
-                        p.Banco += salario;
-                        if (salario > 0)
-                        {
-                            Functions.EnviarMensagem(p.Player, TipoMensagem.Titulo, $"Seu salário de ${salario:N0} foi depositado na sua conta bancária. {(Global.Parametros.Paycheck > 1 ? $"(PAYCHECK {Global.Parametros.Paycheck}x)" : string.Empty)}");
-
-                            if (p.Faccao > 0 && p.RankBD.Salario > 0)
-                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário {p.FaccaoBD.Nome}: ${p.RankBD.Salario:N0}");
-
-                            if (salarioEmprego > 0)
-                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Emprego: ${salarioEmprego:N0}");
-                        }
-                    }
-
-                    if (p.EmTrabalhoAdministrativo)
-                        p.UsuarioBD.TempoTrabalhoAdministrativo++;
-                }
-            }
-
-            foreach (var x in Global.Veiculos.Where(x => x.Vehicle.EngineOn && x.Combustivel > 0 && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty)))
-            {
-                var dif = DateTime.Now - x.DataUltimaVerificacao;
-                if (dif.TotalMinutes >= 1)
-                {
-                    x.DataUltimaVerificacao = DateTime.Now;
-
-                    x.Combustivel--;
-                    x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
-                    if (x.Combustivel == 0)
-                    {
-                        if (x.Vehicle.Driver != null)
-                            x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
-                    }
-                }
-            }
+            if (!BackgroundWorkerSegundo.IsBusy)
+                BackgroundWorkerSegundo.RunWorkerAsync();
         }
 
         private void TimerSalvar_Elapsed(object sender, ElapsedEventArgs e)
@@ -572,6 +638,17 @@ namespace Roleplay
         {
             var p = Functions.ObterPersonagem(player);
 
+            static int ObterSlots(TipoVIP vip)
+            {
+                return vip switch
+                {
+                    TipoVIP.Bronze => 3,
+                    TipoVIP.Prata => 4,
+                    TipoVIP.Ouro => 5,
+                    _ => 2,
+                };
+            }
+
             using var context = new DatabaseContext();
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
                 JsonConvert.SerializeObject(context.Personagens
@@ -584,7 +661,7 @@ namespace Roleplay
                         Status = ObterStatusListarPersonagens(x),
                         Opcoes = ObterOpcoesListarPersonagens(x, p.UsuarioBD),
                     })),
-                    p.SlotsPersonagens);
+                    ObterSlots(p.UsuarioBD.VIP));
         }
 
         private string ObterStatusListarPersonagens(Personagem x)
@@ -664,6 +741,7 @@ namespace Roleplay
             player.Model = (uint)p.Skin;
             p.SetDinheiro();
             player.SetWeather(Global.Weather);
+            p.DataUltimaVerificacao = DateTime.Now;
 
             p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
 

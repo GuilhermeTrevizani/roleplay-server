@@ -1314,7 +1314,14 @@ namespace Roleplay.Commands
         }
 
         [Command("horas")]
-        public void CMD_horas(IPlayer player) => player.Emit("displayAdvancedNotification", $"SV-RP | {DateTime.Now}");
+        public void CMD_horas(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            var horas = Convert.ToInt32(Math.Truncate(p.TempoConectado / 60M));
+            var tempo = 60 - ((horas + 1) * 60 - p.TempoConectado);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{{{Global.CorPrincipal}}}{tempo} {{#FFFFFF}}de {{{Global.CorPrincipal}}}60 {{#FFFFFF}}minutos para o próximo pagamento.");
+            player.Emit("displayAdvancedNotification", $"SV-RP | {DateTime.Now}");
+        }
 
         [Command("telapreta")]
         public void CMD_telapreta(IPlayer player) => player.Emit("chat:toggleTelaPreta");

@@ -31,9 +31,9 @@ namespace RoleplayBOT
                 Client = services.GetRequiredService<DiscordSocketClient>();
 
                 Client.Log += LogAsync;
-                Client.UserJoined += Client_UserJoined;
+                /*Client.Ready += Client_Ready;
+                Client.UserJoined += Client_UserJoined;*/
                 Client.UserLeft += Client_UserLeft;
-                Client.Ready += Client_Ready;
                 services.GetRequiredService<CommandService>().Log += LogAsync;
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
@@ -44,7 +44,7 @@ namespace RoleplayBOT
             }
         }
 
-        private async Task Client_Ready()
+        /*private async Task Client_Ready()
         {
             await Client.SetGameAsync($"{Client.GetGuild(GlobalConfig.GuildId)?.Users.Count} jogadores", type: ActivityType.Listening);
         }
@@ -54,7 +54,7 @@ namespace RoleplayBOT
             var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
             await (Client.GetChannel(GlobalConfig.UserJoinedChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} entrou no servidor. Total de jogadores: {totalJogadores}");
             await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
-        }
+        }*/
 
         private async Task Client_UserLeft(SocketGuildUser arg)
         {

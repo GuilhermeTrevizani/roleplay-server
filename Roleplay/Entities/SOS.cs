@@ -14,6 +14,7 @@ namespace Roleplay.Entities
         public DateTime? DataResposta { get; set; } = null;
         public int UsuarioStaff { get; set; } = 0;
         public TipoRespostaSOS TipoResposta { get; set; } = TipoRespostaSOS.Aguardando;
+        public string MotivoRejeicao { get; set; } = string.Empty;
 
         [NotMapped]
         public int IDPersonagem { get; set; }
@@ -26,7 +27,7 @@ namespace Roleplay.Entities
 
         public Personagem Verificar(int usuario)
         {
-            var p = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == IDPersonagem);
+            var p = Global.PersonagensOnline.FirstOrDefault(x => x.ID == IDPersonagem && x.Nome == NomePersonagem);
             if (p != null)
                 return p;
 

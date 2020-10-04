@@ -169,7 +169,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.Ferido)
+            if (p.TimerFerido != null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está ferido.");
                 return;

@@ -94,9 +94,6 @@ namespace Roleplay.Entities
         public List<Convite> Convites { get; set; } = new List<Convite>();
 
         [NotMapped]
-        public List<Propriedade> Propriedades { get => Global.Propriedades.Where(x => x.Personagem == Codigo).ToList(); }
-
-        [NotMapped]
         public string NomeIC { get => Nome; }
 
         [NotMapped]
@@ -167,21 +164,6 @@ namespace Roleplay.Entities
         }
 
         [NotMapped]
-        public int SlotsPersonagens
-        {
-            get
-            {
-                return UsuarioBD.VIP switch
-                {
-                    TipoVIP.Bronze => 3,
-                    TipoVIP.Prata => 4,
-                    TipoVIP.Ouro => 5,
-                    _ => 2,
-                };
-            }
-        }
-
-        [NotMapped]
         public Position? PosicaoSpec { get; set; } = null;
 
         [NotMapped]
@@ -208,6 +190,9 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public bool Ferido => Ferimentos.Count > 0 || Player.IsDead || TimerFerido != null || Player.Health != Player.MaxHealth;
+
+        [NotMapped]
+        public List<Propriedade> Propriedades { get => Global.Propriedades.Where(x => x.Personagem == Codigo).ToList(); }
 
         public void SetDinheiro()
         {

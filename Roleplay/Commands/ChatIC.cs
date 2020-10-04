@@ -21,6 +21,12 @@ namespace Roleplay.Commands
         public void CMD_s(IPlayer player, string idNome, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
+            if (p.Player.IsDead || p.TimerFerido != null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está gravemente ferido.");
+                return;
+            }
+
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
