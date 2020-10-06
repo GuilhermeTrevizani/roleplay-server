@@ -192,6 +192,9 @@ namespace Roleplay.Entities
         [NotMapped]
         public List<Propriedade> Propriedades { get => Global.Propriedades.Where(x => x.Personagem == Codigo).ToList(); }
 
+        [NotMapped]
+        public int TipoFerido { get; set; } = 0;
+
         public void SetDinheiro()
         {
             if (Player != null)
@@ -304,14 +307,15 @@ namespace Roleplay.Entities
 
         public void Curar()
         {
-            Player.SetSyncedMetaData("ferido", false);
+            TipoFerido = 0;
+            Player.SetSyncedMetaData("ferido", 0);
             if (TimerFerido != null)
             {
                 SetPosition(Player.Position, true);
                 StopAnimation();
             }
             Ferimentos = new List<Ferimento>();
-            Player.Emit("Server:ToggleFerido", false);
+            Player.Emit("Server:ToggleFerido", 0);
             Player.Health = Player.MaxHealth;
             TimerFerido?.Stop();
             TimerFerido = null;

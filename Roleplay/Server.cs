@@ -385,16 +385,32 @@ namespace Roleplay
 
             Global.GlobalVoice.MutePlayer(player);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido e perdeu a consciência! Os médicos deverão chegar em até 5 minutos.");
+            Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos.");
 
-            player.SetSyncedMetaData("ferido", true);
+            player.SetSyncedMetaData("ferido", 1);
+            p.TipoFerido = 1;
 
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(300000)
             {
                 Tag = p.Codigo,
             };
-            p.TimerFerido.Elapsed += TimerFerido_Elapsed;
+            p.TimerFerido.Elapsed += (object sender, ElapsedEventArgs e) =>
+            {
+                var timer = (TagTimer)sender;
+                timer.ElapsedCount++;
+
+                var p = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == (int)timer.Tag);
+                if (p == null)
+                {
+                    timer?.Stop();
+                    return;
+                }
+
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
+                timer?.Stop();
+            };
             p.TimerFerido.Start();
 
             AltAsync.Do(async () =>
@@ -408,23 +424,6 @@ namespace Roleplay
                     await player.EmitAsync("Server:ToggleFerido", true);
                 }
             });
-        }
-
-        private void TimerFerido_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            var timer = (TagTimer)sender;
-            timer.ElapsedCount++;
-
-            var p = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == (int)timer.Tag);
-            if (p == null)
-            {
-                timer?.Stop();
-                return;
-            }
-
-            Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
-            Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
-            timer?.Stop();
         }
 
         private void OnPlayerChat(IPlayer player, string message)
@@ -518,15 +517,24 @@ namespace Roleplay
 
         private bool OnWeaponDamage(IPlayer player, IEntity target, uint weapon, ushort damage, Position shotOffset, BodyPart bodyPart)
         {
-            if (!(target is IPlayer))
+            if (!(target is IPlayer playerTarget))
                 return true;
 
-            var p = Functions.ObterPersonagem((IPlayer)target);
+            var p = Functions.ObterPersonagem(playerTarget);
             if (p == null)
                 return false;
 
-            if (player.IsDead || p.TimerFerido != null)
+            if (playerTarget.IsDead || p.TimerFerido != null)
+            {
+                if (p.TipoFerido == 1)
+                {
+                    Functions.EnviarMensagem(playerTarget, TipoMensagem.Erro, "Você levou PK e perdeu a consciência.");
+                    playerTarget.Emit("Server:ToggleFerido", 2);
+                    playerTarget.SetSyncedMetaData("ferido", 2);
+                    p.TipoFerido = 2;
+                }
                 return false;
+            }
 
             var attacker = Functions.ObterPersonagem(player);
 
@@ -552,7 +560,16 @@ namespace Roleplay
                 return;
 
             if (player.IsDead || p.TimerFerido != null)
+            {
+                if (p.TipoFerido == 1)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você levou PK e perdeu a consciência.");
+                    player.Emit("Server:ToggleFerido", 2);
+                    player.SetSyncedMetaData("ferido", 2);
+                    p.TipoFerido = 2;
+                }
                 return;
+            }
 
             var ferimento = new Personagem.Ferimento()
             {
@@ -784,6 +801,7 @@ namespace Roleplay
                 player.SetSyncedMetaData("nametag", p.Nome);
                 player.Emit("nametags:Config", true);
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
+                player.SetSyncedMetaData("ferido", 0);
                 p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
                 player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
                 player.SetSyncedMetaData("id", p.ID);
