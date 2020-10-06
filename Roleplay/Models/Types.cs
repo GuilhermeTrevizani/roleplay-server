@@ -208,6 +208,7 @@ namespace Roleplay.Models
         DMV = 10,
         Entrada = 11,
         MeCurar = 12,
+        FerroVelho = 13,
     }
 
     public enum TipoEmprego

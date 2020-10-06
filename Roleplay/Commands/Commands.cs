@@ -8,7 +8,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -82,13 +81,14 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/vcomprarvaga", "Compra uma vaga para estacionar um veículo"),
                 new Comando("Veículos", "/vestacionar", "Estaciona um veículo"),
                 new Comando("Veículos", "/vlista", "Mostra seus veículos"),
-                new Comando("Veículos", "/vvender", "Vende um veículo para outro personagem"),
+                new Comando("Veículos", "/vvenderpara", "Vende um veículo para outro personagem"),
                 new Comando("Veículos", "/vliberar", "Libera um veículo apreendido"),
                 new Comando("Veículos", "/portamalas", "Abre/fecha o porta-malas de um veículo"),
                 new Comando("Veículos", "/capo", "Abre/fecha o capô de um veículo"),
                 new Comando("Veículos", "/porta", "Abre/fecha a porta de um veículo"),
                 new Comando("Veículos", "/abastecer", "Abastece um veículo"),
                 new Comando("Veículos", "/mudarplaca", "Altera a placa de um veículo"),
+                new Comando("Veículos", "/vvender", "Vende um veículo no ferro velho"),
                 new Comando("Banco", "/depositar", "Deposita dinheiro no banco"),
                 new Comando("Banco", "/sacar", "Saca dinheiro do banco"),
                 new Comando("Banco", "/transferir", "Transfere dinheiro para outro personagem"),

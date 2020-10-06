@@ -72,6 +72,10 @@ namespace Roleplay.Entities
                     nome = "Tratamento de Ferimentos";
                     descricao = "Use /mecurar";
                     break;
+                case TipoPonto.FerroVelho:
+                    nome = "Ferro Velho";
+                    descricao = "Use /vvender";
+                    break;
             }
 
             TextLabel = Functions.CriarTextDraw($"{nome}\n~w~{descricao}", new Position(PosX, PosY, PosZ), 10, 0.4f, 4, Global.RgbaPrincipal, 0);

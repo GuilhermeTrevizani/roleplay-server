@@ -139,7 +139,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             using var context = new DatabaseContext();
-            var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList()
+            var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList()
                 .Select(x => new
                 {
                     x.Codigo,
@@ -157,8 +157,8 @@ namespace Roleplay.Commands
             player.Emit("Server:SpawnarVeiculos", $"Veículos de {p.Nome} [{p.Codigo}] ({DateTime.Now})", JsonConvert.SerializeObject(veiculos));
         }
 
-        [Command("vvender", "/vvender (ID ou nome) (valor)")]
-        public void CMD_vvender(IPlayer player, string idNome, int valor)
+        [Command("vvenderpara", "/vvenderpara (ID ou nome) (valor)")]
+        public void CMD_vvenderpara(IPlayer player, string idNome, int valor)
         {
             var p = Functions.ObterPersonagem(player);
             var prox = Global.Veiculos
@@ -386,6 +386,27 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a placa do veículo {codigo} para {veh.Placa}.");
             Functions.GravarLog(TipoLog.PlateChange, $"/vplaca {codigo} {placa}", p, null);
+        }
+
+        [Command("vvender")]
+        public void CMD_vvender(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.FerroVelho && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um ferro velho.");
+                return;
+            }
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Personagem == p.Codigo && x.Vehicle == player.Vehicle);
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um veículo seu.");
+                return;
+            }
+
+            var valor = Convert.ToInt32((Global.Precos.FirstOrDefault(x => x.Veiculo && x.Nome.ToLower() == veh.Modelo.ToLower())?.Valor ?? 0) / 2);
+            player.Emit("chat:ExibirConfirmacao", "Confirmar Venda", $"Confirma vender o veículo {veh.Modelo.ToUpper()} para o ferro velho por ${valor:N0}?", "VenderVeiculo");
         }
     }
 }

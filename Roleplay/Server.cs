@@ -73,6 +73,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int, int, int, bool>("UsarATM", UsarATM);
             Alt.OnClient<IPlayer, int, int, int, int, int, int, int, int>("PintarVeiculo", PintarVeiculo);
             Alt.OnClient<IPlayer, int>("SpawnarVeiculo", SpawnarVeiculo);
+            Alt.OnClient<IPlayer>("VenderVeiculo", VenderVeiculo);
             Alt.OnClient<IPlayer, string>("MDCPesquisarPessoa", MDCPesquisarPessoa);
             Alt.OnClient<IPlayer, string>("MDCPesquisarVeiculo", MDCPesquisarVeiculo);
             Alt.OnClient<IPlayer, string>("MDCPesquisarPropriedade", MDCPesquisarPropriedade);
@@ -199,7 +200,7 @@ namespace Roleplay
                         var valorImpostoVeiculo = 0;
 
                         using var context = new DatabaseContext();
-                        var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo).ToList();
+                        var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList();
                         if (p.Propriedades.Count > 0 || veiculos.Count > 0)
                         {
                             var porcentagemImpostoPropriedade = 0.0015M;
@@ -1829,6 +1830,27 @@ namespace Roleplay
             player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou seu veículo.", notify: true);
             player.Emit("Server:CloseView");
+        }
+
+        private void VenderVeiculo(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Personagem == p.Codigo && x.Vehicle == player.Vehicle);
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um veículo seu.");
+                return;
+            }
+
+            var valor = Convert.ToInt32((Global.Precos.FirstOrDefault(x => x.Veiculo && x.Nome.ToLower() == veh.Modelo.ToLower())?.Valor ?? 0) / 2);
+            p.Dinheiro += valor;
+            p.SetDinheiro();
+
+            veh.VendidoFerroVelho = true;
+            veh.Despawnar();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você vendeu seu veículo {veh.Codigo} para o ferro velho por ${valor:N0}.");
+            Functions.GravarLog(TipoLog.Venda, $"/vvender {veh.Codigo} {valor}", p, null);
         }
 
         private void MDCPesquisarPessoa(IPlayer player, string pesquisa)
