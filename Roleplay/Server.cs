@@ -1372,6 +1372,12 @@ namespace Roleplay
                 return;
             }
 
+            if (p.Armas.Any(x => x.Codigo == weapon && x.Municao > 0))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui esse item.", notify: true);
+                return;
+            }
+
             if (p.FaccaoBD.Tipo == TipoFaccao.Criminosa)
             {
                 var preco = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Armas && x.Nome.ToLower() == ((WeaponModel)weapon).ToString().ToLower());
