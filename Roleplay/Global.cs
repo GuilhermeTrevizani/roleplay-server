@@ -163,16 +163,28 @@ namespace Roleplay
             {
                 Tipo = TipoEmprego.Taxista,
                 Posicao = new Position(895.0308f, -179.1359f, 74.70036f),
+                Veiculo = VehicleModel.Taxi,
+                PosicaoAluguel = new Position(906.8967f, -175.66153f, 73.71277f),
+                RotacaoAluguel = new Rotation(0.015625f, 0.015625f, -2.140625f),
+                CorVeiculo = new Rgba(252, 186, 3, 255),
             },
             new Emprego()
             {
                 Tipo = TipoEmprego.Mecanico,
                 Posicao = new Position(-1148.2417f, -1999.5297f, 13.171387f),
+                Veiculo = VehicleModel.TowTruck2,
+                PosicaoAluguel = new Position(-1151.433f, -1982.4923f, 12.632202f),
+                RotacaoAluguel = new Rotation(0.015625f, -0.109375f, -0.796875f),
+                CorVeiculo = new Rgba(0, 0, 0, 255),
             },
             new Emprego()
             {
                 Tipo = TipoEmprego.Lixeiro,
                 Posicao = new Position(-355.18683f, -1513.411f, 27.712769f),
+                Veiculo = VehicleModel.Trash,
+                PosicaoAluguel = new Position(-351.25714f, -1520.6241f, 27.19043f),
+                RotacaoAluguel = new Rotation(0.03125f, -0.140625f, -1.546875f),
+                CorVeiculo = new Rgba(0, 0, 0, 255),
             },
         };
 

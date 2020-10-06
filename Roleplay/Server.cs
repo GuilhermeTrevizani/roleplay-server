@@ -146,6 +146,7 @@ namespace Roleplay
             {
                 var nome = Functions.ObterDisplayEnum(c.Tipo);
                 Functions.CriarTextDraw($"Emprego de {nome}\n~w~Use /emprego para se tornar um {nome.ToLower()}", c.Posicao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
+                Functions.CriarTextDraw($"Aluguel de Veículos {nome}\n~w~Use /valugar ou /vestacionar", c.PosicaoAluguel, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
             }
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
@@ -239,10 +240,10 @@ namespace Roleplay
                             salario += salarioEmprego;
                         }
 
+                        salario *= Global.Parametros.Paycheck;
+
                         salario -= valorImpostoPropriedade;
                         salario -= valorImpostoVeiculo;
-
-                        salario *= Global.Parametros.Paycheck;
 
                         p.Banco += salario;
                         if (salario != 0)
@@ -267,21 +268,37 @@ namespace Roleplay
                 }
             }
 
-            foreach (var x in Global.Veiculos.Where(x => x.Vehicle.EngineOn
-                && x.Combustivel > 0
-                && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty)))
+            foreach (var x in Global.Veiculos)
             {
                 var dif = DateTime.Now - x.DataUltimaVerificacao;
                 if (dif.TotalMinutes >= 1)
                 {
                     x.DataUltimaVerificacao = DateTime.Now;
 
-                    x.Combustivel--;
-                    x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
-                    if (x.Combustivel == 0)
+                    if (x.DataExpiracaoAluguel.HasValue)
                     {
-                        if (x.Vehicle.Driver != null)
-                            x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                        if (x.DataExpiracaoAluguel.Value < DateTime.Now)
+                        {
+                            if (x.Vehicle.Driver != null)
+                            {
+                                x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                                Functions.EnviarMensagem(x.Vehicle.Driver, TipoMensagem.Erro, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora.");
+                            }
+
+                            x.NomeEncarregado = string.Empty;
+                            x.DataExpiracaoAluguel = null;
+                        }
+                    }
+
+                    if (x.Vehicle.EngineOn && x.Combustivel > 0 && !Global.VeiculosSemCombustivel.Contains(x.Info?.Class ?? string.Empty))
+                    {
+                        x.Combustivel--;
+                        x.Vehicle.SetSyncedMetaData("combustivel", x.CombustivelHUD);
+                        if (x.Combustivel == 0)
+                        {
+                            if (x.Vehicle.Driver != null)
+                                x.Vehicle.Driver.Emit("vehicle:setVehicleEngineOn", x.Vehicle, false);
+                        }
                     }
                 }
             }
@@ -301,11 +318,27 @@ namespace Roleplay
 
         private void OnPlayerEnterVehicle(IVehicle vehicle, IPlayer player, byte seat)
         {
+            var p = Functions.ObterPersonagem(player);
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == vehicle);
             if (veh != null)
             {
-                if (veh.Combustivel == 0 && vehicle.EngineOn)
-                    player.Emit("vehicle:setVehicleEngineOn", vehicle, false);
+                if (vehicle.EngineOn)
+                {
+                    if (veh.Combustivel == 0)
+                    {
+                        player.Emit("vehicle:setVehicleEngineOn", vehicle, false);
+                    }
+                    else if (veh.Emprego != TipoEmprego.Nenhum && !veh.DataExpiracaoAluguel.HasValue)
+                    {
+                        player.Emit("vehicle:setVehicleEngineOn", vehicle, false);
+                        if (player.Seat == 0)
+                            Functions.EnviarMensagem(player, TipoMensagem.Erro, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora.");
+                    }
+                    else if (veh.Emprego != TipoEmprego.Nenhum && veh.NomeEncarregado == p.Nome)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O aluguel do veículo irá expirar em {veh.DataExpiracaoAluguel}.");
+                    }
+                }
 
                 if (!veh.HealthSetado)
                 {
@@ -528,7 +561,7 @@ namespace Roleplay
             {
                 if (p.TipoFerido == 1)
                 {
-                    Functions.EnviarMensagem(playerTarget, TipoMensagem.Erro, "Você levou PK e perdeu a consciência.");
+                    Functions.EnviarMensagem(playerTarget, TipoMensagem.Erro, "Você perdeu a consciência.");
                     playerTarget.Emit("Server:ToggleFerido", 2);
                     playerTarget.SetSyncedMetaData("ferido", 2);
                     p.TipoFerido = 2;
@@ -1664,7 +1697,6 @@ namespace Roleplay
             AltAsync.Do(async () =>
             {
                 await Task.Delay(5000);
-                veh.DataUltimaVerificacao = DateTime.Now;
                 veh.Combustivel = veh.TanqueCombustivel;
                 veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
                 p.Dinheiro -= valor;

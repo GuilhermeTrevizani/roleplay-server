@@ -37,15 +37,16 @@ namespace Roleplay.Entities
         public string Danos { get; set; } = "{}";
         public bool Estacionou { get; set; } = false;
         public bool VendidoFerroVelho { get; set; } = false;
+        public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
 
         [NotMapped]
         public IVehicle Vehicle { get; set; }
 
         /// <summary>
-        /// Nome do personagem que usou o /fspawn
+        /// Nome do personagem que usou o /fspawn ou /valugar
         /// </summary>
         [NotMapped]
-        public string NomeEncarregado { get; set; }
+        public string NomeEncarregado { get; set; } = string.Empty;
 
         /// <summary>
         /// TRUE: FECHADA
@@ -82,13 +83,16 @@ namespace Roleplay.Entities
         public VehicleInfo Info { get => Global.VehicleInfos.FirstOrDefault(x => x.Name.ToLower() == Modelo.ToLower()); }
 
         [NotMapped]
-        public DateTime DataUltimaVerificacao { get; set; }
+        public DateTime DataUltimaVerificacao { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Gambiarra necessária enquanto os setters dos healths não funcionam
         /// </summary>
         [NotMapped]
         public bool HealthSetado { get; set; } = false;
+
+        [NotMapped]
+        public DateTime? DataExpiracaoAluguel { get; set; } = null;
 
         public void Spawnar()
         {
@@ -106,33 +110,36 @@ namespace Roleplay.Entities
             if (!Global.VeiculosSemCombustivel.Contains(Info?.Class ?? string.Empty))
                 Vehicle.SetSyncedMetaData("combustivel", CombustivelHUD);
 
-            var dano = JsonConvert.DeserializeObject<Dano>(Danos);
-            if (dano?.WindowsDamaged?.Count > 0)
+            if (Emprego == TipoEmprego.Nenhum)
             {
-                foreach (var x in dano.Bumpers)
-                    Vehicle.SetBumperDamageLevel(x.VehicleBumper, x.VehicleBumperDamage);
-
-                foreach (var x in dano.Parts)
+                var dano = JsonConvert.DeserializeObject<Dano>(Danos);
+                if (dano?.WindowsDamaged?.Count > 0)
                 {
-                    Vehicle.SetPartDamageLevel(x.VehiclePart, x.VehiclePartDamage);
-                    Vehicle.SetPartBulletHoles(x.VehiclePart, x.BulletHoles);
-                }
+                    foreach (var x in dano.Bumpers)
+                        Vehicle.SetBumperDamageLevel(x.VehicleBumper, x.VehicleBumperDamage);
 
-                for (byte i = 0; i <= 10; i++)
-                {
-                    Vehicle.SetLightDamaged(i, dano.LightsDamaged[i]);
-                    Vehicle.SetSpecialLightDamaged(i, dano.SpecialLightsDamaged[i]);
-                    Vehicle.SetWindowDamaged(i, dano.WindowsDamaged[i]);
-                    var armoredWindow = dano.ArmoredWindows[i];
-                    Vehicle.SetArmoredWindowHealth(i, armoredWindow.Health);
-                    Vehicle.SetArmoredWindowShootCount(i, armoredWindow.ShootCount);
-                }
+                    foreach (var x in dano.Parts)
+                    {
+                        Vehicle.SetPartDamageLevel(x.VehiclePart, x.VehiclePartDamage);
+                        Vehicle.SetPartBulletHoles(x.VehiclePart, x.BulletHoles);
+                    }
 
-                foreach (var x in dano.Wheels)
-                {
-                    Vehicle.SetWheelHealth(x.Id, x.Health);
-                    Vehicle.SetWheelDetached(x.Id, x.Detached);
-                    Vehicle.SetWheelBurst(x.Id, x.Burst);
+                    for (byte i = 0; i <= 10; i++)
+                    {
+                        Vehicle.SetLightDamaged(i, dano.LightsDamaged[i]);
+                        Vehicle.SetSpecialLightDamaged(i, dano.SpecialLightsDamaged[i]);
+                        Vehicle.SetWindowDamaged(i, dano.WindowsDamaged[i]);
+                        var armoredWindow = dano.ArmoredWindows[i];
+                        Vehicle.SetArmoredWindowHealth(i, armoredWindow.Health);
+                        Vehicle.SetArmoredWindowShootCount(i, armoredWindow.ShootCount);
+                    }
+
+                    foreach (var x in dano.Wheels)
+                    {
+                        Vehicle.SetWheelHealth(x.Id, x.Health);
+                        Vehicle.SetWheelDetached(x.Id, x.Detached);
+                        Vehicle.SetWheelBurst(x.Id, x.Burst);
+                    }
                 }
             }
 
@@ -141,28 +148,31 @@ namespace Roleplay.Entities
 
         public void Despawnar()
         {
-            EngineHealth = Vehicle.EngineHealth;
-
-            var dano = new Dano();
-
-            foreach (var x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
-                dano.Bumpers.Add(new Dano.Bumper(x, Vehicle.GetBumperDamageLevel(x)));
-
-            foreach (var x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
-                dano.Parts.Add(new Dano.Part(x, Vehicle.GetPartDamageLevel(x), Vehicle.GetPartBulletHoles(x)));
-
-            for (byte i = 0; i <= 10; i++)
+            if (Emprego == TipoEmprego.Nenhum)
             {
-                dano.LightsDamaged.Add(Vehicle.IsLightDamaged(i));
-                dano.SpecialLightsDamaged.Add(Vehicle.IsSpecialLightDamaged(i));
-                dano.WindowsDamaged.Add(Vehicle.IsWindowDamaged(i));
-                dano.ArmoredWindows.Add(new Dano.ArmoredWindow(i, Vehicle.GetArmoredWindowHealth(i), Vehicle.GetArmoredWindowShootCount(i)));
+                EngineHealth = Vehicle.EngineHealth;
+
+                var dano = new Dano();
+
+                foreach (var x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
+                    dano.Bumpers.Add(new Dano.Bumper(x, Vehicle.GetBumperDamageLevel(x)));
+
+                foreach (var x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
+                    dano.Parts.Add(new Dano.Part(x, Vehicle.GetPartDamageLevel(x), Vehicle.GetPartBulletHoles(x)));
+
+                for (byte i = 0; i <= 10; i++)
+                {
+                    dano.LightsDamaged.Add(Vehicle.IsLightDamaged(i));
+                    dano.SpecialLightsDamaged.Add(Vehicle.IsSpecialLightDamaged(i));
+                    dano.WindowsDamaged.Add(Vehicle.IsWindowDamaged(i));
+                    dano.ArmoredWindows.Add(new Dano.ArmoredWindow(i, Vehicle.GetArmoredWindowHealth(i), Vehicle.GetArmoredWindowShootCount(i)));
+                }
+
+                for (byte i = 0; i < Vehicle.WheelsCount; i++)
+                    dano.Wheels.Add(new Dano.Wheel(i, Vehicle.GetWheelHealth(i), Vehicle.IsWheelDetached(i), Vehicle.IsWheelBurst(i)));
+
+                Danos = JsonConvert.SerializeObject(dano);
             }
-
-            for (byte i = 0; i < Vehicle.WheelsCount; i++)
-                dano.Wheels.Add(new Dano.Wheel(i, Vehicle.GetWheelHealth(i), Vehicle.IsWheelDetached(i), Vehicle.IsWheelBurst(i)));
-
-            Danos = JsonConvert.SerializeObject(dano);
 
             using (var context = new DatabaseContext())
             {

@@ -469,5 +469,26 @@ namespace Roleplay.Commands
 
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.Nome}", html));
         }
+
+        [Command("respawnarveiculo", "/respawnarveiculo (código)")]
+        public void CMD_respawnarveiculo(IPlayer player, int codigo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo && x.Emprego != TipoEmprego.Nenhum && !x.DataExpiracaoAluguel.HasValue);
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não é alugado ou tempo de expiração do aluguel não expirou.");
+                return;
+            }
+
+            veh.Despawnar();
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} respawnou o veículo {codigo}.", true);
+        }
     }
 }

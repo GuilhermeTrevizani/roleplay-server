@@ -192,6 +192,9 @@ namespace Roleplay.Models
 
         [Display(Name = "VAPID")]
         VAPID = 15,
+
+        [Display(Name = "Aluguel de Veículos de Empregos")]
+        AluguelEmpregos = 16,
     }
 
     public enum TipoPonto

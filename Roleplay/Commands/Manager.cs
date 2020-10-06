@@ -988,7 +988,7 @@ namespace Roleplay.Commands
                     return;
                 }
             }
-            else if (tp == TipoPreco.Empregos)
+            else if (tp == TipoPreco.Empregos || tp == TipoPreco.AluguelEmpregos)
             {
                 if (!Global.Empregos.Any(x => x.Tipo.ToString().ToLower() == nome.ToLower()))
                 {
@@ -1607,8 +1607,8 @@ namespace Roleplay.Commands
             Functions.GravarLog(TipoLog.Staff, $"/earmiest {armario} {item.Arma} {estoque}", p, null);
         }
 
-        [Command("cveh", "/cveh (modelo) (facção)")]
-        public void CMD_cveh(IPlayer player, string modelo, int faccao)
+        [Command("cvehfac", "/cvehfac (modelo) (facção)")]
+        public void CMD_cvehfac(IPlayer player, string modelo, int faccao)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
@@ -1652,7 +1652,7 @@ namespace Roleplay.Commands
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
-            Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao}", p, null);
+            Functions.GravarLog(TipoLog.Staff, $"/cvehfac {veiculo.Codigo} {modelo} {faccao}", p, null);
         }
 
         [Command("rveh", "/rveh (código)")]
@@ -2248,6 +2248,53 @@ namespace Roleplay.Commands
             context.Database.ExecuteSqlRaw($"UPDATE Parametros SET {parametro.ToUpper()} = {valor}");
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"O parâmetro {parametro.ToUpper()} foi alterado para {valor}.");
             Functions.GravarLog(TipoLog.Staff, $"/param {parametro} {valor}", p, null);
+        }
+
+        [Command("cvehemprego", "/cvehemprego (emprego)")]
+        public void CMD_cvehemprego(IPlayer player, int emprego)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == (TipoEmprego)emprego);
+            if (emp == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Emprego {emprego} não existe.");
+                return;
+            }
+
+            var veiculo = new Veiculo()
+            {
+                PosX = player.Position.X,
+                PosY = player.Position.Y,
+                PosZ = player.Position.Z,
+                RotX = player.Rotation.Roll,
+                RotY = player.Rotation.Pitch,
+                RotZ = player.Rotation.Yaw,
+                Emprego = emp.Tipo,
+                Placa = Functions.GerarPlacaVeiculo(),
+                Modelo = emp.Veiculo.ToString(),
+                Cor1R = emp.CorVeiculo.R,
+                Cor1G = emp.CorVeiculo.G,
+                Cor1B = emp.CorVeiculo.B,
+                Cor2R = emp.CorVeiculo.R,
+                Cor2G = emp.CorVeiculo.G,
+                Cor2B = emp.CorVeiculo.B,
+            };
+            veiculo.Combustivel = veiculo.TanqueCombustivel;
+
+            using (var context = new DatabaseContext())
+            {
+                context.Veiculos.Add(veiculo);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
+            Functions.GravarLog(TipoLog.Staff, $"/cvehemprego {veiculo.Codigo} {emprego}", p, null);
         }
     }
 }

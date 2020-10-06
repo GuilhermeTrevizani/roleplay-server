@@ -2,6 +2,7 @@
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
+using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh?.Personagem != p.Codigo && (veh?.Faccao != p.Faccao || veh?.Faccao == 0))
+            if (veh?.Personagem != p.Codigo && (veh?.Faccao != p.Faccao || veh?.Faccao == 0) && veh?.NomeEncarregado != p.Nome)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui acesso ao veículo.");
                 return;
@@ -33,7 +34,6 @@ namespace Roleplay.Commands
                 return;
             }
 
-            veh.DataUltimaVerificacao = DateTime.Now;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", notify: true);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
@@ -49,8 +49,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if (veh?.Personagem != p.Codigo)
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Personagem == p.Codigo && x.Vehicle == player.Vehicle);
+            if (veh == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
@@ -123,6 +123,20 @@ namespace Roleplay.Commands
                 if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
+                    return;
+                }
+
+                veh.Despawnar();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo.", notify: true);
+                return;
+            }
+
+            if (veh.NomeEncarregado == p.Nome)
+            {
+                var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
+                if (player.Position.Distance(emp.PosicaoAluguel) > Global.DistanciaRP)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no aluguel de veículos para esse emprego.");
                     return;
                 }
 
@@ -221,8 +235,8 @@ namespace Roleplay.Commands
             }
 
             using var context = new DatabaseContext();
-            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-            if (veh?.Personagem != p.Codigo)
+            var veh = context.Veiculos.FirstOrDefault(x => x.Personagem == p.Codigo && x.Codigo == codigo);
+            if (veh == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é o proprietário do veículo.");
                 return;
@@ -366,8 +380,8 @@ namespace Roleplay.Commands
             }
 
             using var context = new DatabaseContext();
-            var veh = context.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
-            if (veh?.Personagem != p.Codigo)
+            var veh = context.Veiculos.FirstOrDefault(x => x.Personagem == p.Codigo && x.Codigo == codigo);
+            if (veh == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não é o proprietário do veículo {codigo}.");
                 return;
@@ -385,7 +399,7 @@ namespace Roleplay.Commands
             context.SaveChanges();
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a placa do veículo {codigo} para {veh.Placa}.");
-            Functions.GravarLog(TipoLog.PlateChange, $"/vplaca {codigo} {placa}", p, null);
+            Functions.GravarLog(TipoLog.PlateChange, $"/mudarplaca {codigo} {placa.ToUpper()}", p, null);
         }
 
         [Command("vvender")]
@@ -407,6 +421,84 @@ namespace Roleplay.Commands
 
             var valor = Convert.ToInt32((Global.Precos.FirstOrDefault(x => x.Veiculo && x.Nome.ToLower() == veh.Modelo.ToLower())?.Valor ?? 0) / 2);
             player.Emit("chat:ExibirConfirmacao", "Confirmar Venda", $"Confirma vender o veículo {veh.Modelo.ToUpper()} para o ferro velho por ${valor:N0}?", "VenderVeiculo");
+        }
+
+        [Command("valugar")]
+        public void CMD_valugar(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Emprego == TipoEmprego.Nenhum)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego.");
+                return;
+            }
+
+            var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
+            if (!player.IsInVehicle)
+            {
+                if (player.Position.Distance(emp.PosicaoAluguel) > Global.DistanciaRP)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no aluguel de veículos para esse emprego.");
+                    return;
+                }
+            }
+
+            if (Global.Veiculos.Any(x => x.NomeEncarregado == p.Nome && x.DataExpiracaoAluguel.HasValue))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um veículo alugado.");
+                return;
+            }
+
+            var preco = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.AluguelEmpregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
+            if (p.Dinheiro < preco)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente $({preco:N0}).");
+                return;
+            }
+
+            Veiculo veh = null;
+            if (player.IsInVehicle)
+            {
+                veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle && x.Emprego == p.Emprego && !x.DataExpiracaoAluguel.HasValue);
+                if (veh == null)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está dentro de um veículo disponível para aluguel.");
+                    return;
+                }
+            }
+            else
+            {
+                using var context = new DatabaseContext();
+                var vehs = context.Veiculos.Where(x => x.Emprego == p.Emprego).ToList();
+                veh = vehs.FirstOrDefault(x => !Global.Veiculos.Any(y => y.Codigo == x.Codigo));
+                if (veh == null)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum veículo disponível para aluguel.");
+                    return;
+                }
+            }
+
+            veh.NomeEncarregado = p.Nome;
+            veh.DataExpiracaoAluguel = DateTime.Now.AddHours(1);
+
+            if (!player.IsInVehicle)
+            {
+                veh.PosX = emp.PosicaoAluguel.X;
+                veh.PosY = emp.PosicaoAluguel.Y;
+                veh.PosZ = emp.PosicaoAluguel.Z;
+                veh.RotX = emp.RotacaoAluguel.Roll;
+                veh.RotY = emp.RotacaoAluguel.Pitch;
+                veh.RotZ = emp.RotacaoAluguel.Yaw;
+                veh.Combustivel = veh.TanqueCombustivel;
+                veh.Spawnar();
+                veh.Vehicle.LockState = VehicleLockState.Unlocked;
+                player.Emit("setPedIntoVehicle", veh.Vehicle, -1);
+            }
+
+            p.Dinheiro -= preco;
+            p.SetDinheiro();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alugou um {emp.Veiculo.ToString().ToUpper()} por uma hora por ${preco:N0} com expiração em {veh.DataExpiracaoAluguel}.");
         }
     }
 }

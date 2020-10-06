@@ -651,9 +651,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Faccao > 0)
+            if (veh.Faccao > 0 || veh.Emprego > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo pertence a uma facção.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo pertence a uma facção ou um emprego.");
                 return;
             }
 

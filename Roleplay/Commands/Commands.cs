@@ -89,6 +89,7 @@ namespace Roleplay.Commands
                 new Comando("Veículos", "/abastecer", "Abastece um veículo"),
                 new Comando("Veículos", "/mudarplaca", "Altera a placa de um veículo"),
                 new Comando("Veículos", "/vvender", "Vende um veículo no ferro velho"),
+                new Comando("Veículos", "/valugar", "Aluga um veículo"),
                 new Comando("Banco", "/depositar", "Deposita dinheiro no banco"),
                 new Comando("Banco", "/sacar", "Saca dinheiro do banco"),
                 new Comando("Banco", "/transferir", "Transfere dinheiro para outro personagem"),
@@ -252,6 +253,7 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/specoff", "Para de observar um personagem"),
                     new Comando("Moderator", "/apm", "Envia uma mensagem privada administrativa"),
                     new Comando("Moderator", "/aferimentos", "Visualiza os ferimentos de um personagem"),
+                    new Comando("Moderator", "/respawnarveiculo", "Estaciona um veículo de aluguel de empregos"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
@@ -321,8 +323,9 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/earminest", "Altera o estoque de uma arma no armário"),
                     new Comando("Manager", "/irarm", "Vai até um armário"),
                     new Comando("Manager", "/eblipinativo", "Ativa/desativa um blip"),
-                    new Comando("Manager", "/cveh", "Cria um veículo"),
-                    new Comando("Manager", "/rveh", "Remove um veículo"),
+                    new Comando("Manager", "/cvehfac", "Cria um veículo para uma facção"),
+                    new Comando("Manager", "/cvehemprego", "Cria um veículo para um emprego"),
+                    new Comando("Manager", "/rveh", "Remove um veículo de uma facção/emprego"),
                     new Comando("Manager", "/evehcor", "Edita as cores de um veículo"),
                     new Comando("Manager", "/evehlivery", "Edita a livery de um veículo"),
                     new Comando("Manager", "/earmipintura", "Edita a pintura de uma arma do armário"),
@@ -1041,7 +1044,7 @@ namespace Roleplay.Commands
             }
 
             var veh = Global.Veiculos
-                .Where(x => (x.Personagem == p.Codigo || (x.Faccao == p.Faccao && x.Faccao != 0))
+                .Where(x => (x.Personagem == p.Codigo || (x.Faccao == p.Faccao && x.Faccao != 0) || x.NomeEncarregado == p.Nome)
                 && player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= 5)
                 .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
                 .FirstOrDefault();

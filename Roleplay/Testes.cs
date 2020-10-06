@@ -113,5 +113,50 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
             p.PlayAnimation(dic, name, flag);
         }
+
+        [Command("l", "/l (livery)")]
+        public void CMD_l(IPlayer player, int livery)
+        {
+            if (!Global.Development)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            if (!player.IsInVehicle)
+                return;
+
+            player.Vehicle.Livery = (byte)livery;
+        }
+
+        [Command("rl", "/rl (livery)")]
+        public void CMD_rl(IPlayer player, int livery)
+        {
+            if (!Global.Development)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            if (!player.IsInVehicle)
+                return;
+
+            player.Vehicle.RoofLivery = (byte)livery;
+        }
+
+        [Command("e", "/e (extra)")]
+        public void CMD_e(IPlayer player, int extra)
+        {
+            if (!Global.Development)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            if (!player.IsInVehicle)
+                return;
+
+            player.Vehicle.ToggleExtra((byte)extra, !player.Vehicle.IsExtraOn((byte)extra));
+        }
     }
 }
