@@ -1911,17 +1911,62 @@ namespace Roleplay
 
         private void MDCPesquisarPessoa(IPlayer player, string pesquisa)
         {
+            using var context = new DatabaseContext();
+            var per = context.Personagens.FirstOrDefault(x => x.Nome.ToLower() == pesquisa.ToLower());
+            if (per == null)
+            {
+                // msg
+                return;
+            }
 
+            var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
+
+            var veiculos = context.Veiculos.Where(x => x.Personagem == per.Codigo).ToList();
         }
 
         private void MDCPesquisarVeiculo(IPlayer player, string pesquisa)
         {
-
+            using var context = new DatabaseContext();
+            var veh = context.Veiculos.FirstOrDefault(x => x.Placa.ToLower() == pesquisa.ToLower());
+            if (veh == null)
+            {
+                // msg
+                return;
+            }
         }
 
         private void MDCPesquisarPropriedade(IPlayer player, string pesquisa)
         {
+            var html = string.Empty;
+            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo.ToString() == pesquisa);
+            if (prop == null)
+            {
+                html = $@"<div class='alert alert-danger'>Nenhuma propriedade foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+            }
+            else
+            {
+                var proprietario = "N/A";
+                if (prop.Personagem > 0)
+                {
+                    using var context = new DatabaseContext();
+                    proprietario = context.Personagens.FirstOrDefault(x => x.Codigo == prop.Personagem)?.Nome ?? string.Empty;
+                }
 
+                html = $@"<h3>Propriedade Nº {prop.Codigo}</h3>
+                <div class='row'>
+                    <div class='col-md-6'>
+                        <p>Endereço: <strong>{prop.Endereco}</strong></p>
+                    </div>
+                    <div class='col-md-4'>
+                        <p>Proprietário: <strong>{proprietario}</strong></p>
+                    </div>
+                    <div class='col-md-2'>
+                        <p>Valor: <strong>${prop.Valor:N0}</strong></p>
+                    </div>
+                </div>";
+            }
+
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarpropriedade", "div-pesquisarpropriedade", html);
         }
         #endregion
     }
