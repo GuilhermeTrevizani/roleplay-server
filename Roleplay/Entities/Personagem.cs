@@ -69,6 +69,7 @@ namespace Roleplay.Entities
         public DateTime? DataUltimoUsoBarbearia { get; set; } = null;
         public int PecasVeiculares { get; set; } = 0;
         public DateTime? DataUltimoUsoAnuncio { get; set; } = null;
+        public int Mascara { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -95,7 +96,7 @@ namespace Roleplay.Entities
         public List<Convite> Convites { get; set; } = new List<Convite>();
 
         [NotMapped]
-        public string NomeIC { get => Nome; }
+        public string NomeIC { get => UsandoMascara ? $"Mascarado {Mascara}" : Nome; }
 
         [NotMapped]
         public List<Contato> Contatos { get; set; } = new List<Contato>();
@@ -194,6 +195,9 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public int TipoFerido { get; set; } = 0;
+
+        [NotMapped]
+        public bool UsandoMascara { get; set; } = false;
 
         public void SetDinheiro()
         {

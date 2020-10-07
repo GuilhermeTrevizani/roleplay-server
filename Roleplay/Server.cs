@@ -831,7 +831,7 @@ namespace Roleplay
                 Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
                 if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
                     Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
-                player.SetSyncedMetaData("nametag", p.Nome);
+                player.SetSyncedMetaData("nametag", p.NomeIC);
                 player.Emit("nametags:Config", true);
                 player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
                 player.SetSyncedMetaData("ferido", 0);
@@ -1069,7 +1069,7 @@ namespace Roleplay
             var personagens = Global.PersonagensOnline
                 .Where(x => x.EtapaPersonalizacao == TipoEtapaPersonalizacao.Concluido)
                 .OrderBy(x => x.ID == p.ID ? 0 : 1).ThenBy(x => x.ID)
-                .Select(x => new { x.ID, x.Nome, x.Player.Ping }).ToList();
+                .Select(x => new { x.ID, Nome = x.NomeIC, x.Player.Ping }).ToList();
 
             var duty = Global.PersonagensOnline.Where(x => x.EmTrabalho);
             player.Emit("Server:ListarPlayers", Global.NomeServidor, JsonConvert.SerializeObject(personagens),
@@ -1162,7 +1162,7 @@ namespace Roleplay
                         do
                         {
                             p.Celular = new Random().Next(1111111, 9999999);
-                            if (p.Celular == 5555555 || context.Personagens.Any(x => x.Celular == p.Celular))
+                            if (p.Celular == 5555555 || p.Celular == 7777777 || context.Personagens.Any(x => x.Celular == p.Celular))
                                 p.Celular = 0;
 
                         } while (p.Celular == 0);
@@ -1275,6 +1275,26 @@ namespace Roleplay
 
                     p.DarArma(WeaponModel.Baseball, 1);
                     strMensagem = $"Você comprou uma bola de baseball.";
+                    break;
+                case "Máscara":
+                    if (p.Mascara > 0)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma máscara.", notify: true);
+                        return;
+                    }
+
+                    using (var context = new DatabaseContext())
+                    {
+                        do
+                        {
+                            p.Mascara = new Random().Next(1, int.MaxValue);
+                            if (context.Personagens.Any(x => x.Mascara == p.Mascara))
+                                p.Mascara = 0;
+
+                        } while (p.Mascara == 0);
+                    }
+
+                    strMensagem = $"Você comprou uma máscara.";
                     break;
             }
 

@@ -1,5 +1,4 @@
-﻿using AltV.Net;
-using AltV.Net.Async;
+﻿using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Roleplay.Models;
@@ -65,7 +64,7 @@ namespace Roleplay.Commands
                     veh.RotY = rotOld.Y;
                     veh.RotZ = rotOld.Z;
                 }
-                Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
+                veh.Reparar();
                 p.PecasVeiculares--;
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você consertou o veículo e usou uma peça veicular.");
                 player.Emit("Server:freezeEntityPosition", false);

@@ -977,7 +977,7 @@ namespace Roleplay.Commands
             AltAsync.Do(async () =>
             {
                 await Task.Delay(5000);
-                Alt.EmitAllClients("vehicle:setVehicleFixed", veh.Vehicle);
+                veh.Reparar();
                 Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
                 player.Emit("Server:freezeEntityPosition", false);
             });

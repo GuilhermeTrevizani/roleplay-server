@@ -55,6 +55,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/limparchat", "Limpa o seu chat"),
                 new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
                 new Comando("Geral", "/mecurar", "Trata os ferimentos em um hospital"),
+                new Comando("Geral", "/mascara", "Coloca/retira uma máscara"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -374,7 +375,7 @@ namespace Roleplay.Commands
         public void CMD_id(IPlayer player, string idNome)
         {
             int.TryParse(idNome, out int id);
-            var personagens = Global.PersonagensOnline.Where(x => x.ID == id || x.Nome.ToLower().Contains(idNome.ToLower())).OrderBy(x => x.ID).ToList();
+            var personagens = Global.PersonagensOnline.Where(x => x.ID == id || x.NomeIC.ToLower().Contains(idNome.ToLower())).OrderBy(x => x.ID).ToList();
             if (personagens.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}.");
@@ -383,7 +384,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Titulo, $"Jogadores encontrados com a pesquisa: {idNome}.");
             foreach (var pl in personagens)
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{pl.Nome} [{pl.ID}]");
+                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{pl.NomeIC} [{pl.ID}]");
         }
 
         [Command("aceitar", "/aceitar (tipo)", Alias = "ac")]
@@ -666,7 +667,7 @@ namespace Roleplay.Commands
             target.Convites.RemoveAll(x => x.Tipo == TipoConvite.Revista);
             target.Convites.Add(convite);
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você solicitou uma revista para {target.Nome}.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você solicitou uma revista para {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"Solicitou uma revista em você. (/ac {(int)convite.Tipo} para aceitar ou /rc {(int)convite.Tipo} para recusar)");
         }
 
@@ -1362,6 +1363,21 @@ namespace Roleplay.Commands
                 player.Emit("Server:freezeEntityPosition", false);
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você tratou seus ferimentos por ${valor:N0}.");
             });
+        }
+
+        [Command("mascara")]
+        public void CMD_mascara(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Mascara == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui uma máscara.");
+                return;
+            }
+
+            p.UsandoMascara = !p.UsandoMascara;
+            player.SetSyncedMetaData("nametag", p.NomeIC);
+            Functions.SendMessageToNearbyPlayers(player, $"{(p.UsandoMascara ? "coloca" : "retira")} sua máscara.", TipoMensagemJogo.Ame, 10);
         }
     }
 }

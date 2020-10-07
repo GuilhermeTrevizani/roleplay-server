@@ -184,6 +184,18 @@ namespace Roleplay.Entities
             Global.Veiculos.Remove(this);
         }
 
+        public void Reparar()
+        {
+            Alt.EmitAllClients("vehicle:setVehicleFixed", Vehicle);
+
+            for (byte i = 0; i <= 10; i++)
+            {
+                Vehicle.SetWindowDamaged(i, false);
+                Vehicle.SetLightDamaged(i, false);
+                Vehicle.SetSpecialLightDamaged(i, false);
+            }
+        }
+
         public class Dano
         {
             public List<bool> WindowsDamaged { get; set; } = new List<bool>();
