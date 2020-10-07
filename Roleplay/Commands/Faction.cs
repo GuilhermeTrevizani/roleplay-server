@@ -762,7 +762,41 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Server:AbrirMDC", p.FaccaoBD.Nome);
+            var htmlLigacoes911 = string.Empty;
+            var ligacoes911 = Global.Ligacoes911.Where(x => x.Tipo == p.FaccaoBD.Tipo && (DateTime.Now - x.Data).TotalHours < 24)
+                .OrderByDescending(x => x.Codigo).ToList();
+            if (ligacoes911.Count == 0)
+            {
+                htmlLigacoes911 = "<div class='alert alert-danger'>Não houve nenhum 911 nas últimas 24 horas.</div>";
+            }
+            else
+            {
+                htmlLigacoes911 = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+                    <table class='table table-bordered table-striped'>
+                        <thead>
+                            <tr class='bg-dark'>
+                                <th>Código</th>
+                                <th>Data</th>
+                                <th>Celular</th>
+                                <th>Localização</th>
+                                <th>Mensagem</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+                foreach (var x in ligacoes911)
+                    htmlLigacoes911 += $@"<tr>
+                                <td>{x.ID}</td>
+                                <td>{x.Data}</td>
+                                <td>{x.Celular}</td>
+                                <td>{x.Localizacao}</td>
+                                <td>{x.Mensagem}</td>
+                            </tr>";
+                htmlLigacoes911 += $@"</tbody>
+                    </table>
+                </div>";
+            }
+
+            player.Emit("Server:AbrirMDC", p.FaccaoBD.Nome, htmlLigacoes911);
             Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
         }
 
@@ -842,7 +876,7 @@ namespace Roleplay.Commands
 
             foreach (var x in target.Armas)
                 target.RemoverArma(x.Codigo);
-            
+
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");
         }

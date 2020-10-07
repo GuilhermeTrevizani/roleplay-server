@@ -31,7 +31,7 @@ namespace Roleplay.Entities
         public string Placa { get; set; } = string.Empty;
         public int Faccao { get; set; } = 0;
         public int EngineHealth { get; set; } = 1000;
-        public int Livery { get; set; } = 0;
+        public int Livery { get; set; } = 1;
         public int ValorApreensao { get; set; } = 0;
         public int Combustivel { get; set; } = 0;
         public string Danos { get; set; } = "{}";

@@ -1911,28 +1911,38 @@ namespace Roleplay
 
         private void MDCPesquisarPessoa(IPlayer player, string pesquisa)
         {
+            var html = string.Empty;
             using var context = new DatabaseContext();
             var per = context.Personagens.FirstOrDefault(x => x.Nome.ToLower() == pesquisa.ToLower());
             if (per == null)
             {
-                // msg
-                return;
+                html = $@"<div class='alert alert-danger'>Nenhuma pessoa foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+            }
+            else
+            {
+                var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
+
+                var veiculos = context.Veiculos.Where(x => x.Personagem == per.Codigo).ToList();
             }
 
-            var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
-
-            var veiculos = context.Veiculos.Where(x => x.Personagem == per.Codigo).ToList();
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarpessoa", "div-pesquisarpessoa", html);
         }
 
         private void MDCPesquisarVeiculo(IPlayer player, string pesquisa)
         {
+            var html = string.Empty;
             using var context = new DatabaseContext();
             var veh = context.Veiculos.FirstOrDefault(x => x.Placa.ToLower() == pesquisa.ToLower());
             if (veh == null)
             {
-                // msg
-                return;
+                html = $@"<div class='alert alert-danger'>Nenhum veículo foi encontrado com a pesquisa <strong>{pesquisa}</strong>.</div>";
             }
+            else
+            {
+
+            }
+
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarveiculo", "div-pesquisarveiculo", html);
         }
 
         private void MDCPesquisarPropriedade(IPlayer player, string pesquisa)
