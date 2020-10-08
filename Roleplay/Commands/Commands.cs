@@ -183,7 +183,7 @@ namespace Roleplay.Commands
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
-                        new Comando("Facção", "/m", "Megafone"),
+                        new Comando("Facção", "/m", "Fala no megafone"),
                         new Comando("Facção", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção", "/multar", "Multa um personagem online"),
                         new Comando("Facção", "/multaroff", "Multa um personagem offline"),
@@ -200,6 +200,7 @@ namespace Roleplay.Commands
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
+                        new Comando("Facção", "/m", "Fala no megafone"),
                         new Comando("Facção", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção", "/curar", "Cura um personagem ferido"),
                         new Comando("Facção", "/ate", "Atende uma ligação 911"),
@@ -216,7 +217,7 @@ namespace Roleplay.Commands
                         new Comando("Facção Gestor", "/expulsar", "Expulsa um personagem da facção"),
                     });
 
-                    if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica || p.FaccaoBD.Tipo == TipoFaccao.Governo)
+                    if (p.FaccaoBD.Governamental)
                         listaComandos.AddRange(new List<Comando>()
                         {
                             new Comando("Facção Gestor", "/gov", "Envia um anúncio governamental da facção"),

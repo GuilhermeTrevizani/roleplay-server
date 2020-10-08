@@ -356,6 +356,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (p.Algemado || p.Ferido)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar esse comando algemado ou ferido.");
+                return;
+            }
+
             var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
             if (target == null)
                 return;
@@ -420,8 +426,8 @@ namespace Roleplay.Commands
             if (target == null)
                 return;
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.Nome} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.NomeIC} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.NomeIC} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
         }
 
         [Command("aferimentos", "/aferimentos (ID ou nome)")]

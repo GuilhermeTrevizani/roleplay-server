@@ -227,9 +227,9 @@ namespace Roleplay.Commands
         public void CMD_m(IPlayer player, string mensagem)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial/médica ou não está em serviço.");
                 return;
             }
 
@@ -958,17 +958,17 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP);
-            if (ponto == null)
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle && x.Vehicle.Driver == player && x.Faccao == p.Faccao);
+            if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está dirigindo um veículo que pertence a sua facção.");
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Vehicle == player.Vehicle);
-            if ((veh?.Faccao ?? 0) == 0)
+            var ponto = Global.Pontos.FirstOrDefault(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && veh.Vehicle.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP);
+            if (ponto == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não pertence a facção.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
                 return;
             }
 

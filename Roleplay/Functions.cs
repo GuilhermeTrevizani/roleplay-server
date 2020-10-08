@@ -306,9 +306,9 @@ namespace Roleplay
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)
         {
             var p = ObterPersonagem(player);
-            if (p.Player.IsDead || p.TimerFerido != null)
+            if (p.TipoFerido == 2)
             {
-                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está gravemente ferido.");
+                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está inconsciente.");
                 return;
             }
 
@@ -541,9 +541,9 @@ namespace Roleplay
             if (string.IsNullOrWhiteSpace(message) || p == null)
                 return;
 
-            if (p.Player.IsDead || p.TimerFerido != null)
+            if (p.TipoFerido == 2)
             {
-                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não pode falar pois está gravemente ferido.");
+                EnviarMensagem(p.Player, TipoMensagem.Erro, "Você não pode falar pois está inconsciente.");
                 return;
             }
 

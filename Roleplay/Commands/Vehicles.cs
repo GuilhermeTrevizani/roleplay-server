@@ -120,7 +120,7 @@ namespace Roleplay.Commands
 
             if (veh?.Faccao == p.Faccao && veh?.Faccao > 0)
             {
-                if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+                if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Vehicle.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
                     return;
@@ -131,10 +131,10 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.NomeEncarregado == p.Nome)
+            if (veh?.NomeEncarregado == p.Nome)
             {
                 var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == p.Emprego);
-                if (player.Position.Distance(emp.PosicaoAluguel) > Global.DistanciaRP)
+                if (player.Vehicle.Position.Distance(emp.PosicaoAluguel) > Global.DistanciaRP)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no aluguel de veículos para esse emprego.");
                     return;

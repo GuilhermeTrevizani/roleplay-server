@@ -28,8 +28,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( PM para {target.Nome} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( PM de {p.Nome} [{p.ID}]: {mensagem} ))", Global.CorCelular);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( PM para {target.NomeIC} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( PM de {p.NomeIC} [{p.ID}]: {mensagem} ))", Global.CorCelular);
         }
     }
 }
