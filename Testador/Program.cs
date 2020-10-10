@@ -6,6 +6,14 @@ namespace Testador
     {
         static void Main(string[] args)
         {
+            var txt = "const accessories7Female = {";
+            for (var i = 0; i <= 14; i++)
+                txt += $"{Environment.NewLine}{i}: {{ drawable: {i}, tipoFaccao: 0 }},";
+            txt += $"{Environment.NewLine}}};";
+        }
+
+        private void MigrarPrecos()
+        {
             var str = $@"dagger|2500
 hatchet|500
 battleaxe|500

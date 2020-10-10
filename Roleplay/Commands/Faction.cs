@@ -1,5 +1,4 @@
-﻿using AltV.Net;
-using AltV.Net.Async;
+﻿using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -704,44 +703,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(p.RoupasCivil))
-            {
-                var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.RoupasCivil);
-                foreach (var x in roupas)
-                    p.SetClothes(x.Slot, x.Drawable, x.Texture);
-
-                p.RoupasCivil = string.Empty;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você retirou seu uniforme.", notify: true);
-                return;
-            }
-
-            p.RoupasCivil = JsonConvert.SerializeObject(p.Roupas);
-
-            p.SetClothes(3, 0, 0);
-            p.SetClothes(7, 0, 0);
-
-            if (p.PersonalizacaoDados.sex == 1)
-            {
-                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
-                {
-                    p.SetClothes(8, 58, 0);
-                    p.SetClothes(6, 25, 0);
-                    p.SetClothes(4, 35, 0);
-                    p.SetClothes(11, 55, 0);
-                }
-            }
-            else
-            {
-                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
-                {
-                    p.SetClothes(8, 35, 0);
-                    p.SetClothes(6, 25, 0);
-                    p.SetClothes(4, 34, 0);
-                    p.SetClothes(11, 48, 0);
-                }
-            }
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você colocou seu uniforme.", notify: true);
+            player.Emit("AbrirLojaRoupas", p.InformacoesRoupas, p.InformacoesAcessorios, p.PersonalizacaoDados.sex, p.SlotsRoupas, p.Roupa, 2, (int)p.FaccaoBD.Tipo);
         }
 
         [Command("mdc")]

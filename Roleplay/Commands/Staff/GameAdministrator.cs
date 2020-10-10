@@ -4,7 +4,7 @@ using Roleplay.Models;
 using System;
 using System.Linq;
 
-namespace Roleplay.Commands
+namespace Roleplay.Commands.Staff
 {
     public class GameAdministrator
     {

@@ -382,7 +382,7 @@ namespace Roleplay
         {
             var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | Último Acesso: <strong>{p.DataUltimoAcesso}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Troca de Nome: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong> | Troca de Nome Fórum: <strong>{(p.UsuarioBD.PossuiNamechangeForum ? "SIM" : "NÃO")}</strong> | Troca de Placa: <strong>{(p.UsuarioBD.PossuiPlateChange ? "SIM" : "NÃO")}</strong><br/>
-            Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong> | Peças Veiculares: <strong>{p.PecasVeiculares:N0}</strong> | Máscara: <strong>{p.Mascara}</strong><br/>";
+            Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong> | Poupança: <strong>${p.Poupanca:N0}</strong> | Peças Veiculares: <strong>{p.PecasVeiculares:N0}</strong> | Máscara: <strong>{p.Mascara}</strong><br/>";
 
             if (p.Player != null)
                 html += $@"Skin: <strong>{(PedModel)p.Player.Model}</strong> | Vida: <strong>{(p.Player.Health > 100 ? p.Player.Health - 100 : p.Player.Health)}</strong> | Colete: <strong>{p.Player.Armor}</strong><br/>";
@@ -403,7 +403,7 @@ namespace Roleplay
                     html += $"Código: <strong>{prop.Codigo}</strong> | Endereço: <strong>{prop.Endereco}</strong> | Valor: <strong>${prop.Valor:N0}</strong><br/>";
             }
 
-            player.Emit("Server:BaseHTML", GerarBaseHTML($"{p.NomeIC} [{p.Codigo}] ({DateTime.Now})", html));
+            player.Emit("Server:BaseHTML", GerarBaseHTML($"{p.Nome} [{p.Codigo}] ({DateTime.Now})", html));
         }
 
         public static void EnviarMensagemCelular(Personagem p, Personagem target, string mensagem)
@@ -1097,6 +1097,24 @@ namespace Roleplay
 
             foreach (var x in players)
                 EnviarMensagem(x.Player, TipoMensagem.Nenhum, mensagem, Global.CorErro);
+        }
+
+        public static void SpawnarPlayer(Personagem p)
+        {
+            p.Player.Dimension = (int)p.Dimensao;
+            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{p.DataUltimoAcesso}{{#FFFFFF}}.");
+            if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
+                EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
+            p.Player.SetSyncedMetaData("nametag", p.NomeIC);
+            p.Player.Emit("nametags:Config", true);
+            p.Player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
+            p.Player.SetSyncedMetaData("ferido", 0);
+            p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
+            p.Player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
+            p.Player.SetSyncedMetaData("id", p.ID);
+            Global.GlobalVoice.AddPlayer(p.Player);
+            Global.GlobalVoice.MutePlayer(p.Player);
+            p.DataUltimoAcesso = DateTime.Now;
         }
     }
 }

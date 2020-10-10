@@ -45,9 +45,9 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (canal == 999 && p.FaccaoBD?.Tipo != TipoFaccao.Policial && p.FaccaoBD?.Tipo != TipoFaccao.Medica)
+            if (canal == 999 && !(p.FaccaoBD?.Governamental ?? false))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 999 é reservado para facções policiais e médicas.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 999 é reservado para facções governamentais.");
                 return;
             }
 

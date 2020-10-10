@@ -37,8 +37,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{p.NomeIC} sussura: {mensagem}", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.NomeIC} sussura: {mensagem}", Global.CorCelular);
+            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"{p.NomeIC} sussurra: {mensagem}", Global.CorCelularSecundaria);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"{p.NomeIC} sussurra: {mensagem}", Global.CorCelular);
             Functions.SendMessageToNearbyPlayers(player, $"sussurra algo para {target.NomeIC}.", TipoMensagemJogo.Ame, 5);
         }
 

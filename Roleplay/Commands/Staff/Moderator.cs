@@ -6,7 +6,7 @@ using Roleplay.Models;
 using System;
 using System.Linq;
 
-namespace Roleplay.Commands
+namespace Roleplay.Commands.Staff
 {
     public class Moderator
     {
@@ -229,7 +229,7 @@ namespace Roleplay.Commands
             }
 
             p.EmTrabalhoAdministrativo = !p.EmTrabalhoAdministrativo;
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.");
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo", true);
         }
 
         [Command("listasos")]
@@ -356,7 +356,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (p.Algemado || p.Ferido)
+            if (p.Algemado || p.TimerFerido != null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar esse comando algemado ou ferido.");
                 return;
@@ -430,8 +430,8 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.NomeIC} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
         }
 
-        [Command("aferimentos", "/aferimentos (ID ou nome)")]
-        public void CMD_aferimentos(IPlayer player, string idNome)
+        [Command("checarferimentos", "/checarferimentos (ID ou nome)")]
+        public void CMD_checarferimentos(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)

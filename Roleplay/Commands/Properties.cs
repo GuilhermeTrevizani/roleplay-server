@@ -56,7 +56,6 @@ namespace Roleplay.Commands
         [Command("sair")]
         public void CMD_sair(IPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
             var prox = Global.Propriedades
                 .Where(x => player.Dimension == x.Codigo
                     && player.Position.Distance(new Position(x.SaidaPosX, x.SaidaPosY, x.SaidaPosZ)) <= Global.DistanciaRP)
@@ -75,6 +74,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            var p = Functions.ObterPersonagem(player);
             p.LimparIPLs();
             player.Dimension = 0;
             p.SetPosition(new Position(prox.EntradaPosX, prox.EntradaPosY, prox.EntradaPosZ), false);
@@ -182,6 +182,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            prop.Aberta = false;
             prop.Personagem = 0;
             prop.CriarIdentificador();
 
@@ -191,6 +192,20 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abandonou a propriedade {prop.Codigo}.");
             Functions.GravarLog(TipoLog.Venda, $"/abandonar {prop.Codigo}", p, null);
+        }
+
+        [Command("guardaroupas")]
+        public void CMD_guardaroupas(IPlayer player)
+        {
+            var prox = Global.Propriedades.FirstOrDefault(x => player.Dimension == x.Codigo);
+            if (prox == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no interior de uma propriedade.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            player.Emit("AbrirLojaRoupas", p.InformacoesRoupas, p.InformacoesAcessorios, p.PersonalizacaoDados.sex, p.SlotsRoupas, p.Roupa, 3);
         }
     }
 }

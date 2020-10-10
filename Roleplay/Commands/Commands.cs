@@ -61,6 +61,7 @@ namespace Roleplay.Commands
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
                 new Comando("Propriedades", "/liberarprop", "Libera uma propriedade de um personagem inativo"),
                 new Comando("Propriedades", "/abandonar", "Abandona uma propriedade"),
+                new Comando("Propriedades", "/guardaroupas", "Altera sua roupa"),
                 new Comando("Chat IC", "/me", "Interpretação de ações de um personagem"),
                 new Comando("Chat IC", "/do", "Interpretação do ambiente"),
                 new Comando("Chat IC", "/g", "Grita"),
@@ -254,7 +255,7 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/spec", "Observa um personagem"),
                     new Comando("Moderator", "/specoff", "Para de observar um personagem"),
                     new Comando("Moderator", "/apm", "Envia uma mensagem privada administrativa"),
-                    new Comando("Moderator", "/aferimentos", "Visualiza os ferimentos de um personagem"),
+                    new Comando("Moderator", "/checarferimentos", "Visualiza os ferimentos de um personagem"),
                     new Comando("Moderator", "/respawnarveiculo", "Estaciona um veículo de aluguel de empregos"),
                 });
 
@@ -1009,6 +1010,7 @@ namespace Roleplay.Commands
             p.TimerFerido = null;
             p.DataMorte = DateTime.Now;
             p.MotivoMorte = "Aceitou CK";
+            Functions.EnviarMensagemStaff($"{p.Nome} aceitou CK.", true);
             Functions.SalvarPersonagem(p, false);
             Functions.GravarLog(TipoLog.Morte, $"/aceitarck", p, null);
             player.Kick("Você aceitou o CK no seu personagem.");
@@ -1162,21 +1164,20 @@ namespace Roleplay.Commands
         [Command("roupas")]
         public void CMD_roupas(IPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
-
             if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.LojaRoupas && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em nenhuma loja de roupas.");
                 return;
             }
 
+            var p = Functions.ObterPersonagem(player);
             if (p.Dinheiro < Global.Parametros.ValorRoupas)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${Global.Parametros.ValorRoupas:N0}).");
                 return;
             }
 
-            player.Emit("AbrirLojaRoupas", p.InformacoesPersonalizacao);
+            player.Emit("AbrirLojaRoupas", p.InformacoesRoupas, p.InformacoesAcessorios, p.PersonalizacaoDados.sex, p.SlotsRoupas, p.Roupa, 1);
         }
 
         [Command("mostrarid", "/mostrarid (ID ou nome)")]

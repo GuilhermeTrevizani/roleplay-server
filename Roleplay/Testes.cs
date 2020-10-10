@@ -8,6 +8,19 @@ namespace Roleplay
 {
     public class Testes
     {
+        [Command("x")]
+        public void CMD_x(IPlayer player)
+        {
+            if (!Global.Development)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            p.DataUltimoUsoBarbearia = null;
+        }
+
         [Command("w", "/w (arma)")]
         public void CMD_w(IPlayer player, string arma)
         {
@@ -75,32 +88,6 @@ namespace Roleplay
             player.Emit("Server:RemoveIpl", ipl);
         }
 
-        [Command("ca", "/ca (slot) (drawable) (texture)")]
-        public void CMD_ca(IPlayer player, int slot, int drawable, int texture)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            var p = Functions.ObterPersonagem(player);
-            p.SetAccessories(slot, drawable, texture);
-        }
-
-        [Command("cc", "/cc (slot) (drawable) (texture)")]
-        public void CMD_cc(IPlayer player, int slot, int drawable, int texture)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            var p = Functions.ObterPersonagem(player);
-            p.SetClothes(slot, drawable, texture);
-        }
-
         [Command("anim", "/cc (dic) (name) (flag)")]
         public void CMD_anim(IPlayer player, string dic, string name, int flag)
         {
@@ -157,6 +144,20 @@ namespace Roleplay
                 return;
 
             player.Vehicle.ToggleExtra((byte)extra, !player.Vehicle.IsExtraOn((byte)extra));
+        }
+
+        [Command("dinheiro", "/dinheiro (dinheiro)")]
+        public void CMD_dinheiro(IPlayer player, int dinheiro)
+        {
+            if (!Global.Development)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            p.Dinheiro = dinheiro;
+            p.SetDinheiro();
         }
     }
 }

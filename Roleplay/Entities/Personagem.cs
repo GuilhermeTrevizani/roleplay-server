@@ -51,7 +51,6 @@ namespace Roleplay.Entities
         public string MotivoMorte { get; set; } = string.Empty;
         public TipoEmprego Emprego { get; set; } = TipoEmprego.Nenhum;
         public string InformacoesPersonalizacao { get; set; } = "[]";
-        public string RoupasCivil { get; set; } = string.Empty;
         public string Historia { get; set; } = string.Empty;
         public int UsuarioStaffAvaliador { get; set; } = 0;
         public string MotivoRejeicao { get; set; } = string.Empty;
@@ -70,6 +69,8 @@ namespace Roleplay.Entities
         public int PecasVeiculares { get; set; } = 0;
         public DateTime? DataUltimoUsoAnuncio { get; set; } = null;
         public int Mascara { get; set; } = 0;
+        public int Roupa { get; set; } = 1;
+        public int Poupanca { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -129,10 +130,10 @@ namespace Roleplay.Entities
         public bool EmTrabalhoAdministrativo { get; set; } = false;
 
         [NotMapped]
-        public List<Roupa> Roupas { get; set; } = new List<Roupa>();
+        public List<Vestimenta> Roupas { get; set; } = new List<Vestimenta>();
 
         [NotMapped]
-        public List<Roupa> Acessorios { get; set; } = new List<Roupa>();
+        public List<Acessorio> Acessorios { get; set; } = new List<Acessorio>();
 
         [NotMapped]
         public List<Ferimento> Ferimentos { get; set; } = new List<Ferimento>();
@@ -144,10 +145,10 @@ namespace Roleplay.Entities
         public List<Arma> Armas { get; set; } = new List<Arma>();
 
         [NotMapped]
-        public string AreaName { get; set; }
+        public string AreaName { get; set; } = string.Empty;
 
         [NotMapped]
-        public string ZoneName { get; set; }
+        public string ZoneName { get; set; } = string.Empty;
 
         [NotMapped]
         public Position PosicaoIC
@@ -158,6 +159,9 @@ namespace Roleplay.Entities
                     return Player.Position;
 
                 var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == Player.Dimension);
+                if (prop == null)
+                    return Player.Position;
+
                 return new Position(prop.EntradaPosX, prop.EntradaPosY, prop.EntradaPosZ);
             }
         }
@@ -198,6 +202,21 @@ namespace Roleplay.Entities
 
         [NotMapped]
         public bool UsandoMascara { get; set; } = false;
+
+        [NotMapped]
+        public int SlotsRoupas
+        {
+            get
+            {
+                return UsuarioBD.VIP switch
+                {
+                    TipoVIP.Bronze => 6,
+                    TipoVIP.Prata => 8,
+                    TipoVIP.Ouro => 10,
+                    _ => 2,
+                };
+            }
+        }
 
         public void SetDinheiro()
         {
@@ -257,24 +276,6 @@ namespace Roleplay.Entities
         {
             Player.Emit("Server:StopAnim");
             Player.SetSyncedMetaData("animation", false);
-        }
-
-        public void SetClothes(int slot, int drawable, int texture, bool setar = true)
-        {
-            Roupas.RemoveAll(x => x.Slot == slot);
-            Roupas.Add(new Roupa() { Slot = slot, Drawable = drawable, Texture = texture });
-
-            if (setar)
-                Player.Emit("Server:SetClothes", slot, drawable, texture);
-        }
-
-        public void SetAccessories(int slot, int drawable, int texture, bool setar = true)
-        {
-            Acessorios.RemoveAll(x => x.Slot == slot);
-            Acessorios.Add(new Roupa() { Slot = slot, Drawable = drawable, Texture = texture });
-
-            if (setar)
-                Player.Emit("Server:SetAccessories", slot, drawable, texture);
         }
 
         public void SetPosition(Position position, bool spawn)
@@ -359,11 +360,21 @@ namespace Roleplay.Entities
             public sbyte BodyPart { get; set; } = -2;
         }
 
-        public class Roupa
+        public class Vestimenta
         {
+            public int ID { get; set; }
             public int Slot { get; set; }
             public int Drawable { get; set; }
             public int Texture { get; set; }
+        }
+
+        public class Acessorio
+        {
+            public int ID { get; set; }
+            public int Slot { get; set; }
+            public int Drawable { get; set; }
+            public int Texture { get; set; }
+            public bool Vestir { get; set; } = false;
         }
 
         public class Arma

@@ -52,7 +52,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, IVehicle, string, object>("SetVehicleMeta", SetVehicleMeta);
             Alt.OnClient<IPlayer>("DevolverItensArmario", DevolverItensArmario);
             Alt.OnClient<IPlayer, int, int>("SpawnarVeiculoFaccao", SpawnarVeiculoFaccao);
-            Alt.OnClient<IPlayer>("ConfirmarLojaRoupas", ConfirmarLojaRoupas);
+            Alt.OnClient<IPlayer, string, string, int, int, bool>("ConfirmarLojaRoupas", ConfirmarLojaRoupas);
             Alt.OnClient<IPlayer, string>("EnviarEmailConfirmacao", EnviarEmailConfirmacao);
             Alt.OnClient<IPlayer, string>("ValidarTokenConfirmacao", ValidarTokenConfirmacao);
             Alt.OnClient<IPlayer>("ExibirPerguntas", ExibirPerguntas);
@@ -310,7 +310,7 @@ namespace Roleplay
             {
                 AltAsync.Do(async () =>
                 {
-                    await Task.Delay(5000);
+                    await Task.Delay(2000);
                     vehicle.Remove();
                 });
             }
@@ -747,8 +747,6 @@ namespace Roleplay
         private void SelecionarPersonagem(IPlayer player, int id, bool namechange)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null || p?.ID > 0)
-                return;
 
             using var context = new DatabaseContext();
             var personagem = context.Personagens.FirstOrDefault(x => x.Codigo == id && x.Usuario == p.UsuarioBD.Codigo);
@@ -756,7 +754,7 @@ namespace Roleplay
             {
                 var staffer = context.Usuarios.FirstOrDefault(x => x.Codigo == personagem.UsuarioStaffAvaliador);
                 var nome = personagem.Nome.Split(' ');
-                player.Emit("Server:CriarPersonagem", personagem.Codigo, nome.FirstOrDefault(), nome.LastOrDefault(), p.PersonalizacaoDados.sex == 1 ? "H" : "M", personagem.DataNascimento.ToShortDateString(), personagem.Historia, personagem.MotivoRejeicao, staffer.Nome);
+                player.Emit("Server:CriarPersonagem", personagem.Codigo, nome.FirstOrDefault(), nome.LastOrDefault(), p.PersonalizacaoDados.sex == 1 ? "M" : "F", personagem.DataNascimento.ToShortDateString(), personagem.Historia, personagem.MotivoRejeicao, staffer.Nome);
                 return;
             }
 
@@ -783,7 +781,6 @@ namespace Roleplay
             foreach (var x in Global.TextDraws)
                 x.CriarIdentificador(player);
 
-            player.Dimension = (int)p.Dimensao;
             p.IPLs = JsonConvert.DeserializeObject<List<string>>(p.IPL);
             p.SetarIPLs();
             player.SetDateTime(DateTime.Now);
@@ -794,15 +791,18 @@ namespace Roleplay
             player.SetWeather(Global.Weather);
             p.DataUltimaVerificacao = DateTime.Now;
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
+            p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
+            p.Roupas = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesRoupas);
+            p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Acessorio>>(p.InformacoesAcessorios);
+            foreach (var x in JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas))
+                p.DarArma((WeaponModel)x.Codigo, x.Municao, x.Pintura, x.Componentes, false);
 
             if (Global.PersonagensOnline.Count(x => x.Codigo > 0) > Global.Parametros.RecordeOnline)
             {
                 Global.Parametros.RecordeOnline = Global.PersonagensOnline.Count;
                 context.Parametros.Update(Global.Parametros);
                 context.SaveChanges();
-
-                foreach (var u in Global.PersonagensOnline)
-                    Functions.EnviarMensagem(u.Player, TipoMensagem.Nenhum, $"O novo recorde de jogadores online é: {{{Global.CorPrincipal}}}{Global.Parametros.RecordeOnline}{{#FFFFFF}}.");
+                Functions.EnviarMensagemStaff($"O novo recorde de jogadores online é: {Global.Parametros.RecordeOnline}.", true);
             }
 
             Functions.GravarLog(TipoLog.Entrada, string.Empty, p, null);
@@ -814,36 +814,10 @@ namespace Roleplay
             }
             else
             {
-                p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
-
-                var roupas = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesRoupas);
-                foreach (var x in roupas)
-                    p.SetClothes(x.Slot, x.Drawable, x.Texture);
-
-                var acessorios = JsonConvert.DeserializeObject<List<Personagem.Roupa>>(p.InformacoesAcessorios);
-                foreach (var x in acessorios)
-                    p.SetAccessories(x.Slot, x.Drawable, x.Texture);
-
-                var armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas);
-                foreach (var x in armas)
-                    p.DarArma((WeaponModel)x.Codigo, x.Municao, x.Pintura, x.Componentes, false);
-
-                Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{personagem.DataUltimoAcesso}{{#FFFFFF}}.");
-                if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
-                player.SetSyncedMetaData("nametag", p.NomeIC);
-                player.Emit("nametags:Config", true);
-                player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-                player.SetSyncedMetaData("ferido", 0);
-                p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
-                player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
-                player.SetSyncedMetaData("id", p.ID);
-                Global.GlobalVoice.AddPlayer(player);
-                Global.GlobalVoice.MutePlayer(player);
-                p.DataUltimoAcesso = DateTime.Now;
+                Functions.SpawnarPlayer(p);
             }
 
-            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)personagem.EtapaPersonalizacao);
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
         }
 
         private void RegistrarUsuario(IPlayer player, string usuario, string email, string senha, string senha2)
@@ -999,6 +973,24 @@ namespace Roleplay
             p.PersonalizacaoDados.structure = new List<double> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             p.PersonalizacaoDados.opacityOverlays = new List<Personagem.Personalizacao.OpacityOverlay> { new Personagem.Personalizacao.OpacityOverlay(0), new Personagem.Personalizacao.OpacityOverlay(3), new Personagem.Personalizacao.OpacityOverlay(6), new Personagem.Personalizacao.OpacityOverlay(7), new Personagem.Personalizacao.OpacityOverlay(9), new Personagem.Personalizacao.OpacityOverlay(11) };
             p.PersonalizacaoDados.colorOverlays = new List<Personagem.Personalizacao.ColorOverlay> { new Personagem.Personalizacao.ColorOverlay(4), new Personagem.Personalizacao.ColorOverlay(5), new Personagem.Personalizacao.ColorOverlay(8) };
+            for (var i = 1; i <= 10; i++)
+            {
+                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 0 });
+                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 1 });
+                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 2 });
+                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 6 });
+                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 7 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 1 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 3 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 4 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 5 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 6 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 7 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 8 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 9 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 10 });
+                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 11 });
+            }
 
             var personagem = new Personagem()
             {
@@ -1018,12 +1010,15 @@ namespace Roleplay
                 HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
                 Historia = historia,
                 Vida = player.MaxHealth,
+                InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas),
+                InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios),
             };
 
             if (personagemAntigo != null)
             {
                 personagem.Dinheiro = personagemAntigo.Dinheiro;
                 personagem.Banco = personagemAntigo.Banco;
+                personagem.Poupanca = personagemAntigo.Poupanca;
                 personagem.InformacoesArmas = personagemAntigo.InformacoesArmas;
             }
 
@@ -1539,12 +1534,35 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você spawnou o veículo {veiculo}.", notify: true);
         }
 
-        private void ConfirmarLojaRoupas(IPlayer player)
+        private void ConfirmarLojaRoupas(IPlayer player, string strRoupas, string strAcessorios, int roupa, int tipo, bool sucesso)
         {
             var p = Functions.ObterPersonagem(player);
-            p.Dinheiro -= Global.Parametros.ValorRoupas;
-            p.SetDinheiro();
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorRoupas:N0} na loja de roupas.");
+
+            if (sucesso)
+            {
+                p.Roupa = roupa;
+                p.InformacoesRoupas = strRoupas;
+                p.Roupas = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesRoupas);
+                p.InformacoesAcessorios = strAcessorios;
+                p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Acessorio>>(p.InformacoesAcessorios);
+            }
+
+            if (tipo == 0)
+            {
+                p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Concluido;
+                using var context = new DatabaseContext();
+                context.Personagens.Update(p);
+                context.SaveChanges();
+                Functions.SpawnarPlayer(p);
+            }
+            else if (tipo == 1 && sucesso)
+            {
+                p.Dinheiro -= Global.Parametros.ValorRoupas;
+                p.SetDinheiro();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorRoupas:N0} na loja de roupas.");
+            }
+
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
         }
 
         private void EnviarEmailConfirmacao(IPlayer player, string email)
@@ -1634,7 +1652,7 @@ namespace Roleplay
             player.Emit("Server:MostrarSucesso", "Caso o usuário e o e-mail correspondam, o e-mail será enviado. Verifique também sua caixa de lixo eletrônico.");
         }
 
-        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, int barbearia, bool sucesso)
+        private void ConfirmarPersonalizacao(IPlayer player, string strPersonalizacao, int tipo, bool sucesso)
         {
             var p = Functions.ObterPersonagem(player);
 
@@ -1644,7 +1662,7 @@ namespace Roleplay
                 p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
             }
 
-            if (barbearia == 0)
+            if (tipo == 0)
             {
                 p.EtapaPersonalizacao = TipoEtapaPersonalizacao.Roupas;
                 using var context = new DatabaseContext();
@@ -1653,7 +1671,7 @@ namespace Roleplay
             }
             else if (sucesso)
             {
-                if (barbearia == 1)
+                if (tipo == 1)
                     p.DataUltimoUsoBarbearia = DateTime.Now;
 
                 p.Dinheiro -= Global.Parametros.ValorBarbearia;
@@ -1661,7 +1679,7 @@ namespace Roleplay
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");
             }
 
-            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, (int)p.EtapaPersonalizacao);
+            player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
         }
 
         private void DeletarPersonagem(IPlayer player, int codigo)

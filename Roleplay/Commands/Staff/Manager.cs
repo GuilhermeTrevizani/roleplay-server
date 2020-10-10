@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Roleplay.Commands
+namespace Roleplay.Commands.Staff
 {
     public class Manager
     {
@@ -54,20 +54,11 @@ namespace Roleplay.Commands
                 }
             }
 
-            foreach (var x in Global.Propriedades)
-            {
-                if (player.Position.Distance(new Position(x.EntradaPosX, x.EntradaPosY, x.EntradaPosZ)) <= distanceVer)
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Propriedade {x.Codigo}");
-                    isTemAlgoProximo = true;
-                }
-            }
-
             foreach (var x in Global.Pontos)
             {
                 if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Ponto {x.Codigo}");
+                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Ponto {x.Codigo} | Tipo: {(int)x.Tipo}");
                     isTemAlgoProximo = true;
                 }
             }
