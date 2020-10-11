@@ -41,7 +41,7 @@ namespace Roleplay
         }
 
         [Command("int", "/int (código)")]
-        public void CMD_int(IPlayer player, int código)
+        public void CMD_int(IPlayer player, int codigo)
         {
             if (!Global.Development)
             {
@@ -49,16 +49,16 @@ namespace Roleplay
                 return;
             }
 
-            if (!Enum.IsDefined(typeof(TipoInterior), código))
+            if (!Enum.IsDefined(typeof(TipoInterior), codigo))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Interior inválido.");
                 return;
             }
 
             var p = Functions.ObterPersonagem(player);
-            var pos = Functions.ObterPosicaoPorInterior((TipoInterior)código);
+            var pos = Functions.ObterPosicaoPorInterior((TipoInterior)codigo);
 
-            p.IPLs = Functions.ObterIPLsPorInterior((TipoInterior)código);
+            p.IPLs = Functions.ObterIPLsPorInterior((TipoInterior)codigo);
             p.SetarIPLs();
             player.Dimension = 0;
             p.SetPosition(pos, false);

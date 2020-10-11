@@ -60,7 +60,7 @@ namespace RoleplayBOT
         {
             var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
             await (Client.GetChannel(GlobalConfig.UserLeftChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} saiu do servidor. Total de jogadores: {totalJogadores}");
-            await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
+            //await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
         }
 
         private Task LogAsync(LogMessage log)

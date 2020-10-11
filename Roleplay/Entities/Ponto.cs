@@ -26,7 +26,7 @@ namespace Roleplay.Entities
             {
                 case TipoPonto.Banco:
                     nome = "Caixa Bancário";
-                    descricao = "Use /sacar, /transferir, /depositar ou /multas";
+                    descricao = "Use /sacar, /transferir, /depositar, /multas, /depositarpoupanca ou /sacarpoupanca";
                     break;
                 case TipoPonto.LojaConveniencia:
                     nome = "Loja de Conveniência";

@@ -192,6 +192,28 @@ namespace Roleplay
 
                     if (p.TempoConectado % 60 == 0)
                     {
+                        var porcentagemImpostoPropriedade = 0.0015M;
+                        var porcentagemImpostoVeiculo = 0.001M;
+                        var porcentagemPoupanca = 0.001M;
+                        switch (p.UsuarioBD.VIP)
+                        {
+                            case TipoVIP.Bronze:
+                                porcentagemImpostoPropriedade = 0.0013M;
+                                porcentagemImpostoVeiculo = 0.0007M;
+                                porcentagemPoupanca = 0.00125M;
+                                break;
+                            case TipoVIP.Prata:
+                                porcentagemImpostoPropriedade = 0.001M;
+                                porcentagemImpostoVeiculo = 0.0005M;
+                                porcentagemPoupanca = 0.00150M;
+                                break;
+                            case TipoVIP.Ouro:
+                                porcentagemImpostoPropriedade = 0.0008M;
+                                porcentagemImpostoVeiculo = 0.0003M;
+                                porcentagemPoupanca = 0.00175M;
+                                break;
+                        }
+
                         if (p.EmTrabalhoAdministrativo)
                             p.UsuarioBD.TempoTrabalhoAdministrativo++;
 
@@ -204,24 +226,6 @@ namespace Roleplay
                         var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList();
                         if (p.Propriedades.Count > 0 || veiculos.Count > 0)
                         {
-                            var porcentagemImpostoPropriedade = 0.0015M;
-                            var porcentagemImpostoVeiculo = 0.001M;
-                            switch (p.UsuarioBD.VIP)
-                            {
-                                case TipoVIP.Bronze:
-                                    porcentagemImpostoPropriedade = 0.0013M;
-                                    porcentagemImpostoVeiculo = 0.0007M;
-                                    break;
-                                case TipoVIP.Prata:
-                                    porcentagemImpostoPropriedade = 0.001M;
-                                    porcentagemImpostoVeiculo = 0.0005M;
-                                    break;
-                                case TipoVIP.Ouro:
-                                    porcentagemImpostoPropriedade = 0.0008M;
-                                    porcentagemImpostoVeiculo = 0.0003M;
-                                    break;
-                            }
-
                             foreach (var x in p.Propriedades)
                                 valorImpostoPropriedade += Convert.ToInt32(Convert.ToDecimal(x.Valor) * porcentagemImpostoPropriedade);
 
@@ -229,6 +233,7 @@ namespace Roleplay
                                 valorImpostoVeiculo += Convert.ToInt32(Convert.ToDecimal(Global.Precos.FirstOrDefault(y => y.Veiculo && y.Nome.ToLower() == x.Modelo.ToLower())?.Valor ?? 0) * porcentagemImpostoVeiculo);
                         }
 
+                        var poupanca = 0;
                         var salarioEmprego = 0;
                         if (p.Faccao > 0)
                         {
@@ -238,6 +243,17 @@ namespace Roleplay
                         {
                             salarioEmprego = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Empregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
                             salario += salarioEmprego;
+                        }
+
+                        if (p.Poupanca > 0)
+                        {
+                            poupanca = Convert.ToInt32(Convert.ToDecimal(p.Poupanca) * porcentagemPoupanca);
+                            p.Poupanca += poupanca;
+                            if (p.Poupanca > 1000000)
+                            {
+                                p.Banco += p.Poupanca - 50000;
+                                p.Poupanca = 50000;
+                            }
                         }
 
                         salario *= Global.Parametros.Paycheck;
@@ -263,6 +279,9 @@ namespace Roleplay
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Imposto Veículos: {{{Global.CorErro}}}- ${valorImpostoVeiculo:N0}");
 
                             Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Total: {{{(salario >= 0 ? Global.CorSucesso : Global.CorErro)}}}${salario:N0}");
+
+                            if (poupanca > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Poupança: {{{Global.CorSucesso}}}+ ${poupanca:N0} (${p.Poupanca:N0})");
                         }
                     }
                 }
@@ -1389,13 +1408,13 @@ namespace Roleplay
 
             static bool VerificarArmaBranca(WeaponModel wp)
             {
-                if (wp == WeaponModel.AntiqueCavalryDagger || wp == WeaponModel.BaseballBat || wp == WeaponModel.BrokenBottle 
+                if (wp == WeaponModel.AntiqueCavalryDagger || wp == WeaponModel.BaseballBat || wp == WeaponModel.BrokenBottle
                     || wp == WeaponModel.Crowbar || wp == WeaponModel.Fist || wp == WeaponModel.Flashlight
                     || wp == WeaponModel.GolfClub || wp == WeaponModel.Hammer || wp == WeaponModel.Hatchet
                     || wp == WeaponModel.BrassKnuckles || wp == WeaponModel.Knife || wp == WeaponModel.Machete
                     || wp == WeaponModel.Switchblade || wp == WeaponModel.Nightstick || wp == WeaponModel.PipeWrench
                     || wp == WeaponModel.BattleAxe || wp == WeaponModel.PoolCue || wp == WeaponModel.StoneHatchet)
-                        return true;
+                    return true;
 
                 return false;
             }

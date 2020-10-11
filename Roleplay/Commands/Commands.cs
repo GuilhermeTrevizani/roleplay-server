@@ -56,6 +56,8 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
                 new Comando("Geral", "/mecurar", "Trata os ferimentos em um hospital"),
                 new Comando("Geral", "/mascara", "Coloca/retira uma máscara"),
+                new Comando("Geral", "/depositarpoupanca", "Aplica $50.000 na poupança"),
+                new Comando("Geral", "/sacarpoupanca", "Saca todo o dinheiro da poupança"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -1379,6 +1381,60 @@ namespace Roleplay.Commands
             p.UsandoMascara = !p.UsandoMascara;
             player.SetSyncedMetaData("nametag", p.NomeIC);
             Functions.SendMessageToNearbyPlayers(player, $"{(p.UsandoMascara ? "coloca" : "retira")} sua máscara.", TipoMensagemJogo.Ame, 10);
+        }
+
+        [Command("depositarpoupanca", "/depositarpoupanca")]
+        public void CMD_depositarpoupanca(IPlayer player)
+        {
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            if (p.Dinheiro < 50000)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro suficiente ($50.000).");
+                return;
+            }
+
+            if (p.Poupanca > 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui dinheiro na poupança.");
+                return;
+            }
+
+            p.Poupanca = 50000;
+            p.Dinheiro -= 50000;
+            p.SetDinheiro();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você depositou $50.000 na poupança.");
+            Functions.GravarLog(TipoLog.Dinheiro, $"/depositarpoupanca", p, null);
+        }
+
+        [Command("sacarpoupanca", "/sacarpoupanca")]
+        public void CMD_sacarpoupanca(IPlayer player)
+        {
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.Banco && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em um banco.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            if (p.Poupanca <= 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui dinheiro na poupança.");
+                return;
+            }
+
+            p.Dinheiro += p.Poupanca;
+            p.SetDinheiro();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você sacou ${p.Poupanca:N0} da poupança.");
+            Functions.GravarLog(TipoLog.Dinheiro, $"/sacarpoupanca {p.Poupanca}", p, null);
+            p.Poupanca = 0;
         }
     }
 }

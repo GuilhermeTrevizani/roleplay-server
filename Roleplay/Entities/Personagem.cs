@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace Roleplay.Entities
 {
@@ -208,12 +209,13 @@ namespace Roleplay.Entities
         {
             get
             {
+                var slots = Roupas.Where(x => x.Drawable != 0).GroupBy(x => x.ID).Count();
                 return UsuarioBD.VIP switch
                 {
                     TipoVIP.Bronze => 6,
                     TipoVIP.Prata => 8,
                     TipoVIP.Ouro => 10,
-                    _ => 2,
+                    _ => slots > 2 ? slots : 2,
                 };
             }
         }
@@ -254,16 +256,26 @@ namespace Roleplay.Entities
 
         public void SetarIPLs()
         {
+            if (IPLs == null)
+                IPLs = new List<string>();
+
             foreach (var ipl in IPLs)
                 Player.Emit("Server:RequestIpl", ipl);
         }
 
         public void LimparIPLs()
         {
-            foreach (var ipl in IPLs)
-                Player.Emit("Server:RemoveIpl", ipl);
+            if (IPLs == null)
+            {
+                IPLs = new List<string>();
+            }
+            else
+            {
+                foreach (var ipl in IPLs)
+                    Player.Emit("Server:RemoveIpl", ipl);
 
-            IPLs.Clear();
+                IPLs = new List<string>();
+            }
         }
 
         public void PlayAnimation(string dic, string name, int flag)
