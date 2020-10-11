@@ -396,19 +396,6 @@ namespace Roleplay.Commands
             }
         }
 
-        [Command("kneel", "/kneel")]
-        public void CMD_kneel(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p == null)
-                return;
-
-            if (!Functions.ChecarAnimacoes(player))
-                return;
-
-            p.PlayAnimation("amb@medic@standing@tendtodead@base", "base", (int)(AnimationFlags.Loop));
-        }
-
         [Command("revistarc", "/revistarc")]
         public void CMD_revistarc(IPlayer player)
         {
@@ -422,7 +409,7 @@ namespace Roleplay.Commands
             p.PlayAnimation("amb@medic@standing@tendtodead@idle_a", "idle_a", (int)(AnimationFlags.Loop));
         }
 
-        [Command("ajoelhar", "/ajoelhar (tipo [1-4])")]
+        [Command("ajoelhar", "/ajoelhar (tipo [1-3])")]
         public void CMD_ajoelhar(IPlayer player, int tipo)
         {
             var p = Functions.ObterPersonagem(player);
@@ -438,16 +425,13 @@ namespace Roleplay.Commands
                     p.PlayAnimation("amb@medic@standing@kneel@enter", "enter", (int)(AnimationFlags.StopOnLastFrame));
                     break;
                 case 2:
-                    p.PlayAnimation("amb@medic@standing@kneel@base", "base", (int)(AnimationFlags.StopOnLastFrame));
+                    p.PlayAnimation("amb@medic@standing@tendtodead@base", "base", (int)(AnimationFlags.Loop));
                     break; 
                 case 3:
-                    p.PlayAnimation("amb@medic@standing@kneel@idle_a", "idle_a", (int)(AnimationFlags.StopOnLastFrame));
-                    break;
-                case 4:
                     p.PlayAnimation("amb@medic@standing@kneel@exit", "exit_flee", (int)(AnimationFlags.StopOnLastFrame));
                     break;
                 default:
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 4.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 3.");
                     break;
             }
         }

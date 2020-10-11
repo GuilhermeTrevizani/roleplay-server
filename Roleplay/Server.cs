@@ -793,7 +793,7 @@ namespace Roleplay
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
             p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);
             p.Roupas = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesRoupas);
-            p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Acessorio>>(p.InformacoesAcessorios);
+            p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesAcessorios);
             foreach (var x in JsonConvert.DeserializeObject<List<Personagem.Arma>>(p.InformacoesArmas))
                 p.DarArma((WeaponModel)x.Codigo, x.Municao, x.Pintura, x.Componentes, false);
 
@@ -975,11 +975,11 @@ namespace Roleplay
             p.PersonalizacaoDados.colorOverlays = new List<Personagem.Personalizacao.ColorOverlay> { new Personagem.Personalizacao.ColorOverlay(4), new Personagem.Personalizacao.ColorOverlay(5), new Personagem.Personalizacao.ColorOverlay(8) };
             for (var i = 1; i <= 10; i++)
             {
-                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 0 });
-                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 1 });
-                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 2 });
-                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 6 });
-                p.Acessorios.Add(new Personagem.Acessorio { ID = i, Slot = 7 });
+                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 0, Drawable = -1 });
+                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 1, Drawable = -1 });
+                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 2, Drawable = -1 });
+                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 6, Drawable = -1 });
+                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 7, Drawable = -1 });
                 p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 1 });
                 p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 3 });
                 p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 4 });
@@ -1544,7 +1544,7 @@ namespace Roleplay
                 p.InformacoesRoupas = strRoupas;
                 p.Roupas = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesRoupas);
                 p.InformacoesAcessorios = strAcessorios;
-                p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Acessorio>>(p.InformacoesAcessorios);
+                p.Acessorios = JsonConvert.DeserializeObject<List<Personagem.Vestimenta>>(p.InformacoesAcessorios);
             }
 
             if (tipo == 0)

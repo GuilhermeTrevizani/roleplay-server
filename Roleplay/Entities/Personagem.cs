@@ -133,7 +133,7 @@ namespace Roleplay.Entities
         public List<Vestimenta> Roupas { get; set; } = new List<Vestimenta>();
 
         [NotMapped]
-        public List<Acessorio> Acessorios { get; set; } = new List<Acessorio>();
+        public List<Vestimenta> Acessorios { get; set; } = new List<Vestimenta>();
 
         [NotMapped]
         public List<Ferimento> Ferimentos { get; set; } = new List<Ferimento>();
@@ -366,15 +366,6 @@ namespace Roleplay.Entities
             public int Slot { get; set; }
             public int Drawable { get; set; }
             public int Texture { get; set; }
-        }
-
-        public class Acessorio
-        {
-            public int ID { get; set; }
-            public int Slot { get; set; }
-            public int Drawable { get; set; }
-            public int Texture { get; set; }
-            public bool Vestir { get; set; } = false;
         }
 
         public class Arma

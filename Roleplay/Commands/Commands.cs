@@ -109,7 +109,6 @@ namespace Roleplay.Commands
                 new Comando("Animações", "/acop", "Segura o cinto"),
                 new Comando("Animações", "/idle", "Fica ocioso"),
                 new Comando("Animações", "/barra", "Faz barras"),
-                new Comando("Animações", "/kneel", "Ajoelha"),
                 new Comando("Animações", "/revistarc", "Revista ajoelhado"),
                 new Comando("Animações", "/ajoelhar", "Ajoelha"),
                 new Comando("Animações", "/drink", "Segura o copo"),
@@ -377,7 +376,7 @@ namespace Roleplay.Commands
         public void CMD_id(IPlayer player, string idNome)
         {
             int.TryParse(idNome, out int id);
-            var personagens = Global.PersonagensOnline.Where(x => x.ID == id || x.NomeIC.ToLower().Contains(idNome.ToLower())).OrderBy(x => x.ID).ToList();
+            var personagens = Global.PersonagensOnline.Where(x => x.ID > 0 && (x.ID == id || x.NomeIC.ToLower().Contains(idNome.ToLower()))).OrderBy(x => x.ID).ToList();
             if (personagens.Count == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}.");

@@ -507,7 +507,7 @@ namespace Roleplay.Commands.Staff
             Functions.GravarLog(TipoLog.Staff, $"/crank {faction.Codigo} {rank.Codigo}", p, null);
         }
 
-        [Command("rrank", "/rrank (facção) (código) (nome)")]
+        [Command("rrank", "/rrank (facção) (código)")]
         public void CMD_rrank(IPlayer player, int fac, int rank)
         {
             var p = Functions.ObterPersonagem(player);
