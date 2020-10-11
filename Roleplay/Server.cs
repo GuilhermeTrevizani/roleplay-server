@@ -1387,7 +1387,20 @@ namespace Roleplay
                 return;
             }
 
-            if (p.Armas.Any(x => x.Codigo == weapon && x.Municao > 0))
+            static bool VerificarArmaBranca(WeaponModel wp)
+            {
+                if (wp == WeaponModel.AntiqueCavalryDagger || wp == WeaponModel.BaseballBat || wp == WeaponModel.BrokenBottle 
+                    || wp == WeaponModel.Crowbar || wp == WeaponModel.Fist || wp == WeaponModel.Flashlight
+                    || wp == WeaponModel.GolfClub || wp == WeaponModel.Hammer || wp == WeaponModel.Hatchet
+                    || wp == WeaponModel.BrassKnuckles || wp == WeaponModel.Knife || wp == WeaponModel.Machete
+                    || wp == WeaponModel.Switchblade || wp == WeaponModel.Nightstick || wp == WeaponModel.PipeWrench
+                    || wp == WeaponModel.BattleAxe || wp == WeaponModel.PoolCue || wp == WeaponModel.StoneHatchet)
+                        return true;
+
+                return false;
+            }
+
+            if (p.Armas.Any(x => x.Codigo == weapon && (x.Municao > 0 || VerificarArmaBranca((WeaponModel)x.Codigo))))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui esse item.", notify: true);
                 return;

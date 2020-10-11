@@ -325,7 +325,7 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/earminest", "Altera o estoque de uma arma no armário"),
                     new Comando("Manager", "/irarm", "Vai até um armário"),
                     new Comando("Manager", "/eblipinativo", "Ativa/desativa um blip"),
-                    new Comando("Manager", "/cvehfac", "Cria um veículo para uma facção"),
+                    new Comando("Manager", "/cveh", "Cria um veículo para uma facção"),
                     new Comando("Manager", "/cvehemprego", "Cria um veículo para um emprego"),
                     new Comando("Manager", "/rveh", "Remove um veículo de uma facção/emprego"),
                     new Comando("Manager", "/evehcor", "Edita as cores de um veículo"),

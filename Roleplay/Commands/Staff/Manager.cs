@@ -1377,8 +1377,8 @@ namespace Roleplay.Commands.Staff
             p.SetPosition(new Position(armario.PosX, armario.PosY, armario.PosZ), false);
         }
 
-        [Command("carmi", "/carmi (armário) (arma)")]
-        public void CMD_carmi(IPlayer player, int armario, string arma)
+        [Command("carmi", "/carmi (armário) (arma) (munição) (estoque)")]
+        public void CMD_carmi(IPlayer player, int armario, string arma, int municao, int estoque)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
@@ -1407,10 +1407,24 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
+            if (municao <= 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Munição inválida.");
+                return;
+            }
+
+            if (estoque < 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Estoque inválido.");
+                return;
+            }
+
             var item = new ArmarioItem()
             {
                 Codigo = armario,
                 Arma = (long)wep,
+                Municao = municao,
+                Estoque = estoque
             };
 
             using (var context = new DatabaseContext())
@@ -1420,8 +1434,8 @@ namespace Roleplay.Commands.Staff
             }
 
             Global.ArmariosItens.Add(item);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} adicionada no armário {armario}.");
-            Functions.GravarLog(TipoLog.Staff, $"/carmi {armario} {item.Arma}", p, null);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Arma {wep} com munição {municao} e estoque {estoque} adicionada no armário {armario}.");
+            Functions.GravarLog(TipoLog.Staff, $"/carmi {armario} {item.Arma} {municao} {estoque}", p, null);
         }
 
         [Command("rarmi", "/rarmi (armário) (arma)")]
@@ -1454,6 +1468,7 @@ namespace Roleplay.Commands.Staff
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Arma {wep} não existe no armário {armario}.");
                 return;
             }
+
             using (var context = new DatabaseContext())
             {
                 context.ArmariosItens.Remove(item);
@@ -1495,11 +1510,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)].Municao = municao;
+            item.Municao = municao;
 
             using (var context = new DatabaseContext())
             {
-                context.ArmariosItens.Update(Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)]);
+                context.ArmariosItens.Update(item);
                 context.SaveChanges();
             }
 
@@ -1544,11 +1559,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)].Rank = rank;
+            item.Rank = rank;
 
             using (var context = new DatabaseContext())
             {
-                context.ArmariosItens.Update(Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)]);
+                context.ArmariosItens.Update(item);
                 context.SaveChanges();
             }
 
@@ -1586,11 +1601,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)].Estoque = estoque;
+            item.Estoque = estoque;
 
             using (var context = new DatabaseContext())
             {
-                context.ArmariosItens.Update(Global.ArmariosItens[Global.ArmariosItens.IndexOf(item)]);
+                context.ArmariosItens.Update(item);
                 context.SaveChanges();
             }
 
@@ -1598,8 +1613,8 @@ namespace Roleplay.Commands.Staff
             Functions.GravarLog(TipoLog.Staff, $"/earmiest {armario} {item.Arma} {estoque}", p, null);
         }
 
-        [Command("cvehfac", "/cvehfac (modelo) (facção)")]
-        public void CMD_cvehfac(IPlayer player, string modelo, int faccao)
+        [Command("cveh", "/cveh (modelo) (facção)")]
+        public void CMD_cveh(IPlayer player, string modelo, int faccao)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
@@ -1643,7 +1658,7 @@ namespace Roleplay.Commands.Staff
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
-            Functions.GravarLog(TipoLog.Staff, $"/cvehfac {veiculo.Codigo} {modelo} {faccao}", p, null);
+            Functions.GravarLog(TipoLog.Staff, $"/cveh {veiculo.Codigo} {modelo} {faccao}", p, null);
         }
 
         [Command("rveh", "/rveh (código)")]
