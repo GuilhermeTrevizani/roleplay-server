@@ -5,20 +5,26 @@ using Roleplay.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Roleplay.Commands
+namespace Roleplay.Commands.Job
 {
-    public class Mechanic
+    public class Mecanico
     {
         [Command("reparar")]
         public void CMD_reparar(IPlayer player)
         {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Emprego != TipoEmprego.Mecanico)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é um mecânico.");
+                return;
+            }
+
             if (player.IsInVehicle)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você deve estar fora do veículo.");
                 return;
             }
 
-            var p = Functions.ObterPersonagem(player);
             if (p.PecasVeiculares == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui peças veiculares.");
@@ -75,13 +81,19 @@ namespace Roleplay.Commands
         [Command("pintar")]
         public void CMD_pintar(IPlayer player)
         {
+            var p = Functions.ObterPersonagem(player);
+            if (p.Emprego != TipoEmprego.Mecanico)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não é um mecânico.");
+                return;
+            }
+
             if (player.IsInVehicle)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você deve estar fora do veículo.");
                 return;
             }
 
-            var p = Functions.ObterPersonagem(player);
             if (p.PecasVeiculares == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui peças veiculares.");

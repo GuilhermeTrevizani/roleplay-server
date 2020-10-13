@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Roleplay.Commands
 {
-    public class Vehicles
+    public class Veiculos
     {
         [Command("motor")]
         public void CMD_motor(IPlayer player)
@@ -34,7 +34,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", notify: true);
+            Functions.SendMessageToNearbyPlayers(player, $"{(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", TipoMensagemJogo.Ame, 5);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
 
@@ -292,7 +292,8 @@ namespace Roleplay.Commands
 
             porta--;
             veh.StatusPortas[porta] = !veh.StatusPortas[porta];
-            player.Emit("SetVehicleDoorState", veh.Vehicle, porta, veh.StatusPortas[porta]);
+            veh.Vehicle.SetNetworkOwner(player);
+            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, porta, veh.StatusPortas[porta]);
         }
 
         [Command("capo")]
@@ -311,7 +312,8 @@ namespace Roleplay.Commands
             }
 
             veh.StatusPortas[4] = !veh.StatusPortas[4];
-            player.Emit("SetVehicleDoorState", veh.Vehicle, 4, veh.StatusPortas[4]);
+            veh.Vehicle.SetNetworkOwner(player);
+            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, 4, veh.StatusPortas[4]);
         }
 
         [Command("portamalas")]
@@ -330,7 +332,8 @@ namespace Roleplay.Commands
             }
 
             veh.StatusPortas[5] = !veh.StatusPortas[5];
-            player.Emit("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
+            veh.Vehicle.SetNetworkOwner(player);
+            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
         }
 
         [Command("abastecer")]
@@ -427,9 +430,9 @@ namespace Roleplay.Commands
         public void CMD_valugar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p.Emprego == TipoEmprego.Nenhum)
+            if (p.Emprego == TipoEmprego.Nenhum || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não tem um emprego ou não está em serviço.");
                 return;
             }
 
@@ -438,7 +441,7 @@ namespace Roleplay.Commands
             {
                 if (player.Position.Distance(emp.PosicaoAluguel) > Global.DistanciaRP)
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no aluguel de veículos para esse emprego.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está no aluguel de veículos para seu emprego.");
                     return;
                 }
             }

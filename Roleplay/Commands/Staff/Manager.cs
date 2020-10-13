@@ -229,11 +229,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.Faccoes[Global.Faccoes.IndexOf(faccao)].Nome = nome;
+            faccao.Nome = nome;
 
             using (var context = new DatabaseContext())
             {
-                context.Faccoes.Update(Global.Faccoes[Global.Faccoes.IndexOf(faccao)]);
+                context.Faccoes.Update(faccao);
                 context.SaveChanges();
             }
 
@@ -264,11 +264,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.Faccoes[Global.Faccoes.IndexOf(faccao)].Tipo = (TipoFaccao)tipo;
+            faccao.Tipo = (TipoFaccao)tipo;
 
             using (var context = new DatabaseContext())
             {
-                context.Faccoes.Update(Global.Faccoes[Global.Faccoes.IndexOf(faccao)]);
+                context.Faccoes.Update(faccao);
                 context.SaveChanges();
             }
 
@@ -299,11 +299,11 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.Faccoes[Global.Faccoes.IndexOf(faccao)].Cor = cor;
+            faccao.Cor = cor;
 
             using (var context = new DatabaseContext())
             {
-                context.Faccoes.Update(Global.Faccoes[Global.Faccoes.IndexOf(faccao)]);
+                context.Faccoes.Update(faccao);
                 context.SaveChanges();
             }
 
@@ -738,7 +738,7 @@ namespace Roleplay.Commands.Staff
                 SaidaPosY = saida.Y,
                 SaidaPosZ = saida.Z,
                 Dimensao = player.Dimension,
-                Endereco = $"{p.AreaName} - {p.ZoneName}",
+                Endereco = p.AreaName,
             };
 
             using (var context = new DatabaseContext())
@@ -884,7 +884,7 @@ namespace Roleplay.Commands.Staff
             prop.EntradaPosY = player.Position.Y;
             prop.EntradaPosZ = player.Position.Z;
             prop.Dimensao = player.Dimension;
-            prop.Endereco = $"{p.AreaName} - {p.ZoneName}";
+            prop.Endereco = p.AreaName;
 
             using (var context = new DatabaseContext())
             {

@@ -58,6 +58,7 @@ namespace Roleplay.Models
         Namechange = 10,
         ExclusaoPersonagem = 11,
         PlateChange = 12,
+        Anuncio = 13,
     }
 
     public enum TipoConvite
@@ -212,6 +213,7 @@ namespace Roleplay.Models
         Entrada = 11,
         MeCurar = 12,
         FerroVelho = 13,
+        Lixeiro = 14,
     }
 
     public enum TipoEmprego

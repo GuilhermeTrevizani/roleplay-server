@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
-    public class Commands
+    public class Comandos
     {
         [Command("ajuda")]
         public void CMD_ajuda(IPlayer player)
@@ -143,7 +143,7 @@ namespace Roleplay.Commands
                 listaComandos.AddRange(new List<Comando>()
                 {
                     new Comando("Emprego", "/sairemprego", "Sai do emprego"),
-                    new Comando("Emprego", "/duty", "Entra/sai de serviço"),
+                    new Comando("Emprego", "/duty /trabalho", "Entra/sai de serviço"),
                 });
 
                 if (p.Emprego == TipoEmprego.Taxista || p.Emprego == TipoEmprego.Mecanico)
@@ -156,10 +156,15 @@ namespace Roleplay.Commands
                 if (p.Emprego == TipoEmprego.Mecanico)
                     listaComandos.AddRange(new List<Comando>()
                     {
-                        new Comando("Emprego", "/chamadas", "Exibe as chamadas aguardando resposta"),
-                        new Comando("Emprego", "/atcha", "Atende uma chamada"),
                         new Comando("Emprego", "/pintar", "Pinta um veículo"),
                         new Comando("Emprego", "/reparar", "Conserta um veículo"),
+                    });
+
+                if (p.Emprego == TipoEmprego.Lixeiro)
+                    listaComandos.AddRange(new List<Comando>()
+                    {
+                        new Comando("Emprego", "/pegarlixo", "Pega um saco de lixo em um ponto de coleta"),
+                        new Comando("Emprego", "/colocarlixo", "Coloca um saco de lixo em um caminhão de lixo"),
                     });
             }
 
@@ -179,6 +184,7 @@ namespace Roleplay.Commands
                         new Comando("Facção", "/fspawn", "Spawna veículos da facção"),
                         new Comando("Facção", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
                         new Comando("Facção", "/freparar", "Conserta veículos da facção"),
+                        new Comando("Facção", "/duty /trabalho", "Entra/sai de trabalho"),
                     });
 
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
@@ -186,7 +192,6 @@ namespace Roleplay.Commands
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
                         new Comando("Facção", "/m", "Fala no megafone"),
-                        new Comando("Facção", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção", "/multar", "Multa um personagem online"),
                         new Comando("Facção", "/multaroff", "Multa um personagem offline"),
                         new Comando("Facção", "/prender", "Prende um personagem"),
@@ -203,7 +208,6 @@ namespace Roleplay.Commands
                     {
                         new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
                         new Comando("Facção", "/m", "Fala no megafone"),
-                        new Comando("Facção", "/duty", "Entra/sai de trabalho"),
                         new Comando("Facção", "/curar", "Cura um personagem ferido"),
                         new Comando("Facção", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção", "/uniforme", "Coloca/retira o uniforme de serviço"),

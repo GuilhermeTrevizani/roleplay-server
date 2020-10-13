@@ -3,7 +3,7 @@ using Roleplay.Models;
 
 namespace Roleplay.Commands
 {
-    public class Anims
+    public class Animacoes
     {
         [Command("stopanim", Alias = "sa")]
         public void CMD_stopanim(IPlayer player) => Functions.ChecarAnimacoes(player, true);

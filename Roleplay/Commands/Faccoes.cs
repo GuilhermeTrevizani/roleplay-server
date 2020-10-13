@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
-    public class Faction
+    public class Faccoes
     {
         [Command("f", "/f (mensagem)", GreedyArg = true)]
         public void CMD_f(IPlayer player, string mensagem)
@@ -214,11 +214,11 @@ namespace Roleplay.Commands
                     p.Player.Emit("RemoveWeapon", x.Codigo);
                 target.Armas = new List<Personagem.Arma>();
                 target.Player.Armor = 0;
-            }
+            };
 
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} expulsou {target.Nome} da facção.");
             target.Faccao = target.Rank = target.Distintivo = 0;
             target.EmTrabalho = false;
-            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} expulsou {target.Nome} da facção.");
             Functions.GravarLog(TipoLog.FaccaoGestor, "/expulsar", p, target);
         }
 
@@ -235,22 +235,116 @@ namespace Roleplay.Commands
             Functions.SendMessageToNearbyPlayers(player, mensagem, TipoMensagemJogo.Megafone, 55.0f);
         }
 
-        [Command("duty")]
+        [Command("duty", Alias = "trabalho")]
         public void CMD_duty(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica && p?.Emprego == 0)
+            if (!(p?.FaccaoBD?.Governamental ?? false) && p?.Emprego == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou médica e não possui um emprego.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental e não possui um emprego.");
+                return;
+            }
+
+            if (p?.Faccao == 0)
+            {
+                if (p.Emprego == TipoEmprego.Lixeiro)
+                {
+                    if (p.PagamentoExtra > 0)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Aguarde o próximo pagamento para trabalhar novamente.");
+                        return;
+                    }
+
+                    var emp = Global.Empregos.FirstOrDefault(x => x.Tipo == TipoEmprego.Lixeiro);
+                    if (emp.Posicao.Distance(player.Position) > Global.DistanciaRP)
+                    {
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo do local de emprego de lixeiro.");
+                        return;
+                    }
+
+                    p.EmTrabalho = !p.EmTrabalho;
+                    if (p.EmTrabalho)
+                    {
+                        var informacoesRoupas = new List<Personagem.Vestimenta>
+                        {
+                            new Personagem.Vestimenta(0, 1, 0),
+                            new Personagem.Vestimenta(0, 5, 0),
+                            new Personagem.Vestimenta(0, 7, 0),
+                            new Personagem.Vestimenta(0, 9, 0),
+                            new Personagem.Vestimenta(0, 10, 0),
+                        };
+
+                        var informacoesAcessorios = new List<Personagem.Vestimenta>
+                        {
+                            new Personagem.Vestimenta(0, 0, -1),
+                            new Personagem.Vestimenta(0, 1, -1),
+                            new Personagem.Vestimenta(0, 2, -1),
+                            new Personagem.Vestimenta(0, 6, -1),
+                            new Personagem.Vestimenta(0, 7, -1),
+                        };
+
+                        if (p.PersonalizacaoDados.sex == 0)
+                        {
+                            informacoesRoupas.AddRange(new List<Personagem.Vestimenta>
+                            {
+                                new Personagem.Vestimenta(0, 3, 72),
+                                new Personagem.Vestimenta(0, 4, 35),
+                                new Personagem.Vestimenta(0, 6, 26),
+                                new Personagem.Vestimenta(0, 8, 36),
+                                new Personagem.Vestimenta(0, 11, 50),
+                            });
+                        }
+                        else
+                        {
+                            informacoesRoupas.AddRange(new List<Personagem.Vestimenta>
+                            {
+                                new Personagem.Vestimenta(0, 3, 63),
+                                new Personagem.Vestimenta(0, 4, 36),
+                                new Personagem.Vestimenta(0, 6, 27),
+                                new Personagem.Vestimenta(0, 8, 59),
+                                new Personagem.Vestimenta(0, 11, 57),
+                            });
+                        }
+
+                        p.ItensColetados = 0;
+                        p.PontosColeta = Global.Pontos.Where(x => x.Tipo == TipoPonto.Lixeiro).OrderBy(x => Guid.NewGuid()).Take(20).ToList();
+                        foreach (var x in p.PontosColeta)
+                        {
+                            player.Emit("blip:create", x.Codigo * -1, 1, "Ponto de Coleta", 2, new Position(x.PosX, x.PosY, x.PosZ), 2, false, 0.5);
+                            player.Emit("marker:create", x.Codigo * -1, 0, new Position(x.PosX, x.PosY, x.PosZ), new Position(0, 0, 0), new Position(0, 0, 0), new Position(1, 1, 1), new Rgba(255, 255, 255, 255), 15);
+                        }
+
+                        player.Emit("Server:SyncClothes", JsonConvert.SerializeObject(informacoesRoupas), JsonConvert.SerializeObject(informacoesAcessorios), 0);
+                        Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou em serviço.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Use {{{Global.CorPrincipal}}}/pegarlixo {{#FFFFFF}}para pegar um saco de lixo em uma lixeira e {{{Global.CorPrincipal}}}/colocarlixo {{#FFFFFF}}para colocá-lo no caminhão.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"No seu GPS foram marcados {{{Global.CorPrincipal}}}{p.PontosColeta.Count} {{#FFFFFF}}pontos de coleta. Você receberá {{{Global.CorPrincipal}}}${Global.Parametros.ValorExtraLixeiro:N0} {{#FFFFFF}}por cada ponto completado.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Após concluir quantos pontos desejar, retorne e saia de serviço para concluir.");
+                    }
+                    else
+                    {
+                        foreach (var x in p.PontosColeta)
+                        {
+                            player.Emit("blip:remove", x.Codigo * -1);
+                            player.Emit("marker:remove", x.Codigo * -1);
+                        }
+
+                        p.PagamentoExtra = p.ItensColetados * Global.Parametros.ValorExtraLixeiro;
+                        if (p.PagamentoExtra > 0)
+                            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"Você realizou {{{Global.CorPrincipal}}}{p.ItensColetados} {{#FFFFFF}}coletas e {{{Global.CorPrincipal}}}${p.PagamentoExtra:N0} {{#FFFFFF}}foram adicionados no seu próximo pagamento.");
+
+                        player.Emit("Server:SyncClothes", p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa);
+                        Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você saiu de serviço.");
+                    }
+                    return;
+                }
+
+                p.EmTrabalho = !p.EmTrabalho;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
                 return;
             }
 
             p.EmTrabalho = !p.EmTrabalho;
-
-            if (p?.Faccao == 0)
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
-            else
-                Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
         }
 
         [Command("sairfaccao")]

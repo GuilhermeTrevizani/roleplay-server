@@ -306,7 +306,7 @@ namespace Roleplay
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)
         {
             var p = ObterPersonagem(player);
-            if (p.TipoFerido == 2)
+            if (p.TipoFerido == 2 && type != TipoMensagemJogo.Do && type != TipoMensagemJogo.Ado)
             {
                 EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está inconsciente.");
                 return;
@@ -352,7 +352,8 @@ namespace Roleplay
                                 EnviarMensagem(target, TipoMensagem.Nenhum, $"* {message} (( {p.NomeIC} ))", "#C2A2DA");
                                 break;
                             case TipoMensagemJogo.ChatOOC:
-                                EnviarMensagem(target, TipoMensagem.Nenhum, $"(( {p.NomeIC} [{p.ID}]: {message} ))", "#BABABA");
+                                var cor = p.EmTrabalhoAdministrativo && !string.IsNullOrWhiteSpace(p.CorStaff) ? p.CorStaff : "#BABABA";
+                                EnviarMensagem(target, TipoMensagem.Nenhum, $"(( {{{cor}}}{p.NomeIC} [{p.ID}]{{#BABABA}}: {message} ))", "#BABABA");
                                 break;
                             case TipoMensagemJogo.ChatICBaixo:
                                 EnviarMensagem(target, TipoMensagem.Nenhum, $"{p.NomeIC} diz [baixo]: {message}", chatMessageColor);
@@ -380,7 +381,7 @@ namespace Roleplay
 
         public static void MostrarStats(IPlayer player, Personagem p)
         {
-            var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | Último Acesso: <strong>{p.DataUltimoAcesso}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong><br/>
+            var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Troca de Nome: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong> | Troca de Nome Fórum: <strong>{(p.UsuarioBD.PossuiNamechangeForum ? "SIM" : "NÃO")}</strong> | Troca de Placa: <strong>{(p.UsuarioBD.PossuiPlateChange ? "SIM" : "NÃO")}</strong><br/>
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong> | Poupança: <strong>${p.Poupanca:N0}</strong> | Peças Veiculares: <strong>{p.PecasVeiculares:N0}</strong> | Máscara: <strong>{p.Mascara}</strong><br/>";
 
@@ -589,7 +590,7 @@ namespace Roleplay
                                 PosY = p.PosicaoIC.Y,
                                 PosZ = p.PosicaoIC.Z,
                                 Mensagem = message,
-                                Localizacao = $"{p.AreaName} - {p.ZoneName}",
+                                Localizacao = p.AreaName,
                                 ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
                             };
                             using var context = new DatabaseContext();
@@ -599,7 +600,7 @@ namespace Roleplay
 
                             EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.ID}", true, true);
                             EnviarMensagemTipoFaccao(tipoFaccao, $"De: {{#FFFFFF}}{p.Celular}", true, true);
-                            EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName}", true, true);
                             EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {{#FFFFFF}}{message}", true, true);
                         }
 
@@ -622,7 +623,7 @@ namespace Roleplay
 
                     EnviarMensagemEmprego(TipoEmprego.Taxista, $"Downtown Cab Company | Solicitação de Táxi {{#FFFFFF}}#{p.ID}", Global.CorCelularSecundaria);
                     EnviarMensagemEmprego(TipoEmprego.Taxista, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelularSecundaria);
-                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Taxista, $"Localização: {{#FFFFFF}}{p.AreaName}", Global.CorCelularSecundaria);
                     EnviarMensagemEmprego(TipoEmprego.Taxista, $"Destino: {{#FFFFFF}}{message}", Global.CorCelularSecundaria);
 
                     p.LimparLigacao();
@@ -635,7 +636,7 @@ namespace Roleplay
 
                     EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Central de Mecânicos | Solicitação de Mecânico {{#FFFFFF}}#{p.ID}", Global.CorCelularSecundaria);
                     EnviarMensagemEmprego(TipoEmprego.Mecanico, $"De: {{#FFFFFF}}{p.Celular}", Global.CorCelularSecundaria);
-                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Localização: {{#FFFFFF}}{p.AreaName} - {p.ZoneName}", Global.CorCelularSecundaria);
+                    EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Localização: {{#FFFFFF}}{p.AreaName}", Global.CorCelularSecundaria);
                     EnviarMensagemEmprego(TipoEmprego.Mecanico, $"Mensagem: {{#FFFFFF}}{message}", Global.CorCelularSecundaria);
 
                     p.LimparLigacao();
@@ -1097,24 +1098,6 @@ namespace Roleplay
 
             foreach (var x in players)
                 EnviarMensagem(x.Player, TipoMensagem.Nenhum, mensagem, Global.CorErro);
-        }
-
-        public static void SpawnarPlayer(Personagem p)
-        {
-            p.Player.Dimension = (int)p.Dimensao;
-            EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{p.UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{p.DataUltimoAcesso}{{#FFFFFF}}.");
-            if (p.UsuarioBD.DataExpiracaoVIP.HasValue)
-                EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {p.UsuarioBD.VIP}{{#FFFFFF}} {(p.UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{p.UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
-            p.Player.SetSyncedMetaData("nametag", p.NomeIC);
-            p.Player.Emit("nametags:Config", true);
-            p.Player.Emit("chat:activateTimeStamp", p.UsuarioBD.TimeStamp);
-            p.Player.SetSyncedMetaData("ferido", 0);
-            p.SetPosition(new Position(p.PosX, p.PosY, p.PosZ), true);
-            p.Player.Rotation = new Position(p.RotX, p.RotY, p.RotZ);
-            p.Player.SetSyncedMetaData("id", p.ID);
-            Global.GlobalVoice.AddPlayer(p.Player);
-            Global.GlobalVoice.MutePlayer(p.Player);
-            p.DataUltimoAcesso = DateTime.Now;
         }
     }
 }

@@ -72,6 +72,7 @@ namespace Roleplay.Entities
         public int Mascara { get; set; } = 0;
         public int Roupa { get; set; } = 1;
         public int Poupanca { get; set; } = 0;
+        public int PagamentoExtra { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -149,9 +150,6 @@ namespace Roleplay.Entities
         public string AreaName { get; set; } = string.Empty;
 
         [NotMapped]
-        public string ZoneName { get; set; } = string.Empty;
-
-        [NotMapped]
         public Position PosicaoIC
         {
             get
@@ -186,7 +184,7 @@ namespace Roleplay.Entities
             TipoStaff.GameAdministrator => "#40BFFF",
             TipoStaff.LeadAdministrator => "#00AA00",
             TipoStaff.Manager => "#CC4545",
-            _ => "#000000",
+            _ => string.Empty,
         };
 
         [NotMapped]
@@ -219,6 +217,15 @@ namespace Roleplay.Entities
                 };
             }
         }
+
+        [NotMapped]
+        public List<Ponto> PontosColeta { get; set; } = new List<Ponto>();
+
+        [NotMapped]
+        public Ponto PontoColetando { get; set; } = new Ponto();
+
+        [NotMapped]
+        public int ItensColetados { get; set; } = 0;
 
         public void SetDinheiro()
         {
@@ -363,6 +370,24 @@ namespace Roleplay.Entities
             Player.Emit("RemoveWeapon", weapon);
         }
 
+        public void Spawnar()
+        {
+            Player.Dimension = (int)Dimensao;
+            Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{DataUltimoAcesso}{{#FFFFFF}}.");
+            if (UsuarioBD.DataExpiracaoVIP.HasValue)
+                Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {UsuarioBD.VIP}{{#FFFFFF}} {(UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
+            Player.SetSyncedMetaData("nametag", NomeIC);
+            Player.Emit("nametags:Config", true);
+            Player.Emit("chat:activateTimeStamp", UsuarioBD.TimeStamp);
+            Player.SetSyncedMetaData("ferido", 0);
+            SetPosition(new Position(PosX, PosY, PosZ), true);
+            Player.Rotation = new Position(RotX, RotY, RotZ);
+            Player.SetSyncedMetaData("id", ID);
+            Global.GlobalVoice.AddPlayer(Player);
+            Global.GlobalVoice.MutePlayer(Player);
+            DataUltimoAcesso = DateTime.Now;
+        }
+
         public class Ferimento
         {
             public DateTime Data { get; set; } = DateTime.Now;
@@ -374,10 +399,27 @@ namespace Roleplay.Entities
 
         public class Vestimenta
         {
+            public Vestimenta()
+            {
+            }
+
+            public Vestimenta(int id, int slot)
+            {
+                ID = id;
+                Slot = slot;
+            }
+
+            public Vestimenta(int id, int slot, int drawable)
+            {
+                ID = id;
+                Slot = slot;
+                Drawable = drawable;
+            }
+
             public int ID { get; set; }
             public int Slot { get; set; }
-            public int Drawable { get; set; }
-            public int Texture { get; set; }
+            public int Drawable { get; set; } = 0;
+            public int Texture { get; set; } = 0;
         }
 
         public class Arma

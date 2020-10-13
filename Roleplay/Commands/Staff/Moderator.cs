@@ -229,7 +229,7 @@ namespace Roleplay.Commands.Staff
             }
 
             p.EmTrabalhoAdministrativo = !p.EmTrabalhoAdministrativo;
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo", true);
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.", true);
         }
 
         [Command("listasos")]

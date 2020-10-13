@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Roleplay.Commands
 {
-    public class Cellphone
+    public class Celular
     {
         [Command("sms", "/sms (número ou nome do contato) (mensagem)", GreedyArg = true)]
         public void CMD_sms(IPlayer player, string numeroNomeContato, string mensagem)
@@ -76,6 +76,7 @@ namespace Roleplay.Commands
                 target.LimparLigacao();
             }
 
+            Functions.SendMessageToNearbyPlayers(player, "desligou a ligação.", TipoMensagemJogo.Ame, 5);
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target != null ? target.Celular : p.NumeroLigacao)}.", Global.CorCelularSecundaria);
             p.LimparLigacao();
         }
@@ -103,6 +104,7 @@ namespace Roleplay.Commands
                 return;
             }
 
+            Functions.SendMessageToNearbyPlayers(player, "atendeu a ligação.", TipoMensagemJogo.Ame, 5);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida.", Global.CorCelularSecundaria);
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}.", Global.CorCelularSecundaria);
 
@@ -198,8 +200,15 @@ namespace Roleplay.Commands
             p.Dinheiro -= Global.Parametros.ValorAnuncio;
             p.SetDinheiro();
 
-            foreach (var x in Global.PersonagensOnline.Where(x => !x.UsuarioBD.TogAnuncio))
-                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"[CENTRAL DE ANÚNCIOS] {mensagem} | Contato: {p.Celular}", "#8EBE59");
+            foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0 && !x.UsuarioBD.TogAnuncio))
+            {
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"[CENTRAL DE ANÚNCIOS] {mensagem} [CONTATO: {p.Celular}]", "#8EBE59");
+
+                if (x.UsuarioBD.Staff != TipoStaff.Nenhum)
+                    Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"{p.Nome} [{p.ID}] enviou o anúncio.", Global.CorErro);
+            }
+
+            Functions.GravarLog(TipoLog.Anuncio, mensagem, p, null);
         }
     }
 }

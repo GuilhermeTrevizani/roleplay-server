@@ -17,8 +17,8 @@ namespace Roleplay
                 return;
             }
 
-            var p = Functions.ObterPersonagem(player);
-            p.DataUltimoUsoBarbearia = null;
+            //Alt.CreateBlip(player, BlipType.Object, player.Position);
+            //Alt.CreateCheckpoint(CheckpointType.Cyclinder, player.Position, 1, 1, new Rgba(255, 255, 255, 255));
         }
 
         [Command("w", "/w (arma)")]
@@ -88,7 +88,7 @@ namespace Roleplay
             player.Emit("Server:RemoveIpl", ipl);
         }
 
-        [Command("anim", "/cc (dic) (name) (flag)")]
+        [Command("anim", "/anim (dic) (name) (flag)")]
         public void CMD_anim(IPlayer player, string dic, string name, int flag)
         {
             if (!Global.Development)
@@ -102,7 +102,7 @@ namespace Roleplay
         }
 
         [Command("l", "/l (livery)")]
-        public void CMD_l(IPlayer player, int livery)
+        public void CMD_l(IPlayer player, byte livery)
         {
             if (!Global.Development)
             {
@@ -113,26 +113,11 @@ namespace Roleplay
             if (!player.IsInVehicle)
                 return;
 
-            player.Vehicle.Livery = (byte)livery;
-        }
-
-        [Command("rl", "/rl (livery)")]
-        public void CMD_rl(IPlayer player, int livery)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            if (!player.IsInVehicle)
-                return;
-
-            player.Vehicle.RoofLivery = (byte)livery;
+            player.Vehicle.Livery = livery;
         }
 
         [Command("e", "/e (extra)")]
-        public void CMD_e(IPlayer player, int extra)
+        public void CMD_e(IPlayer player, byte extra)
         {
             if (!Global.Development)
             {
@@ -143,7 +128,7 @@ namespace Roleplay
             if (!player.IsInVehicle)
                 return;
 
-            player.Vehicle.ToggleExtra((byte)extra, !player.Vehicle.IsExtraOn((byte)extra));
+            player.Vehicle.ToggleExtra(extra, player.Vehicle.IsExtraOn(extra));
         }
 
         [Command("dinheiro", "/dinheiro (dinheiro)")]

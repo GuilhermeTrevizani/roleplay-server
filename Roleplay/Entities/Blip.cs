@@ -19,7 +19,7 @@ namespace Roleplay.Entities
             DeletarIdentificador(player);
 
             if (!Inativo)
-                player.Emit("blip:create", Codigo, Tipo, Nome, Cor, new Position(PosX, PosY, PosZ));
+                player.Emit("blip:create", Codigo, Tipo, Nome, Cor, new Position(PosX, PosY, PosZ), 2, true, 0.8);
         }
 
         public void DeletarIdentificador(IPlayer player) => player.Emit("blip:remove", Codigo);

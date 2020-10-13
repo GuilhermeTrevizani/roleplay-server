@@ -3,9 +3,9 @@ using AltV.Net.Enums;
 using Roleplay.Models;
 using System.Linq;
 
-namespace Roleplay.Commands
+namespace Roleplay.Commands.Job
 {
-    public class Job 
+    public class Emprego 
     {
         [Command("sairemprego")]
         public void CMD_sairemprego(IPlayer player)

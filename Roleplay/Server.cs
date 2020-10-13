@@ -77,6 +77,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, string>("MDCPesquisarPessoa", MDCPesquisarPessoa);
             Alt.OnClient<IPlayer, string>("MDCPesquisarVeiculo", MDCPesquisarVeiculo);
             Alt.OnClient<IPlayer, string>("MDCPesquisarPropriedade", MDCPesquisarPropriedade);
+            Alt.OnClient<IPlayer, float, float, float>("SoltarSacoLixo", SoltarSacoLixo);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -243,6 +244,7 @@ namespace Roleplay
                         {
                             salarioEmprego = Global.Precos.FirstOrDefault(x => x.Tipo == TipoPreco.Empregos && x.Nome.ToLower() == p.Emprego.ToString().ToLower())?.Valor ?? 0;
                             salario += salarioEmprego;
+                            salario += p.PagamentoExtra;
                         }
 
                         if (p.Poupanca > 0)
@@ -272,6 +274,9 @@ namespace Roleplay
                             if (salarioEmprego > 0)
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Salário Emprego: {{{Global.CorSucesso}}}+ ${salarioEmprego:N0}");
 
+                            if (p.PagamentoExtra > 0)
+                                Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Extra Emprego: {{{Global.CorSucesso}}}+ ${p.PagamentoExtra:N0}");
+
                             if (valorImpostoPropriedade > 0)
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Imposto Propriedades: {{{Global.CorErro}}}- ${valorImpostoPropriedade:N0}");
 
@@ -283,6 +288,8 @@ namespace Roleplay
                             if (poupanca > 0)
                                 Functions.EnviarMensagem(p.Player, TipoMensagem.Nenhum, $"Poupança: {{{Global.CorSucesso}}}+ ${poupanca:N0} (${p.Poupanca:N0})");
                         }
+
+                        p.PagamentoExtra = 0;
                     }
                 }
             }
@@ -544,6 +551,14 @@ namespace Roleplay
                         else if (x.ParameterType == typeof(float))
                         {
                             float.TryParse(p, out float val);
+                            if (val == 0 && p != "0")
+                                continue;
+
+                            arr.Add(val);
+                        }
+                        else if (x.ParameterType == typeof(byte))
+                        {
+                            byte.TryParse(p, out byte val);
                             if (val == 0 && p != "0")
                                 continue;
 
@@ -833,7 +848,7 @@ namespace Roleplay
             }
             else
             {
-                Functions.SpawnarPlayer(p);
+                p.Spawnar();
             }
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
@@ -949,7 +964,7 @@ namespace Roleplay
                 return;
             }
 
-            var nomeCompleto = $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(nome)} {CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sobrenome)}";
+            var nomeCompleto = $"{nome} {sobrenome}";
             if (nomeCompleto.Length > 25)
             {
                 player.Emit("Server:MostrarErro", "Nome do personagem não pode possuir mais que 25 caracteres.");
@@ -982,7 +997,7 @@ namespace Roleplay
                 }
             }
 
-            if (context.Personagens.Any(x => x.Nome == nomeCompleto && x.Codigo != codigo))
+            if (context.Personagens.Any(x => x.Nome.ToLower() == nomeCompleto.ToLower() && x.Codigo != codigo))
             {
                 player.Emit("Server:MostrarErro", $"Personagem {nomeCompleto} já existe.");
                 return;
@@ -994,21 +1009,21 @@ namespace Roleplay
             p.PersonalizacaoDados.colorOverlays = new List<Personagem.Personalizacao.ColorOverlay> { new Personagem.Personalizacao.ColorOverlay(4), new Personagem.Personalizacao.ColorOverlay(5), new Personagem.Personalizacao.ColorOverlay(8) };
             for (var i = 1; i <= 10; i++)
             {
-                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 0, Drawable = -1 });
-                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 1, Drawable = -1 });
-                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 2, Drawable = -1 });
-                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 6, Drawable = -1 });
-                p.Acessorios.Add(new Personagem.Vestimenta { ID = i, Slot = 7, Drawable = -1 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 1 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 3 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 4 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 5 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 6 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 7 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 8 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 9 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 10 });
-                p.Roupas.Add(new Personagem.Vestimenta { ID = i, Slot = 11 });
+                p.Acessorios.Add(new Personagem.Vestimenta(i, 0, -1));
+                p.Acessorios.Add(new Personagem.Vestimenta(i, 1, -1));
+                p.Acessorios.Add(new Personagem.Vestimenta(i, 2, -1));
+                p.Acessorios.Add(new Personagem.Vestimenta(i, 6, -1));
+                p.Acessorios.Add(new Personagem.Vestimenta(i, 7, -1));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 1));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 3));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 4));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 5));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 6));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 7));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 8));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 9));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 10));
+                p.Roupas.Add(new Personagem.Vestimenta(i, 11));
             }
 
             var personagem = new Personagem()
@@ -1146,7 +1161,7 @@ namespace Roleplay
             p.Dinheiro -= preco.Valor;
             p.SetDinheiro();
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo.ToUpper()} por ${preco.Valor:N0}.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você comprou {veh.Modelo.ToUpper()} por ${preco.Valor:N0}. Use /vlista para spawnar.");
             player.Emit("Server:CloseView");
         }
 
@@ -1495,8 +1510,13 @@ namespace Roleplay
         private void AtualizarInformacoes(IPlayer player, string areaName, string zoneName, string armas)
         {
             var p = Functions.ObterPersonagem(player);
-            p.AreaName = areaName;
-            p.ZoneName = zoneName;
+            p.AreaName = $"{areaName} - {zoneName}";
+            if (player.Dimension != 0)
+            {
+                var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo == player.Dimension);
+                if (prop != null)
+                    p.AreaName = prop.Endereco;
+            }
 
             var weapons = (armas ?? string.Empty).Split(";").Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => new Personagem.Arma()
@@ -1585,7 +1605,7 @@ namespace Roleplay
                 using var context = new DatabaseContext();
                 context.Personagens.Update(p);
                 context.SaveChanges();
-                Functions.SpawnarPlayer(p);
+                p.Spawnar();
             }
             else if (tipo == 1 && sucesso)
             {
@@ -1977,6 +1997,30 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você vendeu seu veículo {veh.Codigo} para o ferro velho por ${valor:N0}.");
             Functions.GravarLog(TipoLog.Venda, $"/vvender {veh.Codigo} {valor}", p, null);
+        }
+
+        private void SoltarSacoLixo(IPlayer player, float x, float y, float z)
+        {
+            if (player.Position.Distance(new Position(x, y, z)) > 2)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na parte de trás de um caminho de lixo.");
+                return;
+            }
+
+            player.Emit("Server:SoltarSacoLixo");
+            var p = Functions.ObterPersonagem(player);
+            player.Emit("blip:remove", p.PontoColetando.Codigo * -1);
+            player.Emit("marker:remove", p.PontoColetando.Codigo * -1);
+            p.PontosColeta.Remove(p.PontoColetando);
+            p.ItensColetados++;
+            p.PontoColetando = new Ponto();
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você colocou um saco de lixo no caminhão.");
+
+            if (p.PontosColeta.Count == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você realizou todas as coletas. Retorne ao centro de reciclagem e saia de serviço.");
+                return;
+            }
         }
 
         private void MDCPesquisarPessoa(IPlayer player, string pesquisa)

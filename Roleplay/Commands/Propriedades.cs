@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Roleplay.Commands
 {
-    public class Properties
+    public class Propriedades
     {
         [Command("entrar")]
         public void CMD_entrar(IPlayer player)
