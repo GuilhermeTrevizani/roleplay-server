@@ -79,10 +79,18 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            Global.Weather = (WeatherType)tempo;
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} alterou o tempo para {Global.Weather}.", true);
-            foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
-                x.Player.SetWeather(Global.Weather);
+            Global.Parametros.Weather = (WeatherType)tempo;
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} alterou o tempo para {Global.Parametros.Weather}.", true);
+            foreach (var x in Global.PersonagensOnline)
+                x.Player.SetWeather(Global.Parametros.Weather);
+
+            using (var context = new DatabaseContext())
+            {
+                context.Parametros.Update(Global.Parametros);
+                context.SaveChanges();
+            }
+
+            Functions.GravarLog(TipoLog.Staff, $"/tempo {tempo}", p, null);
         }
 
         [Command("bloquearnc", "/bloquearnc (ID ou nome)")]

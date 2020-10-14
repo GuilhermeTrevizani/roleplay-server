@@ -386,7 +386,7 @@ namespace Roleplay
         private void OnPlayerConnect(IPlayer player, string reason)
         {
             player.SetDateTime(DateTime.Now);
-            player.SetWeather(Global.Weather);
+            player.SetWeather(Global.Parametros.Weather);
             player.Spawn(new Position(0f, 0f, 0f));
 
             using var context = new DatabaseContext();
@@ -822,7 +822,7 @@ namespace Roleplay
             player.Armor = (ushort)p.Colete;
             player.Model = (uint)p.Skin;
             p.SetDinheiro();
-            player.SetWeather(Global.Weather);
+            player.SetWeather(Global.Parametros.Weather);
             p.DataUltimaVerificacao = DateTime.Now;
             p.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(p.InformacoesPersonalizacao);
             p.Contatos = JsonConvert.DeserializeObject<List<Personagem.Contato>>(p.InformacoesContatos);

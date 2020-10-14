@@ -1,4 +1,6 @@
-﻿namespace Roleplay.Entities
+﻿using AltV.Net.Enums;
+
+namespace Roleplay.Entities
 {
     public class Parametro
     {
@@ -15,5 +17,7 @@
         public int ValorLicencaMotoristaRenovacao { get; set; } = 0;
         public int ValorAnuncio { get; set; } = 0;
         public int ValorExtraLixeiro { get; set; } = 0;
+        public WeatherType Weather { get; set; } = WeatherType.Clear;
+        public bool Blackout { get; set; } = false;
     }
 }

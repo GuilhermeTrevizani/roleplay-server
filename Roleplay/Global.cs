@@ -192,8 +192,6 @@ namespace Roleplay
 
         public static List<TextDraw> TextDraws { get; set; } = new List<TextDraw>();
 
-        public static WeatherType Weather { get; set; } = WeatherType.Clear;
-
         public static List<WeaponComponent> WeaponComponents { get; set; } = new List<WeaponComponent>()
         {
             new WeaponComponent(WeaponModel.BrassKnuckles, "BaseModel", 0xF3462F33),

@@ -351,6 +351,7 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/eponto", "Edita um ponto"),
                     new Comando("Manager", "/jetpack", "Cria um jetpack"),
                     new Comando("Manager", "/param", "Edita um parâmetro do servidor"),
+                    new Comando("Manager", "/blackout", "Ativa/desativa blackout"),
                 });
 
             var html = $@"

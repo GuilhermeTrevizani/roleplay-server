@@ -2265,5 +2265,29 @@ namespace Roleplay.Commands.Staff
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Veículo {veiculo.Codigo} criado.");
             Functions.GravarLog(TipoLog.Staff, $"/cvehemprego {veiculo.Codigo} {emprego}", p, null);
         }
+
+        [Command("blackout")]
+        public void CMD_blackout(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            Global.Parametros.Blackout = !Global.Parametros.Blackout;
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(!Global.Parametros.Blackout ? "des" : string.Empty)}ativou o blackout.", true);
+            foreach (var x in Global.PersonagensOnline)
+                x.Player.Emit("Server:setArtificialLightsState", Global.Parametros.Blackout);
+
+            using (var context = new DatabaseContext())
+            {
+                context.Parametros.Update(Global.Parametros);
+                context.SaveChanges();
+            }
+
+            Functions.GravarLog(TipoLog.Staff, "/blackout", p, null);
+        }
     }
 }

@@ -59,6 +59,7 @@ namespace Roleplay.Models
         ExclusaoPersonagem = 11,
         PlateChange = 12,
         Anuncio = 13,
+        AnuncioGov = 14,
     }
 
     public enum TipoConvite

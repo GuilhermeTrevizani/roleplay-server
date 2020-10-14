@@ -386,6 +386,7 @@ namespace Roleplay.Entities
             Global.GlobalVoice.AddPlayer(Player);
             Global.GlobalVoice.MutePlayer(Player);
             DataUltimoAcesso = DateTime.Now;
+            Player.Emit("Server:setArtificialLightsState", Global.Parametros.Blackout);
         }
 
         public class Ferimento

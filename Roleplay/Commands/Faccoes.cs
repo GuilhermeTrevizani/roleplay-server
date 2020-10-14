@@ -563,6 +563,8 @@ namespace Roleplay.Commands
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.Codigo > 0))
                 Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}", $"#{p.FaccaoBD.Cor}");
+
+            Functions.GravarLog(TipoLog.AnuncioGov, mensagem, p, null);
         }
 
         [Command("armario")]
