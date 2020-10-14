@@ -26,6 +26,7 @@ namespace Roleplay.Commands
             {
                 new Comando("Teclas", "F2", "Jogadores online"),
                 new Comando("Teclas", "F7", "Habilita/desabilita a HUD"),
+                new Comando("Teclas", "B", "Aponta/para de apontar o dedo estando fora de um veículo"),
                 new Comando("Geral", "/stats", "Mostra as informações do seu personagem"),
                 new Comando("Geral", "/id", "Procura o ID de um personagem"),
                 new Comando("Geral", "/aceitar /ac", "Aceita um convite"),
@@ -207,6 +208,7 @@ namespace Roleplay.Commands
                         new Comando("Facção", "/mdc", "Abre o MDC"),
                         new Comando("Facção", "/tac /t", "Entra/sai do canal de voz TAC"),
                         new Comando("Facção", "/confiscar", "Confisca as armas de um personagem"),
+                        new Comando("Facção", "/colocar", "Coloca um personagem algemado no banco traseiro de um veículo"),
                     });
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()

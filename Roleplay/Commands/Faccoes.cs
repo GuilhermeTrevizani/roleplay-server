@@ -8,6 +8,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -561,8 +562,13 @@ namespace Roleplay.Commands
                 return;
             }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.Codigo > 0))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}", $"#{p.FaccaoBD.Cor}");
+            foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            {
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"{p.FaccaoBD.Nome}: {{#FFFFFF}}{mensagem}", $"#{p.FaccaoBD.Cor}");
+
+                if (x.UsuarioBD.Staff != TipoStaff.Nenhum)
+                    Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"{p.Nome} [{p.ID}] enviou o anúncio governamental.", Global.CorErro);
+            }
 
             Functions.GravarLog(TipoLog.AnuncioGov, mensagem, p, null);
         }
@@ -1039,6 +1045,60 @@ namespace Roleplay.Commands
                 Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
                 player.Emit("Server:freezeEntityPosition", false);
             });
+        }
+
+        [Command("colocar", "/colocar (ID ou nome)")]
+        public void CMD_colocar(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                return;
+            }
+
+            var veh = Global.Veiculos.Where(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)) <= Global.DistanciaRP
+                && x.Vehicle.Dimension == player.Dimension
+                && x.Vehicle.LockState == VehicleLockState.Unlocked)
+                .OrderBy(x => player.Position.Distance(new Position(x.Vehicle.Position.X, x.Vehicle.Position.Y, x.Vehicle.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Player.Position) > Global.DistanciaRP || player.Dimension != target.Player.Dimension || !target.Algemado)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está próximo de você ou não está algemado.");
+                return;
+            }
+
+            var passageiros = Global.PersonagensOnline.Where(x => x?.Player?.Vehicle == veh.Vehicle && x?.Player != veh.Vehicle.Driver).ToList();
+            var seat1Livre = !passageiros.Any(x => x.Player.Seat == 1);
+            var seat2Livre = !passageiros.Any(x => x.Player.Seat == 2);
+
+            if (seat1Livre)
+            {
+                target.Player.Emit("setPedIntoVehicle", veh.Vehicle, 1);
+            }
+            else if (seat2Livre)
+            {
+                target.Player.Emit("setPedIntoVehicle", veh.Vehicle, 2);
+            }
+            else
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Todos os assentos traseiros do veículo estão ocupados.");
+                return;
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você colocou {target.NomeIC} dentro do veículo.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} colocou você dentro do veículo.");
         }
     }
 }

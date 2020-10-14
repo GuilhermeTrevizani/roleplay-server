@@ -76,7 +76,7 @@ namespace Roleplay.Commands
                 target.LimparLigacao();
             }
 
-            Functions.SendMessageToNearbyPlayers(player, "desligou a ligação.", TipoMensagemJogo.Ame, 5);
+            Functions.SendMessageToNearbyPlayers(player, "desliga a ligação.", TipoMensagemJogo.Ame, 5);
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você desligou a ligação de {p.ObterNomeContato(target != null ? target.Celular : p.NumeroLigacao)}.", Global.CorCelularSecundaria);
             p.LimparLigacao();
         }
@@ -104,7 +104,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.SendMessageToNearbyPlayers(player, "atendeu a ligação.", TipoMensagemJogo.Ame, 5);
+            Functions.SendMessageToNearbyPlayers(player, "atende a ligação.", TipoMensagemJogo.Ame, 5);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {target.ObterNomeContato(p.Celular)} foi atendida.", Global.CorCelularSecundaria);
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] Você atendeu a ligação de {p.ObterNomeContato(target.Celular)}.", Global.CorCelularSecundaria);
 

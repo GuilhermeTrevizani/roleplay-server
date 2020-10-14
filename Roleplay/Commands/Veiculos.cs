@@ -34,7 +34,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            Functions.SendMessageToNearbyPlayers(player, $"{(player.Vehicle.EngineOn ? "des" : string.Empty)}ligou o motor do veículo.", TipoMensagemJogo.Ame, 5);
+            Functions.SendMessageToNearbyPlayers(player, $"{(player.Vehicle.EngineOn ? "des" : string.Empty)}liga o motor do veículo.", TipoMensagemJogo.Ame, 5);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }
 
