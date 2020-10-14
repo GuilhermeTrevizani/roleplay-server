@@ -1,4 +1,5 @@
-﻿using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using Roleplay.Entities;
 using Roleplay.Models;
 using System;
@@ -53,7 +54,7 @@ namespace Roleplay.Commands.Staff
             if (target == null)
                 return;
 
-            if (target.UsuarioBD.Staff <= p.UsuarioBD.Staff)
+            if (target.UsuarioBD.Staff >= p.UsuarioBD.Staff)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -116,7 +117,7 @@ namespace Roleplay.Commands.Staff
 
             var user = context.Usuarios.FirstOrDefault(x => x.Codigo == per.Usuario);
 
-            if (user.Staff <= p.UsuarioBD.Staff)
+            if (user.Staff >= p.UsuarioBD.Staff)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;
@@ -228,6 +229,20 @@ namespace Roleplay.Commands.Staff
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);
 
             Functions.GravarLog(TipoLog.Staff, $"/reviver", p, target);
+        }
+
+        [Command("pos", "/pos (x) (y) (z)")]
+        public void CMD_pos(IPlayer player, float x, float y, float z)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            p.SetPosition(new Position(x, y, z), false);
+            Functions.GravarLog(TipoLog.Staff, $"/pos {x} {y} {z}", p, null);
         }
     }
 }

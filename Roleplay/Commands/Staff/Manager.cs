@@ -1802,43 +1802,6 @@ namespace Roleplay.Commands.Staff
             Functions.GravarLog(TipoLog.Staff, $"/earmipintura {armario} {item.Arma} {pintura}", p, null);
         }
 
-        [Command("save")]
-        public void CMD_save(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            if (player.IsInVehicle)
-            {
-                player.Emit("alt:log", $"POS: {player.Vehicle.Position.X.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Y.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Z.ToString().Replace(",", ".")}f");
-                player.Emit("alt:log", $"ROT: {player.Vehicle.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Yaw.ToString().Replace(",", ".")}f");
-            }
-            else
-            {
-                player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}f, {player.Position.Y.ToString().Replace(",", ".")}f, {player.Position.Z.ToString().Replace(",", ".")}f");
-                player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Rotation.Yaw.ToString().Replace(",", ".")}f");
-            }
-        }
-
-        [Command("pos", "/pos (x) (y) (z)")]
-        public void CMD_pos(IPlayer player, float x, float y, float z)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            p.SetPosition(new Position(x, y, z), false);
-
-            Functions.GravarLog(TipoLog.Staff, $"/pos {x} {y} {z}", p, null);
-        }
-
         [Command("carmicomp", "/carmicomp (armário) (arma) (componente)")]
         public void CMD_carmicomp(IPlayer player, int armario, string arma, string componente)
         {

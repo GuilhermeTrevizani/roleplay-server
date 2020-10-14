@@ -140,7 +140,7 @@ namespace Roleplay.Commands.Staff
             if (target == null)
                 return;
 
-            if (target.UsuarioBD.Staff <= p.UsuarioBD.Staff)
+            if (target.UsuarioBD.Staff >= p.UsuarioBD.Staff)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
                 return;

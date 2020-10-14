@@ -1275,15 +1275,15 @@ namespace Roleplay
                     p.DarArma(WeaponModel.Hammer, 1);
                     strMensagem = $"Você comprou um martelo.";
                     break;
-                case "Chave para Tubos":
+                case "Chave de Grifo":
                     if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.PipeWrench))
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma chave para tubos.", notify: true);
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui uma chave de grifo.", notify: true);
                         return;
                     }
 
                     p.DarArma(WeaponModel.PipeWrench, 1);
-                    strMensagem = $"Você comprou uma chave para tubos.";
+                    strMensagem = $"Você comprou uma chave de grifo.";
                     break;
                 case "Taco de Baseball":
                     if (p.Armas.Any(x => x.Codigo == (long)WeaponModel.BaseballBat))

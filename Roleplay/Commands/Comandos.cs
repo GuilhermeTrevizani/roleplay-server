@@ -52,12 +52,16 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/tog", "Ativa/desativa opções (pm chatstaff chatfaccao anuncio)"),
                 new Comando("Geral", "/horas", "Exibe o horário"),
                 new Comando("Geral", "/telapreta", "Exibe um fundo preto na tela"),
+                new Comando("Geral", "/telacinza", "Exibe um fundo cinza na tela"),
+                new Comando("Geral", "/telaverde", "Exibe um fundo verde na tela"),
+                new Comando("Geral", "/telalaranja", "Exibe um fundo laranja na tela"),
                 new Comando("Geral", "/limparchat", "Limpa o seu chat"),
                 new Comando("Geral", "/dl", "Ativa/desativa informações dos veículos"),
                 new Comando("Geral", "/mecurar", "Trata os ferimentos em um hospital"),
                 new Comando("Geral", "/mascara", "Coloca/retira uma máscara"),
                 new Comando("Geral", "/depositarpoupanca", "Aplica $50.000 na poupança"),
                 new Comando("Geral", "/sacarpoupanca", "Saca todo o dinheiro da poupança"),
+                new Comando("Geral", "/save", "Exibe sua posição e rotação ou do seu veículo no console"),
                 new Comando("Propriedades", "/entrar", "Entra de uma propriedade"),
                 new Comando("Propriedades", "/sair", "Sai de uma propriedade"),
                 new Comando("Propriedades", "/pvender", "Vende uma propriedade para um personagem"),
@@ -274,6 +278,7 @@ namespace Roleplay.Commands
                     new Comando("Game Administrator", "/unban", "Desbane um usuário"),
                     new Comando("Game Administrator", "/banoff", "Bane um usuário que está offline"),
                     new Comando("Game Administrator", "/reviver", "Cura um personagem ferido"),
+                    new Comando("Game Administrator", "/pos", "Vai até a posição"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.LeadAdministrator)
@@ -337,8 +342,6 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/evehcor", "Edita as cores de um veículo"),
                     new Comando("Manager", "/evehlivery", "Edita a livery de um veículo"),
                     new Comando("Manager", "/earmipintura", "Edita a pintura de uma arma do armário"),
-                    new Comando("Manager", "/save", "Exibe sua posição e rotação ou do seu veículo no console"),
-                    new Comando("Manager", "/pos", "Vai até a posição"),
                     new Comando("Manager", "/carmicomp", "Adiciona componentes em um arma de um armário"),
                     new Comando("Manager", "/rarmicomp", "Remove componentes em um arma de um armário"),
                     new Comando("Manager", "/ccomp", "Adiciona componentes em um armário"),
@@ -1325,6 +1328,15 @@ namespace Roleplay.Commands
         [Command("telapreta")]
         public void CMD_telapreta(IPlayer player) => player.Emit("chat:toggleTelaPreta");
 
+        [Command("telacinza")]
+        public void CMD_telacinza(IPlayer player) => player.Emit("chat:toggleTelaCinza");
+
+        [Command("telalaranja")]
+        public void CMD_telalaranja(IPlayer player) => player.Emit("chat:toggleTelaLaranja");
+
+        [Command("telaverde")]
+        public void CMD_telaverde(IPlayer player) => player.Emit("chat:toggleTelaVerde");
+
         [Command("limparchat")]
         public void CMD_limparchat(IPlayer player) => player.Emit("chat:clearMessages");
 
@@ -1439,6 +1451,21 @@ namespace Roleplay.Commands
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você sacou ${p.Poupanca:N0} da poupança.");
             Functions.GravarLog(TipoLog.Dinheiro, $"/sacarpoupanca {p.Poupanca}", p, null);
             p.Poupanca = 0;
+        }
+
+        [Command("save")]
+        public void CMD_save(IPlayer player)
+        {
+            if (player.IsInVehicle)
+            {
+                player.Emit("alt:log", $"POS: {player.Vehicle.Position.X.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Y.ToString().Replace(",", ".")}f, {player.Vehicle.Position.Z.ToString().Replace(",", ".")}f");
+                player.Emit("alt:log", $"ROT: {player.Vehicle.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Vehicle.Rotation.Yaw.ToString().Replace(",", ".")}f");
+            }
+            else
+            {
+                player.Emit("alt:log", $"POS: {player.Position.X.ToString().Replace(",", ".")}f, {player.Position.Y.ToString().Replace(",", ".")}f, {player.Position.Z.ToString().Replace(",", ".")}f");
+                player.Emit("alt:log", $"ROT: {player.Rotation.Roll.ToString().Replace(",", ".")}f, {player.Rotation.Pitch.ToString().Replace(",", ".")}f, {player.Rotation.Yaw.ToString().Replace(",", ".")}f");
+            }
         }
     }
 }
