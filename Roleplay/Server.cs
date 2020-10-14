@@ -1129,6 +1129,13 @@ namespace Roleplay
                 return;
             }
 
+            var restricao = Functions.VerificarRestricaoVeiculo(veiculo);
+            if (restricao.Item2 > p.UsuarioBD.VIP)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O veículo é restrito para VIP {restricao.Item2}.", notify: true);
+                return;
+            }
+
             var concessionaria = Global.Concessionarias.FirstOrDefault(x => x.Tipo == (TipoPreco)tipo);
 
             var veh = new Veiculo()

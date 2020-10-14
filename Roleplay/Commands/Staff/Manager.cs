@@ -2076,7 +2076,7 @@ namespace Roleplay.Commands.Staff
             context.Usuarios.Update(user);
             context.SaveChanges();
 
-            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Usuario == usuario);
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x?.Usuario == usuario);
             if (target != null)
             {
                 target.UsuarioBD.VIP = user.VIP;
@@ -2087,7 +2087,7 @@ namespace Roleplay.Commands.Staff
                 Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível VIP para {vip} expirando em {user.DataExpiracaoVIP}.");
             }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível VIP de {target.UsuarioBD.Nome} para {vip} expirando em {user.DataExpiracaoVIP}.");
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível VIP de {user.Nome} para {vip} expirando em {user.DataExpiracaoVIP}.");
             Functions.GravarLog(TipoLog.Staff, $"/vip {usuario} {vip} {meses}", p, null);
         }
 

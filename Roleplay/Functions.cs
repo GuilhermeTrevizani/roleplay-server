@@ -1099,5 +1099,72 @@ namespace Roleplay
             foreach (var x in players)
                 EnviarMensagem(x.Player, TipoMensagem.Nenhum, mensagem, Global.CorErro);
         }
+
+        public static Tuple<string, TipoVIP> VerificarRestricaoVeiculo(string modelo)
+        {
+            var restricao = string.Empty;
+            var vip = TipoVIP.Nenhum;
+            modelo = modelo.ToLower();
+
+            if (modelo == VehicleModel.Speeder.ToString().ToLower()
+                || modelo == VehicleModel.TriBike3.ToString().ToLower()
+                || modelo == VehicleModel.Supervolito2.ToString().ToLower()
+                || modelo == VehicleModel.Bf400.ToString().ToLower()
+                || modelo == VehicleModel.Dominator3.ToString().ToLower()
+                || modelo == VehicleModel.Dubsta3.ToString().ToLower()
+                || modelo == VehicleModel.Luxor2.ToString().ToLower()
+                || modelo == VehicleModel.Contender.ToString().ToLower()
+                || modelo == VehicleModel.Patriot2.ToString().ToLower()
+                || modelo == VehicleModel.Deveste.ToString().ToLower()
+                || modelo == VehicleModel.Elegy.ToString().ToLower()
+                || modelo == VehicleModel.Neon.ToString().ToLower()
+                || modelo == VehicleModel.Issi7.ToString().ToLower()
+                || modelo == VehicleModel.Pfister811.ToString().ToLower()
+                || modelo == VehicleModel.Banshee2.ToString().ToLower())
+            {
+                restricao = $"<span class='label' style='background-color:#f1c40f'>VIP OURO</span>";
+                vip = TipoVIP.Ouro;
+            }
+            else if (modelo == VehicleModel.Tropic2.ToString().ToLower()
+                || modelo == VehicleModel.Issi2.ToString().ToLower()
+                || modelo == VehicleModel.Windsor2.ToString().ToLower()
+                || modelo == VehicleModel.TriBike2.ToString().ToLower()
+                || modelo == VehicleModel.Akuma.ToString().ToLower()
+                || modelo == VehicleModel.CarbonRs.ToString().ToLower()
+                || modelo == VehicleModel.Yosemite2.ToString().ToLower()
+                || modelo == VehicleModel.Brawler.ToString().ToLower()
+                || modelo == VehicleModel.Everon.ToString().ToLower()
+                || modelo == VehicleModel.Nimbus.ToString().ToLower()
+                || modelo == VehicleModel.Comet5.ToString().ToLower()
+                || modelo == VehicleModel.Ninef2.ToString().ToLower()
+                || modelo == VehicleModel.Entity2.ToString().ToLower()
+                || modelo == VehicleModel.Prototipo.ToString().ToLower()
+                || modelo == VehicleModel.Emerus.ToString().ToLower())
+            {
+                restricao = $"<span class='label' style='background-color:#607d8b'>VIP PRATA</span>";
+                vip = TipoVIP.Prata;
+            }
+            else if (modelo == VehicleModel.Seashark.ToString().ToLower()
+                || modelo == VehicleModel.Seashark3.ToString().ToLower()
+                || modelo == VehicleModel.TriBike.ToString().ToLower()
+                || modelo == VehicleModel.Havok.ToString().ToLower()
+                || modelo == VehicleModel.Double.ToString().ToLower()
+                || modelo == VehicleModel.Hakuchou2.ToString().ToLower()
+                || modelo == VehicleModel.Vindicator.ToString().ToLower()
+                || modelo == VehicleModel.Blazer.ToString().ToLower()
+                || modelo == VehicleModel.Baller2.ToString().ToLower()
+                || modelo == VehicleModel.Locust.ToString().ToLower()
+                || modelo == VehicleModel.Komoda.ToString().ToLower()
+                || modelo == VehicleModel.Turismo2.ToString().ToLower()
+                || modelo == VehicleModel.Krieger.ToString().ToLower()
+                || modelo == VehicleModel.Nero2.ToString().ToLower()
+                || modelo == VehicleModel.Tyrant.ToString().ToLower())
+            {
+                restricao = $"<span class='label' style='background-color:#a84300'>VIP BRONZE</span>";
+                vip = TipoVIP.Bronze;
+            }
+
+            return new Tuple<string, TipoVIP>(restricao, vip);
+        }
     }
 }

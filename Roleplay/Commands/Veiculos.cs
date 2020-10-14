@@ -203,6 +203,13 @@ namespace Roleplay.Commands
                 return;
             }
 
+            var restricao = Functions.VerificarRestricaoVeiculo(prox.Modelo);
+            if (restricao.Item2 > target.UsuarioBD.VIP)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O veículo é restrito para VIP {restricao.Item2}.");
+                return;
+            }
+
             var convite = new Convite()
             {
                 Tipo = TipoConvite.VendaVeiculo,
