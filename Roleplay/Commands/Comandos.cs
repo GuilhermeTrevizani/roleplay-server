@@ -895,10 +895,15 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (Global.SOSs.Any(x => x.IDPersonagem == p.ID))
+            var sos = Global.SOSs.FirstOrDefault(x => x.IDPersonagem == p.ID);
+            if (sos != null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um SOS pendente de resposta.");
-                return;
+                var target = sos.Verificar(p.Usuario);
+                if (target != null)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você já possui um SOS pendente de resposta.");
+                    return;
+                }
             }
 
             var players = Global.PersonagensOnline.Where(x => x.EmTrabalhoAdministrativo && x.UsuarioBD?.Staff > 0).ToList();
@@ -908,7 +913,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var sos = new SOS()
+            sos = new SOS()
             {
                 IDPersonagem = p.ID,
                 Mensagem = mensagem,

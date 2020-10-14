@@ -486,10 +486,10 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo && x.Emprego != TipoEmprego.Nenhum && !x.DataExpiracaoAluguel.HasValue);
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não é alugado ou tempo de expiração do aluguel não expirou.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
                 return;
             }
 

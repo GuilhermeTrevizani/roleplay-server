@@ -446,9 +446,6 @@ namespace Roleplay
 
             Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos.");
 
-            player.SetSyncedMetaData("ferido", 1);
-            p.TipoFerido = 1;
-
             p.TimerFerido?.Stop();
             p.TimerFerido = new TagTimer(300000)
             {
@@ -481,6 +478,8 @@ namespace Roleplay
                     p.StopAnimation();
                     p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
                     await player.EmitAsync("Server:ToggleFerido", true);
+                    player.SetSyncedMetaData("ferido", 1);
+                    p.TipoFerido = 1;
                 }
             });
         }
@@ -769,11 +768,11 @@ namespace Roleplay
             if (!x.DataMorte.HasValue && x.UsuarioStaffAvaliador != 0 && (x.DataTerminoPrisao ?? DateTime.MinValue) < DateTime.Now)
             {
                 if (string.IsNullOrWhiteSpace(x.MotivoRejeicao))
-                    opcoes = $"<button class='btn btn-primary' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
+                    opcoes = $"<button id='btn-selecionarpersonagem{x.Codigo}' class='btn btn-primary' onclick='selecionarPersonagem({x.Codigo}, false);'>LOGAR</button>";
                 else
-                    opcoes = $"<button class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
+                    opcoes = $"<button id='btn-selecionarpersonagem{x.Codigo}' class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, false);'>REFAZER APLICAÇÃO</button>";
             }
-            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, true);'>ALTERAR NOME</button>" : string.Empty;
+            opcoes += x.StatusNamechange == TipoStatusNamechange.Liberado && u.PossuiNamechange && string.IsNullOrWhiteSpace(x.MotivoRejeicao) && x.UsuarioStaffAvaliador != 0 ? $" <button id='btn-selecionarpersonagem{x.Codigo}' class='btn btn-dark' onclick='selecionarPersonagem({x.Codigo}, true);'>ALTERAR NOME</button>" : string.Empty;
             opcoes += $" <button class='btn btn-danger' onclick='deletarPersonagem({x.Codigo});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
             return opcoes;
         }

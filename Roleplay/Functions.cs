@@ -306,7 +306,7 @@ namespace Roleplay
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)
         {
             var p = ObterPersonagem(player);
-            if (p.TipoFerido == 2 && type != TipoMensagemJogo.Do && type != TipoMensagemJogo.Ado)
+            if (p.TipoFerido == 2 && type != TipoMensagemJogo.Do && type != TipoMensagemJogo.Ado && type != TipoMensagemJogo.ChatOOC)
             {
                 EnviarMensagem(player, TipoMensagem.Erro, "Você não pode falar pois está inconsciente.");
                 return;
