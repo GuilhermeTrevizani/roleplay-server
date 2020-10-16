@@ -880,5 +880,146 @@ namespace Roleplay.Commands
 
             p.PlayAnimation("misscarsteal2peeing", "peeing_loop", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody));
         }
+
+        [Command("dancar", "/dancar (tipo [1-41])")]
+        public void CMD_dancar(IPlayer player, int tipo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if (p == null)
+                return;
+
+            if (!Functions.ChecarAnimacoes(player))
+                return;
+
+            switch (tipo)
+            {
+                case 1:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@club_ambientpeds@med-hi_intensity", "mi-hi_amb_club_10_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 2:
+                    p.PlayAnimation("amb@code_human_in_car_mp_actions@dance@bodhi@ds@base", "idle_a_fp", (int)AnimationFlags.Loop);
+                    break;
+                case 3:
+                    p.PlayAnimation("amb@code_human_in_car_mp_actions@dance@bodhi@rds@base", "idle_b", (int)AnimationFlags.Loop);
+                    break;
+                case 4:
+                    p.PlayAnimation("amb@code_human_in_car_mp_actions@dance@std@ds@base", "idle_a", (int)AnimationFlags.Loop);
+                    break;
+                case 5:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj@hi_intensity", "hi_dance_facedj_09_v2_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 6:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj@low_intesnsity", "li_dance_facedj_09_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 7:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj_transitions@from_hi_intensity", "trans_dance_facedj_hi_to_li_09_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 8:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj_transitions@from_low_intensity", "trans_dance_facedj_li_to_hi_07_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 9:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_groups@hi_intensity", "hi_dance_crowd_13_v2_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 10:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_groups_transitions@from_hi_intensity", "trans_dance_crowd_hi_to_li__07_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 11:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_single_props@hi_intensity", "hi_dance_prop_13_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 12:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_single_props_transitions@from_med_intensity", "trans_crowd_prop_mi_to_li_11_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 13:
+                    p.PlayAnimation("anim@amb@nightclub@mini@dance@dance_solo@male@var_a@", "med_center_up", (int)AnimationFlags.Loop);
+                    break;
+                case 14:
+                    p.PlayAnimation("anim@amb@nightclub@mini@dance@dance_solo@male@var_a@", "med_right_up", (int)AnimationFlags.Loop);
+                    break;
+                case 15:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_groups@low_intensity", "li_dance_crowd_17_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 16:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj_transitions@from_med_intensity", "trans_dance_facedj_mi_to_li_09_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 17:
+                    p.PlayAnimation("special_ped@zombie@monologue_4@monologue_4l", "iamtheundead_11", (int)AnimationFlags.Loop);
+                    break;
+                case 18:
+                    p.PlayAnimation("timetable@tracy@ig_5@idle_b", "idle_e", (int)AnimationFlags.Loop);
+                    break;
+                case 19:
+                    p.PlayAnimation("mini@strip_club@idles@dj@idle_04", "idle_04", (int)AnimationFlags.Loop);
+                    break;
+                case 20:
+                    p.PlayAnimation("special_ped@mountain_dancer@monologue_1@monologue_1a", "mtn_dnc_if_you_want_to_get_to_heaven", (int)AnimationFlags.Loop);
+                    break;
+                case 21:
+                    p.PlayAnimation("special_ped@mountain_dancer@monologue_4@monologue_4a", "mnt_dnc_verse", (int)AnimationFlags.Loop);
+                    break;
+                case 22:
+                    p.PlayAnimation("special_ped@mountain_dancer@monologue_3@monologue_3a", "mnt_dnc_buttwag", (int)AnimationFlags.Loop);
+                    break;
+                case 23:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@black_madonna_entourage@", "hi_dance_facedj_09_v2_male^5", (int)AnimationFlags.Loop);
+                    break;
+                case 24:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_single_props@", "hi_dance_prop_09_v1_male^6", (int)AnimationFlags.Loop);
+                    break;
+                case 25:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@dixon_entourage@", "mi_dance_facedj_15_v1_male^4", (int)AnimationFlags.Loop);
+                    break;
+                case 26:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@podium_dancers@", "hi_dance_facedj_17_v2_male^5", (int)AnimationFlags.Loop);
+                    break;
+                case 27:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@tale_of_us_entourage@", "mi_dance_prop_13_v2_male^4", (int)AnimationFlags.Loop);
+                    break;
+                case 28:
+                    p.PlayAnimation("misschinese2_crystalmazemcs1_cs", "dance_loop_tao", (int)AnimationFlags.Loop);
+                    break;
+                case 29:
+                    p.PlayAnimation("misschinese2_crystalmazemcs1_ig", "dance_loop_tao", (int)AnimationFlags.Loop);
+                    break;
+                case 30:
+                    p.PlayAnimation("anim@mp_player_intcelebrationfemale@uncle_disco", "uncle_disco", (int)AnimationFlags.Loop);
+                    break;
+                case 31:
+                    p.PlayAnimation("anim@mp_player_intcelebrationfemale@raise_the_roof", "raise_the_roof", (int)AnimationFlags.Loop);
+                    break;
+                case 32:
+                    p.PlayAnimation("anim@mp_player_intcelebrationmale@cats_cradle", "cats_cradle", (int)AnimationFlags.Loop);
+                    break;
+                case 33:
+                    p.PlayAnimation("anim@mp_player_intupperbanging_tunes", "idle_a", (int)AnimationFlags.Loop);
+                    break;
+                case 34:
+                    p.PlayAnimation("anim@amb@nightclub@mini@dance@dance_solo@female@var_a@", "high_center", (int)AnimationFlags.Loop);
+                    break;
+                case 35:
+                    p.PlayAnimation("anim@amb@nightclub@mini@dance@dance_solo@female@var_b@", "high_center", (int)AnimationFlags.Loop);
+                    break;
+                case 36:
+                    p.PlayAnimation("anim@amb@nightclub@mini@dance@dance_solo@male@var_b@", "high_center", (int)AnimationFlags.Loop);
+                    break;
+                case 37:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj_transitions@", "trans_dance_facedj_hi_to_mi_11_v1_female^6", (int)AnimationFlags.Loop);
+                    break;
+                case 38:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj_transitions@from_hi_intensity", "trans_dance_facedj_hi_to_li_07_v1_female^6", (int)AnimationFlags.Loop);
+                    break;
+                case 39:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_facedj@", "hi_dance_facedj_09_v1_female^6", (int)AnimationFlags.Loop);
+                    break;
+                case 40:
+                    p.PlayAnimation("anim@amb@nightclub@dancers@crowddance_groups@hi_intensity", "hi_dance_crowd_09_v1_female^6", (int)AnimationFlags.Loop);
+                    break;
+                case 41:
+                    p.PlayAnimation("anim@amb@nightclub@lazlow@hi_podium@", "danceidle_hi_06_base_laz", (int)AnimationFlags.Loop);
+                    break;
+                default:
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 41.");
+                    break;
+            }
+        }
     }
 }
