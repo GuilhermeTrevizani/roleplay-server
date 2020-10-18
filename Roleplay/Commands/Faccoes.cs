@@ -554,18 +554,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            target.Player.SetSyncedMetaData("ferido", false);
-            if (target.TimerFerido != null)
-            {
-                target.SetPosition(target.Player.Position, true);
-                target.StopAnimation();
-            }
-            target.Ferimentos = new List<Personagem.Ferimento>();
-            target.Player.Emit("Server:ToggleFerido", false);
-            target.Player.Health = target.Player.MaxHealth;
-            target.TimerFerido?.Stop();
-            target.TimerFerido = null;
-
+            target.Curar();
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você curou {target.NomeIC}.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} curou você.");
         }
