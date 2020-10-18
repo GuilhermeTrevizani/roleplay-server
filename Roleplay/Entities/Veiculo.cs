@@ -198,6 +198,7 @@ namespace Roleplay.Entities
                         Vehicle.SetWheelHealth(x.Id, x.Health);
                         Vehicle.SetWheelDetached(x.Id, x.Detached);
                         Vehicle.SetWheelBurst(x.Id, x.Burst);
+                        Vehicle.SetWheelHasTire(x.Id, x.HasTire);
                     }
                 }
             }
@@ -228,7 +229,7 @@ namespace Roleplay.Entities
                 }
 
                 for (byte i = 0; i < Vehicle.WheelsCount; i++)
-                    dano.Wheels.Add(new Dano.Wheel(i, Vehicle.GetWheelHealth(i), Vehicle.IsWheelDetached(i), Vehicle.IsWheelBurst(i)));
+                    dano.Wheels.Add(new Dano.Wheel(i, Vehicle.GetWheelHealth(i), Vehicle.IsWheelDetached(i), Vehicle.IsWheelBurst(i), Vehicle.DoesWheelHasTire(i)));
 
                 Danos = JsonConvert.SerializeObject(dano);
             }
@@ -277,6 +278,14 @@ namespace Roleplay.Entities
                 Vehicle.SetLightDamaged(i, false);
                 Vehicle.SetSpecialLightDamaged(i, false);
             }
+
+            for (byte i = 0; i < Vehicle.WheelsCount; i++)
+            {
+                Vehicle.SetWheelHealth(i, 1000);
+                Vehicle.SetWheelDetached(i, false);
+                Vehicle.SetWheelBurst(i, false);
+                Vehicle.SetWheelHasTire(i, true);
+            }
         }
 
         public class Dano
@@ -291,18 +300,20 @@ namespace Roleplay.Entities
 
             public class Wheel
             {
-                public Wheel(byte id, float health, bool detached, bool burst)
+                public Wheel(byte id, float health, bool detached, bool burst, bool hasTire)
                 {
                     Id = id;
                     Health = health;
                     Detached = detached;
                     Burst = burst;
+                    HasTire = hasTire;
                 }
 
                 public byte Id { get; set; } = 0;
                 public float Health { get; set; } = 0;
                 public bool Detached { get; set; } = false;
                 public bool Burst { get; set; } = false;
+                public bool HasTire { get; set; } = true;
             }
 
             public class ArmoredWindow

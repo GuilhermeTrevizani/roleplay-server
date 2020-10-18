@@ -42,9 +42,9 @@ namespace Roleplay.Commands
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"[CELULAR] SMS para {p.ObterNomeContato(numero)}: {mensagem}", Global.CorCelularSecundaria);
-            Functions.SendMessageToNearbyPlayers(player, "envia uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
+            Functions.SendMessageToNearbyPlayers(player, "envia uma mensagem de texto.", TipoMensagemJogo.Ame, 5);
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(p.Celular)}: {mensagem}", Global.CorCelular);
-            Functions.SendMessageToNearbyPlayers(target.Player, "recebe uma mensagem de texto.", TipoMensagemJogo.Ame, 5, true);
+            Functions.SendMessageToNearbyPlayers(target.Player, "recebe uma mensagem de texto.", TipoMensagemJogo.Ame, 5);
         }
 
         [Command("ligar", "/ligar (número ou nome do contato)")]

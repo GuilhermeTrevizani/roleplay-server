@@ -290,6 +290,7 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
                     new Comando("Lead Administrator", "/limparchatgeral", "Limpa o chat de todos os personagens"),
                     new Comando("Lead Administrator", "/areparar", "Conserta um veículo"),
+                    new Comando("Lead Administrator", "/logs", "Consulta os logs do servidor"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)

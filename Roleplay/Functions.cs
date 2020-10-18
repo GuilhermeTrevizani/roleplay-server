@@ -323,9 +323,7 @@ namespace Roleplay
                 excludePlayer = true;
 
             var distanceGap = range / 5;
-
-            var targetList = Global.PersonagensOnline.Where(x => x.Player != null && x.Player.Dimension == player.Dimension).Select(x => x.Player).ToList();
-            foreach (var target in targetList)
+            foreach (var target in Global.PersonagensOnline.Where(x => x.Player != null && x.Player.Dimension == player.Dimension).Select(x => x.Player).ToList())
             {
                 if (player != target || (player == target && !excludePlayer))
                 {
@@ -373,10 +371,16 @@ namespace Roleplay
                                 EnviarMensagem(target, TipoMensagem.Nenhum, $"{p.NomeIC} [celular]: {message}", chatMessageColor);
                                 break;
                             case TipoMensagemJogo.Ame:
-                                target.Emit("text:playerAction", player, $"* {p.NomeIC} {message}");
+                                if (player == target)
+                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"* {p.NomeIC} {message}", "#C2A2DA");
+                                else
+                                    target.Emit("text:playerAction", player, $"* {p.NomeIC} {message}");
                                 break;
                             case TipoMensagemJogo.Ado:
-                                target.Emit("text:playerAction", player, $"* {message} (( {p.NomeIC} ))");
+                                if (player == target)
+                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"* {message} (( {p.NomeIC} ))", "#C2A2DA");
+                                else
+                                    target.Emit("text:playerAction", player, $"* {message} (( {p.NomeIC} ))");
                                 break;
                             case TipoMensagemJogo.Radio:
                                 EnviarMensagem(target, TipoMensagem.Nenhum, $"{p.NomeIC} [rádio]: {message}", chatMessageColor);
