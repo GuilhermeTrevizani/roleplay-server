@@ -8,12 +8,10 @@ namespace Roleplay.Commands
         [Command("stopanim", Alias = "sa")]
         public void CMD_stopanim(IPlayer player) => Functions.ChecarAnimacoes(player, true);
 
-        [Command("handsup", "/hs (tipo [1-13])", Alias = "hs")]
+        [Command("handsup", "/hs (tipo [1-12])", Alias = "hs")]
         public void CMD_hs(IPlayer player, int tipo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p == null)
-                return;
 
             if (!Functions.ChecarAnimacoes(player))
                 return;
@@ -56,13 +54,21 @@ namespace Roleplay.Commands
                 case 12:
                     p.PlayAnimation("missminuteman_1ig_2", "handsup_base", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
                     break;
-                case 13:
-                    p.PlayAnimation("anim@mp_player_intincarsurrenderstd@ds@", "idle_a", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
-                    break;
                 default:
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 13.");
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 12.");
                     break;
             }
+        }
+
+        [Command("hsv")]
+        public void CMD_hsv(IPlayer player)
+        {
+            var p = Functions.ObterPersonagem(player);
+
+            if (!Functions.ChecarAnimacoes(player, somenteDentroVeiculo: true))
+                return;
+
+            p.PlayAnimation("anim@mp_player_intincarsurrenderstd@ds@", "idle_a", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
         }
 
         [Command("crossarms", "/crossarms (tipo [1-2])")]
@@ -362,7 +368,7 @@ namespace Roleplay.Commands
                     break;
                 case 3:
                     p.PlayAnimation("amb@world_human_drug_dealer_hard@male@idle_b", "idle_d", (int)(AnimationFlags.Loop));
-                    break; 
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 3.");
                     break;
@@ -383,13 +389,13 @@ namespace Roleplay.Commands
             {
                 case 1:
                     p.PlayAnimation("amb@prop_human_muscle_chin_ups@male@enter", "enter", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 2:
                     p.PlayAnimation("amb@prop_human_muscle_chin_ups@male@base", "base", (int)(AnimationFlags.Loop));
                     break;
                 case 3:
                     p.PlayAnimation("amb@prop_human_muscle_chin_ups@male@exit", "exit_flee", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 3.");
                     break;
@@ -426,7 +432,7 @@ namespace Roleplay.Commands
                     break;
                 case 2:
                     p.PlayAnimation("amb@medic@standing@tendtodead@base", "base", (int)(AnimationFlags.Loop));
-                    break; 
+                    break;
                 case 3:
                     p.PlayAnimation("amb@medic@standing@kneel@exit", "exit_flee", (int)(AnimationFlags.StopOnLastFrame));
                     break;
@@ -480,7 +486,7 @@ namespace Roleplay.Commands
                     break;
                 case 2:
                     p.PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
-                    break; 
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 2.");
                     break;
@@ -597,7 +603,7 @@ namespace Roleplay.Commands
             {
                 case 1:
                     p.PlayAnimation("random@arrests@busted", "idle_c", (int)(AnimationFlags.Loop));
-                    break; 
+                    break;
                 case 2:
                     p.PlayAnimation("random@arrests", "kneeling_arrest_idle", (int)(AnimationFlags.Loop));
                     break;
@@ -624,7 +630,7 @@ namespace Roleplay.Commands
                     break;
                 case 2:
                     p.PlayAnimation("missfbi2", "franklin_sniper_crouch", (int)(AnimationFlags.Loop));
-                    break; 
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 2.");
                     break;
@@ -645,16 +651,16 @@ namespace Roleplay.Commands
             {
                 case 1:
                     p.PlayAnimation("switch@michael@sitting", "idle", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 2:
                     p.PlayAnimation("switch@michael@tv_w_kids", "001520_02_mics3_14_tv_w_kids_idle_mic", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 3:
                     p.PlayAnimation("switch@michael@on_sofa", "base_michael", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 4:
                     p.PlayAnimation("safe@franklin@ig_13", "base", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 5:
                     p.PlayAnimation("switch@michael@bench", "bench_on_phone_idle", (int)(AnimationFlags.StopOnLastFrame));
                     break;
@@ -663,10 +669,10 @@ namespace Roleplay.Commands
                     break;
                 case 7:
                     p.PlayAnimation("switch@michael@smoking2", "loop", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 8:
                     p.PlayAnimation("switch@michael@tv_w_kids", "001520_02_mics3_14_tv_w_kids_idle_jmy", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 8.");
                     break;
@@ -687,7 +693,7 @@ namespace Roleplay.Commands
             {
                 case 1:
                     p.PlayAnimation("switch@franklin@napping", "002333_01_fras_v2_10_napping_idle", (int)(AnimationFlags.StopOnLastFrame));
-                    break; 
+                    break;
                 case 2:
                     p.PlayAnimation("switch@trevor@dumpster", "002002_01_trvs_14_dumpster_idle", (int)(AnimationFlags.StopOnLastFrame));
                     break;

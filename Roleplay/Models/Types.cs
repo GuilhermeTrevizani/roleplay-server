@@ -36,6 +36,8 @@ namespace Roleplay.Models
         Criminosa = 3,
 
         Governo = 4,
+
+        Jornalismo = 5,
     }
 
     public enum TipoPunicao
@@ -60,6 +62,8 @@ namespace Roleplay.Models
         PlateChange = 12,
         Anuncio = 13,
         AnuncioGov = 14,
+        LoginFalha = 15,
+        EsqueciMinhaSenhaFalha = 16,
     }
 
     public enum TipoConvite
@@ -279,7 +283,6 @@ namespace Roleplay.Models
         Pulice3,
         Pulice4,
         POLThrust,
-        LSPDTowtruck,
         LSPDPolmav,
         LSFD,
         LSFD2,

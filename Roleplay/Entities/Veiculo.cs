@@ -94,6 +94,65 @@ namespace Roleplay.Entities
         [NotMapped]
         public DateTime? DataExpiracaoAluguel { get; set; } = null;
 
+        [NotMapped]
+        public string NumeracaoLivery
+        {
+            get
+            {
+                switch (Modelo.ToUpper())
+                {
+                    case "PULICE":
+                        if (Livery == 1)
+                            return "489-02";
+                        else if (Livery == 2)
+                            return "755-02";
+                        else if (Livery == 3)
+                            return "021-25";
+                        else if (Livery == 4)
+                            return "811-25";
+                        break;
+                    case "PULICE2":
+                        if (Livery == 1)
+                            return "180-02";
+                        else if (Livery == 2)
+                            return "528-02";
+                        else if (Livery == 3)
+                            return "405-25";
+                        else if (Livery == 4)
+                            return "466-25";
+                        break;
+                    case "PULICE3":
+                        if (Livery == 1)
+                            return "507-02";
+                        else if (Livery == 2)
+                            return "062-02";
+                        break;
+                    case "PSCOUT":
+                        if (Livery == 1)
+                            return "845-02";
+                        else if (Livery == 2)
+                            return "105-02";
+                        else if (Livery == 3)
+                            return "556-25";
+                        else if (Livery == 4)
+                            return "153-25";
+                        break;
+                    case "POLICESLICK":
+                        if (Livery == 1)
+                            return "206-02";
+                        else if (Livery == 2)
+                            return "378-02";
+                        else if (Livery == 3)
+                            return "494-25";
+                        else if (Livery == 4)
+                            return "549-25";
+                        break;
+                }
+
+                return string.Empty;
+            }
+        }
+
         public void Spawnar()
         {
             Vehicle = Alt.CreateVehicle(Modelo, new Position(PosX, PosY, PosZ), new Rotation(RotX, RotY, RotZ));
@@ -186,6 +245,30 @@ namespace Roleplay.Entities
 
         public void Reparar()
         {
+            if (Vehicle.IsDestroyed)
+            {
+                var pos = Vehicle.Position;
+                var rot = Vehicle.Rotation;
+                Vehicle.Remove();
+                Global.Veiculos.Remove(this);
+                EngineHealth = 1000;
+                var posOld = new Position(PosX, PosY, PosZ);
+                var rotOld = new Position(RotX, RotY, RotZ);
+                PosX = pos.X;
+                PosY = pos.Y;
+                PosZ = pos.Z;
+                RotX = rot.Roll;
+                RotY = rot.Pitch;
+                RotZ = rot.Yaw;
+                Spawnar();
+                PosX = posOld.X;
+                PosY = posOld.Y;
+                PosZ = posOld.Z;
+                RotX = rotOld.X;
+                RotY = rotOld.Y;
+                RotZ = rotOld.Z;
+            }
+
             Alt.EmitAllClients("vehicle:setVehicleFixed", Vehicle);
 
             for (byte i = 0; i <= 10; i++)

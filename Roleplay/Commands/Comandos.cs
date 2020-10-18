@@ -8,7 +8,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -106,6 +105,7 @@ namespace Roleplay.Commands
                 new Comando("Animações", "/stopanim /sa","Para as animações"),
                 new Comando("Animações", "/crossarms", "Cruza os braços"),
                 new Comando("Animações", "/handsup /hs", "Levanta as mãos"),
+                new Comando("Animações", "/hsv", "Levanta as mãos"),
                 new Comando("Animações", "/smoke", "Fuma"),
                 new Comando("Animações", "/lean", "Encosta"),
                 new Comando("Animações", "/police", "Faz gestos policiais"),
@@ -138,6 +138,7 @@ namespace Roleplay.Commands
                 new Comando("Animações", "/necessidades", "Faz o número 2"),
                 new Comando("Animações", "/meth", "Cheira cocaína"),
                 new Comando("Animações", "/mijar", "Mija"),
+                new Comando("Animações", "/dancar", "Dança"),
                 new Comando("Rádio", "/canal", "Troca os canais de rádio"),
                 new Comando("Rádio", "/r", "Fala no canal de rádio principal"),
                 new Comando("Rádio", "/r2", "Fala no canal de rádio secundário"),
@@ -188,24 +189,22 @@ namespace Roleplay.Commands
                     listaComandos.AddRange(new List<Comando>()
                     {
                         new Comando("Facção", "/fspawn", "Spawna veículos da facção"),
+                        new Comando("Facção", "/e", "Ativa/desativa extras de veículos da facção"),
                         new Comando("Facção", "/mostrardistintivo", "Mostra seu distintivo para um personagem"),
                         new Comando("Facção", "/freparar", "Conserta veículos da facção"),
                         new Comando("Facção", "/duty /trabalho", "Entra/sai de trabalho"),
+                        new Comando("Facção", "/mdc", "Abre o MDC"),
                     });
 
                 if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
                     listaComandos.AddRange(new List<Comando>()
                     {
-                        new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
+                        new Comando("Teclas", "Z", "Desliga/liga som da sirene de um veículo"),
                         new Comando("Facção", "/m", "Fala no megafone"),
-                        new Comando("Facção", "/multar", "Multa um personagem online"),
-                        new Comando("Facção", "/multaroff", "Multa um personagem offline"),
                         new Comando("Facção", "/prender", "Prende um personagem"),
                         new Comando("Facção", "/algemar", "Algema/desalgema um personagem"),
-                        new Comando("Facção", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção", "/apreender", "Apreende um veículo"),
                         new Comando("Facção", "/uniforme", "Coloca/retira o uniforme de serviço"),
-                        new Comando("Facção", "/mdc", "Abre o MDC"),
                         new Comando("Facção", "/tac /t", "Entra/sai do canal de voz TAC"),
                         new Comando("Facção", "/confiscar", "Confisca as armas de um personagem"),
                         new Comando("Facção", "/colocar", "Coloca um personagem algemado no banco traseiro de um veículo"),
@@ -213,10 +212,9 @@ namespace Roleplay.Commands
                 else if (p.FaccaoBD.Tipo == TipoFaccao.Medica)
                     listaComandos.AddRange(new List<Comando>()
                     {
-                        new Comando("Teclas", "Z", "Desligar/ligar som da sirene"),
+                        new Comando("Teclas", "Z", "Desliga/liga som da sirene de um veículo"),
                         new Comando("Facção", "/m", "Fala no megafone"),
                         new Comando("Facção", "/curar", "Cura um personagem ferido"),
-                        new Comando("Facção", "/ate", "Atende uma ligação 911"),
                         new Comando("Facção", "/uniforme", "Coloca/retira o uniforme de serviço"),
                     });
 
@@ -266,9 +264,9 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/rj", "Rejeita um SOS"),
                     new Comando("Moderator", "/spec", "Observa um personagem"),
                     new Comando("Moderator", "/specoff", "Para de observar um personagem"),
-                    new Comando("Moderator", "/apm", "Envia uma mensagem privada administrativa"),
-                    new Comando("Moderator", "/checarferimentos", "Visualiza os ferimentos de um personagem"),
+                    new Comando("Moderator", "/aferimentos", "Visualiza os ferimentos de um personagem"),
                     new Comando("Moderator", "/respawnarveiculo", "Estaciona um veículo de aluguel de empregos"),
+                    new Comando("Moderator", "/reviver", "Cura um personagem ferido"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.GameAdministrator)
@@ -280,7 +278,6 @@ namespace Roleplay.Commands
                     new Comando("Game Administrator", "/ban", "Bane um usuário"),
                     new Comando("Game Administrator", "/unban", "Desbane um usuário"),
                     new Comando("Game Administrator", "/banoff", "Bane um usuário que está offline"),
-                    new Comando("Game Administrator", "/reviver", "Cura um personagem ferido"),
                     new Comando("Game Administrator", "/pos", "Vai até a posição"),
                 });
 
@@ -292,6 +289,7 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/bloquearnc", "Bloqueia a possibilidade de troca de nome de um personagem"),
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
                     new Comando("Lead Administrator", "/limparchatgeral", "Limpa o chat de todos os personagens"),
+                    new Comando("Lead Administrator", "/areparar", "Conserta um veículo"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
@@ -349,12 +347,18 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/rarmicomp", "Remove componentes em um arma de um armário"),
                     new Comando("Manager", "/ccomp", "Adiciona componentes em um armário"),
                     new Comando("Manager", "/rcomp", "Remove componentes de um armário"),
-                    new Comando("Manager", "/vip", "Adiciona VIP para um usuário"),
                     new Comando("Manager", "/ncforum", "Remove o namechange do fórum de um usuário"),
                     new Comando("Manager", "/eponto", "Edita um ponto"),
                     new Comando("Manager", "/jetpack", "Cria um jetpack"),
                     new Comando("Manager", "/param", "Edita um parâmetro do servidor"),
                     new Comando("Manager", "/blackout", "Ativa/desativa blackout"),
+                    new Comando("Manager", "/dinheiro", "Adiciona dinheiro para um personagem"),
+                });
+
+            if (p.Usuario == 1)
+                listaComandos.AddRange(new List<Comando>()
+                {
+                    new Comando("TR3V1Z4", "/vip", "Adiciona VIP para um usuário"),
                 });
 
             var html = $@"
@@ -429,7 +433,7 @@ namespace Roleplay.Commands
                     p.Faccao = faccao;
                     p.Rank = rank;
 
-                    if (p.FaccaoBD?.Governamental ?? false)
+                    if (p.FaccaoBD?.Tipo != TipoFaccao.Criminosa)
                     {
                         p.Emprego = TipoEmprego.Nenhum;
                         p.EmTrabalho = false;
@@ -1224,7 +1228,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
 
-            if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date > DateTime.Now && !p.DataRevogacaoLicencaMotorista.HasValue)
+            if ((p.DataValidadeLicencaMotorista ?? DateTime.MinValue).Date > DateTime.Now && p.PolicialRevogacaoLicencaMotorista == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Sua licença de motorista não vence hoje ou não está revogada.");
                 return;
@@ -1244,7 +1248,7 @@ namespace Roleplay.Commands
             }
 
             p.DataValidadeLicencaMotorista = DateTime.Now.AddMonths(6);
-            p.DataRevogacaoLicencaMotorista = null;
+            p.PolicialRevogacaoLicencaMotorista = 0;
 
             p.Dinheiro -= valor;
             p.SetDinheiro();
@@ -1274,7 +1278,7 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(target.Player, TipoMensagem.Titulo, $"Licença de Motorista de {p.Nome}");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Validade: {p.DataValidadeLicencaMotorista?.ToShortDateString()}");
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Status: {(p.DataRevogacaoLicencaMotorista.HasValue ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"Status: {(p.PolicialRevogacaoLicencaMotorista > 0 ? $"{{{Global.CorErro}}}REVOGADA" : (p.DataValidadeLicencaMotorista?.Date >= DateTime.Now.Date ? $"{{{Global.CorSucesso}}}VÁLIDA" : $"{{{Global.CorErro}}}VENCIDA"))}");
             Functions.SendMessageToNearbyPlayers(player, p == target ? "olha sua própria licença de motorista." : $"mostra sua licença de motorista para {target.NomeIC}.", TipoMensagemJogo.Ame, 10);
         }
 
@@ -1405,7 +1409,7 @@ namespace Roleplay.Commands
             }
 
             p.UsandoMascara = !p.UsandoMascara;
-            player.SetSyncedMetaData("nametag", p.NomeIC);
+            p.SetNametag();
             Functions.SendMessageToNearbyPlayers(player, $"{(p.UsandoMascara ? "coloca" : "retira")} sua máscara.", TipoMensagemJogo.Ame, 10);
         }
 

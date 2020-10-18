@@ -132,5 +132,28 @@ namespace Roleplay.Commands.Staff
 
             Functions.GravarLog(TipoLog.Staff, $"/limparchatgeral", p, null);
         }
+
+        [Command("areparar", "/areparar (veículo)")]
+        public void CMD_areparar(IPlayer player, int veiculo)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
+            if (veh == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
+                return;
+            }
+
+            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} reparou o veículo {veh.Codigo}.", true);
+            veh.Reparar();
+
+            Functions.GravarLog(TipoLog.Staff, $"/areparar {veiculo}", p, null);
+        }
     }
 }

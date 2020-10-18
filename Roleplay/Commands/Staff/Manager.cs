@@ -2289,5 +2289,34 @@ namespace Roleplay.Commands.Staff
 
             Functions.GravarLog(TipoLog.Staff, "/blackout", p, null);
         }
+
+        [Command("dinheiro", "/dinheiro (ID ou nome) (valor)")]
+        public void CMD_dinheiro(IPlayer player, string idNome, int valor)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            if (valor <= 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            target.Dinheiro += valor;
+            target.SetDinheiro();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você setou ${valor:N0} para {target.Nome}.");
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} setou ${valor:N0} para você.");
+
+            Functions.GravarLog(TipoLog.Staff, $"/dinheiro {valor}", p, target);
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Testador
 {
@@ -6,6 +8,7 @@ namespace Testador
     {
         static void Main(string[] args)
         {
+            var aaaaa = Criptografar("123");
             var txt = "const accessories7Female = {";
             for (var i = 0; i <= 14; i++)
                 txt += $"{Environment.NewLine}{i}: {{ drawable: {i}, tipoFaccao: 0 }},";
@@ -88,6 +91,18 @@ stickybomb|80000";
                 ret += $"(7,'{s[0]}',{s[1]}),";
             }
             var a = ret;
+        }
+
+        public static string Criptografar(string texto)
+        {
+            var encodedValue = Encoding.UTF8.GetBytes(texto);
+            var encryptedPassword = SHA512.Create().ComputeHash(encodedValue);
+
+            var sb = new StringBuilder();
+            foreach (var caracter in encryptedPassword)
+                sb.Append(caracter.ToString("X2"));
+
+            return sb.ToString();
         }
     }
 }

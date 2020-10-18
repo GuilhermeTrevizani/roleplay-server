@@ -203,34 +203,6 @@ namespace Roleplay.Commands.Staff
             Functions.MostrarStats(player, personagem);
         }
 
-        [Command("reviver", "/reviver (ID ou nome)")]
-        public void CMD_reviver(IPlayer player, string idNome)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            if (!target.Ferido)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
-                return;
-            }
-
-            target.Curar();
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você reviveu {target.Nome}.", notify: true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);
-
-            Functions.GravarLog(TipoLog.Staff, $"/reviver", p, target);
-        }
-
         [Command("pos", "/pos (x) (y) (z)")]
         public void CMD_pos(IPlayer player, float x, float y, float z)
         {

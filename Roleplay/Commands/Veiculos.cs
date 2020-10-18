@@ -1,4 +1,5 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -299,8 +300,7 @@ namespace Roleplay.Commands
 
             porta--;
             veh.StatusPortas[porta] = !veh.StatusPortas[porta];
-            veh.Vehicle.SetNetworkOwner(player);
-            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, porta, veh.StatusPortas[porta]);
+            Alt.EmitAllClients("SetVehicleDoorState", veh.Vehicle, porta, veh.StatusPortas[porta]);
         }
 
         [Command("capo")]
@@ -319,8 +319,7 @@ namespace Roleplay.Commands
             }
 
             veh.StatusPortas[4] = !veh.StatusPortas[4];
-            veh.Vehicle.SetNetworkOwner(player);
-            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, 4, veh.StatusPortas[4]);
+            Alt.EmitAllClients("SetVehicleDoorState", veh.Vehicle, 4, veh.StatusPortas[4]);
         }
 
         [Command("portamalas")]
@@ -339,8 +338,7 @@ namespace Roleplay.Commands
             }
 
             veh.StatusPortas[5] = !veh.StatusPortas[5];
-            veh.Vehicle.SetNetworkOwner(player);
-            veh.Vehicle.NetworkOwner.Emit("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
+            Alt.EmitAllClients("SetVehicleDoorState", veh.Vehicle, 5, veh.StatusPortas[5]);
         }
 
         [Command("abastecer")]

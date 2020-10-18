@@ -11,5 +11,7 @@ namespace Roleplay.Entities
         public int Valor { get; set; }
         public string Motivo { get; set; }
         public DateTime? DataPagamento { get; set; } = null;
+        public int Faccao { get; set; }
+        public string Descricao { get; set; } = string.Empty;
     }
 }

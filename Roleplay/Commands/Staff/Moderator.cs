@@ -123,7 +123,7 @@ namespace Roleplay.Commands.Staff
             }
 
             foreach (var pl in Global.PersonagensOnline.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum && !x.UsuarioBD.TogChatStaff))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {Functions.ObterDisplayEnum(p.UsuarioBD.Staff)} {p.UsuarioBD.Nome}: {mensagem} ))", "#33EE33");
+                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {Functions.ObterDisplayEnum(p.UsuarioBD.Staff)} {p.UsuarioBD.Nome} [{p.ID}]: {mensagem} ))", "#33EE33");
         }
 
         [Command("kick", "/kick (ID ou nome) (motivo)", GreedyArg = true)]
@@ -229,6 +229,7 @@ namespace Roleplay.Commands.Staff
             }
 
             p.EmTrabalhoAdministrativo = !p.EmTrabalhoAdministrativo;
+            p.SetNametag();
             Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.", true);
         }
 
@@ -389,7 +390,7 @@ namespace Roleplay.Commands.Staff
             p.IDSpec = target.ID;
             player.Dimension = target.Player.Dimension;
             p.SetPosition(new Position(target.Player.Position.X, target.Player.Position.Y, target.Player.Position.Z + 5), true);
-            player.SetSyncedMetaData("nametag", string.Empty);
+            p.SetNametag();
             player.Emit("SpectatePlayer", target.Player);
         }
 
@@ -412,26 +413,8 @@ namespace Roleplay.Commands.Staff
             p.Unspectate();
         }
 
-        [Command("apm", "/apm (ID ou nome) (mensagem)", GreedyArg = true)]
-        public void CMD_apm(IPlayer player, string idNome, string mensagem)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator || !p.EmTrabalhoAdministrativo)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando ou não está em serviço administrativo.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
-            if (target == null)
-                return;
-
-            Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( APM para {target.NomeIC} [{target.ID}]: {mensagem} ))", Global.CorCelularSecundaria);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"(( APM de {{{p.CorStaff}}}{p.NomeIC} [{p.ID}]{{{Global.CorCelularSecundaria}}}: {mensagem} ))", Global.CorCelular);
-        }
-
-        [Command("checarferimentos", "/checarferimentos (ID ou nome)")]
-        public void CMD_checarferimentos(IPlayer player, string idNome)
+        [Command("aferimentos", "/aferimentos (ID ou nome)")]
+        public void CMD_aferimentos(IPlayer player, string idNome)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
@@ -495,6 +478,34 @@ namespace Roleplay.Commands.Staff
 
             veh.Despawnar();
             Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} respawnou o veículo {codigo}.", true);
+        }
+
+        [Command("reviver", "/reviver (ID ou nome)")]
+        public void CMD_reviver(IPlayer player, string idNome)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            if (target == null)
+                return;
+
+            if (!target.Ferido)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
+                return;
+            }
+
+            target.Curar();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você reviveu {target.Nome}.", notify: true);
+            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);
+
+            Functions.GravarLog(TipoLog.Staff, $"/reviver", p, target);
         }
     }
 }

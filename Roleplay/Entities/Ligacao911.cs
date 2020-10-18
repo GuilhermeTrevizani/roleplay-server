@@ -1,6 +1,5 @@
 ﻿using Roleplay.Models;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Roleplay.Entities
 {
@@ -15,8 +14,5 @@ namespace Roleplay.Entities
         public float PosZ { get; set; }
         public string Mensagem { get; set; }
         public string Localizacao { get; set; }
-
-        [NotMapped]
-        public int ID { get; set; }
     }
 }

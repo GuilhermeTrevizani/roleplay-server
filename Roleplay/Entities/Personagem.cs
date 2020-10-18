@@ -1,13 +1,16 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net.Async;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Net.NetworkInformation;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace Roleplay.Entities
 {
@@ -60,7 +63,7 @@ namespace Roleplay.Entities
         public DateTime? DataExclusao { get; set; } = null;
         public DateTime? DataTerminoPrisao { get; set; } = null;
         public DateTime? DataValidadeLicencaMotorista { get; set; } = null;
-        public DateTime? DataRevogacaoLicencaMotorista { get; set; } = null;
+        public int PolicialRevogacaoLicencaMotorista { get; set; } = 0;
         public int Distintivo { get; set; } = 0;
         public string InformacoesRoupas { get; set; } = "[]";
         public string InformacoesAcessorios { get; set; } = "[]";
@@ -73,6 +76,8 @@ namespace Roleplay.Entities
         public int Roupa { get; set; } = 1;
         public int Poupanca { get; set; } = 0;
         public int PagamentoExtra { get; set; } = 0;
+        public string InformacoesFerimentos { get; set; } = "[]";
+        public int TipoFerido { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();
@@ -191,13 +196,10 @@ namespace Roleplay.Entities
         public bool DL { get; set; } = false;
 
         [NotMapped]
-        public bool Ferido => Ferimentos.Count > 0 || Player.IsDead || TimerFerido != null || Player.Health != Player.MaxHealth;
+        public bool Ferido => Ferimentos.Count > 0 || TimerFerido != null || Player.Health != Player.MaxHealth;
 
         [NotMapped]
         public List<Propriedade> Propriedades { get => Global.Propriedades.Where(x => x.Personagem == Codigo).ToList(); }
-
-        [NotMapped]
-        public int TipoFerido { get; set; } = 0;
 
         [NotMapped]
         public bool UsandoMascara { get; set; } = false;
@@ -321,12 +323,12 @@ namespace Roleplay.Entities
             IPLs = IPLsSpec;
             SetarIPLs();
             Player.Dimension = DimensaoSpec;
-            Player.SetSyncedMetaData("nametag", NomeIC);
             SetPosition(PosicaoSpec.Value, true);
             PosicaoSpec = null;
             DimensaoSpec = IDSpec = 0;
             IPLsSpec = new List<string>();
             Player.Emit("UnspectatePlayer");
+            SetNametag();
         }
 
         public void Curar()
@@ -364,19 +366,13 @@ namespace Roleplay.Entities
             });
         }
 
-        public void RemoverArma(long weapon)
-        {
-            Armas.RemoveAll(x => x.Codigo == weapon);
-            Player.Emit("RemoveWeapon", weapon);
-        }
-
         public void Spawnar()
         {
             Player.Dimension = (int)Dimensao;
             Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{DataUltimoAcesso}{{#FFFFFF}}.");
             if (UsuarioBD.DataExpiracaoVIP.HasValue)
                 Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {UsuarioBD.VIP}{{#FFFFFF}} {(UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
-            Player.SetSyncedMetaData("nametag", NomeIC);
+            SetNametag();
             Player.Emit("nametags:Config", true);
             Player.Emit("chat:activateTimeStamp", UsuarioBD.TimeStamp);
             Player.SetSyncedMetaData("ferido", 0);
@@ -387,7 +383,76 @@ namespace Roleplay.Entities
             Global.GlobalVoice.MutePlayer(Player);
             DataUltimoAcesso = DateTime.Now;
             Player.Emit("Server:setArtificialLightsState", Global.Parametros.Blackout);
+            Player.Health = (ushort)Vida;
+            Player.Armor = (ushort)Colete;
+
+            if (TipoFerido > 0)
+                SetarFerido(false);
+
+            AltAsync.Do(async () =>
+            {
+                var context = new DatabaseContext();
+                var multas = await context.Multas.CountAsync(x => x.PersonagemMultado == Codigo && !x.DataPagamento.HasValue);
+                if (multas > 0)
+                {
+                    var strMultas = multas > 1 ? "s" : string.Empty;
+                    Functions.EnviarMensagem(Player, TipoMensagem.Erro, $"Você possui {multas} multa{strMultas} pendente{strMultas}.");
+                }
+            });
         }
+
+        public void SetarFerido(bool temDelay)
+        {
+            if (temDelay || TipoFerido == 1)
+                Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos.");
+            else if (TipoFerido == 2)
+                Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você perdeu a consciência.");
+
+            TimerFerido?.Stop();
+            TimerFerido = new TagTimer(300000)
+            {
+                Tag = Codigo,
+            };
+            TimerFerido.Elapsed += (object sender, ElapsedEventArgs e) =>
+            {
+                var timer = (TagTimer)sender;
+                timer.ElapsedCount++;
+
+                var p = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == (int)timer.Tag);
+                if (p == null)
+                {
+                    timer?.Stop();
+                    return;
+                }
+
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
+                timer?.Stop();
+            };
+            TimerFerido.Start();
+
+            AltAsync.Do(async () =>
+            {
+                if (temDelay)
+                    await Task.Delay(5000);
+
+                if (Player.IsDead || !temDelay)
+                {
+                    if (temDelay)
+                    {
+                        await Player.SpawnAsync(Player.Position);
+                        TipoFerido = 1;
+                    }
+
+                    StopAnimation();
+                    PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
+                    await Player.EmitAsync("Server:ToggleFerido", TipoFerido);
+                    Player.SetSyncedMetaData("ferido", TipoFerido);
+                }
+            });
+        }
+
+        public void SetNametag() => Player.SetSyncedMetaData("nametag", !PosicaoSpec.HasValue ? (EmTrabalhoAdministrativo ? $"~q~{UsuarioBD?.Nome}" : NomeIC) : string.Empty);
 
         public class Ferimento
         {

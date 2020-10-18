@@ -32,8 +32,8 @@ namespace RoleplayBOT
 
                 Client.Log += LogAsync;
                 /*Client.Ready += Client_Ready;
-                Client.UserJoined += Client_UserJoined;*/
-                Client.UserLeft += Client_UserLeft;
+                Client.UserJoined += Client_UserJoined;
+                Client.UserLeft += Client_UserLeft;*/
                 services.GetRequiredService<CommandService>().Log += LogAsync;
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
@@ -54,14 +54,14 @@ namespace RoleplayBOT
             var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
             await (Client.GetChannel(GlobalConfig.UserJoinedChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} entrou no servidor. Total de jogadores: {totalJogadores}");
             await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
-        }*/
+        }
 
         private async Task Client_UserLeft(SocketGuildUser arg)
         {
             var totalJogadores = Client.GetGuild(GlobalConfig.GuildId)?.Users.Count;
             await (Client.GetChannel(GlobalConfig.UserLeftChanelId) as SocketTextChannel).SendMessageAsync($"{arg.Mention} saiu do servidor. Total de jogadores: {totalJogadores}");
-            //await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
-        }
+            await Client.SetGameAsync($"{totalJogadores} jogadores", type: ActivityType.Listening);
+        }*/
 
         private Task LogAsync(LogMessage log)
         {

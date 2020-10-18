@@ -47,29 +47,6 @@ namespace Roleplay.Commands.Job
             AltAsync.Do(async () =>
             {
                 await Task.Delay(5000);
-                if (veh.Vehicle.IsDestroyed)
-                {
-                    var pos = veh.Vehicle.Position;
-                    var rot = veh.Vehicle.Rotation;
-                    veh.Vehicle.Remove();
-                    Global.Veiculos.Remove(veh);
-                    veh.EngineHealth = 1000;
-                    var posOld = new Position(veh.PosX, veh.PosY, veh.PosZ);
-                    var rotOld = new Position(veh.RotX, veh.RotY, veh.RotZ);
-                    veh.PosX = pos.X;
-                    veh.PosY = pos.Y;
-                    veh.PosZ = pos.Z;
-                    veh.RotX = rot.Roll;
-                    veh.RotY = rot.Pitch;
-                    veh.RotZ = rot.Yaw;
-                    veh.Spawnar();
-                    veh.PosX = posOld.X;
-                    veh.PosY = posOld.Y;
-                    veh.PosZ = posOld.Z;
-                    veh.RotX = rotOld.X;
-                    veh.RotY = rotOld.Y;
-                    veh.RotZ = rotOld.Z;
-                }
                 veh.Reparar();
                 p.PecasVeiculares--;
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você consertou o veículo e usou uma peça veicular.");

@@ -100,49 +100,5 @@ namespace Roleplay
             var p = Functions.ObterPersonagem(player);
             p.PlayAnimation(dic, name, flag);
         }
-
-        [Command("l", "/l (livery)")]
-        public void CMD_l(IPlayer player, byte livery)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            if (!player.IsInVehicle)
-                return;
-
-            player.Vehicle.Livery = livery;
-        }
-
-        [Command("e", "/e (extra)")]
-        public void CMD_e(IPlayer player, byte extra)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            if (!player.IsInVehicle)
-                return;
-
-            player.Vehicle.ToggleExtra(extra, player.Vehicle.IsExtraOn(extra));
-        }
-
-        [Command("dinheiro", "/dinheiro (dinheiro)")]
-        public void CMD_dinheiro(IPlayer player, int dinheiro)
-        {
-            if (!Global.Development)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "O servidor não está em modo desenvolvimento.");
-                return;
-            }
-
-            var p = Functions.ObterPersonagem(player);
-            p.Dinheiro = dinheiro;
-            p.SetDinheiro();
-        }
     }
 }

@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay;
+using Roleplay.Entities;
 using Roleplay.Models;
 using System;
 using System.Linq;
@@ -59,6 +60,10 @@ namespace RoleplayBOT
                 if (app == null)
                     return ReplyAsync("Não temos aplicações aguardando avaliação. :smiling_face_with_3_hearts:");
 
+                var userApp = context.Usuarios.FirstOrDefault(x => x.Codigo == app.Usuario);
+
+                app.PersonalizacaoDados = JsonConvert.DeserializeObject<Personagem.Personalizacao>(app.InformacoesPersonalizacao);
+
                 var x = new EmbedBuilder
                 {
                     Title = $"Aplicação de {app.Nome} [{app.Codigo}]",
@@ -68,6 +73,7 @@ namespace RoleplayBOT
                 x.AddField("Sexo", app.PersonalizacaoDados.sex == 1 ? "Homem" : "Mulher", true);
                 x.AddField("Nascimento", $"{app.DataNascimento.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - app.DataNascimento).TotalDays / 365):N0} anos)", true);
                 x.AddField("Caracteres História", $"{app.Historia.Length} de 2048", false);
+                x.AddField("OOC", $"{userApp?.Nome ?? string.Empty} [{userApp.Codigo}]", true);
                 x.WithFooter($"Enviada em {app.DataRegistro}");
                 x.Color = Color.DarkRed;
 

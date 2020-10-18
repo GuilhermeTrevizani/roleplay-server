@@ -27,6 +27,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (canal < 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal inválido.");
+                return;
+            }
+
             if (canal >= 911 && canal <= 920 && p.FaccaoBD?.Tipo != TipoFaccao.Policial)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal 911 até 920 é reservado para facções policiais.");

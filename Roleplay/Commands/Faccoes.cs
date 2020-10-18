@@ -8,7 +8,6 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -240,9 +239,9 @@ namespace Roleplay.Commands
         public void CMD_duty(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (!(p?.FaccaoBD?.Governamental ?? false) && p?.Emprego == 0)
+            if (!(p?.FaccaoBD?.Tipo != TipoFaccao.Criminosa) && p?.Emprego == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental e não possui um emprego.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada e não possui um emprego.");
                 return;
             }
 
@@ -307,7 +306,6 @@ namespace Roleplay.Commands
                             });
                         }
 
-                        p.ItensColetados = 0;
                         p.PontosColeta = Global.Pontos.Where(x => x.Tipo == TipoPonto.Lixeiro).OrderBy(x => Guid.NewGuid()).Take(20).ToList();
                         foreach (var x in p.PontosColeta)
                         {
@@ -335,10 +333,11 @@ namespace Roleplay.Commands
 
                         player.Emit("Server:SyncClothes", p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa);
                         Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você saiu de serviço.");
+                        p.ItensColetados = 0;
                     }
+
                     return;
                 }
-
                 p.EmTrabalho = !p.EmTrabalho;
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(p.EmTrabalho ? "entrou em" : "saiu de")} serviço.");
                 return;
@@ -369,93 +368,6 @@ namespace Roleplay.Commands
             Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} saiu da facção.");
             p.Faccao = p.Rank = p.Distintivo = 0;
             p.EmTrabalho = false;
-        }
-
-        [Command("multar", "/multar (ID ou nome) (valor) (motivo)", GreedyArg = true)]
-        public void CMD_multar(IPlayer player, string idNome, int valor, string motivo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
-            if (target == null)
-                return;
-
-            if (valor <= 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
-                return;
-            }
-
-            if (motivo.Length > 255)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.");
-                return;
-            }
-
-            using (var context = new DatabaseContext())
-            {
-                context.Multas.Add(new Multa()
-                {
-                    Motivo = motivo,
-                    PersonagemMultado = target.Codigo,
-                    PersonagemPolicial = p.Codigo,
-                    Valor = valor,
-                });
-                context.SaveChanges();
-            }
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {target.Nome} por ${valor:N0}. Motivo: {motivo}");
-            if (target.Celular > 0)
-                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(911)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CorCelular);
-        }
-
-        [Command("multaroff", "/multar (nome completo) (valor) (motivo)", GreedyArg = true)]
-        public void CMD_multaroff(IPlayer player, string nomeCompleto, int valor, string motivo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
-                return;
-            }
-
-            if (valor <= 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.");
-                return;
-            }
-
-            if (motivo.Length > 255)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.");
-                return;
-            }
-
-            nomeCompleto = nomeCompleto.Replace("_", " ");
-
-            using var context = new DatabaseContext();
-            var personagem = context.Personagens.FirstOrDefault(x => x.Nome.ToLower() == nomeCompleto.ToLower() && !x.Online);
-            if (personagem == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {nomeCompleto} não encontrado ou está online.");
-                return;
-            }
-
-            context.Multas.Add(new Multa()
-            {
-                Motivo = motivo,
-                PersonagemMultado = personagem.Codigo,
-                PersonagemPolicial = p.Codigo,
-                Valor = valor,
-            });
-            context.SaveChanges();
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {personagem.Nome} por ${valor:N0}. Motivo: {motivo}");
         }
 
         [Command("prender", "/prender (ID ou nome) (minutos)")]
@@ -662,9 +574,9 @@ namespace Roleplay.Commands
         public void CMD_fspawn(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
+            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;
             }
 
@@ -682,6 +594,8 @@ namespace Roleplay.Commands
                 {
                     x.Codigo,
                     Modelo = x.Modelo.ToUpper(),
+                    NomeExibicao = Global.VehicleInfos.FirstOrDefault(y => y.Name.ToLower() == x.Modelo.ToLower())?.DisplayName ?? string.Empty,
+                    Numeracao = x.NumeracaoLivery,
                     x.Placa,
                     Encarregado = Global.Veiculos.FirstOrDefault(y => y.Codigo == x.Codigo)?.NomeEncarregado ?? "N/A",
                 }).ToList();
@@ -695,34 +609,13 @@ namespace Roleplay.Commands
             player.Emit("Server:SpawnarVeiculosFaccao", ponto.Codigo, p.FaccaoBD.Nome, JsonConvert.SerializeObject(veiculos));
         }
 
-        [Command("ate", "/ate (código)")]
-        public void CMD_ate(IPlayer player, int codigo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica) || !p.EmTrabalho)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
-                return;
-            }
-
-            var ligacao911 = Global.Ligacoes911.FirstOrDefault(x => x.ID == codigo);
-            if (ligacao911 == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Nenhuma ligação 911 encontrada com o código {codigo}.");
-                return;
-            }
-
-            player.Emit("Server:SetWaypoint", ligacao911.PosX, ligacao911.PosY);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A localização da ligação de emergência #{codigo} foi marcada no seu GPS.", notify: true);
-        }
-
         [Command("apreender", "/apreender (placa) (valor) (motivo)", GreedyArg = true)]
         public void CMD_apreender(IPlayer player, string placa, int valor, string motivo)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
+            if ((p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Governo) || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial/governo ou não está em serviço.");
                 return;
             }
 
@@ -781,6 +674,7 @@ namespace Roleplay.Commands
                 Motivo = motivo,
                 PersonagemPolicial = p.Codigo,
                 Valor = valor,
+                Faccao = p.Faccao,
             });
             context.SaveChanges();
 
@@ -793,7 +687,7 @@ namespace Roleplay.Commands
         public void CMD_uniforme(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial && p?.FaccaoBD?.Tipo != TipoFaccao.Medica)
+            if (!(p?.FaccaoBD?.Governamental ?? false))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental.");
                 return;
@@ -812,9 +706,9 @@ namespace Roleplay.Commands
         public void CMD_mdc(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
+            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
                 return;
             }
 
@@ -826,42 +720,69 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var htmlLigacoes911 = string.Empty;
-            var ligacoes911 = Global.Ligacoes911.Where(x => x.Tipo == p.FaccaoBD.Tipo && (DateTime.Now - x.Data).TotalHours < 24)
-                .OrderByDescending(x => x.Codigo).ToList();
-            if (ligacoes911.Count == 0)
+            AltAsync.Do(async () =>
             {
-                htmlLigacoes911 = "<div class='alert alert-danger'>Não houve nenhum 911 nas últimas 24 horas.</div>";
-            }
-            else
-            {
-                htmlLigacoes911 = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
-                    <table class='table table-bordered table-striped'>
-                        <thead>
-                            <tr class='bg-dark'>
-                                <th>Código</th>
-                                <th>Data</th>
-                                <th>Celular</th>
-                                <th>Localização</th>
-                                <th>Mensagem</th>
-                            </tr>
-                        </thead>
-                        <tbody>";
-                foreach (var x in ligacoes911)
-                    htmlLigacoes911 += $@"<tr>
-                                <td>{x.ID}</td>
-                                <td>{x.Data}</td>
-                                <td>{x.Celular}</td>
-                                <td>{x.Localizacao}</td>
-                                <td>{x.Mensagem}</td>
-                            </tr>";
-                htmlLigacoes911 += $@"</tbody>
-                    </table>
-                </div>";
-            }
+                var htmlLigacoes911 = string.Empty;
+                var htmlAPB = string.Empty;
+                var htmlBOLO = string.Empty;
+                var htmlRelatoriosPendentes = string.Empty;
 
-            player.Emit("Server:AbrirMDC", p.FaccaoBD.Nome, htmlLigacoes911);
-            Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
+                if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica)
+                {
+                    var ligacoes911 = Global.Ligacoes911.Where(x => x.Tipo == p.FaccaoBD.Tipo && (DateTime.Now - x.Data).TotalHours < 24)
+                        .OrderByDescending(x => x.Codigo).ToList();
+                    if (ligacoes911.Count == 0)
+                    {
+                        htmlLigacoes911 = "<div class='alert alert-danger'>Não houve nenhum 911 nas últimas 24 horas.</div>";
+                    }
+                    else
+                    {
+                        htmlLigacoes911 = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+                        <table class='table table-bordered table-striped'>
+                            <thead>
+                                <tr class='bg-dark'>
+                                    <th>Código</th>
+                                    <th>Data</th>
+                                    <th>Celular</th>
+                                    <th>Localização</th>
+                                    <th>Mensagem</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>";
+                        foreach (var x in ligacoes911)
+                            htmlLigacoes911 += $@"<tr>
+                                    <td>{x.Codigo}</td>
+                                    <td>{x.Data}</td>
+                                    <td>{x.Celular}</td>
+                                    <td>{x.Localizacao}</td>
+                                    <td>{x.Mensagem}</td>
+                                    <td class='text-center'><button class='btn btn-dark btn-xs' onclick='rastrear911({x.Codigo});'>Rastrear</button></td>
+                                </tr>";
+                        htmlLigacoes911 += $@"</tbody>
+                        </table>
+                    </div>";
+                    }
+                }
+
+                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
+                {
+                    var procurados = await Functions.ObterHTMLProcurados();
+                    htmlAPB = procurados.Item1;
+                    htmlBOLO = procurados.Item2;
+                }
+
+                if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Governo)
+                {
+                    // Apreensões veiculares, Confiscos e Prisões
+                    // Apreensões Veiculares e Prisões (/confiscar tbm? criar um Confiscos)
+                    // relatorios pendentes listar da facçção inteira  e ordenar para o do proprio usuario primeiro e aparecer botão só pra preencher se for o dono do relatorio
+                    // OBterHtmlRelatoriosPendentes pra depois atualizar
+                }
+
+                player.Emit("Server:AbrirMDC", (int)p.FaccaoBD.Tipo, p.FaccaoBD.Nome, htmlLigacoes911, htmlAPB, htmlBOLO, htmlRelatoriosPendentes);
+                Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
+            });
         }
 
         [Command("tac", "/tac (canal [0-5])", Alias = "t")]
@@ -938,10 +859,27 @@ namespace Roleplay.Commands
                 return;
             }
 
-            foreach (var x in target.Armas)
-                target.RemoverArma(x.Codigo);
+            if (target.Armas.Count == 0)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"{target.NomeIC} não possui nenhuma arma para ser confiscada.");
+                return;
+            }
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC}.");
+            var confisco = new Confisco
+            {
+                PersonagemPolicial = p.Codigo,
+                Personagem = target.Codigo,
+                Armas = JsonConvert.SerializeObject(target.Armas),
+            };
+            using var context = new DatabaseContext();
+            context.Confiscos.Add(confisco);
+            context.SaveChanges();
+
+            foreach (var x in target.Armas)
+                target.Player.Emit("RemoveWeapon", x.Codigo);
+            target.Armas = new List<Personagem.Arma>();
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você confiscou as armas de {target.NomeIC} e criou um registro de confisco.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} confiscou suas armas.");
         }
 
@@ -1099,6 +1037,32 @@ namespace Roleplay.Commands
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você colocou {target.NomeIC} dentro do veículo.");
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.NomeIC} colocou você dentro do veículo.");
+        }
+
+        [Command("e", "/e (extra)")]
+        public void CMD_e(IPlayer player, byte extra)
+        {
+            if (!player.IsInVehicle)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está dentro de um veículo.");
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
+                return;
+            }
+
+            if (!Global.Pontos.Any(x => x.Tipo == TipoPonto.SpawnVeiculosFaccao && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.DistanciaRP))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está próximo de nenhum ponto de spawn de veículos da facção.");
+                return;
+            }
+
+            player.Vehicle.ToggleExtra(extra, player.Vehicle.IsExtraOn(extra));
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou extra {extra} do veículo.");
         }
     }
 }

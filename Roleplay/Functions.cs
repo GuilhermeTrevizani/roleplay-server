@@ -1,6 +1,8 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net.Async;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -14,6 +16,7 @@ using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Roleplay
 {
@@ -57,27 +60,30 @@ namespace Roleplay
             return false;
         }
 
-        public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player?.HardwareIdHash == player?.HardwareIdHash);
+        public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player == player);
 
         public static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
         {
-            using var context = new DatabaseContext();
-            context.Logs.Add(new Log()
+            AltAsync.Do(async () =>
             {
-                Tipo = tipo,
-                Descricao = descricao,
-                PersonagemOrigem = origem.Codigo,
-                IPOrigem = origem.IPUltimoAcesso,
-                SocialClubOrigem = origem.SocialClubUltimoAcesso,
-                PersonagemDestino = destino?.Codigo ?? 0,
-                IPDestino = destino?.IPUltimoAcesso,
-                SocialClubDestino = destino?.SocialClubUltimoAcesso ?? 0,
-                HardwareIdHashOrigem = origem.HardwareIdHashUltimoAcesso,
-                HardwareIdHashDestino = destino?.HardwareIdHashUltimoAcesso ?? 0,
-                HardwareIdExHashOrigem = origem.HardwareIdExHashUltimoAcesso,
-                HardwareIdExHashDestino = destino?.HardwareIdExHashUltimoAcesso ?? 0,
+                using var context = new DatabaseContext();
+                await context.Logs.AddAsync(new Log()
+                {
+                    Tipo = tipo,
+                    Descricao = descricao,
+                    PersonagemOrigem = origem?.Codigo ?? 0,
+                    IPOrigem = origem?.IPUltimoAcesso ?? string.Empty,
+                    SocialClubOrigem = origem?.SocialClubUltimoAcesso ?? 0,
+                    PersonagemDestino = destino?.Codigo ?? 0,
+                    IPDestino = destino?.IPUltimoAcesso ?? string.Empty,
+                    SocialClubDestino = destino?.SocialClubUltimoAcesso ?? 0,
+                    HardwareIdHashOrigem = origem?.HardwareIdHashUltimoAcesso ?? 0,
+                    HardwareIdHashDestino = destino?.HardwareIdHashUltimoAcesso ?? 0,
+                    HardwareIdExHashOrigem = origem?.HardwareIdExHashUltimoAcesso ?? 0,
+                    HardwareIdExHashDestino = destino?.HardwareIdExHashUltimoAcesso ?? 0,
+                });
+                await context.SaveChangesAsync();
             });
-            context.SaveChanges();
         }
 
         public static int ObterNovoID()
@@ -222,7 +228,7 @@ namespace Roleplay
         public static Personagem ObterPersonagemPorIdNome(IPlayer player, string idNome, bool isPodeProprioPlayer = true)
         {
             int.TryParse(idNome, out int id);
-            var p = Global.PersonagensOnline.FirstOrDefault(x => x.ID == id);
+            var p = Global.PersonagensOnline.FirstOrDefault(x => x.ID == id && x.ID > 0);
             if (p != null)
             {
                 if (!isPodeProprioPlayer && player == p.Player)
@@ -234,7 +240,7 @@ namespace Roleplay
                 return p;
             }
 
-            var ps = Global.PersonagensOnline.Where(x => x.Nome.ToLower().Contains(idNome.Replace("_", " ").ToLower())).ToList();
+            var ps = Global.PersonagensOnline.Where(x => x.Nome.ToLower().Contains(idNome.Replace("_", " ").ToLower()) && x.ID > 0).ToList();
             if (ps.Count == 1)
             {
                 if (!isPodeProprioPlayer && player == ps.FirstOrDefault().Player)
@@ -295,6 +301,7 @@ namespace Roleplay
             p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
             p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
             p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
+            p.InformacoesFerimentos = JsonConvert.SerializeObject(p.Ferimentos);
             context.Personagens.Update(p);
 
             p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
@@ -353,7 +360,8 @@ namespace Roleplay
                                 break;
                             case TipoMensagemJogo.ChatOOC:
                                 var cor = p.EmTrabalhoAdministrativo && !string.IsNullOrWhiteSpace(p.CorStaff) ? p.CorStaff : "#BABABA";
-                                EnviarMensagem(target, TipoMensagem.Nenhum, $"(( {{{cor}}}{p.NomeIC} [{p.ID}]{{#BABABA}}: {message} ))", "#BABABA");
+                                var nomeOOC = p.EmTrabalhoAdministrativo ? $"({p.UsuarioBD.Nome})" : string.Empty;
+                                EnviarMensagem(target, TipoMensagem.Nenhum, $"(( {{{cor}}}{p.NomeIC} {nomeOOC} [{p.ID}]{{#BABABA}}: {message} ))", "#BABABA");
                                 break;
                             case TipoMensagemJogo.ChatICBaixo:
                                 EnviarMensagem(target, TipoMensagem.Nenhum, $"{p.NomeIC} diz [baixo]: {message}", chatMessageColor);
@@ -510,12 +518,26 @@ namespace Roleplay
             };
         }
 
-        public static bool ChecarAnimacoes(IPlayer player, bool pararAnim = false)
+        public static bool ChecarAnimacoes(IPlayer player, bool pararAnim = false, bool somenteDentroVeiculo = false)
         {
-            if (player.IsInVehicle)
+            if (!pararAnim)
             {
-                EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação em um veículo.");
-                return false;
+                if (somenteDentroVeiculo)
+                {
+                    if (!player.IsInVehicle)
+                    {
+                        EnviarMensagem(player, TipoMensagem.Erro, "Você precisa estar dentro de um veículo.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (player.IsInVehicle)
+                    {
+                        EnviarMensagem(player, TipoMensagem.Erro, "Você não pode utilizar comandos de animação em um veículo.");
+                        return false;
+                    }
+                }
             }
 
             var p = ObterPersonagem(player);
@@ -591,14 +613,13 @@ namespace Roleplay
                                 PosZ = p.PosicaoIC.Z,
                                 Mensagem = message,
                                 Localizacao = p.AreaName,
-                                ID = Global.Ligacoes911.Select(x => x.ID).DefaultIfEmpty(0).Max() + 1,
                             };
                             using var context = new DatabaseContext();
                             context.Ligacoes911.Add(ligacao911);
                             context.SaveChanges();
                             Global.Ligacoes911.Add(ligacao911);
 
-                            EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.ID}", true, true);
+                            EnviarMensagemTipoFaccao(tipoFaccao, $"Central de Emergência | Ligação 911 {{#FFFFFF}}#{ligacao911.Codigo}", true, true);
                             EnviarMensagemTipoFaccao(tipoFaccao, $"De: {{#FFFFFF}}{p.Celular}", true, true);
                             EnviarMensagemTipoFaccao(tipoFaccao, $"Localização: {{#FFFFFF}}{p.AreaName}", true, true);
                             EnviarMensagemTipoFaccao(tipoFaccao, $"Mensagem: {{#FFFFFF}}{message}", true, true);
@@ -810,12 +831,14 @@ namespace Roleplay
                 };
                 msg.To.Add(email);
 
-                var clienteSmtp = new SmtpClient("segundavida.com.br")
+                var clienteSmtp = new SmtpClient("mail.segundavida.com.br")
                 {
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     Credentials = new NetworkCredential("naoresponda@segundavida.com.br", "3sEuV,%GKqg_"),
                     Port = 587,
+                    //Port = 465,
+                    //EnableSsl = true,
                 };
 
                 await clienteSmtp.SendMailAsync(msg);
@@ -830,8 +853,6 @@ namespace Roleplay
         {
             try
             {
-                Console.WriteLine(JsonConvert.SerializeObject(ex));
-
                 var listaErros = new List<BeautifulException>();
 
                 var path = AppDomain.CurrentDomain.BaseDirectory;
@@ -850,11 +871,22 @@ namespace Roleplay
                 };
                 listaErros.Add(exception);
 
-                File.WriteAllText(path, JsonConvert.SerializeObject(listaErros));
+                File.WriteAllText(path, JsonConvert.SerializeObject(listaErros, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }));
+
+                Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }));
             }
             catch (Exception ex1)
             {
-                Console.WriteLine(JsonConvert.SerializeObject(ex1));
+                Console.WriteLine(JsonConvert.SerializeObject(ex1, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }));
             }
         }
 
@@ -1165,6 +1197,89 @@ namespace Roleplay
             }
 
             return new Tuple<string, TipoVIP>(restricao, vip);
+        }
+
+        public async static Task<Tuple<string, string>> ObterHTMLProcurados()
+        {
+            var htmlAPB = string.Empty;
+            var htmlBOLO = string.Empty;
+            using var context = new DatabaseContext();
+            var sql = $@"SELECT pro.*,
+                    per.Nome NomePersonagem,
+                    pp.Nome NomePersonagemPolicial,
+                    vei.Modelo ModeloVeiculo, vei.Placa PlacaVeiculo
+                    FROM Procurados pro
+                    LEFT JOIN Personagens pp ON pro.PersonagemPolicial = pp.Codigo
+                    LEFT JOIN Personagens per ON pro.Personagem = per.Codigo
+                    LEFT JOIN Veiculos vei ON pro.Veiculo = vei.Codigo
+                    WHERE pro.DataExclusao is null";
+            var procurados = await context.ProcuradosInfos.FromSqlRaw(sql).ToListAsync();
+            var apbs = procurados.Where(x => x.Personagem > 0).ToList();
+            var bolos = procurados.Where(x => x.Veiculo > 0).ToList();
+
+            if (apbs.Count == 0)
+            {
+                htmlAPB = $@"<div class='alert alert-danger'>Nenhum APB encontrado.</div>";
+            }
+            else
+            {
+                htmlAPB = $@"<table class='table table-bordered table-striped'>
+                            <thead>
+                                <tr class='bg-dark'>
+                                    <th>Código</th>
+                                    <th>Data</th>
+                                    <th>Policial</th>
+                                    <th>Procurado</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>";
+
+                foreach (var x in apbs)
+                    htmlAPB += $@"<tr>
+                            <td>{x.Codigo}</td>
+                            <td>{x.Data}</td>
+                            <td>{x.NomePersonagemPolicial}</td>
+                            <td>{x.NomePersonagem}</td>
+                            <td>{x.Motivo}</td>
+                            </tr>";
+
+                htmlAPB += @"</tbody>
+                        </table>";
+            }
+
+            if (bolos.Count == 0)
+            {
+                htmlBOLO = $@"<div class='alert alert-danger'>Nenhum BOLO encontrado.</div>";
+            }
+            else
+            {
+                htmlBOLO = $@"<table class='table table-bordered table-striped'>
+                            <thead>
+                                <tr class='bg-dark'>
+                                    <th>Código</th>
+                                    <th>Data</th>
+                                    <th>Policial</th>
+                                    <th>Veículo</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>";
+
+                foreach (var x in bolos)
+                    htmlBOLO += $@"<tr>
+                            <td>{x.Codigo}</td>
+                            <td>{x.Data}</td>
+                            <td>{x.NomePersonagemPolicial}</td>
+                            <td>{x.ModeloVeiculo.ToUpper()} {x.PlacaVeiculo}</td>
+                            <td>{x.Motivo}</td>
+                            </tr>";
+
+                htmlBOLO += @"</tbody>
+                        </table>";
+            }
+
+            return new Tuple<string, string>(htmlAPB, htmlBOLO);
         }
     }
 }
