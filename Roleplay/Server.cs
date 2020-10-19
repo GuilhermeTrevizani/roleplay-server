@@ -84,6 +84,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("MDCRastrear911", MDCRastrear911);
             Alt.OnClient<IPlayer, int, string, int, string, string>("MDCMultar", MDCMultar);
             Alt.OnClient<IPlayer, int>("MDCRevogarLicencaMotorista", MDCRevogarLicencaMotorista);
+            Alt.OnClient<IPlayer, string>("PesquisarLogs", PesquisarLogs);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -962,6 +963,8 @@ namespace Roleplay
                 return;
             }
 
+            p.Acessorios = new List<Personagem.Vestimenta>();
+            p.Roupas = new List<Personagem.Vestimenta>();
             p.PersonalizacaoDados.sex = sexo == "M" ? 1 : 0;
             p.PersonalizacaoDados.structure = new List<double> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             p.PersonalizacaoDados.opacityOverlays = new List<Personagem.Personalizacao.OpacityOverlay> { new Personagem.Personalizacao.OpacityOverlay(0), new Personagem.Personalizacao.OpacityOverlay(3), new Personagem.Personalizacao.OpacityOverlay(6), new Personagem.Personalizacao.OpacityOverlay(7), new Personagem.Personalizacao.OpacityOverlay(9), new Personagem.Personalizacao.OpacityOverlay(11) };
@@ -2383,6 +2386,11 @@ namespace Roleplay
                 context.Personagens.Update(per);
                 await context.SaveChangesAsync();
             });
+        }
+
+        private void PesquisarLogs(IPlayer player, string pesquisa)
+        {
+
         }
         #endregion
     }
