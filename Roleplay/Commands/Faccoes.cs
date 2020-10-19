@@ -943,9 +943,9 @@ namespace Roleplay.Commands
         public void CMD_freparar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
+            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;
             }
 
@@ -1038,9 +1038,9 @@ namespace Roleplay.Commands
             }
 
             var p = Functions.ObterPersonagem(player);
-            if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
+            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção governamental ou não está em serviço.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;
             }
 

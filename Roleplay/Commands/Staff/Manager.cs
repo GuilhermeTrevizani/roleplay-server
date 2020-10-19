@@ -651,7 +651,7 @@ namespace Roleplay.Commands.Staff
             target.UsuarioBD.Staff = stf;
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível staff para {stf} [{staff}].");
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível staff de {target.UsuarioBD.Nome} para {stf} [{staff}].");
-            Functions.GravarLog(TipoLog.Staff, $"/staff {staff}", p, target);
+            Functions.GravarLog(TipoLog.Staff, $"/setstaff {staff}", p, target);
         }
 
         [Command("lider", "/lider (ID ou nome) (facção)")]

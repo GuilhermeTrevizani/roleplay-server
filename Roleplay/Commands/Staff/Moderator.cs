@@ -218,7 +218,7 @@ namespace Roleplay.Commands.Staff
             veh.Vehicle.Dimension = player.Dimension;
         }
 
-        [Command("aduty")]
+        [Command("aduty", "/atrabalho")]
         public void CMD_aduty(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
