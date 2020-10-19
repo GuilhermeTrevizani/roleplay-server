@@ -49,20 +49,45 @@ namespace Roleplay.Models
     public enum TipoLog
     {
         Staff = 1,
+
+        [Display(Name = "Líder Facção")]
         FaccaoLider = 2,
+
+        [Display(Name = "Gestor Facção")]
         FaccaoGestor = 3,
+
         Dinheiro = 4,
+
         Venda = 5,
+
         Entrada = 6,
+
+        [Display(Name = "Saída")]
         Saida = 7,
+
         Morte = 8,
+
         Arma = 9,
+
+        [Display(Name = "Troca de Nome")]
         Namechange = 10,
+
+        [Display(Name = "Exclusão de Personagem")]
         ExclusaoPersonagem = 11,
+
+        [Display(Name = "Troca de Placa")]
         PlateChange = 12,
+
+        [Display(Name = "Anúncio")]
         Anuncio = 13,
+
+        [Display(Name = "Anúncio Governamental")]
         AnuncioGov = 14,
+
+        [Display(Name = "Falha Login")]
         LoginFalha = 15,
+
+        [Display(Name = "Falha Esqueci Minha Senha")]
         EsqueciMinhaSenhaFalha = 16,
     }
 
@@ -278,10 +303,6 @@ namespace Roleplay.Models
         PolSpeedo,
         PolRiot,
         LSPDB,
-        Pulice,
-        Pulice2,
-        Pulice3,
-        Pulice4,
         POLThrust,
 
         LSPDPolmav,
