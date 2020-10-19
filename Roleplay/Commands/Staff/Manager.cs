@@ -2175,13 +2175,14 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            if (player.Dimension != 0)
+            if (player.Dimension == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando em outra dimensão.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode executar esse comando na dimensão padrão.");
                 return;
             }
 
             var veh = Alt.CreateVehicle(VehicleModel.Thruster, player.Position, player.Rotation);
+            veh.Dimension = player.Dimension;
             veh.ManualEngineControl = false;
             veh.EngineOn = true;
             player.Emit("setPedIntoVehicle", veh, -1);
