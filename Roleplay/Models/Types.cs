@@ -283,6 +283,7 @@ namespace Roleplay.Models
         Pulice3,
         Pulice4,
         POLThrust,
+
         LSPDPolmav,
         LSFD,
         LSFD2,
@@ -292,6 +293,10 @@ namespace Roleplay.Models
         LSFDTruck,
         LSFDTruck2,
         LSFDTruck3,
+
+        Newsvan,
+        Newsvan2,
+        Newsmav,
     }
 
     public enum TipoStatusNamechange

@@ -258,7 +258,7 @@ namespace Roleplay.Commands
                     new Comando("Moderator", "/kick", "Expulsa um personagem"),
                     new Comando("Moderator", "/irveh", "Vai a um veículo"),
                     new Comando("Moderator", "/trazerveh", "Traz um veículo"),
-                    new Comando("Moderator", "/aduty", "Entra/sai de serviço administrativo"),
+                    new Comando("Moderator", "/aduty /atrabalho", "Entra/sai de serviço administrativo"),
                     new Comando("Moderator", "/listasos", "Lista os SOSs pendentes"),
                     new Comando("Moderator", "/aj", "Aceita um SOS"),
                     new Comando("Moderator", "/rj", "Rejeita um SOS"),
