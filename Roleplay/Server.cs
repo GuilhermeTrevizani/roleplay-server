@@ -1698,9 +1698,6 @@ namespace Roleplay
             }
             else if (sucesso)
             {
-                if (tipo == 1)
-                    p.DataUltimoUsoBarbearia = DateTime.Now;
-
                 p.Dinheiro -= Global.Parametros.ValorBarbearia;
                 p.SetDinheiro();
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você pagou ${Global.Parametros.ValorBarbearia:N0} na barbearia.");

@@ -69,7 +69,6 @@ namespace Roleplay.Entities
         public string InformacoesAcessorios { get; set; } = "[]";
         public string InformacoesArmas { get; set; } = "[]";
         public string InformacoesContatos { get; set; } = "[]";
-        public DateTime? DataUltimoUsoBarbearia { get; set; } = null;
         public int PecasVeiculares { get; set; } = 0;
         public DateTime? DataUltimoUsoAnuncio { get; set; } = null;
         public int Mascara { get; set; } = 0;

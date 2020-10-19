@@ -1148,19 +1148,6 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var dias = 21;
-            if (p.UsuarioBD.VIP == TipoVIP.Ouro)
-                dias = 7;
-            else if (p.UsuarioBD.VIP == TipoVIP.Prata)
-                dias = 14;
-
-            var cooldown = (p.DataUltimoUsoBarbearia ?? DateTime.MinValue).AddDays(dias);
-            if (cooldown > DateTime.Now)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O uso da barbearia estará disponível em {cooldown}.");
-                return;
-            }
-
             player.Emit("AbrirBarbeariaMaquiagem", p.InformacoesPersonalizacao, 1);
         }
 
