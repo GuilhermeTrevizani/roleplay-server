@@ -372,13 +372,13 @@ namespace Roleplay
                                 break;
                             case TipoMensagemJogo.Ame:
                                 if (player == target)
-                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"* {p.NomeIC} {message}", "#C2A2DA");
+                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"> {p.NomeIC} {message}", "#C2A2DA");
                                 else
                                     target.Emit("text:playerAction", player, $"* {p.NomeIC} {message}");
                                 break;
                             case TipoMensagemJogo.Ado:
                                 if (player == target)
-                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"* {message} (( {p.NomeIC} ))", "#C2A2DA");
+                                    EnviarMensagem(target, TipoMensagem.Nenhum, $"> {message} (( {p.NomeIC} ))", "#C2A2DA");
                                 else
                                     target.Emit("text:playerAction", player, $"* {message} (( {p.NomeIC} ))");
                                 break;
