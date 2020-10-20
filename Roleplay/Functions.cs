@@ -772,6 +772,8 @@ namespace Roleplay
             if (textDraw == null)
                 return;
 
+            Global.TextDraws.Remove(textDraw);
+
             foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
                 textDraw.DeletarIdentificador(x.Player);
         }
