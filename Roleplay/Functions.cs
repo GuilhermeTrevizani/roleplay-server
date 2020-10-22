@@ -268,46 +268,49 @@ namespace Roleplay
 
         public static void SalvarPersonagem(Personagem p, bool online = true)
         {
-            if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
-                return;
-
-            if (!online && p.Celular > 0)
+            AltAsync.Do(async () =>
             {
-                p.LimparLigacao();
-                var pLigando = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
-                if (pLigando != null)
+                if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
+                    return;
+
+                if (!online && p.Celular > 0)
                 {
-                    pLigando.LimparLigacao();
-                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Global.CorCelularSecundaria);
+                    p.LimparLigacao();
+                    var pLigando = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
+                    if (pLigando != null)
+                    {
+                        pLigando.LimparLigacao();
+                        EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Global.CorCelularSecundaria);
+                    }
                 }
-            }
 
-            using var context = new DatabaseContext();
-            p.Online = online;
-            p.Skin = p.Player.Model;
-            p.PosX = p.Player.Position.X;
-            p.PosY = p.Player.Position.Y;
-            p.PosZ = p.Player.Position.Z;
-            p.Vida = p.Player.Health;
-            p.Colete = p.Player.Armor;
-            p.Dimensao = p.Player.Dimension;
-            p.IPL = JsonConvert.SerializeObject(p.IPLs);
-            p.RotX = p.Player.Rotation.Roll;
-            p.RotY = p.Player.Rotation.Pitch;
-            p.RotZ = p.Player.Rotation.Yaw;
-            p.DataUltimoAcesso = DateTime.Now;
-            p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
-            p.InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas);
-            p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
-            p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
-            p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
-            p.InformacoesFerimentos = JsonConvert.SerializeObject(p.Ferimentos);
-            context.Personagens.Update(p);
+                using var context = new DatabaseContext();
+                p.Online = online;
+                p.Skin = p.Player.Model;
+                p.PosX = p.Player.Position.X;
+                p.PosY = p.Player.Position.Y;
+                p.PosZ = p.Player.Position.Z;
+                p.Vida = p.Player.Health;
+                p.Colete = p.Player.Armor;
+                p.Dimensao = p.Player.Dimension;
+                p.IPL = JsonConvert.SerializeObject(p.IPLs);
+                p.RotX = p.Player.Rotation.Roll;
+                p.RotY = p.Player.Rotation.Pitch;
+                p.RotZ = p.Player.Rotation.Yaw;
+                p.DataUltimoAcesso = DateTime.Now;
+                p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
+                p.InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas);
+                p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
+                p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
+                p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
+                p.InformacoesFerimentos = JsonConvert.SerializeObject(p.Ferimentos);
+                context.Personagens.Update(p);
 
-            p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
-            context.Usuarios.Update(p.UsuarioBD);
+                p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
+                context.Usuarios.Update(p.UsuarioBD);
 
-            context.SaveChanges();
+                await context.SaveChangesAsync();
+            });
         }
 
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)

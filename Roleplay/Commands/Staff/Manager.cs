@@ -2048,7 +2048,7 @@ namespace Roleplay.Commands.Staff
         }
 
         [Command("vip", "/vip (usuário) (nível) (meses)")]
-        public void CMD_vip(IPlayer player, int usuario, int nivelVip, int meses)
+        public void CMD_vip(IPlayer player, string usuario, int nivelVip, int meses)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.Usuario != 1)
@@ -2064,7 +2064,7 @@ namespace Roleplay.Commands.Staff
             }
 
             using var context = new DatabaseContext();
-            var user = context.Usuarios.FirstOrDefault(x => x.Codigo == usuario);
+            var user = context.Usuarios.FirstOrDefault(x => x.Nome.ToLower() == usuario.ToLower());
             if (user == null)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não existe.");
@@ -2080,7 +2080,7 @@ namespace Roleplay.Commands.Staff
             context.Usuarios.Update(user);
             context.SaveChanges();
 
-            var target = Global.PersonagensOnline.FirstOrDefault(x => x?.Usuario == usuario);
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x?.UsuarioBD?.Nome?.ToLower() == usuario.ToLower());
             if (target != null)
             {
                 target.UsuarioBD.VIP = user.VIP;
