@@ -3,7 +3,10 @@ using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Discord;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -13,6 +16,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
@@ -93,6 +97,9 @@ namespace Roleplay
             Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
             Global.VehicleInfos = JsonConvert.DeserializeObject<List<VehicleInfo>>(File.ReadAllText("vehicles.json"));
             Global.Development = config.Development;
+            Global.TokenBot = config.TokenBot;
+            Global.CanalAnuncios = config.CanalAnuncios;
+            Global.CanalAnunciosGovernamentais = config.CanalAnunciosGovernamentais;
 
             using (var context = new DatabaseContext())
             {
@@ -172,6 +179,35 @@ namespace Roleplay
                 WorkerSupportsCancellation = true
             };
             BackgroundWorkerSegundo.DoWork += BackgroundWorkerSegundo_DoWork;
+
+            MainAsync();
+        }
+
+        public async void MainAsync()
+        {
+            using var services = ConfigureServices();
+            Global.DiscordClient = services.GetRequiredService<DiscordSocketClient>();
+
+            Global.DiscordClient.Log += LogAsync;
+
+            await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.TokenBot);
+            await Global.DiscordClient.StartAsync();
+
+            await Task.Delay(System.Threading.Timeout.Infinite);
+        }
+
+        private Task LogAsync(LogMessage log)
+        {
+            Console.WriteLine(log.ToString());
+            return Task.CompletedTask;
+        }
+
+        private ServiceProvider ConfigureServices()
+        {
+            return new ServiceCollection()
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<HttpClient>()
+                .BuildServiceProvider();
         }
 
         private void BackgroundWorkerSegundo_DoWork(object sender, DoWorkEventArgs e)
@@ -219,7 +255,7 @@ namespace Roleplay
                         var valorImpostoVeiculo = 0;
 
                         using var context = new DatabaseContext();
-                        var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList();
+                        var veiculos = context.Veiculos.AsQueryable().Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList();
                         if (p.Propriedades.Count > 0 || veiculos.Count > 0)
                         {
                             foreach (var x in p.Propriedades)
@@ -327,6 +363,9 @@ namespace Roleplay
 
         private void OnPlayerLeaveVehicle(IVehicle vehicle, IPlayer player, byte seat)
         {
+            var p = Functions.ObterPersonagem(player);
+            p.StopAnimation();
+
             if (vehicle.Model == (uint)VehicleModel.Thruster)
             {
                 AltAsync.Do(async () =>
@@ -408,7 +447,7 @@ namespace Roleplay
             if (p?.Codigo > 0)
             {
                 foreach (var x in Global.PersonagensOnline.Where(x => x.Player.Dimension == player.Dimension && player.Position.Distance(x.Player.Position) <= 20))
-                    Functions.EnviarMensagem(player, TipoMensagem.Nenhum, $"(( {p.NomeIC} [{p.ID}] {{{Global.CorErro}}}{{#FFFFFF}} saiu do servidor. ))");
+                    Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"(( {p.NomeIC} [{p.ID}] saiu do servidor. ))");
 
                 if (p.PosicaoSpec.HasValue)
                     p.Unspectate();
@@ -692,7 +731,7 @@ namespace Roleplay
 
             using var context = new DatabaseContext();
             player.Emit("Server:ListarPersonagens", p.UsuarioBD.Nome,
-                JsonConvert.SerializeObject(context.Personagens
+                JsonConvert.SerializeObject(context.Personagens.AsQueryable()
                     .Where(x => x.Usuario == p.UsuarioBD.Codigo && x.StatusNamechange != TipoStatusNamechange.Realizado && !x.DataExclusao.HasValue)
                     .ToList()
                     .Select(x => new
@@ -1648,7 +1687,7 @@ namespace Roleplay
         private void EnviarEmailAlterarSenha(IPlayer player, string usuario, string email)
         {
             using var context = new DatabaseContext();
-            var user = context.Usuarios.Where(x => x.Nome.ToLower() == usuario.ToLower() && x.Email.ToLower() == email.ToLower()).FirstOrDefault();
+            var user = context.Usuarios.AsQueryable().Where(x => x.Nome.ToLower() == usuario.ToLower() && x.Email.ToLower() == email.ToLower()).FirstOrDefault();
             if (user != null)
             {
                 var senha = Functions.GerarStringAleatoria(10);
@@ -1988,7 +2027,7 @@ namespace Roleplay
             {
                 var html = string.Empty;
                 using var context = new DatabaseContext();
-                var per = await context.Personagens.FirstOrDefaultAsync(x => x.Nome.ToLower() == pesquisa.ToLower());
+                var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Nome.ToLower() == pesquisa.ToLower());
                 if (per == null)
                 {
                     html = $@"<div class='alert alert-danger'>Nenhuma pessoa foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
@@ -1997,16 +2036,16 @@ namespace Roleplay
                 {
                     var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
 
-                    var veiculos = await context.Veiculos.Where(x => x.Personagem == per.Codigo)
+                    var veiculos = await context.Veiculos.AsQueryable().Where(x => x.Personagem == per.Codigo)
                     .OrderByDescending(x => x.Codigo).ToListAsync();
 
-                    var multas = await context.Multas.Where(x => x.PersonagemMultado == per.Codigo)
+                    var multas = await context.Multas.AsQueryable().Where(x => x.PersonagemMultado == per.Codigo)
                         .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
 
-                    var prisoes = await context.Prisoes.Where(x => x.Preso == per.Codigo)
+                    var prisoes = await context.Prisoes.AsQueryable().Where(x => x.Preso == per.Codigo)
                         .Include(x => x.PolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
 
-                    var confiscos = await context.Confiscos.Where(x => x.Personagem == per.Codigo)
+                    var confiscos = await context.Confiscos.AsQueryable().Where(x => x.Personagem == per.Codigo)
                         .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
 
                     var emprego = Functions.ObterDisplayEnum(per.Emprego);
@@ -2017,7 +2056,7 @@ namespace Roleplay
                     var licencaMotorista = $"<span class='label' style='background-color:{Global.CorSucesso};'>VÁLIDA</span>";
                     if (per.PolicialRevogacaoLicencaMotorista > 0)
                     {
-                        var policial = await context.Personagens.FirstOrDefaultAsync(x => x.Codigo == per.PolicialRevogacaoLicencaMotorista);
+                        var policial = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == per.PolicialRevogacaoLicencaMotorista);
                         licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>REVOGADA POR {policial?.Nome?.ToUpper() ?? string.Empty}</span>";
                         botaoRevogarLicenca = string.Empty;
                     }
@@ -2035,7 +2074,7 @@ namespace Roleplay
                     var strBolo = string.Empty;
                     var botaoBolo = $@"<button onclick='adicionarBOLO(1, {per.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Adicionar APB</button>";
 
-                    var bolo = await context.Procurados.Where(x => x.Personagem == per.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
+                    var bolo = await context.Procurados.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
                     if (bolo != null)
                     {
                         botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Remover APB</button>";
@@ -2127,7 +2166,7 @@ namespace Roleplay
             {
                 var html = string.Empty;
                 using var context = new DatabaseContext();
-                var veh = await context.Veiculos.FirstOrDefaultAsync(x => x.Placa.ToLower() == pesquisa.ToLower());
+                var veh = await context.Veiculos.AsQueryable().FirstOrDefaultAsync(x => x.Placa.ToLower() == pesquisa.ToLower());
                 if (veh == null)
                 {
                     html = $@"<div class='alert alert-danger'>Nenhum veículo foi encontrado com a pesquisa <strong>{pesquisa}</strong>.</div>";
@@ -2140,10 +2179,10 @@ namespace Roleplay
                     if (veh.Personagem > 0)
                     {
                         botaoBolo = $@"<button onclick='adicionarBOLO(2, {veh.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Adicionar BOLO</button>";
-                        var per = await context.Personagens.FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
+                        var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
                         proprietario = per?.Nome ?? string.Empty;
 
-                        var bolo = await context.Procurados.Where(x => x.Veiculo == veh.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
+                        var bolo = await context.Procurados.AsQueryable().Where(x => x.Veiculo == veh.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
                         if (bolo != null)
                         {
                             botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Remover BOLO</button>";
@@ -2205,7 +2244,7 @@ namespace Roleplay
                     if (prop.Personagem > 0)
                     {
                         using var context = new DatabaseContext();
-                        var per = await context.Personagens.FirstOrDefaultAsync(x => x.Codigo == prop.Personagem);
+                        var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == prop.Personagem);
                         proprietario = per?.Nome ?? string.Empty;
                     }
 
@@ -2278,7 +2317,7 @@ namespace Roleplay
             {
                 var p = Functions.ObterPersonagem(player);
                 using var context = new DatabaseContext();
-                var bolo = await context.Procurados.FirstOrDefaultAsync(x => x.Codigo == codigo);
+                var bolo = await context.Procurados.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
                 bolo.PersonagemPolicialExclusao = p.Codigo;
                 bolo.DataExclusao = DateTime.Now;
                 context.Procurados.Update(bolo);
@@ -2365,7 +2404,7 @@ namespace Roleplay
                 if (target != null)
                     target.PolicialRevogacaoLicencaMotorista = p.Codigo;
 
-                var per = await context.Personagens.FirstOrDefaultAsync(x => x.Codigo == codigo);
+                var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
                 per.PolicialRevogacaoLicencaMotorista = p.Codigo;
                 context.Personagens.Update(per);
                 await context.SaveChangesAsync();

@@ -1,5 +1,6 @@
 ﻿using AltV.Net.Data;
 using AltV.Net.Enums;
+using Discord.WebSocket;
 using Roleplay.Entities;
 using Roleplay.Models;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace Roleplay
 
         public static List<Personagem> PersonagensOnline { get; set; } = new List<Personagem>();
 
-        public static List<Entities.Blip> Blips { get; set; }
+        public static List<Blip> Blips { get; set; }
 
         public static List<Faccao> Faccoes { get; set; }
 
@@ -724,5 +725,13 @@ namespace Roleplay
         public static List<VehicleInfo> VehicleInfos { get; set; } = new List<VehicleInfo>();
 
         public static bool Development { get; set; }
+
+        public static DiscordSocketClient DiscordClient { get; set; }
+
+        public static string TokenBot { get; set; } 
+
+        public static ulong CanalAnuncios { get; set; }
+
+        public static ulong CanalAnunciosGovernamentais { get; set; }
     }
 }

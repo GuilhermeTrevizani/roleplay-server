@@ -154,7 +154,7 @@ namespace Roleplay.Commands
         {
             var p = Functions.ObterPersonagem(player);
             using var context = new DatabaseContext();
-            var veiculos = context.Veiculos.Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList()
+            var veiculos = context.Veiculos.AsQueryable().Where(x => x.Personagem == p.Codigo && !x.VendidoFerroVelho).ToList()
                 .Select(x => new
                 {
                     x.Codigo,
@@ -268,7 +268,7 @@ namespace Roleplay.Commands
             veh.ValorApreensao = 0;
             context.Veiculos.Update(veh);
 
-            var apreensao = context.Apreensoes.Where(x => x.Veiculo == veh.Codigo).ToList().LastOrDefault();
+            var apreensao = context.Apreensoes.AsQueryable().Where(x => x.Veiculo == veh.Codigo).ToList().LastOrDefault();
             apreensao.DataPagamento = DateTime.Now;
             context.Apreensoes.Update(apreensao);
 
@@ -477,7 +477,7 @@ namespace Roleplay.Commands
             else
             {
                 using var context = new DatabaseContext();
-                var vehs = context.Veiculos.Where(x => x.Emprego == p.Emprego).ToList();
+                var vehs = context.Veiculos.AsQueryable().Where(x => x.Emprego == p.Emprego).ToList();
                 veh = vehs.FirstOrDefault(x => !Global.Veiculos.Any(y => y.Codigo == x.Codigo));
                 if (veh == null)
                 {

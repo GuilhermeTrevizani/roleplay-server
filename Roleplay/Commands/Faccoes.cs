@@ -2,6 +2,7 @@
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -483,6 +484,11 @@ namespace Roleplay.Commands
             }
 
             Functions.GravarLog(TipoLog.AnuncioGov, mensagem, p, null);
+
+            AltAsync.Do(async () =>
+            {
+                await (Global.DiscordClient.GetChannel(Global.CanalAnunciosGovernamentais) as SocketTextChannel).SendMessageAsync($"{p.FaccaoBD.Nome}: {mensagem}");
+            });
         }
 
         [Command("armario")]
@@ -577,7 +583,7 @@ namespace Roleplay.Commands
             }
 
             using var context = new DatabaseContext();
-            var veiculos = context.Veiculos.Where(x => x.Faccao == p.Faccao).ToList()
+            var veiculos = context.Veiculos.AsQueryable().Where(x => x.Faccao == p.Faccao).ToList()
                 .OrderBy(x => Convert.ToInt32(Global.Veiculos.Any(y => y.Codigo == x.Codigo))).ThenBy(x => x.Modelo).ThenBy(x => x.Placa)
                 .Select(x => new
                 {

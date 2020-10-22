@@ -381,7 +381,7 @@ namespace Roleplay.Entities
             AltAsync.Do(async () =>
             {
                 var context = new DatabaseContext();
-                var multas = await context.Multas.CountAsync(x => x.PersonagemMultado == Codigo && !x.DataPagamento.HasValue);
+                var multas = await context.Multas.AsQueryable().CountAsync(x => x.PersonagemMultado == Codigo && !x.DataPagamento.HasValue);
                 if (multas > 0)
                 {
                     var strMultas = multas > 1 ? "s" : string.Empty;
@@ -393,7 +393,7 @@ namespace Roleplay.Entities
         public void SetarFerido(bool temDelay)
         {
             if (temDelay || TipoFerido == 1)
-                Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos.");
+                Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos ou você perderá a consciência.");
             else if (TipoFerido == 2)
                 Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você perdeu a consciência.");
 

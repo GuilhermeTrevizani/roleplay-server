@@ -701,7 +701,7 @@ namespace Roleplay.Commands
             }
 
             using var context = new DatabaseContext();
-            var multas = context.Multas.Where(x => !x.DataPagamento.HasValue && x.PersonagemMultado == p.Codigo).OrderBy(x => x.Data).Select(x => new
+            var multas = context.Multas.AsQueryable().Where(x => !x.DataPagamento.HasValue && x.PersonagemMultado == p.Codigo).OrderBy(x => x.Data).Select(x => new
             {
                 x.Codigo,
                 x.Motivo,

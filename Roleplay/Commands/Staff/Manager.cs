@@ -498,7 +498,7 @@ namespace Roleplay.Commands.Staff
 
             using (var context = new DatabaseContext())
             {
-                var ranks = context.Ranks.Where(x => x.Faccao == fac).ToList();
+                var ranks = context.Ranks.AsQueryable().Where(x => x.Faccao == fac).ToList();
                 rank.Codigo = ranks.Count == 0 ? 1 : ranks.Max(x => x.Codigo) + 1;
                 context.Ranks.Add(rank);
                 context.SaveChanges();
