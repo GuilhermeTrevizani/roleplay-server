@@ -204,19 +204,19 @@ namespace Roleplay.Commands
             if (p == null)
                 return;
 
-            if (!Functions.ChecarAnimacoes(player))
+            if (!Functions.ChecarAnimacoes(player, somenteDentroVeiculo: true))
                 return;
 
             switch (tipo)
             {
                 case 1:
-                    p.PlayAnimation("amb@incar@male@patrol@ds@idle_b", "idle_d", (int)(AnimationFlags.Loop));
+                    p.PlayAnimation("amb@incar@male@patrol@ds@idle_b", "idle_d", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
                     break;
                 case 2:
-                    p.PlayAnimation("amb@incar@male@patrol@ds@base", "base", (int)(AnimationFlags.Loop));
+                    p.PlayAnimation("amb@incar@male@patrol@ds@base", "base", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
                     break;
                 case 3:
-                    p.PlayAnimation("amb@incar@male@patrol@ps@idle_a", "idle_a", (int)(AnimationFlags.Loop));
+                    p.PlayAnimation("amb@incar@male@patrol@ps@idle_a", "idle_a", (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl));
                     break;
                 default:
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tipo deve ser entre 1 e 3.");
