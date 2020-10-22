@@ -431,7 +431,7 @@ namespace Roleplay.Entities
                     return;
                 }
 
-                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitartratamento para que você receba os cuidados dos médicos.");
+                Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarhospital para que você receba os cuidados dos médicos e seja levado ao hospital.");
                 Functions.EnviarMensagem(p.Player, TipoMensagem.Erro, "Digite /aceitarck para aplicar CK no seu personagem. ESSA OPERAÇÃO É IRREVERSÍVEL.");
                 timer?.Stop();
             };

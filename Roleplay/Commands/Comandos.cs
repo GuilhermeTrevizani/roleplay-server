@@ -39,7 +39,7 @@ namespace Roleplay.Commands
                 new Comando("Geral", "/staff", "Lista os membros da staff que estão online"),
                 new Comando("Geral", "/sos", "Envia solicitação de ajuda aos administradores em serviço"),
                 new Comando("Geral", "/ferimentos", "Visualiza os ferimentos de um personagem"),
-                new Comando("Geral", "/aceitartratamento", "Aceita o tratamento médico após estar ferido e é levado ao hospital"),
+                new Comando("Geral", "/aceitarhospital", "Aceita o tratamento médico após estar ferido e é levado ao hospital"),
                 new Comando("Geral", "/aceitarck", "Aceita o CK no personagem"),
                 new Comando("Geral", "/trancar", "Traca/destranca propriedades e veículos"),
                 new Comando("Geral", "/entregararma", "Entrega uma arma para um personagem"),
@@ -986,8 +986,8 @@ namespace Roleplay.Commands
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.NomeIC}", html));
         }
 
-        [Command("aceitartratamento")]
-        public void CMD_aceitartratamento(IPlayer player)
+        [Command("aceitarhospital")]
+        public void CMD_aceitarhospital(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.TimerFerido == null)
