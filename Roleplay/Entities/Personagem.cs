@@ -286,25 +286,9 @@ namespace Roleplay.Entities
             }
         }
 
-        public void PlayAnimation(string dic, string name, int flag)
-        {
-            AltAsync.Do(async () =>
-            {
-                await Player.EmitAsync("Server:PlayAnim", dic, name, flag);
-                //await Player.SetSyncedMetaDataAsync("animation_dic", dic);
-                //await Player.SetSyncedMetaDataAsync("animation_name", name);
-                //await Player.SetSyncedMetaDataAsync("animation_flag", flag);
-            });
-        }
+        public void PlayAnimation(string dic, string name, int flag) => Player.Emit("Server:PlayAnim", dic, name, flag);
 
-        public void StopAnimation()
-        {
-            AltAsync.Do(async () =>
-            {
-                //await Player.SetSyncedMetaDataAsync("animation_dic", string.Empty);
-                await Player.EmitAsync("Server:StopAnim");
-            });
-        }
+        public void StopAnimation() => Player.Emit("Server:StopAnim");
 
         public void SetPosition(Position position, bool spawn)
         {

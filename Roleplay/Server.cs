@@ -84,7 +84,6 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("MDCRastrear911", MDCRastrear911);
             Alt.OnClient<IPlayer, int, string, int, string, string>("MDCMultar", MDCMultar);
             Alt.OnClient<IPlayer, int>("MDCRevogarLicencaMotorista", MDCRevogarLicencaMotorista);
-            Alt.OnClient<IPlayer>("StopAnimation", StopAnimation);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -2371,12 +2370,6 @@ namespace Roleplay
                 context.Personagens.Update(per);
                 await context.SaveChangesAsync();
             });
-        }
-
-        private void StopAnimation(IPlayer player)
-        {
-            var p = Functions.ObterPersonagem(player);
-            p.StopAnimation();
         }
         #endregion
     }
