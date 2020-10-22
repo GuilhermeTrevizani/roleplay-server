@@ -447,7 +447,7 @@ namespace Roleplay
             if (p?.Codigo > 0)
             {
                 foreach (var x in Global.PersonagensOnline.Where(x => x.Player.Dimension == player.Dimension && player.Position.Distance(x.Player.Position) <= 20))
-                    Functions.EnviarMensagem(x.Player, TipoMensagem.Nenhum, $"(( {p.NomeIC} [{p.ID}] saiu do servidor. ))");
+                    Functions.EnviarMensagem(x.Player, TipoMensagem.Erro, $"(( {p.NomeIC} [{p.ID}] saiu do servidor. ))");
 
                 if (p.PosicaoSpec.HasValue)
                     p.Unspectate();

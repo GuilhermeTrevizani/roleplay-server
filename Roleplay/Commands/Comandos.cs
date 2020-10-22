@@ -1008,8 +1008,11 @@ namespace Roleplay.Commands
             foreach (var x in p.Armas)
                 player.Emit("RemoveWeapon", x.Codigo);
             p.Armas = new List<Personagem.Arma>();
-            p.SetPosition(new Position(298.16702f, -584.2286f, 43.24829f), true);
 
+            foreach (var x in Global.PersonagensOnline.Where(x => x.Player.Dimension == player.Dimension && player.Position.Distance(x.Player.Position) <= 20))
+                Functions.EnviarMensagem(x.Player, TipoMensagem.Erro, $"(( {p.NomeIC} [{p.ID}] aceitou tratamento no hospital. ))");
+
+            p.SetPosition(new Position(298.16702f, -584.2286f, 43.24829f), true);
             p.Banco -= Global.Parametros.ValorCustosHospitalares;
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você aceitou o tratamento e foi levado para o hospital. Os custos hospitalares foram ${Global.Parametros.ValorCustosHospitalares:N0}.");
         }
