@@ -1,5 +1,4 @@
 ﻿using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -717,10 +716,6 @@ namespace Roleplay
         };
 
         public static List<Ligacao911> Ligacoes911 { get; set; } = new List<Ligacao911>();
-
-        public static List<IVoiceChannel> TACVoice { get; set; }
-
-        public static IVoiceChannel GlobalVoice { get; set; }
 
         public static List<ArmarioComponente> ArmariosComponentes { get; set; } = new List<ArmarioComponente>();
 
