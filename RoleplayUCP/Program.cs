@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Roleplay;
+using Roleplay.Models;
+using System.IO;
 
 namespace RoleplayUCP
 {
@@ -13,6 +11,8 @@ namespace RoleplayUCP
     {
         public static void Main(string[] args)
         {
+            var config = JsonConvert.DeserializeObject<Configuracao>(File.ReadAllText("settings.json"));
+            Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
             CreateHostBuilder(args).Build().Run();
         }
 

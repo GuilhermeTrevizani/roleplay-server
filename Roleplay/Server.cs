@@ -84,7 +84,7 @@ namespace Roleplay
             Alt.OnClient<IPlayer, int>("MDCRastrear911", MDCRastrear911);
             Alt.OnClient<IPlayer, int, string, int, string, string>("MDCMultar", MDCMultar);
             Alt.OnClient<IPlayer, int>("MDCRevogarLicencaMotorista", MDCRevogarLicencaMotorista);
-            Alt.OnClient<IPlayer, string>("PesquisarLogs", PesquisarLogs);
+            Alt.OnClient<IPlayer>("StopAnimation", StopAnimation);
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
@@ -159,17 +159,6 @@ namespace Roleplay
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
             Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
-
-            Global.TACVoice = new List<IVoiceChannel>
-            {
-                Alt.CreateVoiceChannel(false, 0),
-                Alt.CreateVoiceChannel(false, 0),
-                Alt.CreateVoiceChannel(false, 0),
-                Alt.CreateVoiceChannel(false, 0),
-                Alt.CreateVoiceChannel(false, 0),
-            };
-
-            Global.GlobalVoice = Alt.CreateVoiceChannel(true, 10);
 
             TimerSegundo = new Timer(1000);
             TimerSegundo.Elapsed += TimerSegundo_Elapsed;
@@ -444,12 +433,6 @@ namespace Roleplay
             Functions.GravarLog(TipoLog.Morte, JsonConvert.SerializeObject(p.Ferimentos), p,
                 killer is IPlayer playerKiller ? Functions.ObterPersonagem(playerKiller) : null);
 
-            foreach (var x in Global.TACVoice)
-                if (x.HasPlayer(player))
-                    x.RemovePlayer(player);
-
-            Global.GlobalVoice.MutePlayer(player);
-
             p.SetarFerido(true);
         }
 
@@ -571,6 +554,9 @@ namespace Roleplay
                 return false;
             }
 
+            if (!p.Algemado)
+                p.StopAnimation();
+
             var attacker = Functions.ObterPersonagem(player);
 
             p.Ferimentos.Add(new Personagem.Ferimento()
@@ -605,6 +591,8 @@ namespace Roleplay
                 }
                 return;
             }
+
+            p.StopAnimation();
 
             var ferimento = new Personagem.Ferimento()
             {
@@ -2385,9 +2373,10 @@ namespace Roleplay
             });
         }
 
-        private void PesquisarLogs(IPlayer player, string pesquisa)
+        private void StopAnimation(IPlayer player)
         {
-
+            var p = Functions.ObterPersonagem(player);
+            p.StopAnimation();
         }
         #endregion
     }

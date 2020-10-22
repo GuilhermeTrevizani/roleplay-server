@@ -48,6 +48,8 @@ namespace Roleplay.Models
 
     public enum TipoLog
     {
+        Todos = 0,
+
         Staff = 1,
 
         [Display(Name = "Líder Facção")]
@@ -89,6 +91,12 @@ namespace Roleplay.Models
 
         [Display(Name = "Falha Esqueci Minha Senha")]
         EsqueciMinhaSenhaFalha = 16,
+
+        [Display(Name = "Entrada UCP")]
+        EntradaUCP = 17,
+
+        [Display(Name = "Falha Login UCP")]
+        LoginFalhaUCP = 18,
     }
 
     public enum TipoConvite

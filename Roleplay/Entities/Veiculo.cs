@@ -101,7 +101,7 @@ namespace Roleplay.Entities
             {
                 switch (Modelo.ToUpper())
                 {
-                    case "PULICE":
+                    case "POLICE":
                         if (Livery == 1)
                             return "489-02";
                         else if (Livery == 2)
@@ -111,7 +111,7 @@ namespace Roleplay.Entities
                         else if (Livery == 4)
                             return "811-25";
                         break;
-                    case "PULICE2":
+                    case "POLICE2":
                         if (Livery == 1)
                             return "180-02";
                         else if (Livery == 2)
@@ -121,7 +121,7 @@ namespace Roleplay.Entities
                         else if (Livery == 4)
                             return "466-25";
                         break;
-                    case "PULICE3":
+                    case "POLICE3":
                         if (Livery == 1)
                             return "507-02";
                         else if (Livery == 2)

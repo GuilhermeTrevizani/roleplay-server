@@ -290,7 +290,6 @@ namespace Roleplay.Commands
                     new Comando("Lead Administrator", "/unck", "Remove CK de um personagem"),
                     new Comando("Lead Administrator", "/limparchatgeral", "Limpa o chat de todos os personagens"),
                     new Comando("Lead Administrator", "/areparar", "Conserta um veículo"),
-                    new Comando("Lead Administrator", "/logs", "Consulta os logs do servidor"),
                 });
 
             if ((int)p.UsuarioBD.Staff >= (int)TipoStaff.Manager)
@@ -873,7 +872,8 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var html = $@"<table class='table table-bordered table-striped'>
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+            <table class='table table-bordered table-striped'>
                 <thead>
                     <tr class='bg-dark'>
                         <th>Rank</th>
@@ -889,7 +889,7 @@ namespace Roleplay.Commands
                 html += $@"<tr><td>{Functions.ObterDisplayEnum(x.UsuarioBD.Staff)}</td><td>{x.UsuarioBD.Nome}</td><td class='text-center'>{status}</td></tr>";
             }
 
-            html += $@"</tbody></table>";
+            html += $@"</tbody></table></div>";
 
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • Staff Online", html));
         }

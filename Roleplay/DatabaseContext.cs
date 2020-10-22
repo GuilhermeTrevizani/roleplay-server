@@ -35,6 +35,7 @@ namespace Roleplay
         // Não representam tabelas exatas no banco de dados
         public DbSet<PunicaoAdministrativa> PunicoesAdministrativas { get; set; }
         public DbSet<ProcuradoInfo> ProcuradosInfos { get; set; }
+        public DbSet<LogInfo> LogsInfos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,6 +74,7 @@ namespace Roleplay
             // Não representam tabelas exatas no banco de dados
             modelBuilder.Entity<PunicaoAdministrativa>().HasKey(x => x.Codigo);
             modelBuilder.Entity<ProcuradoInfo>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<LogInfo>().HasKey(x => x.Codigo);
         }
     }
 }

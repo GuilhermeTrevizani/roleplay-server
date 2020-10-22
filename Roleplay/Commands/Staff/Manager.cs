@@ -434,6 +434,7 @@ namespace Roleplay.Commands.Staff
             }
 
             var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise as facções...' /><br/>
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
             <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
@@ -453,7 +454,8 @@ namespace Roleplay.Commands.Staff
 
             html += $@"
                 </tbody>
-            </table>";
+            </table>
+            </div>";
 
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • Faccções", html));
         }
@@ -601,6 +603,7 @@ namespace Roleplay.Commands.Staff
             }
 
             var html = $@"<input id='pesquisa' type='text' autofocus class='form-control' placeholder='Pesquise os ranks...' /><br/>
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
             <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
@@ -616,7 +619,8 @@ namespace Roleplay.Commands.Staff
 
             html += $@"
                 </tbody>
-            </table>";
+            </table>
+            </div>";
 
             player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{faction.Nome} • Ranks", html));
         }

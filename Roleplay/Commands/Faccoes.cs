@@ -239,7 +239,7 @@ namespace Roleplay.Commands
         public void CMD_duty(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (!(p?.FaccaoBD?.Tipo != TipoFaccao.Criminosa) && p?.Emprego == 0)
+            if ((p.Faccao == 0 || p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa) && p.Emprego == TipoEmprego.Nenhum)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada e não possui um emprego.");
                 return;
@@ -563,7 +563,7 @@ namespace Roleplay.Commands
         public void CMD_fspawn(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
+            if (p.Faccao == 0 || p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;
@@ -774,60 +774,6 @@ namespace Roleplay.Commands
             });
         }
 
-        [Command("tac", "/tac (canal [0-5])", Alias = "t")]
-        public void CMD_tac(IPlayer player, int canal)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo != TipoFaccao.Policial || !p.EmTrabalho)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção policial ou não está em serviço.");
-                return;
-            }
-
-            if (canal < 0 || canal > 5)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Canal deve ser entre 0 e 5.");
-                return;
-            }
-
-            if (p.TimerFerido != null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está gravamente ferido.");
-                return;
-            }
-
-            if (canal == 0)
-            {
-                foreach (var x in Global.TACVoice)
-                    if (x.HasPlayer(player))
-                        x.RemovePlayer(player);
-
-                Global.GlobalVoice.MutePlayer(player);
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você saiu do TAC.", notify: true);
-                return;
-            }
-
-            foreach (var x in Global.TACVoice)
-            {
-                if (x.HasPlayer(player))
-                {
-                    if (canal == Global.TACVoice.IndexOf(x) + 1)
-                    {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você já está no TAC {canal}.");
-                        return;
-                    }
-                    else
-                    {
-                        x.RemovePlayer(player);
-                    }
-                }
-            }
-
-            Global.TACVoice[canal - 1].AddPlayer(player);
-            Global.GlobalVoice.UnmutePlayer(player);
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você entrou no TAC {canal}.", notify: true);
-        }
-
         [Command("confiscar", "/confiscar (ID ou nome)")]
         public void CMD_confiscar(IPlayer player, string idNome)
         {
@@ -943,7 +889,7 @@ namespace Roleplay.Commands
         public void CMD_freparar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
+            if (p.Faccao == 0 || p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;
@@ -1038,7 +984,7 @@ namespace Roleplay.Commands
             }
 
             var p = Functions.ObterPersonagem(player);
-            if (p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
+            if (p.Faccao == 0 || p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está em uma facção habilitada ou não está em serviço.");
                 return;

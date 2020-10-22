@@ -288,14 +288,22 @@ namespace Roleplay.Entities
 
         public void PlayAnimation(string dic, string name, int flag)
         {
-            Player.Emit("Server:PlayAnim", dic, name, flag);
-            Player.SetSyncedMetaData("animation", true);
+            AltAsync.Do(async () =>
+            {
+                await Player.EmitAsync("Server:PlayAnim", dic, name, flag);
+                //await Player.SetSyncedMetaDataAsync("animation_dic", dic);
+                //await Player.SetSyncedMetaDataAsync("animation_name", name);
+                //await Player.SetSyncedMetaDataAsync("animation_flag", flag);
+            });
         }
 
         public void StopAnimation()
         {
-            Player.Emit("Server:StopAnim");
-            Player.SetSyncedMetaData("animation", false);
+            AltAsync.Do(async () =>
+            {
+                //await Player.SetSyncedMetaDataAsync("animation_dic", string.Empty);
+                await Player.EmitAsync("Server:StopAnim");
+            });
         }
 
         public void SetPosition(Position position, bool spawn)
@@ -378,8 +386,6 @@ namespace Roleplay.Entities
             SetPosition(new Position(PosX, PosY, PosZ), true);
             Player.Rotation = new Position(RotX, RotY, RotZ);
             Player.SetSyncedMetaData("id", ID);
-            Global.GlobalVoice.AddPlayer(Player);
-            Global.GlobalVoice.MutePlayer(Player);
             DataUltimoAcesso = DateTime.Now;
             Player.Emit("Server:setArtificialLightsState", Global.Parametros.Blackout);
             Player.Health = (ushort)Vida;
@@ -407,6 +413,7 @@ namespace Roleplay.Entities
             else if (TipoFerido == 2)
                 Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você perdeu a consciência.");
 
+            Algemado = false;
             TimerFerido?.Stop();
             TimerFerido = new TagTimer(300000)
             {
@@ -444,7 +451,6 @@ namespace Roleplay.Entities
                     }
 
                     StopAnimation();
-                    PlayAnimation("misslamar1dead_body", "dead_idle", (int)AnimationFlags.Loop);
                     await Player.EmitAsync("Server:ToggleFerido", TipoFerido);
                     Player.SetSyncedMetaData("ferido", TipoFerido);
                 }

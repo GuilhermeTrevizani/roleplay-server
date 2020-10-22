@@ -199,7 +199,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            if (p.Dimensao > 0)
+            if (player.Dimension > 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não é possível usar esse comando em um interior.");
                 return;

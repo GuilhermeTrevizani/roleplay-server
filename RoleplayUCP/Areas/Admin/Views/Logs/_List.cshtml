@@ -1,0 +1,31 @@
+﻿@model List<Roleplay.Entities.LogInfo>
+
+@if (Model.Count == 0)
+{
+    <tr>
+        <td colspan="13" class="text-center">
+            Nenhum log encontrado.
+        </td>
+    </tr>
+}
+else
+{
+    foreach (var x in Model)
+    {
+        <tr>
+            <td>@x.Tipo</td>
+            <td>@x.Data</td>
+            <td>@x.Descricao</td>
+            <td>@x.PersonagemOrigem</td>
+            <td>@x.IPOrigem</td>
+            <td>@x.SocialClubOrigem</td>
+            <td>@x.HardwareIdHashOrigem</td>
+            <td>@x.HardwareIdExHashOrigem</td>
+            <td>@x.PersonagemDestino</td>
+            <td>@x.IPDestino</td>
+            <td>@x.SocialClubDestino</td>
+            <td>@x.HardwareIdHashDestino</td>
+            <td>@x.HardwareIdExHashDestino</td>
+        </tr>
+    }
+}
