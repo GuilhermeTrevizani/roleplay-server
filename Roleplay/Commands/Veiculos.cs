@@ -141,6 +141,7 @@ namespace Roleplay.Commands
                     return;
                 }
 
+                veh.Combustivel = veh.TanqueCombustivel;
                 veh.Despawnar();
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você estacionou o veículo.", notify: true);
                 return;
