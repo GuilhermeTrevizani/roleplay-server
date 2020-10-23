@@ -35,6 +35,12 @@ namespace Roleplay.Commands
                 return;
             }
 
+            if (veh?.Info?.Class == "CYCLE")
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não possui motor.");
+                return;
+            }
+
             Functions.SendMessageToNearbyPlayers(player, $"{(player.Vehicle.EngineOn ? "des" : string.Empty)}liga o motor do veículo.", TipoMensagemJogo.Ame, 5);
             player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, !player.Vehicle.EngineOn);
         }

@@ -400,6 +400,11 @@ namespace Roleplay
                         Functions.EnviarMensagem(player, TipoMensagem.Erro, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora.");
                 }
             }
+            else
+            {
+                if (veh.Info?.Class == "CYCLE")
+                    player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, true);
+            }
 
             if (veh.Emprego != TipoEmprego.Nenhum && veh.NomeEncarregado == p.Nome && veh.DataExpiracaoAluguel.HasValue)
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O aluguel do veículo irá expirar em {veh.DataExpiracaoAluguel}.");
