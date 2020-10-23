@@ -77,6 +77,7 @@ namespace Roleplay.Entities
         public int PagamentoExtra { get; set; } = 0;
         public string InformacoesFerimentos { get; set; } = "[]";
         public int TipoFerido { get; set; } = 0;
+        public int UsuarioStaffAvaliando { get; set; } = 0;
 
         [NotMapped]
         public Personalizacao PersonalizacaoDados { get; set; } = new Personalizacao();

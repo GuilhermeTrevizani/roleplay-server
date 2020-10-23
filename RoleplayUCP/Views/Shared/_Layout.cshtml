@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/css/icons.min.css" />
     <link rel="stylesheet" href="~/css/app.css" />
     <link rel="stylesheet" href="~/css/vendor/dataTables.bootstrap4.css" />
+    <link rel="stylesheet" href="~/css/vendor/jquery-confirm.css" />
     <link rel="stylesheet" href="~/css/toastr.min.css" />
 </head>
 <body class="loading" data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false,"leftSidebarCondensed":false,"leftSidebarScrollable":false,"darkMode":false,"showRightSidebarOnStart": true}'>
@@ -34,6 +35,17 @@
                             <span class="text-white-50"> Início</span>
                         </a>
                     </li>
+
+                    @if ((int)tipo >= (int)Roleplay.Models.TipoStaff.Moderator)
+                    {
+                        <li class="side-nav-title side-nav-item text-white-50">Moderator</li>
+                        <li class="side-nav-item">
+                            <a asp-area="Admin" asp-controller="AplicacoesPersonagens" asp-action="Index" class="side-nav-link">
+                                <i class="mdi mdi-account text-white-50"></i>
+                                <span class="text-white-50"> Aplicações de Personagens </span>
+                            </a>
+                        </li>
+                    }
 
                     @if ((int)tipo >= (int)Roleplay.Models.TipoStaff.LeadAdministrator)
                     {
@@ -98,6 +110,7 @@
     <script src="~/js/vendor/jquery.dataTables.min.js"></script>
     <script src="~/js/vendor/dataTables.bootstrap4.js"></script>
     <script src="~/js/vendor/loadingoverlay.min.js"></script>
+    <script src="~/js/vendor/jquery-confirm.js"></script>
     <script src="~/js/toastr.min.js"></script>
     <script src="~/js/segundavida.js"></script>
     @RenderSection("Scripts", required: false)
