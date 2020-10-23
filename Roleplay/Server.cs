@@ -1787,7 +1787,7 @@ namespace Roleplay
 
             var combustivelNecessario = veh.TanqueCombustivel - veh.Combustivel;
             var valor = combustivelNecessario * Global.Parametros.ValorCombustivel;
-            if (valor > p.Dinheiro)
+            if (valor > p.Dinheiro && veh.Faccao > 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
                 return;
@@ -1800,9 +1800,16 @@ namespace Roleplay
                 await Task.Delay(5000);
                 veh.Combustivel = veh.TanqueCombustivel;
                 veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
-                p.Dinheiro -= valor;
-                p.SetDinheiro();
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+                if (veh.Faccao == 0)
+                {
+                    p.Dinheiro -= valor;
+                    p.SetDinheiro();
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+                }
+                else
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível.");
+                }
                 Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
                 player.Emit("Server:freezeEntityPosition", false);
             });
