@@ -230,23 +230,27 @@ namespace Roleplay
                         var porcentagemImpostoPropriedade = 0.0015M;
                         var porcentagemImpostoVeiculo = 0.001M;
                         var porcentagemPoupanca = 0.001M;
-                        switch (p.UsuarioBD.VIP)
+
+                        if ((p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) >= DateTime.Now)
                         {
-                            case TipoVIP.Bronze:
-                                porcentagemImpostoPropriedade = 0.0013M;
-                                porcentagemImpostoVeiculo = 0.0007M;
-                                porcentagemPoupanca = 0.00125M;
-                                break;
-                            case TipoVIP.Prata:
-                                porcentagemImpostoPropriedade = 0.001M;
-                                porcentagemImpostoVeiculo = 0.0005M;
-                                porcentagemPoupanca = 0.00150M;
-                                break;
-                            case TipoVIP.Ouro:
-                                porcentagemImpostoPropriedade = 0.0008M;
-                                porcentagemImpostoVeiculo = 0.0003M;
-                                porcentagemPoupanca = 0.00175M;
-                                break;
+                            switch (p.UsuarioBD.VIP)
+                            {
+                                case TipoVIP.Bronze:
+                                    porcentagemImpostoPropriedade = 0.0013M;
+                                    porcentagemImpostoVeiculo = 0.0007M;
+                                    porcentagemPoupanca = 0.00125M;
+                                    break;
+                                case TipoVIP.Prata:
+                                    porcentagemImpostoPropriedade = 0.001M;
+                                    porcentagemImpostoVeiculo = 0.0005M;
+                                    porcentagemPoupanca = 0.00150M;
+                                    break;
+                                case TipoVIP.Ouro:
+                                    porcentagemImpostoPropriedade = 0.0008M;
+                                    porcentagemImpostoVeiculo = 0.0003M;
+                                    porcentagemPoupanca = 0.00175M;
+                                    break;
+                            }
                         }
 
                         var salario = 0;
@@ -718,9 +722,12 @@ namespace Roleplay
         {
             var p = Functions.ObterPersonagem(player);
 
-            static int ObterSlots(TipoVIP vip)
+            static int ObterSlots(Usuario u)
             {
-                return vip switch
+                if ((u.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
+                    return 2;
+
+                return u.VIP switch
                 {
                     TipoVIP.Bronze => 3,
                     TipoVIP.Prata => 4,
@@ -741,7 +748,7 @@ namespace Roleplay
                         Status = ObterStatusListarPersonagens(x),
                         Opcoes = ObterOpcoesListarPersonagens(x, p.UsuarioBD),
                     })),
-                    ObterSlots(p.UsuarioBD.VIP));
+                    ObterSlots(p.UsuarioBD));
         }
 
         private string ObterStatusListarPersonagens(Personagem x)
@@ -1119,7 +1126,7 @@ namespace Roleplay
             }
 
             var restricao = Functions.VerificarRestricaoVeiculo(veiculo);
-            if (restricao.Item2 > p.UsuarioBD.VIP)
+            if (restricao.Item2 > p.UsuarioBD.VIP || (p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O veículo é restrito para VIP {restricao.Item2}.", notify: true);
                 return;

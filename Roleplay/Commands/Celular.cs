@@ -186,10 +186,13 @@ namespace Roleplay.Commands
             }
 
             var segundos = 120;
-            if (p.UsuarioBD.VIP == TipoVIP.Ouro)
-                segundos = 30;
-            else if (p.UsuarioBD.VIP == TipoVIP.Prata)
-                segundos = 60;
+            if ((p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) >= DateTime.Now)
+            {
+                if (p.UsuarioBD.VIP == TipoVIP.Ouro)
+                    segundos = 30;
+                else if (p.UsuarioBD.VIP == TipoVIP.Prata)
+                    segundos = 60;
+            }
 
             var cooldown = (p.DataUltimoUsoAnuncio ?? DateTime.MinValue).AddSeconds(segundos);
             if (cooldown > DateTime.Now)

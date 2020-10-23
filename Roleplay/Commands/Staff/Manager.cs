@@ -2077,8 +2077,6 @@ namespace Roleplay.Commands.Staff
             user.PossuiNamechange = user.PossuiNamechangeForum = true;
             if (vip == TipoVIP.Prata || vip == TipoVIP.Ouro)
                 user.PossuiPlateChange = true;
-            context.Usuarios.Update(user);
-            context.SaveChanges();
 
             var target = Global.PersonagensOnline.FirstOrDefault(x => x?.UsuarioBD?.Nome?.ToLower() == usuario.ToLower());
             if (target != null)
@@ -2089,6 +2087,11 @@ namespace Roleplay.Commands.Staff
                 target.UsuarioBD.PossuiNamechangeForum = user.PossuiNamechangeForum;
                 target.UsuarioBD.PossuiPlateChange = user.PossuiPlateChange;
                 Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou seu nível VIP para {vip} expirando em {user.DataExpiracaoVIP}.");
+            }
+            else
+            {
+                context.Usuarios.Update(user);
+                context.SaveChanges();
             }
 
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou o nível VIP de {user.Nome} para {vip} expirando em {user.DataExpiracaoVIP}.");
@@ -2322,6 +2325,42 @@ namespace Roleplay.Commands.Staff
             Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} setou ${valor:N0} para você.");
 
             Functions.GravarLog(TipoLog.Staff, $"/dinheiro {valor}", p, target);
+        }
+
+        [Command("contentcreator", "/contentcreator (usuário)")]
+        public void CMD_contentcreator(IPlayer player, string usuario)
+        {
+            var p = Functions.ObterPersonagem(player);
+            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Manager)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                return;
+            }
+
+            using var context = new DatabaseContext();
+            var user = context.Usuarios.FirstOrDefault(x => x.Nome.ToLower() == usuario.ToLower());
+            if (user == null)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não existe.");
+                return;
+            }
+
+            user.ContentCreator = !user.ContentCreator;
+
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x?.UsuarioBD?.Nome?.ToLower() == usuario.ToLower());
+            if (target != null)
+            {
+                target.UsuarioBD.ContentCreator = user.ContentCreator;
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} {(user.ContentCreator ? "adicionou" : "removeu")} você como criador de conteúdo.");
+            }
+            else
+            {
+                context.Usuarios.Update(user);
+                context.SaveChanges();
+            }
+
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(user.ContentCreator ? "adicionou" : "removeu")} {user.Nome} como criador de conteúdo.");
+            Functions.GravarLog(TipoLog.Staff, $"/contentcreator {usuario}", p, null);
         }
     }
 }

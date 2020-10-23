@@ -209,6 +209,9 @@ namespace Roleplay.Entities
             get
             {
                 var slots = Roupas.Where(x => x.Drawable != 0).GroupBy(x => x.ID).Count();
+                if ((UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
+                    return slots > 2 ? slots : 2;
+
                 return UsuarioBD.VIP switch
                 {
                     TipoVIP.Bronze => 6,
@@ -360,9 +363,14 @@ namespace Roleplay.Entities
         public void Spawnar()
         {
             Player.Dimension = (int)Dimensao;
+
             Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Olá {{{Global.CorPrincipal}}}{UsuarioBD.Nome}{{#FFFFFF}}, que bom te ver por aqui! Seu último login foi em {{{Global.CorPrincipal}}}{DataUltimoAcesso}{{#FFFFFF}}.");
+
             if (UsuarioBD.DataExpiracaoVIP.HasValue)
                 Functions.EnviarMensagem(Player, TipoMensagem.Nenhum, $"Seu {{{Global.CorPrincipal}}}VIP {UsuarioBD.VIP}{{#FFFFFF}} {(UsuarioBD.DataExpiracaoVIP.Value < DateTime.Now ? "expirou" : "expira")} em {{{Global.CorPrincipal}}}{UsuarioBD.DataExpiracaoVIP.Value}{{#FFFFFF}}.");
+            else if ((UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
+                UsuarioBD.TogPM = false;
+
             SetNametag();
             Player.Emit("nametags:Config", true);
             Player.Emit("chat:activateTimeStamp", UsuarioBD.TimeStamp);

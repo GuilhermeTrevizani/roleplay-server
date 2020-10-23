@@ -37,5 +37,6 @@ namespace Roleplay.Entities
         public bool TogChatFaccao { get; set; } = false;
         public bool PossuiPlateChange { get; set; } = false;
         public bool TogAnuncio { get; set; } = false;
+        public bool ContentCreator { get; set; } = false;
     }
 }

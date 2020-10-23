@@ -396,7 +396,7 @@ namespace Roleplay
 
         public static void MostrarStats(IPlayer player, Personagem p)
         {
-            var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong><br/>
+            var html = $@"OOC: <strong>{p.UsuarioBD.Nome} [{p.UsuarioBD.Codigo}]</strong> | Registro: <strong>{p.DataRegistro}</strong> | VIP: <strong>{p.UsuarioBD.VIP} {(p.UsuarioBD.DataExpiracaoVIP.HasValue ? $"- {(p.UsuarioBD.DataExpiracaoVIP < DateTime.Now ? "Expirado" : "Expira")} em {p.UsuarioBD.DataExpiracaoVIP}" : string.Empty)}</strong> | Criador de Conteúdo: <strong>{(p.UsuarioBD.ContentCreator ? "SIM" : "NÃO")}</strong><br/>
             Tempo Conectado (minutos): <strong>{p.TempoConectado}</strong> | Emprego: <strong>{ObterDisplayEnum(p.Emprego)}</strong> | Troca de Nome: <strong>{(p.UsuarioBD.PossuiNamechange ? "SIM" : "NÃO")} {(p.StatusNamechange == TipoStatusNamechange.Bloqueado ? "(BLOQUEADO)" : string.Empty)}</strong> | Troca de Nome Fórum: <strong>{(p.UsuarioBD.PossuiNamechangeForum ? "SIM" : "NÃO")}</strong> | Troca de Placa: <strong>{(p.UsuarioBD.PossuiPlateChange ? "SIM" : "NÃO")}</strong><br/>
             Dinheiro: <strong>${p.Dinheiro:N0}</strong> | Banco: <strong>${p.Banco:N0}</strong> | Poupança: <strong>${p.Poupanca:N0}</strong> | Peças Veiculares: <strong>{p.PecasVeiculares:N0}</strong> | Máscara: <strong>{p.Mascara}</strong><br/>";
 

@@ -205,7 +205,7 @@ namespace Roleplay.Commands
             }
 
             var restricao = Functions.VerificarRestricaoVeiculo(prox.Modelo);
-            if (restricao.Item2 > target.UsuarioBD.VIP)
+            if (restricao.Item2 > target.UsuarioBD.VIP || (target.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O veículo é restrito para VIP {restricao.Item2}.");
                 return;

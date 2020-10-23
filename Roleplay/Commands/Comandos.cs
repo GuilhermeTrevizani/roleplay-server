@@ -353,6 +353,7 @@ namespace Roleplay.Commands
                     new Comando("Manager", "/param", "Edita um parâmetro do servidor"),
                     new Comando("Manager", "/blackout", "Ativa/desativa blackout"),
                     new Comando("Manager", "/dinheiro", "Adiciona dinheiro para um personagem"),
+                    new Comando("Manager", "/contentcreator", "Adiciona/remove um usuário como criador de conteúdo"),
                 });
 
             if (p.Usuario == 1)
@@ -1280,9 +1281,9 @@ namespace Roleplay.Commands
             switch (tipo.ToLower())
             {
                 case "pm":
-                    if (p.UsuarioBD.VIP == TipoVIP.Nenhum)
+                    if ((p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now && !p.UsuarioBD.ContentCreator)
                     {
-                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Opção disponível apenas para VIP.");
+                        Functions.EnviarMensagem(player, TipoMensagem.Erro, "Opção disponível apenas para VIP ou criadores de conteúdo.");
                         return;
                     }
 
