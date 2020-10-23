@@ -6,6 +6,7 @@ using AltV.Net.Enums;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Roleplay.Entities;
@@ -18,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -953,12 +955,6 @@ namespace Roleplay
             if (historia.Length < 500)
             {
                 player.Emit("Server:MostrarErro", $"História deve possuir mais que 500 caracteres ({historia.Length} de 500).");
-                return;
-            }
-
-            if (historia.Length > 2048)
-            {
-                player.Emit("Server:MostrarErro", $"História deve possuir 2048 caracteres ou menos ({historia.Length} de 2048).");
                 return;
             }
 
@@ -2055,7 +2051,7 @@ namespace Roleplay
                 {
                     var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
 
-                    var veiculos = await context.Veiculos.AsQueryable().Where(x => x.Personagem == per.Codigo)
+                    var veiculos = await context.Veiculos.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.VendidoFerroVelho)
                     .OrderByDescending(x => x.Codigo).ToListAsync();
 
                     var multas = await context.Multas.AsQueryable().Where(x => x.PersonagemMultado == per.Codigo)
@@ -2198,8 +2194,15 @@ namespace Roleplay
                     if (veh.Personagem > 0)
                     {
                         botaoBolo = $@"<button onclick='adicionarBOLO(2, {veh.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Adicionar BOLO</button>";
-                        var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
-                        proprietario = per?.Nome ?? string.Empty;
+                        if (veh.VendidoFerroVelho)
+                        {
+                            proprietario = "FERRO VELHO";
+                        }
+                        else
+                        {
+                            var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
+                            proprietario = per?.Nome ?? string.Empty;
+                        }
 
                         var bolo = await context.Procurados.AsQueryable().Where(x => x.Veiculo == veh.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
                         if (bolo != null)
