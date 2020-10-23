@@ -154,7 +154,7 @@ namespace Roleplay.Commands.Staff
         }
 
         [Command("unban", "/unban (usuario)")]
-        public void CMD_unban(IPlayer player, int usuario)
+        public void CMD_unban(IPlayer player, string usuario)
         {
             var p = Functions.ObterPersonagem(player);
             if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.GameAdministrator)
@@ -165,7 +165,14 @@ namespace Roleplay.Commands.Staff
 
             using (var context = new DatabaseContext())
             {
-                var ban = context.Banimentos.FirstOrDefault(x => x.Usuario == usuario);
+                var user = context.Usuarios.FirstOrDefault(x => x.Nome.ToLower() == usuario.ToLower());
+                if (user == null)
+                {
+                    Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não existe.");
+                    return;
+                }
+
+                var ban = context.Banimentos.FirstOrDefault(x => x.Usuario == user.Codigo);
                 if (ban == null)
                 {
                     Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Usuário {usuario} não está banido.");
