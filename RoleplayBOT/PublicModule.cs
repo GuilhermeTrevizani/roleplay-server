@@ -56,7 +56,7 @@ namespace RoleplayBOT
                 var app = context.Personagens.FromSqlRaw(@"SELECT per.* FROM Personagens per
                 INNER JOIN Usuarios usu ON per.Usuario = usu.Codigo
                 WHERE per.UsuarioStaffAvaliador = 0
-                ORDER BY CASE WHEN usu.VIP = 1 THEN 0 ELSE usu.VIP END DESC").FirstOrDefault();
+                ORDER BY CASE WHEN usu.VIP = 1 THEN 0 ELSE usu.VIP END DESC, usu.ContentCreator DESC").FirstOrDefault();
                 if (app == null)
                     return ReplyAsync("Não temos aplicações aguardando avaliação. :smiling_face_with_3_hearts:");
 
