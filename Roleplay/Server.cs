@@ -6,7 +6,6 @@ using AltV.Net.Enums;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Roleplay.Entities;
@@ -19,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -405,7 +403,7 @@ namespace Roleplay
             else
             {
                 if (veh.Info?.Class == "CYCLE")
-                    player.Emit("vehicle:setVehicleEngineOn", player.Vehicle, true);
+                    player.Emit("vehicle:setVehicleEngineOn", vehicle, true);
             }
 
             if (veh.Emprego != TipoEmprego.Nenhum && veh.NomeEncarregado == p.Nome && veh.DataExpiracaoAluguel.HasValue)
@@ -1127,7 +1125,7 @@ namespace Roleplay
             }
 
             var restricao = Functions.VerificarRestricaoVeiculo(veiculo);
-            if (restricao.Item2 > p.UsuarioBD.VIP || (p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now)
+            if (restricao.Item2 > p.UsuarioBD.VIP || (p.UsuarioBD.VIP != TipoVIP.Nenhum && (p.UsuarioBD.DataExpiracaoVIP ?? DateTime.MinValue) < DateTime.Now))
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O veículo é restrito para VIP {restricao.Item2}.", notify: true);
                 return;
@@ -1788,7 +1786,7 @@ namespace Roleplay
 
             var combustivelNecessario = veh.TanqueCombustivel - veh.Combustivel;
             var valor = combustivelNecessario * Global.Parametros.ValorCombustivel;
-            if (valor > p.Dinheiro && veh.Faccao > 0)
+            if (valor > p.Dinheiro && veh.Faccao == 0)
             {
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Você não possui dinheiro suficiente (${valor:N0}).");
                 return;
