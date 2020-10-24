@@ -16,12 +16,12 @@ else
             <td>@x.Tipo</td>
             <td>@x.Data</td>
             <td>@x.Descricao</td>
-            <td>@x.PersonagemOrigem</td>
+            <td>@(x.PersonagemOrigem > 0 ? $"{x.NomePersonagemOrigem} [{x.PersonagemOrigem}] ({x.UsuarioOrigem})" : "0")</td>
             <td>@x.IPOrigem</td>
             <td>@x.SocialClubOrigem</td>
             <td>@x.HardwareIdHashOrigem</td>
             <td>@x.HardwareIdExHashOrigem</td>
-            <td>@x.PersonagemDestino</td>
+            <td>@(x.PersonagemDestino > 0 ? $"{x.NomePersonagemDestino} [{x.PersonagemDestino}] ({x.UsuarioDestino})" : "0")</td>
             <td>@x.IPDestino</td>
             <td>@x.SocialClubDestino</td>
             <td>@x.HardwareIdHashDestino</td>

@@ -22,10 +22,14 @@ namespace RoleplayUCP.Areas.Admin.Controllers
             using var context = new DatabaseContext();
             var sql = $@"SELECT l.*, 
                     po.Nome NomePersonagemOrigem, 
-                    pd.Nome NomePersonagemDestino 
+                    pd.Nome NomePersonagemDestino,
+                    uo.Nome UsuarioOrigem,
+                    ud.Nome UsuarioDestino
                     FROM Logs l
                     LEFT JOIN Personagens po ON l.PersonagemOrigem = po.Codigo
                     LEFT JOIN Personagens pd ON l.PersonagemDestino = pd.Codigo
+                    LEFT JOIN Usuarios uo ON po.Usuario = uo.Codigo
+                    LEFT JOIN Usuarios ud ON pd.Usuario = ud.Codigo
                     WHERE 1=1";
 
             if (viewModel.Tipo != 0)

@@ -39,5 +39,7 @@ namespace Roleplay.Entities
         public long HardwareIdExHashDestino { get; set; } = 0;
         public string NomePersonagemOrigem { get; set; }
         public string NomePersonagemDestino { get; set; }
+        public string UsuarioOrigem { get; set; }
+        public string UsuarioDestino { get; set; }
     }
 }
