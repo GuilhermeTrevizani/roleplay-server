@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="1.40.1" />
+    <PackageReference Include="AltV.Net" Version="1.40.2" />
     <PackageReference Include="AltV.Net.Async" Version="1.40.1" />
     <PackageReference Include="Discord.Net.Core" Version="2.2.0" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0" />
