@@ -452,6 +452,11 @@ namespace Roleplay.Entities
 
         public void SetNametag() => Player.SetSyncedMetaData("nametag", !PosicaoSpec.HasValue ? (EmTrabalhoAdministrativo ? $"~q~{UsuarioBD?.Nome}" : NomeIC) : string.Empty);
 
+        public class Item
+        {
+
+        }
+
         public class Ferimento
         {
             public DateTime Data { get; set; } = DateTime.Now;
