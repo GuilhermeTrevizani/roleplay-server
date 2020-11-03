@@ -85,12 +85,6 @@ namespace Roleplay.Entities
         [NotMapped]
         public DateTime DataUltimaVerificacao { get; set; } = DateTime.Now;
 
-        /// <summary>
-        /// Gambiarra necessária enquanto os setters dos healths não funcionam
-        /// </summary>
-        [NotMapped]
-        public bool HealthSetado { get; set; } = false;
-
         [NotMapped]
         public DateTime? DataExpiracaoAluguel { get; set; } = null;
 

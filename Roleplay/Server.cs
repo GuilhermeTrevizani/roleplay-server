@@ -408,12 +408,6 @@ namespace Roleplay
 
             if (veh.Emprego != TipoEmprego.Nenhum && veh.NomeEncarregado == p.Nome && veh.DataExpiracaoAluguel.HasValue)
                 Functions.EnviarMensagem(player, TipoMensagem.Erro, $"O aluguel do veículo irá expirar em {veh.DataExpiracaoAluguel}.");
-
-            if (!veh.HealthSetado)
-            {
-                player.Emit("vehicle:setVehicleEngineHealth", vehicle, veh.EngineHealth);
-                veh.HealthSetado = true;
-            }
         }
 
         public override void OnStop()
@@ -443,8 +437,8 @@ namespace Roleplay
 
         private void OnPlayerConnectLogin(IPlayer player)
         {
+            // começar a usar localstorage ao invés desse context
             using var context = new DatabaseContext();
-
             player.Emit("Server:Login", context.Usuarios.FirstOrDefault(x => x.SocialClubRegistro == (long)player.SocialClubId
                 && x.HardwareIdHashRegistro == (long)player.HardwareIdHash
                 && x.HardwareIdExHashRegistro == (long)player.HardwareIdExHash)?.Nome ?? string.Empty);
@@ -485,6 +479,7 @@ namespace Roleplay
 
         private void OnPlayerChat(IPlayer player, string message)
         {
+            // se contem <script>, travar
             if (message[0] != '/')
             {
                 Functions.EnviarMensagemChat(Functions.ObterPersonagem(player), message, TipoMensagemJogo.ChatICNormal);
@@ -1537,6 +1532,7 @@ namespace Roleplay
                     x.Municao = wep?.Municao ?? 0;
             }
 
+            // Feito para armas jogáveis
             foreach (var x in armasRemover)
                 p.Armas.Remove(x);
         }
