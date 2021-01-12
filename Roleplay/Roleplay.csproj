@@ -21,12 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="1.40.4" />
-    <PackageReference Include="AltV.Net.Async" Version="1.40.1" />
+    <PackageReference Include="AltV.Net" Version="1.48.3" />
+    <PackageReference Include="AltV.Net.Async" Version="1.48.3" />
     <PackageReference Include="Discord.Net.Core" Version="2.2.0" />
     <PackageReference Include="Discord.Net.WebSocket" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.4" />
   </ItemGroup>
 
   <ItemGroup>

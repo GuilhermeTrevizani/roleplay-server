@@ -169,12 +169,12 @@ namespace Roleplay.Entities
                 if (dano?.WindowsDamaged?.Count > 0)
                 {
                     foreach (var x in dano.Bumpers)
-                        Vehicle.SetBumperDamageLevel(x.VehicleBumper, x.VehicleBumperDamage);
+                        Vehicle.SetBumperDamageLevel((byte)x.VehicleBumper, (byte)x.VehicleBumperDamage);
 
                     foreach (var x in dano.Parts)
                     {
-                        Vehicle.SetPartDamageLevel(x.VehiclePart, x.VehiclePartDamage);
-                        Vehicle.SetPartBulletHoles(x.VehiclePart, x.BulletHoles);
+                        Vehicle.SetPartDamageLevel((byte)x.VehiclePart, (byte)x.VehiclePartDamage);
+                        Vehicle.SetPartBulletHoles((byte)x.VehiclePart, x.BulletHoles);
                     }
 
                     for (byte i = 0; i <= 10; i++)
@@ -208,11 +208,11 @@ namespace Roleplay.Entities
 
                 var dano = new Dano();
 
-                foreach (var x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
-                    dano.Bumpers.Add(new Dano.Bumper(x, Vehicle.GetBumperDamageLevel(x)));
+                foreach (byte x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
+                    dano.Bumpers.Add(new Dano.Bumper((VehicleBumper)x, (VehicleBumperDamage)Vehicle.GetBumperDamageLevel(x)));
 
-                foreach (var x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
-                    dano.Parts.Add(new Dano.Part(x, Vehicle.GetPartDamageLevel(x), Vehicle.GetPartBulletHoles(x)));
+                foreach (byte x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
+                    dano.Parts.Add(new Dano.Part((VehiclePart)x, (VehiclePartDamage)Vehicle.GetPartDamageLevel(x), Vehicle.GetPartBulletHoles(x)));
 
                 for (byte i = 0; i <= 10; i++)
                 {
