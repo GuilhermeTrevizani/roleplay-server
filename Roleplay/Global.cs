@@ -733,5 +733,15 @@ namespace Roleplay
         public static ulong CanalAnuncios { get; set; }
 
         public static ulong CanalAnunciosGovernamentais { get; set; }
+
+        public static string EmailHost { get; set; }
+
+        public static string EmailAddress { get; set; }
+
+        public static string EmailName { get; set; }
+
+        public static string EmailPassword { get; set; }
+
+        public static int EmailPort { get; set; }
     }
 }

@@ -11,5 +11,10 @@
         public string TokenBot { get; set; }
         public ulong CanalAnuncios { get; set; }
         public ulong CanalAnunciosGovernamentais { get; set; }
+        public string EmailHost { get; set; }
+        public string EmailAddress { get; set; }
+        public string EmailName { get; set; }
+        public string EmailPassword { get; set; }
+        public int EmailPort { get; set; }
     }
 }

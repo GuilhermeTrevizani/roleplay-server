@@ -830,24 +830,25 @@ namespace Roleplay
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(Global.EmailHost))
+                    return;
+
                 var msg = new MailMessage
                 {
                     IsBodyHtml = true,
-                    From = new MailAddress("naoresponda@segundavida.com.br", "Segunda Vida Roleplay"),
+                    From = new MailAddress(Global.EmailAddress, Global.EmailName),
                     Subject = titulo,
                     Body = mensagem,
                     BodyEncoding = Encoding.UTF8,
                 };
                 msg.To.Add(email);
 
-                var clienteSmtp = new SmtpClient("mail.segundavida.com.br")
+                var clienteSmtp = new SmtpClient(Global.EmailHost)
                 {
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Credentials = new NetworkCredential("naoresponda@segundavida.com.br", "3sEuV,%GKqg_"),
-                    Port = 587,
-                    //Port = 465,
-                    //EnableSsl = true,
+                    Credentials = new NetworkCredential(Global.EmailAddress, Global.EmailPassword),
+                    Port = Global.EmailPort,
                 };
 
                 await clienteSmtp.SendMailAsync(msg);

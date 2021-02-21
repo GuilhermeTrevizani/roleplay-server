@@ -100,6 +100,11 @@ namespace Roleplay
             Global.TokenBot = config.TokenBot;
             Global.CanalAnuncios = config.CanalAnuncios;
             Global.CanalAnunciosGovernamentais = config.CanalAnunciosGovernamentais;
+            Global.EmailHost = config.EmailHost;
+            Global.EmailAddress = config.EmailAddress;
+            Global.EmailName = config.EmailName;
+            Global.EmailPassword = config.EmailPassword;
+            Global.EmailPort = config.EmailPort;
 
             using (var context = new DatabaseContext())
             {
@@ -180,7 +185,8 @@ namespace Roleplay
             };
             BackgroundWorkerSegundo.DoWork += BackgroundWorkerSegundo_DoWork;
 
-            MainAsync();
+            if (!string.IsNullOrWhiteSpace(Global.TokenBot))
+                MainAsync();
         }
 
         public async void MainAsync()
@@ -920,7 +926,7 @@ namespace Roleplay
                     HardwareIdExHashRegistro = (long)player.HardwareIdExHash,
                     HardwareIdHashUltimoAcesso = (long)player.HardwareIdHash,
                     HardwareIdExHashUltimoAcesso = (long)player.HardwareIdExHash,
-                    TokenConfirmacao = new Random().Next(111111, 999999).ToString(),
+                    TokenConfirmacao = string.IsNullOrWhiteSpace(Global.EmailHost) ? string.Empty : new Random().Next(111111, 999999).ToString(),
                 };
                 context.Usuarios.Add(user);
                 context.SaveChanges();
