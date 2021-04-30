@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:65vh;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button class="btn btn-default" onclick="closeView();">
+                    Fechar
+                </button>
+            </div>
+            <h3 class="panel-title">Concessionária</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-7">
+                    <label style="vertical-align: middle;">Cores:</label>
+					<button id="corprimaria" class="jscolor {valueElement:null,value:'000000',onFineChange:'updateCor1(this)'}" style="vertical-align: middle;width:35px; height:35px;vertical-align: middle;"></button>   
+					<button id="corsecundaria" class="jscolor {valueElement:null,value:'000000',onFineChange:'updateCor2(this)'}" style="vertical-align: middle;width:35px; height:35px;vertical-align: middle;"></button>   
+                </div> 
+                <div class="col-md-3">
+                    <button onclick="copiarCorPrimaria()" type="button" class="btn btn-dark btn-block">Copiar Cor</button>
+                </div>
+                <div class="col-md-2">
+                    <button onclick="pintar()" type="button" class="btn btn-primary btn-block">Pintar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/jscolor.js"></script>
+    <script src="pintar.js"></script>
+</body>
+</html>

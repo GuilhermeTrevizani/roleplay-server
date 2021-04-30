@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;">
+    <div id="container" class="cls-container" style="background-color:transparent;">
+		<div class="cls-content">
+		    <div class="cls-content-sm panel" style="background-color:#ededed;">
+		        <div class="panel-body">
+		            <div class="mar-ver pad-btm">
+                        <h1 class="h3">Alterar Senha</h1>
+		            </div>
+                    <div id="erro" class="alert alert-danger" style="display:none;"></div>
+                    <div id="sucesso" class="alert alert-success" style="display:none;"></div>
+                    <form>
+		                <div class="form-group">
+		                    <input id="senhaAntiga" type="password" class="form-control" placeholder="Senha Atual" autofocus>
+		                </div>
+		                <div class="form-group">
+		                    <input id="novaSenha" type="password" class="form-control" placeholder="Nova Senha">
+		                </div>
+		                <div class="form-group">
+		                    <input id="novaSenha2" type="password" class="form-control" placeholder="Confirmação da Nova Senha">
+		                </div>
+		                <button id="btn-alterar" onclick="alterar()" class="btn btn-primary btn-lg btn-block" type="button">Alterar</button>
+		            </form>
+		        </div>
+		        <div class="pad-all text-center">
+		            <a onclick="voltar()" href="#" class="btn-link mar-rgt">Voltar para a seleção de personagens</a>
+		        </div>
+		    </div>
+		</div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/loadingoverlay.min.js"></script>
+    <script src="alterarsenha.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+﻿@media only screen and (min-width: 2550px) { 
+    html {
+        -moz-transform: scale(1.33, 1.33);
+        zoom: 1.33;
+    }
+}
+
+@media only screen and (min-width: 3830px) {
+    html {
+        -moz-transform: scale(2, 2);
+        zoom: 2;
+    }
+}
+
+@font-face {
+    font-family: "Roboto";
+    src: url("../resources/Roboto/Roboto-Regular.eot");
+    src: url("../resources/Roboto/Roboto-Regular.eot?#iefix") format('embedded-opentype'),
+         url("../resources/Roboto/Roboto-Regular.woff2") format('woff2'),
+         url("../resources/Roboto/Roboto-Regular.woff") format('woff'),
+         url("../resources/Roboto/Roboto-Regular.ttf") format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+body
+{
+	font-family: Roboto, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+    font-size: 18px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: transparent
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.playerList{
+	background-color: rgba(12, 12, 12, 0.80);
+	width: 550px;
+	border: 1px solid #000;
+	margin: 0px auto 0px;
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.playerBody {
+	overflow: auto;
+	max-height: 50vh;
+}
+
+.playerListTitle{
+	width: 550px;
+	text-align: center;
+    padding: 5px;
+	padding-top:0.6em;
+	background-color: #313131;
+    color: #FFF;
+    font-weight: 400;
+    font-size: 18px;
+    font-style: normal;
+	border: 1px solid #000;
+	margin: 100px auto 0px;
+	border-bottom: none;
+}
+
+.playerListBottom{
+	width: 550px;
+	text-align: center;
+    padding: 5px;
+	padding-top:0.6em;
+	background-color: #313131;
+    color: #FFF;
+    font-weight: 400;
+    font-size: 18px;
+    font-style: normal;
+	border: 1px solid #000;
+	margin: 0px auto 0px;
+	border-top: none;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    word-break: break-all;
+}
+
+.table{
+	color: grey;
+}
+
+.table-active, .table-active>td, .table-active>th {
+    background-color: #c6c8ca;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    /*height: 1.236476043276662vh;*/
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .75);
+}
+
+.table {
+    margin-bottom: 0px !important;
+}

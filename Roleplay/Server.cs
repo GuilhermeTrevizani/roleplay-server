@@ -94,7 +94,7 @@ namespace Roleplay
 
             var config = JsonConvert.DeserializeObject<Configuracao>(File.ReadAllText("settings.json"));
             Global.MaxPlayers = config.MaxPlayers;
-            Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
+            Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};User ID={config.DBUser};Password={config.DBPassword}";
             Global.VehicleInfos = JsonConvert.DeserializeObject<List<VehicleInfo>>(File.ReadAllText("vehicles.json"));
             Global.Development = config.Development;
             Global.TokenBot = config.TokenBot;
@@ -144,7 +144,7 @@ namespace Roleplay
                 Global.ArmariosItens = context.ArmariosItens.ToList();
                 Console.WriteLine($"ArmariosItens: {Global.ArmariosItens.Count}");
 
-                context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = now(), TipoResposta = 3 WHERE DataResposta is null");
+                context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = getdate(), TipoResposta = 3 WHERE DataResposta is null");
                 Console.WriteLine("SOSs limpos");
 
                 Global.Perguntas = context.Perguntas.ToList();
@@ -170,6 +170,8 @@ namespace Roleplay
             Console.WriteLine($"Empregos: {Global.Empregos.Count}");
 
             Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
+
+            Global.VoiceChannel = Alt.CreateVoiceChannel(true, 20);
 
             TimerSegundo = new Timer(1000);
             TimerSegundo.Elapsed += TimerSegundo_Elapsed;
@@ -452,6 +454,9 @@ namespace Roleplay
 
         private void OnPlayerDisconnect(IPlayer player, string reason)
         {
+            if (Global.VoiceChannel.HasPlayer(player))
+                Global.VoiceChannel.RemovePlayer(player);
+
             var p = Functions.ObterPersonagem(player);
             if (p?.Codigo > 0)
             {
@@ -857,6 +862,9 @@ namespace Roleplay
             {
                 p.Spawnar();
             }
+
+            if (!Global.VoiceChannel.HasPlayer(player))
+                Global.VoiceChannel.AddPlayer(player);
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
         }

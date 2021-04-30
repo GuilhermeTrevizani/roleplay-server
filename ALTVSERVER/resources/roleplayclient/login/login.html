@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;">
+    <div id="container" class="cls-container" style="background-color:transparent;">
+		<div class="cls-content">
+		    <div class="cls-content-sm panel" style="background-color:#ededed;">
+		        <div class="panel-body">
+		            <div class="mar-ver pad-btm">
+                        <img src="../resources/img/logo.png" style="width:300px;" />
+		            </div>
+                    <div id="erro" class="alert alert-danger" style="display:none;"></div>
+                    <form>
+		                <div class="form-group">
+		                    <input id="user" type="text" class="form-control" placeholder="Usuário" spellcheck="false" autofocus>
+		                </div>
+		                <div class="form-group">
+		                    <input id="password" type="password" class="form-control" placeholder="Senha">
+		                </div>
+		                <button id="btn-entrar" onclick="entrar()" class="btn btn-primary btn-lg btn-block" type="button">Entrar</button>
+		            </form>
+		        </div>
+		        <div class="pad-all text-center">
+		            <a onclick="esqueciMinhaSenha()" href="#" class="btn-link mar-rgt">Esqueci minha senha</a>
+		            <a id="btn-registrar" onclick="registrar()" href="#" class="btn-link mar-lft">Criar uma conta</a>
+		        </div>
+		    </div>
+		</div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/loadingoverlay.min.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>

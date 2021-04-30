@@ -743,5 +743,7 @@ namespace Roleplay
         public static string EmailPassword { get; set; }
 
         public static int EmailPort { get; set; }
+
+        public static AltV.Net.Elements.Entities.IVoiceChannel VoiceChannel { get; set; }
     }
 }

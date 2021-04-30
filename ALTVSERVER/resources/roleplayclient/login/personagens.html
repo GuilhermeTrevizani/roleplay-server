@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:60%;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button id="btn-atualizar" class="btn btn-default" onclick="atualizar();">
+                    Atualizar
+                </button>
+            </div>
+            <h3 id="titulo" class="panel-title"></h3>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="bg-dark">
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Opções</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-personagens">
+                    </tbody>
+                </table>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<button onclick="punicoesAdministrativas()" class="btn btn-block btn-dark">Punições Administrativas</button>
+				</div>
+				<div class="col-md-3">
+					<button onclick="alterarEmail()" class="btn btn-block btn-dark">Alterar E-mail</button>
+				</div>
+				<div class="col-md-3">
+					<button onclick="alterarSenha()" class="btn btn-block btn-dark">Alterar Senha</button>
+				</div>
+				<div class="col-md-3">
+					<button id="btn-criarpersonagem" onclick="criarPersonagem();" class="btn btn-block btn-primary">Criar Personagem</button>
+				</div>
+			</div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/jquery-confirm.js"></script>
+    <script src="../resources/js/loadingoverlay.min.js"></script>
+    <script src="personagens.js"></script>
+</body>
+</html>

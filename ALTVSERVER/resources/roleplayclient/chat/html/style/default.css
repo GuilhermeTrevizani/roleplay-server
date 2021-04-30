@@ -1,0 +1,100 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+body {
+    background-color: transparent;
+}
+
+*::-webkit-scrollbar {
+    visibility: hidden;
+}
+
+.chat-box {
+    margin: 5px 0 0 5px;
+    width: 37vw;
+}
+
+.chat-box .chat-messages-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden auto;
+}
+
+.chat-box .chat-messages-list .chat-message {
+    color: white;
+    padding-left: 2px;
+
+    line-height: 22px;
+}
+
+.chat-box .chat-input-bar {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 70%;
+    outline: none;
+    border: none;
+
+    height: 40px;
+    padding: 0 10px 0 10px;
+    margin-top: 10px;
+}
+
+.chat-input-bar-length {
+    color: white;
+    margin-left: 5px;
+}
+
+.chat-new-messages-warning {
+    background: linear-gradient(90deg,rgba(255, 255, 0, 0.3) 0%, rgba(255,255,255,0) 100%);
+    color: rgb(255, 255, 0);
+    padding-left: 2px;
+}
+
+.hide {
+    visibility: hidden;
+}
+
+.animated-hide {
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0.15s linear, opacity 0.15s linear;
+}
+
+.no-select {
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    -moz-user-select: none;
+    -ms-user-select: none; 
+    user-select: none; 
+}
+
+.stroke {
+    text-shadow: rgb(0, 0, 0) 2px 0px 0px, rgb(0, 0, 0) 1.75517px 0.958851px 0px, rgb(0, 0, 0) 1.0806px 1.68294px 0px, rgb(0, 0, 0) 0.141474px 1.99499px 0px, rgb(0, 0, 0) -0.832294px 1.81859px 0px, rgb(0, 0, 0) -1.60229px 1.19694px 0px, rgb(0, 0, 0) -1.97998px 0.28224px 0px, rgb(0, 0, 0) -1.87291px -0.701566px 0px, rgb(0, 0, 0) -1.30729px -1.5136px 0px, rgb(0, 0, 0) -0.421592px -1.95506px 0px, rgb(0, 0, 0) 0.567324px -1.91785px 0px, rgb(0, 0, 0) 1.41734px -1.41108px 0px, rgb(0, 0, 0) 1.92034px -0.558831px 0px;
+}
+
+.telapreta {
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+}
+
+.telaverde {
+    background-color: #00d900;
+    width: 100%;
+    height: 100%;
+}
+
+.telacinza {
+    background-color: #6e6e6e;
+    width: 100%;
+    height: 100%;
+}
+
+.telalaranja {
+    background-color: #ff8000;
+    width: 100%;
+    height: 100%;
+}

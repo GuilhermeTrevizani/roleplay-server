@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:60%;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button class="btn btn-default" onclick="closeView();">
+                    Fechar
+                </button>
+            </div>
+            <h3 id="titulo" class="panel-title"></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-5">
+                    <input id="celular" type="text" class="form-control" placeholder="Celular">
+                </div>
+                <div class="col-md-5">
+                    <input id="nome" type="text" class="form-control" placeholder="Nome do contato" maxlength="25">
+                </div>
+                <div class="col-md-2">
+                    <button onclick="adicionarContato()" type="button" class="btn btn-block btn-primary">Gravar</button>
+                </div>
+            </div>
+            <hr/>
+            <input id="pesquisa" type="text" autofocus class="form-control" placeholder="Pesquise os contatos..." /> <br/>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="bg-dark">
+                            <th>Nome</th>
+                            <th>Número</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-contatos">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

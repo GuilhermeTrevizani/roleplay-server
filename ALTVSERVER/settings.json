@@ -1,8 +1,8 @@
 {
   "DBHost": "localhost",
-  "DBName": "bdsegundavidaroleplay",
-  "DBUser": "root",
-  "DBPassword": "tCsgwqFhg1aj",
+  "DBName": "bdroleplay",
+  "DBUser": "sa",
+  "DBPassword": "123",
   "MaxPlayers": 125,
   "Development": false,
   "TokenBot": "",

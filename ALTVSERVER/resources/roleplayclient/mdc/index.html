@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:80%;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button class="btn btn-default" onclick="closeView();">
+                    Fechar
+                </button>
+            </div>
+            <h3 id="titulo" class="panel-title"></h3>
+        </div>
+        <div class="panel-body">
+            <div class="tab-base tab-stacked-left">
+                <ul class="nav nav-tabs" style="width:20vh">
+                    <li id="li-pesquisarpessoa" class="active">
+                        <a data-toggle="tab" href="#tab-pesquisarpessoa" aria-expanded="true">Pesquisar Pessoa</a>
+                    </li>
+                    <li id="li-pesquisarveiculo">
+                        <a data-toggle="tab" href="#tab-pesquisarveiculo" aria-expanded="false">Pesquisar Veículo</a>
+                    </li>
+                    <li id="li-pesquisarpropriedade">
+                        <a data-toggle="tab" href="#tab-pesquisarpropriedade">Pesquisar Propriedade</a>
+                    </li>
+                    <li id="li-911">
+                        <a data-toggle="tab" href="#tab-911">Ligações 911</a>
+                    </li>
+                    <li id="li-apb">
+                        <a data-toggle="tab" href="#tab-apb">APB</a>
+                    </li>
+                    <li id="li-bolo">
+                        <a data-toggle="tab" href="#tab-bolo">BOLO</a>
+                    </li>
+                    <li id="li-unidades">
+                        <a data-toggle="tab" href="#tab-unidades">Unidades</a>
+                    </li>
+                    <li id="li-relatoriospendentes">
+                        <a data-toggle="tab" href="#tab-relatoriospendentes">Relatórios Pendentes</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-pesquisarpessoa" class="tab-pane fade active in">
+                        <div class="input-group mar-btm">
+                            <input id="input-pesquisarpessoa" type="text" placeholder="Pesquise pelo nome da pessoa" class="form-control" autofocus spellcheck="false">
+                            <span class="input-group-btn">
+                                <button id="btn-pesquisarpessoa" onclick="" class="btn btn-dark" type="button">Pesquisar</button>
+                            </span>
+                        </div>
+                        <div id="div-pesquisarpessoa">
+                        </div>
+                    </div>
+                    <div id="tab-pesquisarveiculo" class="tab-pane fade">
+                        <div class="input-group mar-btm">
+                            <input id="input-pesquisarveiculo" type="text" placeholder="Pesquise pela placa do veículo" class="form-control" autofocus spellcheck="false">
+                            <span class="input-group-btn">
+                                <button id="btn-pesquisarveiculo" onclick="" class="btn btn-dark" type="button">Pesquisar</button>
+                            </span>
+                        </div>
+                        <div id="div-pesquisarveiculo">
+                        </div>
+                    </div>
+                    <div id="tab-pesquisarpropriedade" class="tab-pane fade">
+                        <div class="input-group mar-btm">
+                            <input id="input-pesquisarpropriedade" type="text" placeholder="Pesquise pelo número da propriedade" class="form-control" autofocus spellcheck="false">
+                            <span class="input-group-btn">
+                                <button id="btn-pesquisarpropriedade" class="btn btn-dark" type="button">Pesquisar</button>
+                            </span>
+                        </div>
+                        <div id="div-pesquisarpropriedade">
+                        </div>
+                    </div>
+                    <div id="tab-911" class="tab-pane fade">
+                    </div>
+                    <div id="tab-apb" class="tab-pane fade">
+                    </div>
+                    <div id="tab-bolo" class="tab-pane fade">
+                    </div>
+                    <div id="tab-unidades" class="tab-pane fade">
+                        <div class="alert alert-danger">
+                            Em desenvolvimento.
+                        </div>
+                        <!--BOTÃO ADICIONAR PARA HISTÓRICO UNIDADE E VIATURA E ENTÃO TER COMO FECHAR
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr class="bg-dark">
+                                    <th>Unidade</th>
+                                    <th>Viatura</th>
+                                    <th>Ocupantes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-unidades">
+                            </tbody>
+                        </table>-->
+                    </div>
+                    <div id="tab-relatoriospendentes" class="tab-pane fade">
+                        <div class="alert alert-danger">
+                            Em desenvolvimento.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/loadingoverlay.min.js"></script>
+    <script src="../resources/js/jquery-confirm.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
