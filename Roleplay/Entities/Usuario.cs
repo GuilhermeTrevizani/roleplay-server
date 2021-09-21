@@ -65,5 +65,7 @@ namespace Roleplay.Entities
         public bool TogAnuncio { get; set; } = false;
 
         public bool ContentCreator { get; set; } = false;
+
+        public long Discord { get; set; } = 0;
     }
 }
