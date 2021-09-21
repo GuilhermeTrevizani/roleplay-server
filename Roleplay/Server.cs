@@ -94,7 +94,7 @@ namespace Roleplay
 
             var config = JsonConvert.DeserializeObject<Configuracao>(File.ReadAllText("settings.json"));
             Global.MaxPlayers = config.MaxPlayers;
-            Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};User ID={config.DBUser};Password={config.DBPassword}";
+            Global.ConnectionString = $"Server={config.DBHost};Database={config.DBName};Uid={config.DBUser};Password={config.DBPassword}";
             Global.VehicleInfos = JsonConvert.DeserializeObject<List<VehicleInfo>>(File.ReadAllText("vehicles.json"));
             Global.Development = config.Development;
             Global.TokenBot = config.TokenBot;

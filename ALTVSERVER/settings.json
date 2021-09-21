@@ -1,10 +1,10 @@
 {
   "DBHost": "localhost",
   "DBName": "bdroleplay",
-  "DBUser": "sa",
-  "DBPassword": "123",
+  "DBUser": "root",
+  "DBPassword": "159357",
   "MaxPlayers": 125,
-  "Development": false,
+  "Development": true,
   "TokenBot": "",
   "CanalAnuncios": 768883782262325258,
   "CanalAnunciosGovernamentais": 768883855955984426,

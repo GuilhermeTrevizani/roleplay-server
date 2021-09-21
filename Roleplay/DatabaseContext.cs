@@ -39,7 +39,7 @@ namespace Roleplay
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(Global.ConnectionString);
+            optionsBuilder.UseMySQL(Global.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
