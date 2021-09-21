@@ -56,6 +56,7 @@ namespace Roleplay
             modelBuilder.Entity<Log>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Multa>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Parametro>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<Parametro>().Property(e => e.Weather).HasConversion<int>();
             modelBuilder.Entity<Pergunta>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Personagem>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Ponto>().HasKey(x => x.Codigo);
@@ -70,6 +71,7 @@ namespace Roleplay
             modelBuilder.Entity<Unidade>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Veiculo>().HasKey(x => x.Codigo);
+
 
             // Não representam tabelas exatas no banco de dados
             modelBuilder.Entity<PunicaoAdministrativa>().HasKey(x => x.Codigo);

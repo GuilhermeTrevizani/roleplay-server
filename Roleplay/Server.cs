@@ -144,7 +144,7 @@ namespace Roleplay
                 Global.ArmariosItens = context.ArmariosItens.ToList();
                 Console.WriteLine($"ArmariosItens: {Global.ArmariosItens.Count}");
 
-                context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = getdate(), TipoResposta = 3 WHERE DataResposta is null");
+                context.Database.ExecuteSqlRaw("UPDATE SOSs SET DataResposta = now(), TipoResposta = 3 WHERE DataResposta is null");
                 Console.WriteLine("SOSs limpos");
 
                 Global.Perguntas = context.Perguntas.ToList();
