@@ -1,3 +1,3 @@
 # roleplay-server
 
-Discord: Guilherme Trevizani#5180
+Discord: TR3V1Z4#5180
