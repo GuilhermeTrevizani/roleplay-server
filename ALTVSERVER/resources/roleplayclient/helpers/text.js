@@ -141,11 +141,13 @@ export async function drawText3d(
     native.setTextCentre(true);
     native.setTextColour(r, g, b, a);
 
-    if (useOutline) native.setTextOutline();
+    if (useOutline) 
+        native.setTextOutline();
 
-    if (useDropShadow) native.setTextDropShadow();
+    if (useDropShadow) 
+        native.setTextDropShadow();
 
-    native.endTextCommandDisplayText(0, 0);
+    native.endTextCommandDisplayText(0, 0, 0);
     native.clearDrawOrigin();
 }
 
@@ -178,5 +180,5 @@ export async function drawText2d(
     if (useDropShadow) 
         native.setTextDropShadow();
 
-    native.endTextCommandDisplayText(x, y);
+    native.endTextCommandDisplayText(x, y, 0);
 }

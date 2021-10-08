@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v5.0": {
       "Roleplay/1.0.0": {
         "dependencies": {
-          "AltV.Net": "4.0.0",
-          "AltV.Net.Async": "4.0.0",
+          "AltV.Net": "6.0.2",
+          "AltV.Net.Async": "6.0.2",
           "Discord.Net.Core": "2.4.0",
           "Discord.Net.WebSocket": "2.4.0",
           "Microsoft.EntityFrameworkCore": "5.0.10",
@@ -19,7 +19,7 @@
           "Roleplay.dll": {}
         }
       },
-      "AltV.Net/4.0.0": {
+      "AltV.Net/6.0.2": {
         "runtime": {
           "lib/net5.0/AltV.Net.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -27,9 +27,9 @@
           }
         }
       },
-      "AltV.Net.Async/4.0.0": {
+      "AltV.Net.Async/6.0.2": {
         "dependencies": {
-          "AltV.Net": "4.0.0",
+          "AltV.Net": "6.0.2",
           "System.Threading.Channels": "5.0.0"
         },
         "runtime": {
@@ -470,19 +470,19 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AltV.Net/4.0.0": {
+    "AltV.Net/6.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-l6T/F69vEd9cFGG8zUZVXg2RIzz4TeMeM7YVgJ9w+JyMoUqll62Vm2qScZrLn73gJ2GFhfL1+5PqibORMNJ0iQ==",
-      "path": "altv.net/4.0.0",
-      "hashPath": "altv.net.4.0.0.nupkg.sha512"
+      "sha512": "sha512-tadIOUPdGz8ErhYcOP6TK4RN7o+IFQ8whoTuBLHsdY6jg0qb+mmheTeT5FkGFMidJS2u5rUKNaiHWYMgwO+INg==",
+      "path": "altv.net/6.0.2",
+      "hashPath": "altv.net.6.0.2.nupkg.sha512"
     },
-    "AltV.Net.Async/4.0.0": {
+    "AltV.Net.Async/6.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-+Ur588uaYYJI5fwURruOtwKlUuKajntIpVEBdMwjxfWjrRi/QDmeSfKTA8xseJtnQWJM5ITBrR5rRo5mDsKJ+A==",
-      "path": "altv.net.async/4.0.0",
-      "hashPath": "altv.net.async.4.0.0.nupkg.sha512"
+      "sha512": "sha512-zR/miW+uql+lzV9UvqvDIADZ+T5gXjpew9FVft1swDb6QWKcjJMfCi7ygnhxpOmFELP946Opcp073Uw44wHl4A==",
+      "path": "altv.net.async/6.0.2",
+      "hashPath": "altv.net.async.6.0.2.nupkg.sha512"
     },
     "BouncyCastle.NetCore/1.8.5": {
       "type": "package",

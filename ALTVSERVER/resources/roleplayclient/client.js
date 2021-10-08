@@ -116,7 +116,7 @@ native.freezeEntityPosition(player.scriptID, true);
 let cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', -436.0717, 1039.26, 372.1287, 0, 0, 0, 60, true, 0);
 native.pointCamAtCoord(cam, 3.063985, 0.0, -170.8151);
 native.setCamActive(cam, true);
-native.renderScriptCams(true, false, 0, true, false);
+native.renderScriptCams(true, false, 0, true, false, 0);
 let directions = [ { name: 'N', value: 0 }, { name: 'NO', value: 45 }, { name: 'O', value: 90 }, { name: 'SO', value: 135 }, { name: 'S', value: 180 }, { name: 'SE', value: 225 }, { name: 'L', value: 270 }, { name: 'ND', value: 315 }, { name: 'N', value: 360 }];
 
 alt.setInterval(() => {
@@ -506,7 +506,7 @@ alt.onServer('Server:SelecionarPersonagem', (personalizacao, roupas, acessorios,
     toggleView(false);
 
     native.destroyAllCams(true);
-    native.renderScriptCams(false, false, 0, false, false);
+    native.renderScriptCams(false, false, 0, false, false, 0);
     
     native.setEntityInvincible(player.scriptID, false);
     native.freezeEntityPosition(player.scriptID, false);
@@ -733,7 +733,7 @@ alt.onServer('Server:Abastecer', (veiculo) => {
 alt.onServer('SpectatePlayer', (target) => {
     native.freezeEntityPosition(player.scriptID, true);
     native.destroyAllCams(true);
-    native.renderScriptCams(false, false, 0, false, false);
+    native.renderScriptCams(false, false, 0, false, false, 0);
     native.setPedCanSwitchWeapon(player.scriptID, false);
 
     if (intervalSpec != null)
@@ -747,7 +747,7 @@ alt.onServer('SpectatePlayer', (target) => {
             native.attachEntityToEntity(player.scriptID, target.scriptID, 0, 0.0, 0.0, 5.0, 0.0, 0.0, 0.0, true, false, false, false, 0, false);
             let cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', target.pos.x, target.pos.y, target.pos.z, 0, 0, 0, 60);
             native.setCamActive(cam, true);
-            native.renderScriptCams(true, false, 0, true, false);
+            native.renderScriptCams(true, false, 0, true, false, 0);
             native.setCamAffectsAiming(cam, false);
             native.attachCamToEntity(cam, target.scriptID, 0, -8.0, 5.0, true); 
             native.pointCamAtEntity(cam, target.scriptID, 0.0, 0.0, 0.0, true);
@@ -761,7 +761,7 @@ alt.onServer('UnspectatePlayer', () => {
         alt.clearInterval(intervalSpec);
 
     native.destroyAllCams(true);
-    native.renderScriptCams(false, false, 0, false, false);
+    native.renderScriptCams(false, false, 0, false, false, 0);
     native.detachEntity(player.scriptID, true, true);
     native.freezeEntityPosition(player.scriptID, false);
     native.setEntityVisible(player.scriptID, true, true);

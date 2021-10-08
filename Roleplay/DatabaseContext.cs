@@ -72,7 +72,6 @@ namespace Roleplay
             modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
             modelBuilder.Entity<Veiculo>().HasKey(x => x.Codigo);
 
-
             // Não representam tabelas exatas no banco de dados
             modelBuilder.Entity<PunicaoAdministrativa>().HasKey(x => x.Codigo);
             modelBuilder.Entity<ProcuradoInfo>().HasKey(x => x.Codigo);

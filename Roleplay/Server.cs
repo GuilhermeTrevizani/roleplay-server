@@ -171,8 +171,6 @@ namespace Roleplay
 
             Functions.CriarTextDraw("Prisão\n~w~Use /prender", Global.PosicaoPrisao, 10, 0.4f, 4, Global.RgbaPrincipal, 0);
 
-            Global.VoiceChannel = Alt.CreateVoiceChannel(true, 20);
-
             TimerSegundo = new Timer(1000);
             TimerSegundo.Elapsed += TimerSegundo_Elapsed;
             TimerSegundo.Start();
@@ -454,9 +452,6 @@ namespace Roleplay
 
         private void OnPlayerDisconnect(IPlayer player, string reason)
         {
-            if (Global.VoiceChannel.HasPlayer(player))
-                Global.VoiceChannel.RemovePlayer(player);
-
             var p = Functions.ObterPersonagem(player);
             if (p?.Codigo > 0)
             {
@@ -624,7 +619,7 @@ namespace Roleplay
             return true;
         }
 
-        private void OnPlayerDamage(IPlayer player, IEntity attacker, uint weapon, ushort damage)
+        private void OnPlayerDamage(IPlayer player, IEntity attacker, uint weapon, ushort healthDamage, ushort armorDamage)
         {
             if (Enum.GetValues(typeof(WeaponModel)).Cast<WeaponModel>().Any(x => (uint)x == weapon))
                 return;
@@ -651,7 +646,7 @@ namespace Roleplay
             {
                 Data = DateTime.Now,
                 Arma = weapon,
-                Dano = damage,
+                Dano = healthDamage,
             };
 
             Personagem pAttacker = null;
@@ -862,9 +857,6 @@ namespace Roleplay
             {
                 p.Spawnar();
             }
-
-            if (!Global.VoiceChannel.HasPlayer(player))
-                Global.VoiceChannel.AddPlayer(player);
 
             player.Emit("Server:SelecionarPersonagem", p.InformacoesPersonalizacao, p.InformacoesRoupas, p.InformacoesAcessorios, p.Roupa, (int)p.EtapaPersonalizacao);
         }
