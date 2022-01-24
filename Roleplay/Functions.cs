@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -62,28 +61,25 @@ namespace Roleplay
 
         public static Personagem ObterPersonagem(IPlayer player) => Global.PersonagensOnline.FirstOrDefault(x => x?.Player == player);
 
-        public static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
+        public async static void GravarLog(TipoLog tipo, string descricao, Personagem origem, Personagem destino)
         {
-            AltAsync.Do(async () =>
+            using var context = new DatabaseContext();
+            await context.Logs.AddAsync(new Log()
             {
-                using var context = new DatabaseContext();
-                await context.Logs.AddAsync(new Log()
-                {
-                    Tipo = tipo,
-                    Descricao = descricao,
-                    PersonagemOrigem = origem?.Codigo ?? 0,
-                    IPOrigem = origem?.IPUltimoAcesso ?? string.Empty,
-                    SocialClubOrigem = origem?.SocialClubUltimoAcesso ?? 0,
-                    PersonagemDestino = destino?.Codigo ?? 0,
-                    IPDestino = destino?.IPUltimoAcesso ?? string.Empty,
-                    SocialClubDestino = destino?.SocialClubUltimoAcesso ?? 0,
-                    HardwareIdHashOrigem = origem?.HardwareIdHashUltimoAcesso ?? 0,
-                    HardwareIdHashDestino = destino?.HardwareIdHashUltimoAcesso ?? 0,
-                    HardwareIdExHashOrigem = origem?.HardwareIdExHashUltimoAcesso ?? 0,
-                    HardwareIdExHashDestino = destino?.HardwareIdExHashUltimoAcesso ?? 0,
-                });
-                await context.SaveChangesAsync();
+                Tipo = tipo,
+                Descricao = descricao,
+                PersonagemOrigem = origem?.Codigo ?? 0,
+                IPOrigem = origem?.IPUltimoAcesso ?? string.Empty,
+                SocialClubOrigem = origem?.SocialClubUltimoAcesso ?? 0,
+                PersonagemDestino = destino?.Codigo ?? 0,
+                IPDestino = destino?.IPUltimoAcesso ?? string.Empty,
+                SocialClubDestino = destino?.SocialClubUltimoAcesso ?? 0,
+                HardwareIdHashOrigem = origem?.HardwareIdHashUltimoAcesso ?? 0,
+                HardwareIdHashDestino = destino?.HardwareIdHashUltimoAcesso ?? 0,
+                HardwareIdExHashOrigem = origem?.HardwareIdExHashUltimoAcesso ?? 0,
+                HardwareIdExHashDestino = destino?.HardwareIdExHashUltimoAcesso ?? 0,
             });
+            await context.SaveChangesAsync();
         }
 
         public static int ObterNovoID()
@@ -266,51 +262,48 @@ namespace Roleplay
             return null;
         }
 
-        public static void SalvarPersonagem(Personagem p, bool online = true)
+        public static async void SalvarPersonagem(Personagem p, bool online = true)
         {
-            AltAsync.Do(async () =>
+            if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
+                return;
+
+            if (!online && p.Celular > 0)
             {
-                if (p.EtapaPersonalizacao != TipoEtapaPersonalizacao.Concluido)
-                    return;
-
-                if (!online && p.Celular > 0)
+                p.LimparLigacao();
+                var pLigando = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
+                if (pLigando != null)
                 {
-                    p.LimparLigacao();
-                    var pLigando = Global.PersonagensOnline.FirstOrDefault(x => x.NumeroLigacao == p.Celular);
-                    if (pLigando != null)
-                    {
-                        pLigando.LimparLigacao();
-                        EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Global.CorCelularSecundaria);
-                    }
+                    pLigando.LimparLigacao();
+                    EnviarMensagem(pLigando.Player, TipoMensagem.Nenhum, $"[CELULAR] Sua ligação para {pLigando.ObterNomeContato(p.Celular)} caiu.", Global.CorCelularSecundaria);
                 }
+            }
 
-                using var context = new DatabaseContext();
-                p.Online = online;
-                p.Skin = p.Player.Model;
-                p.PosX = p.Player.Position.X;
-                p.PosY = p.Player.Position.Y;
-                p.PosZ = p.Player.Position.Z;
-                p.Vida = p.Player.Health;
-                p.Colete = p.Player.Armor;
-                p.Dimensao = p.Player.Dimension;
-                p.IPL = JsonConvert.SerializeObject(p.IPLs);
-                p.RotX = p.Player.Rotation.Roll;
-                p.RotY = p.Player.Rotation.Pitch;
-                p.RotZ = p.Player.Rotation.Yaw;
-                p.DataUltimoAcesso = DateTime.Now;
-                p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
-                p.InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas);
-                p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
-                p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
-                p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
-                p.InformacoesFerimentos = JsonConvert.SerializeObject(p.Ferimentos);
-                context.Personagens.Update(p);
+            using var context = new DatabaseContext();
+            p.Online = online;
+            p.Skin = p.Player.Model;
+            p.PosX = p.Player.Position.X;
+            p.PosY = p.Player.Position.Y;
+            p.PosZ = p.Player.Position.Z;
+            p.Vida = p.Player.Health;
+            p.Colete = p.Player.Armor;
+            p.Dimensao = p.Player.Dimension;
+            p.IPL = JsonConvert.SerializeObject(p.IPLs);
+            p.RotX = p.Player.Rotation.Roll;
+            p.RotY = p.Player.Rotation.Pitch;
+            p.RotZ = p.Player.Rotation.Yaw;
+            p.DataUltimoAcesso = DateTime.Now;
+            p.InformacoesPersonalizacao = JsonConvert.SerializeObject(p.PersonalizacaoDados);
+            p.InformacoesRoupas = JsonConvert.SerializeObject(p.Roupas);
+            p.InformacoesAcessorios = JsonConvert.SerializeObject(p.Acessorios);
+            p.InformacoesArmas = JsonConvert.SerializeObject(p.Armas);
+            p.InformacoesContatos = JsonConvert.SerializeObject(p.Contatos);
+            p.InformacoesFerimentos = JsonConvert.SerializeObject(p.Ferimentos);
+            context.Personagens.Update(p);
 
-                p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
-                context.Usuarios.Update(p.UsuarioBD);
+            p.UsuarioBD.DataUltimoAcesso = p.DataUltimoAcesso;
+            context.Usuarios.Update(p.UsuarioBD);
 
-                await context.SaveChangesAsync();
-            });
+            await context.SaveChangesAsync();
         }
 
         public static void SendMessageToNearbyPlayers(IPlayer player, string message, TipoMensagemJogo type, float range, bool excludePlayer = false)

@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Discord.WebSocket;
@@ -485,10 +484,8 @@ namespace Roleplay.Commands
 
             Functions.GravarLog(TipoLog.AnuncioGov, mensagem, p, null);
 
-            AltAsync.Do(async () =>
-            {
-                await (Global.DiscordClient.GetChannel(Global.CanalAnunciosGovernamentais) as SocketTextChannel).SendMessageAsync($"{p.FaccaoBD.Nome}: {mensagem}");
-            });
+            if (!string.IsNullOrWhiteSpace(Global.TokenBot))
+                (Global.DiscordClient.GetChannel(Global.CanalAnunciosGovernamentais) as SocketTextChannel).SendMessageAsync($"{p.FaccaoBD.Nome}: {mensagem}");
         }
 
         [Command("armario")]
@@ -698,7 +695,7 @@ namespace Roleplay.Commands
         }
 
         [Command("mdc")]
-        public void CMD_mdc(IPlayer player)
+        public async void CMD_mdc(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (!(p?.FaccaoBD?.Governamental ?? false) || !p.EmTrabalho)
@@ -715,24 +712,22 @@ namespace Roleplay.Commands
                 return;
             }
 
-            AltAsync.Do(async () =>
-            {
-                var htmlLigacoes911 = string.Empty;
-                var htmlAPB = string.Empty;
-                var htmlBOLO = string.Empty;
-                var htmlRelatoriosPendentes = string.Empty;
+            var htmlLigacoes911 = string.Empty;
+            var htmlAPB = string.Empty;
+            var htmlBOLO = string.Empty;
+            var htmlRelatoriosPendentes = string.Empty;
 
-                if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica)
+            if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Medica)
+            {
+                var ligacoes911 = Global.Ligacoes911.Where(x => x.Tipo == p.FaccaoBD.Tipo && (DateTime.Now - x.Data).TotalHours < 24)
+                    .OrderByDescending(x => x.Codigo).ToList();
+                if (ligacoes911.Count == 0)
                 {
-                    var ligacoes911 = Global.Ligacoes911.Where(x => x.Tipo == p.FaccaoBD.Tipo && (DateTime.Now - x.Data).TotalHours < 24)
-                        .OrderByDescending(x => x.Codigo).ToList();
-                    if (ligacoes911.Count == 0)
-                    {
-                        htmlLigacoes911 = "<div class='alert alert-danger'>Não houve nenhum 911 nas últimas 24 horas.</div>";
-                    }
-                    else
-                    {
-                        htmlLigacoes911 = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+                    htmlLigacoes911 = "<div class='alert alert-danger'>Não houve nenhum 911 nas últimas 24 horas.</div>";
+                }
+                else
+                {
+                    htmlLigacoes911 = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
                         <table class='table table-bordered table-striped'>
                             <thead>
                                 <tr class='bg-dark'>
@@ -745,8 +740,8 @@ namespace Roleplay.Commands
                                 </tr>
                             </thead>
                             <tbody>";
-                        foreach (var x in ligacoes911)
-                            htmlLigacoes911 += $@"<tr>
+                    foreach (var x in ligacoes911)
+                        htmlLigacoes911 += $@"<tr>
                                     <td>{x.Codigo}</td>
                                     <td>{x.Data}</td>
                                     <td>{x.Celular}</td>
@@ -754,30 +749,29 @@ namespace Roleplay.Commands
                                     <td>{x.Mensagem}</td>
                                     <td class='text-center'><button class='btn btn-dark btn-xs' onclick='rastrear911({x.Codigo});'>Rastrear</button></td>
                                 </tr>";
-                        htmlLigacoes911 += $@"</tbody>
+                    htmlLigacoes911 += $@"</tbody>
                         </table>
                     </div>";
-                    }
                 }
+            }
 
-                if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
-                {
-                    var procurados = await Functions.ObterHTMLProcurados();
-                    htmlAPB = procurados.Item1;
-                    htmlBOLO = procurados.Item2;
-                }
+            if (p.FaccaoBD.Tipo == TipoFaccao.Policial)
+            {
+                var procurados = await Functions.ObterHTMLProcurados();
+                htmlAPB = procurados.Item1;
+                htmlBOLO = procurados.Item2;
+            }
 
-                if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Governo)
-                {
-                    // Apreensões veiculares, Confiscos e Prisões
-                    // Apreensões Veiculares e Prisões (/confiscar tbm? criar um Confiscos)
-                    // relatorios pendentes listar da facçção inteira  e ordenar para o do proprio usuario primeiro e aparecer botão só pra preencher se for o dono do relatorio
-                    // OBterHtmlRelatoriosPendentes pra depois atualizar
-                }
+            if (p.FaccaoBD.Tipo == TipoFaccao.Policial || p.FaccaoBD.Tipo == TipoFaccao.Governo)
+            {
+                // Apreensões veiculares, Confiscos e Prisões
+                // Apreensões Veiculares e Prisões (/confiscar tbm? criar um Confiscos)
+                // relatorios pendentes listar da facçção inteira  e ordenar para o do proprio usuario primeiro e aparecer botão só pra preencher se for o dono do relatorio
+                // OBterHtmlRelatoriosPendentes pra depois atualizar
+            }
 
-                player.Emit("Server:AbrirMDC", (int)p.FaccaoBD.Tipo, p.FaccaoBD.Nome, htmlLigacoes911, htmlAPB, htmlBOLO, htmlRelatoriosPendentes);
-                Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
-            });
+            player.Emit("Server:AbrirMDC", (int)p.FaccaoBD.Tipo, p.FaccaoBD.Nome, htmlLigacoes911, htmlAPB, htmlBOLO, htmlRelatoriosPendentes);
+            Functions.SendMessageToNearbyPlayers(player, "abre o MDC.", TipoMensagemJogo.Ame, 10);
         }
 
         [Command("confiscar", "/confiscar (ID ou nome)")]
@@ -892,7 +886,7 @@ namespace Roleplay.Commands
         }
 
         [Command("freparar")]
-        public void CMD_freparar(IPlayer player)
+        public async void CMD_freparar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.Faccao == 0 || p?.FaccaoBD?.Tipo == TipoFaccao.Criminosa || !p.EmTrabalho)
@@ -917,13 +911,10 @@ namespace Roleplay.Commands
 
             player.Emit("Server:freezeEntityPosition", true);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
-            AltAsync.Do(async () =>
-            {
-                await Task.Delay(5000);
-                veh.Reparar();
-                Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
-                player.Emit("Server:freezeEntityPosition", false);
-            });
+            await Task.Delay(5000);
+            veh.Reparar();
+            player.Emit("Server:freezeEntityPosition", false);
+            Functions.EnviarMensagemFaccao(p, $"{p.RankBD.Nome} {p.Nome} reparou o veículo {veh.Modelo.ToUpper()} {veh.Placa}.");
         }
 
         [Command("colocar", "/colocar (ID ou nome)")]

@@ -190,9 +190,13 @@ namespace Roleplay.Entities
                     foreach (var x in dano.Wheels)
                     {
                         Vehicle.SetWheelHealth(x.Id, x.Health);
-                        Vehicle.SetWheelDetached(x.Id, x.Detached);
-                        Vehicle.SetWheelBurst(x.Id, x.Burst);
                         Vehicle.SetWheelHasTire(x.Id, x.HasTire);
+
+                        if (!x.Detached)
+                            Vehicle.SetWheelDetached(x.Id, x.Detached);
+
+                        if (!x.Burst)
+                            Vehicle.SetWheelBurst(x.Id, x.Burst);
                     }
                 }
             }
@@ -276,9 +280,8 @@ namespace Roleplay.Entities
             for (byte i = 0; i < Vehicle.WheelsCount; i++)
             {
                 Vehicle.SetWheelHealth(i, 1000);
-                Vehicle.SetWheelDetached(i, false);
-                Vehicle.SetWheelBurst(i, false);
                 Vehicle.SetWheelHasTire(i, true);
+                Vehicle.SetWheelFixed(i);
             }
         }
 

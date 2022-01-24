@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Roleplay.Models;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace Roleplay.Commands.Job
     public class Mecanico
     {
         [Command("reparar")]
-        public void CMD_reparar(IPlayer player)
+        public async void CMD_reparar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (p.Emprego != TipoEmprego.Mecanico)
@@ -44,15 +43,12 @@ namespace Roleplay.Commands.Job
 
             player.Emit("Server:freezeEntityPosition", true);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
-            AltAsync.Do(async () =>
-            {
-                await Task.Delay(5000);
-                veh.Reparar();
-                p.PecasVeiculares--;
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você consertou o veículo e usou uma peça veicular.");
-                player.Emit("Server:freezeEntityPosition", false);
-                Functions.SendMessageToNearbyPlayers(player, "conserta o veículo.", TipoMensagemJogo.Ame, 10);
-            });
+            await Task.Delay(5000);
+            veh.Reparar();
+            p.PecasVeiculares--;
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você consertou o veículo e usou uma peça veicular.");
+            player.Emit("Server:freezeEntityPosition", false);
+            Functions.SendMessageToNearbyPlayers(player, "conserta o veículo.", TipoMensagemJogo.Ame, 10);
         }
 
         [Command("pintar")]

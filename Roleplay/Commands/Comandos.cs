@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Newtonsoft.Json;
@@ -1355,7 +1354,7 @@ namespace Roleplay.Commands
         }
 
         [Command("mecurar")]
-        public void CMD_mecurar(IPlayer player)
+        public async void CMD_mecurar(IPlayer player)
         {
             var p = Functions.ObterPersonagem(player);
             if (!p.Ferido)
@@ -1379,15 +1378,12 @@ namespace Roleplay.Commands
 
             player.Emit("Server:freezeEntityPosition", true);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
-            AltAsync.Do(async () =>
-            {
-                await Task.Delay(5000);
-                p.Curar();
-                p.Dinheiro -= valor;
-                p.SetDinheiro();
-                player.Emit("Server:freezeEntityPosition", false);
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você tratou seus ferimentos por ${valor:N0}.");
-            });
+            await Task.Delay(5000);
+            p.Curar();
+            p.Dinheiro -= valor;
+            p.SetDinheiro();
+            player.Emit("Server:freezeEntityPosition", false);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você tratou seus ferimentos por ${valor:N0}.");
         }
 
         [Command("mascara")]

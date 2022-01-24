@@ -9,7 +9,7 @@ namespace Roleplay
     public class Testes
     {
         [Command("x")]
-        public void CMD_x(IPlayer player)
+        public async void CMD_x(IPlayer player)
         {
             if (!Global.Development)
             {
@@ -19,12 +19,10 @@ namespace Roleplay
 
             /*var p = Functions.ObterPersonagem(player);
 
-            AltAsync.Do(async () =>
-            {
                 //p.PlayAnimation("cellphone@", "cellphone_call_in", (int)(AnimationFlags.StopOnLastFrame | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody)); //pegando celular
                 //await Task.Delay(2000); // 2 seg
                 p.PlayAnimation("cellphone@", "cellphone_call_listen_base", (int)(AnimationFlags.StopOnLastFrame | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody)); //em ligação
-            });*/
+            */
 
             //Alt.CreateBlip(player, BlipType.Object, player.Position);
             //Alt.CreateCheckpoint(CheckpointType.Cyclinder, player.Position, 1, 1, new Rgba(255, 255, 255, 255));

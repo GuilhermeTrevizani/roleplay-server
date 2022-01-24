@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Data;
+﻿using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -387,19 +386,21 @@ namespace Roleplay.Entities
             if (TipoFerido > 0)
                 SetarFerido(false);
 
-            AltAsync.Do(async () =>
-            {
-                var context = new DatabaseContext();
-                var multas = await context.Multas.AsQueryable().CountAsync(x => x.PersonagemMultado == Codigo && !x.DataPagamento.HasValue);
-                if (multas > 0)
-                {
-                    var strMultas = multas > 1 ? "s" : string.Empty;
-                    Functions.EnviarMensagem(Player, TipoMensagem.Erro, $"Você possui {multas} multa{strMultas} pendente{strMultas}.");
-                }
-            });
+            ExibirMensagemMultas(this);
         }
 
-        public void SetarFerido(bool temDelay)
+        private static async void ExibirMensagemMultas(Personagem personagem)
+        {
+            var context = new DatabaseContext();
+            var multas = await context.Multas.AsQueryable().CountAsync(x => x.PersonagemMultado == personagem.Codigo && !x.DataPagamento.HasValue);
+            if (multas > 0)
+            {
+                var strMultas = multas > 1 ? "s" : string.Empty;
+                Functions.EnviarMensagem(personagem.Player, TipoMensagem.Erro, $"Você possui {multas} multa{strMultas} pendente{strMultas}.");
+            }
+        }
+
+        public async void SetarFerido(bool temDelay)
         {
             if (temDelay || TipoFerido == 1)
                 Functions.EnviarMensagem(Player, TipoMensagem.Erro, "Você foi gravemente ferido. Os médicos deverão chegar em até 5 minutos ou você perderá a consciência.");
@@ -430,24 +431,21 @@ namespace Roleplay.Entities
             };
             TimerFerido.Start();
 
-            AltAsync.Do(async () =>
+            if (temDelay)
+                await Task.Delay(5000);
+
+            if (Player.IsDead || !temDelay)
             {
                 if (temDelay)
-                    await Task.Delay(5000);
-
-                if (Player.IsDead || !temDelay)
                 {
-                    if (temDelay)
-                    {
-                        await Player.SpawnAsync(Player.Position);
-                        TipoFerido = 1;
-                    }
-
-                    StopAnimation();
-                    await Player.EmitAsync("Server:ToggleFerido", TipoFerido);
-                    Player.SetSyncedMetaData("ferido", TipoFerido);
+                    Player.Spawn(Player.Position);
+                    TipoFerido = 1;
                 }
-            });
+
+                StopAnimation();
+                Player.Emit("Server:ToggleFerido", TipoFerido);
+                Player.SetSyncedMetaData("ferido", TipoFerido);
+            }
         }
 
         public void SetNametag() => Player.SetSyncedMetaData("nametag", !PosicaoSpec.HasValue ? (EmTrabalhoAdministrativo ? $"~q~{UsuarioBD?.Nome}" : NomeIC) : string.Empty);

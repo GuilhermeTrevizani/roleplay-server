@@ -1,5 +1,4 @@
-﻿using AltV.Net.Async;
-using AltV.Net.Elements.Entities;
+﻿using AltV.Net.Elements.Entities;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using Roleplay.Models;
@@ -215,10 +214,8 @@ namespace Roleplay.Commands
 
             Functions.GravarLog(TipoLog.Anuncio, mensagem, p, null);
 
-            AltAsync.Do(async () =>
-            {
-                await (Global.DiscordClient.GetChannel(Global.CanalAnuncios) as SocketTextChannel).SendMessageAsync($"{mensagem} [CONTATO: {p.Celular}]");
-            });
+            if (!string.IsNullOrWhiteSpace(Global.TokenBot))
+                (Global.DiscordClient.GetChannel(Global.CanalAnuncios) as SocketTextChannel).SendMessageAsync($"{mensagem} [CONTATO: {p.Celular}]");
         }
     }
 }

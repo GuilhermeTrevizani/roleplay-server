@@ -1,5 +1,4 @@
 ﻿using AltV.Net;
-using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -23,7 +22,7 @@ using System.Timers;
 
 namespace Roleplay
 {
-    public class Server : AsyncResource
+    public class Server : Resource
     {
         Timer TimerSegundo { get; set; }
         Timer TimerSalvar { get; set; }
@@ -371,18 +370,15 @@ namespace Roleplay
             }
         }
 
-        private void OnPlayerLeaveVehicle(IVehicle vehicle, IPlayer player, byte seat)
+        private async void OnPlayerLeaveVehicle(IVehicle vehicle, IPlayer player, byte seat)
         {
             var p = Functions.ObterPersonagem(player);
             p.StopAnimation();
 
             if (vehicle.Model == (uint)VehicleModel.Thruster)
             {
-                AltAsync.Do(async () =>
-                {
-                    await Task.Delay(2000);
-                    vehicle.Remove();
-                });
+                await Task.Delay(2000);
+                vehicle.Remove();
             }
         }
 
@@ -486,6 +482,7 @@ namespace Roleplay
         private void OnPlayerChat(IPlayer player, string message)
         {
             // se contem <script>, travar
+
             if (message[0] != '/')
             {
                 Functions.EnviarMensagemChat(Functions.ObterPersonagem(player), message, TipoMensagemJogo.ChatICNormal);
@@ -583,7 +580,7 @@ namespace Roleplay
 
         private bool OnWeaponDamage(IPlayer player, IEntity target, uint weapon, ushort damage, Position shotOffset, BodyPart bodyPart)
         {
-            if (!(target is IPlayer playerTarget))
+            if (target is not IPlayer playerTarget)
                 return true;
 
             var p = Functions.ObterPersonagem(playerTarget);
@@ -1780,7 +1777,7 @@ namespace Roleplay
 
         private void EnviarLocalizacaoContatoCelular(IPlayer player, int celular) => Functions.EnviarLocalizacaoCelular(player, celular.ToString());
 
-        private void AbastecerVeiculo(IPlayer player, int veiculo)
+        private async void AbastecerVeiculo(IPlayer player, int veiculo)
         {
             var p = Functions.ObterPersonagem(player);
 
@@ -1796,24 +1793,21 @@ namespace Roleplay
 
             player.Emit("Server:freezeEntityPosition", true);
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
-            AltAsync.Do(async () =>
+            await Task.Delay(5000);
+            veh.Combustivel = veh.TanqueCombustivel;
+            veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+            if (veh.Faccao == 0)
             {
-                await Task.Delay(5000);
-                veh.Combustivel = veh.TanqueCombustivel;
-                veh.Vehicle.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
-                if (veh.Faccao == 0)
-                {
-                    p.Dinheiro -= valor;
-                    p.SetDinheiro();
-                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
-                }
-                else
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível.");
-                }
-                Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
-                player.Emit("Server:freezeEntityPosition", false);
-            });
+                p.Dinheiro -= valor;
+                p.SetDinheiro();
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível por ${valor:N0}.");
+            }
+            else
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você abasteceu {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)} de combustível.");
+            }
+            Functions.SendMessageToNearbyPlayers(player, "abastece o veículo.", TipoMensagemJogo.Ame, 10);
+            player.Emit("Server:freezeEntityPosition", false);
         }
 
         private void PunicoesAdministrativas(IPlayer player)
@@ -1919,7 +1913,7 @@ namespace Roleplay
                 Functions.CMDSacar(player, valor);
         }
 
-        private void PintarVeiculo(IPlayer player, int veiculo, int tipo, int r1, int g1, int b1, int r2, int g2, int b2)
+        private async void PintarVeiculo(IPlayer player, int veiculo, int tipo, int r1, int g1, int b1, int r2, int g2, int b2)
         {
             player.Emit("Server:CloseView");
 
@@ -1932,16 +1926,13 @@ namespace Roleplay
 
                 player.Emit("Server:freezeEntityPosition", true);
                 Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Aguarde 5 segundos.");
-                AltAsync.Do(async () =>
-                {
-                    await Task.Delay(5000);
-                    await veh.Vehicle.SetPrimaryColorRgbAsync(new Rgba((byte)r1, (byte)g1, (byte)b1, 255));
-                    await veh.Vehicle.SetSecondaryColorRgbAsync(new Rgba((byte)r2, (byte)g2, (byte)b2, 255));
-                    p.PecasVeiculares--;
-                    Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pintou o veículo e usou uma peça veicular.");
-                    Functions.SendMessageToNearbyPlayers(player, "pinta o veículo.", TipoMensagemJogo.Ame, 10);
-                    player.Emit("Server:freezeEntityPosition", false);
-                });
+                await Task.Delay(5000);
+                veh.Vehicle.PrimaryColorRgb = new Rgba((byte)r1, (byte)g1, (byte)b1, 255);
+                veh.Vehicle.SecondaryColorRgb = new Rgba((byte)r2, (byte)g2, (byte)b2, 255);
+                p.PecasVeiculares--;
+                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "Você pintou o veículo e usou uma peça veicular.");
+                Functions.SendMessageToNearbyPlayers(player, "pinta o veículo.", TipoMensagemJogo.Ame, 10);
+                player.Emit("Server:freezeEntityPosition", false);
             }
             else
             {
@@ -2036,64 +2027,62 @@ namespace Roleplay
             }
         }
 
-        private void MDCPesquisarPessoa(IPlayer player, string pesquisa)
+        private async void MDCPesquisarPessoa(IPlayer player, string pesquisa)
         {
-            AltAsync.Do(async () =>
+            var html = string.Empty;
+            using var context = new DatabaseContext();
+            var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Nome.ToLower() == pesquisa.ToLower());
+            if (per == null)
             {
-                var html = string.Empty;
-                using var context = new DatabaseContext();
-                var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Nome.ToLower() == pesquisa.ToLower());
-                if (per == null)
+                html = $@"<div class='alert alert-danger'>Nenhuma pessoa foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+            }
+            else
+            {
+                var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
+
+                var veiculos = await context.Veiculos.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.VendidoFerroVelho)
+                .OrderByDescending(x => x.Codigo).ToListAsync();
+
+                var multas = await context.Multas.AsQueryable().Where(x => x.PersonagemMultado == per.Codigo)
+                    .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
+
+                var prisoes = await context.Prisoes.AsQueryable().Where(x => x.Preso == per.Codigo)
+                    .Include(x => x.PolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
+
+                var confiscos = await context.Confiscos.AsQueryable().Where(x => x.Personagem == per.Codigo)
+                    .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
+
+                var emprego = Functions.ObterDisplayEnum(per.Emprego);
+                if (per.Faccao > 0)
+                    emprego = $"{Global.Ranks.FirstOrDefault(x => x.Codigo == per.Rank && x.Faccao == per.Faccao)?.Nome ?? string.Empty} - {Global.Faccoes.FirstOrDefault(x => x.Codigo == per.Faccao)?.Nome ?? string.Empty}";
+
+                var botaoRevogarLicenca = $@"<button onclick='revogarLicenca({per.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Revogar Licença de Motorista</button>";
+                var licencaMotorista = $"<span class='label' style='background-color:{Global.CorSucesso};'>VÁLIDA</span>";
+                if (per.PolicialRevogacaoLicencaMotorista > 0)
                 {
-                    html = $@"<div class='alert alert-danger'>Nenhuma pessoa foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+                    var policial = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == per.PolicialRevogacaoLicencaMotorista);
+                    licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>REVOGADA POR {policial?.Nome?.ToUpper() ?? string.Empty}</span>";
+                    botaoRevogarLicenca = string.Empty;
                 }
-                else
+                else if (!per.DataValidadeLicencaMotorista.HasValue)
                 {
-                    var propriedades = Global.Propriedades.Where(x => x.Personagem == per.Codigo).ToList();
+                    licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>NÃO POSSUI</span>";
+                    botaoRevogarLicenca = string.Empty;
+                }
+                else if (per.DataValidadeLicencaMotorista?.Date < DateTime.Now.Date)
+                {
+                    licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>VENCIDA</span>";
+                    botaoRevogarLicenca = string.Empty;
+                }
 
-                    var veiculos = await context.Veiculos.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.VendidoFerroVelho)
-                    .OrderByDescending(x => x.Codigo).ToListAsync();
+                var strBolo = string.Empty;
+                var botaoBolo = $@"<button onclick='adicionarBOLO(1, {per.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Adicionar APB</button>";
 
-                    var multas = await context.Multas.AsQueryable().Where(x => x.PersonagemMultado == per.Codigo)
-                        .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
-
-                    var prisoes = await context.Prisoes.AsQueryable().Where(x => x.Preso == per.Codigo)
-                        .Include(x => x.PolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
-
-                    var confiscos = await context.Confiscos.AsQueryable().Where(x => x.Personagem == per.Codigo)
-                        .Include(x => x.PersonagemPolicialBD).OrderByDescending(x => x.Codigo).ToListAsync();
-
-                    var emprego = Functions.ObterDisplayEnum(per.Emprego);
-                    if (per.Faccao > 0)
-                        emprego = $"{Global.Ranks.FirstOrDefault(x => x.Codigo == per.Rank && x.Faccao == per.Faccao)?.Nome ?? string.Empty} - {Global.Faccoes.FirstOrDefault(x => x.Codigo == per.Faccao)?.Nome ?? string.Empty}";
-
-                    var botaoRevogarLicenca = $@"<button onclick='revogarLicenca({per.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Revogar Licença de Motorista</button>";
-                    var licencaMotorista = $"<span class='label' style='background-color:{Global.CorSucesso};'>VÁLIDA</span>";
-                    if (per.PolicialRevogacaoLicencaMotorista > 0)
-                    {
-                        var policial = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == per.PolicialRevogacaoLicencaMotorista);
-                        licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>REVOGADA POR {policial?.Nome?.ToUpper() ?? string.Empty}</span>";
-                        botaoRevogarLicenca = string.Empty;
-                    }
-                    else if (!per.DataValidadeLicencaMotorista.HasValue)
-                    {
-                        licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>NÃO POSSUI</span>";
-                        botaoRevogarLicenca = string.Empty;
-                    }
-                    else if (per.DataValidadeLicencaMotorista?.Date < DateTime.Now.Date)
-                    {
-                        licencaMotorista = $"<span class='label' style='background-color:{Global.CorErro};'>VENCIDA</span>";
-                        botaoRevogarLicenca = string.Empty;
-                    }
-
-                    var strBolo = string.Empty;
-                    var botaoBolo = $@"<button onclick='adicionarBOLO(1, {per.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Adicionar APB</button>";
-
-                    var bolo = await context.Procurados.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
-                    if (bolo != null)
-                    {
-                        botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Remover APB</button>";
-                        strBolo = $@"<div class='row'>
+                var bolo = await context.Procurados.AsQueryable().Where(x => x.Personagem == per.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
+                if (bolo != null)
+                {
+                    botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{per.Nome}"");' type='button' class='btn btn-xs btn-dark'>Remover APB</button>";
+                    strBolo = $@"<div class='row'>
                             <div class='col-md-12'>
                                 <div class='well' style='margin-top:10px'>
                                     <p> <span class='label label-danger label-md'>APB</span> {bolo.Motivo}</p> 
@@ -2101,9 +2090,9 @@ namespace Roleplay
                                 </div>
                             </div>
                         </div>";
-                    }
+                }
 
-                    html = $@"<div class='row'>
+                html = $@"<div class='row'>
                                 <div class='col-md-6'>
                                     <h3>{per.Nome}</h3>
                                 </div>
@@ -2129,86 +2118,83 @@ namespace Roleplay
                             </div>
                             {strBolo}";
 
-                    if (propriedades.Count > 0)
-                    {
-                        html += $@"<p class='text-main text-semibold'>Propriedades</p>";
-                        foreach (var x in propriedades)
-                            html += $@"<p>Nº {x.Codigo} - {x.Endereco}</p>";
-                    }
-
-                    if (veiculos.Count > 0)
-                    {
-                        html += $@"<p class='text-main text-semibold'>Veículos</p>";
-                        foreach (var x in veiculos)
-                            html += $@"<p>Modelo: <strong>{x.Modelo.ToUpper()}</strong> Placa: <strong>{x.Placa}</strong></p>";
-                    }
-
-                    if (multas.Count > 0)
-                    {
-                        html += $@"<p class='text-main text-semibold'>Multas</p>";
-                        foreach (var x in multas)
-                            html += $@"<p>Data: <strong>{x.Data}</strong> Valor: <strong>${x.Valor:N0}</strong> Policial: <strong>{x.PersonagemPolicialBD?.Nome ?? string.Empty}</strong> Motivo: <strong>{x.Motivo}</strong> Status: <strong>{(x.DataPagamento.HasValue ? $"<span class='label' style='background-color:{Global.CorSucesso};'>PAGA</span>" : $"<span class='label' style='background-color:{Global.CorErro};'>PENDENTE</span>")}</strong> <button onclick='$.alert(""{x.Descricao}"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
-                    }
-
-                    if (prisoes.Count > 0)
-                    {
-                        html += $@"<p class='text-main text-semibold'>Prisões</p>";
-                        foreach (var x in prisoes)
-                            html += $@"<p>Data: <strong>{x.Data}</strong> Tempo: <strong>{Convert.ToInt32((x.Termino - x.Data).TotalMinutes)} minutos</strong> Policial: <strong>{x.PolicialBD?.Nome ?? string.Empty}</strong></p> <button onclick='$.alert(""<p>{x.Descricao}</p><p>{x.Crimes}</p>"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
-                    }
-
-                    if (confiscos.Count > 0)
-                    {
-                        html += $@"<p class='text-main text-semibold'>Confiscos</p>";
-                        foreach (var x in confiscos)
-                        {
-                            html += $@"<p>Data: <strong>{x.Data}</strong> Policial: <strong>{x.PersonagemPolicialBD?.Nome ?? string.Empty}</strong> <button onclick='$.alert(""{x.Descricao}"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
-                            var armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(x.Armas);
-                            html += "<p>Armas</p>";
-                            foreach (var y in armas)
-                                html += $@"<p>Arma: <strong>{(WeaponModel)y.Codigo}</strong> Munição: <strong>{y.Municao}</strong></p>";
-                        }
-                    }
+                if (propriedades.Count > 0)
+                {
+                    html += $@"<p class='text-main text-semibold'>Propriedades</p>";
+                    foreach (var x in propriedades)
+                        html += $@"<p>Nº {x.Codigo} - {x.Endereco}</p>";
                 }
 
-                player.Emit("Server:AtualizarMDC", "btn-pesquisarpessoa", "div-pesquisarpessoa", html);
-            });
+                if (veiculos.Count > 0)
+                {
+                    html += $@"<p class='text-main text-semibold'>Veículos</p>";
+                    foreach (var x in veiculos)
+                        html += $@"<p>Modelo: <strong>{x.Modelo.ToUpper()}</strong> Placa: <strong>{x.Placa}</strong></p>";
+                }
+
+                if (multas.Count > 0)
+                {
+                    html += $@"<p class='text-main text-semibold'>Multas</p>";
+                    foreach (var x in multas)
+                        html += $@"<p>Data: <strong>{x.Data}</strong> Valor: <strong>${x.Valor:N0}</strong> Policial: <strong>{x.PersonagemPolicialBD?.Nome ?? string.Empty}</strong> Motivo: <strong>{x.Motivo}</strong> Status: <strong>{(x.DataPagamento.HasValue ? $"<span class='label' style='background-color:{Global.CorSucesso};'>PAGA</span>" : $"<span class='label' style='background-color:{Global.CorErro};'>PENDENTE</span>")}</strong> <button onclick='$.alert(""{x.Descricao}"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
+                }
+
+                if (prisoes.Count > 0)
+                {
+                    html += $@"<p class='text-main text-semibold'>Prisões</p>";
+                    foreach (var x in prisoes)
+                        html += $@"<p>Data: <strong>{x.Data}</strong> Tempo: <strong>{Convert.ToInt32((x.Termino - x.Data).TotalMinutes)} minutos</strong> Policial: <strong>{x.PolicialBD?.Nome ?? string.Empty}</strong></p> <button onclick='$.alert(""<p>{x.Descricao}</p><p>{x.Crimes}</p>"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
+                }
+
+                if (confiscos.Count > 0)
+                {
+                    html += $@"<p class='text-main text-semibold'>Confiscos</p>";
+                    foreach (var x in confiscos)
+                    {
+                        html += $@"<p>Data: <strong>{x.Data}</strong> Policial: <strong>{x.PersonagemPolicialBD?.Nome ?? string.Empty}</strong> <button onclick='$.alert(""{x.Descricao}"");' class='btn btn-dark btn-xs'>Detalhes</button></p>";
+                        var armas = JsonConvert.DeserializeObject<List<Personagem.Arma>>(x.Armas);
+                        html += "<p>Armas</p>";
+                        foreach (var y in armas)
+                            html += $@"<p>Arma: <strong>{(WeaponModel)y.Codigo}</strong> Munição: <strong>{y.Municao}</strong></p>";
+                    }
+                }
+            }
+
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarpessoa", "div-pesquisarpessoa", html);
         }
 
-        private void MDCPesquisarVeiculo(IPlayer player, string pesquisa)
+        private async void MDCPesquisarVeiculo(IPlayer player, string pesquisa)
         {
-            AltAsync.Do(async () =>
+            var html = string.Empty;
+            using var context = new DatabaseContext();
+            var veh = await context.Veiculos.AsQueryable().FirstOrDefaultAsync(x => x.Placa.ToLower() == pesquisa.ToLower());
+            if (veh == null)
             {
-                var html = string.Empty;
-                using var context = new DatabaseContext();
-                var veh = await context.Veiculos.AsQueryable().FirstOrDefaultAsync(x => x.Placa.ToLower() == pesquisa.ToLower());
-                if (veh == null)
+                html = $@"<div class='alert alert-danger'>Nenhum veículo foi encontrado com a pesquisa <strong>{pesquisa}</strong>.</div>";
+            }
+            else
+            {
+                var strBolo = string.Empty;
+                var botaoBolo = string.Empty;
+                var proprietario = $"Emprego de {Functions.ObterDisplayEnum(veh.Emprego)}";
+                if (veh.Personagem > 0)
                 {
-                    html = $@"<div class='alert alert-danger'>Nenhum veículo foi encontrado com a pesquisa <strong>{pesquisa}</strong>.</div>";
-                }
-                else
-                {
-                    var strBolo = string.Empty;
-                    var botaoBolo = string.Empty;
-                    var proprietario = $"Emprego de {Functions.ObterDisplayEnum(veh.Emprego)}";
-                    if (veh.Personagem > 0)
+                    botaoBolo = $@"<button onclick='adicionarBOLO(2, {veh.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Adicionar BOLO</button>";
+                    if (veh.VendidoFerroVelho)
                     {
-                        botaoBolo = $@"<button onclick='adicionarBOLO(2, {veh.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Adicionar BOLO</button>";
-                        if (veh.VendidoFerroVelho)
-                        {
-                            proprietario = "FERRO VELHO";
-                        }
-                        else
-                        {
-                            var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
-                            proprietario = per?.Nome ?? string.Empty;
-                        }
+                        proprietario = "FERRO VELHO";
+                    }
+                    else
+                    {
+                        var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == veh.Personagem);
+                        proprietario = per?.Nome ?? string.Empty;
+                    }
 
-                        var bolo = await context.Procurados.AsQueryable().Where(x => x.Veiculo == veh.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
-                        if (bolo != null)
-                        {
-                            botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Remover BOLO</button>";
-                            strBolo = $@"<div class='row'>
+                    var bolo = await context.Procurados.AsQueryable().Where(x => x.Veiculo == veh.Codigo && !x.DataExclusao.HasValue).Include(x => x.PersonagemPolicialBD).FirstOrDefaultAsync();
+                    if (bolo != null)
+                    {
+                        botaoBolo = $@"<button onclick='removerBOLO({bolo.Codigo},""{pesquisa}"");' type='button' class='btn btn-xs btn-dark'>Remover BOLO</button>";
+                        strBolo = $@"<div class='row'>
                             <div class='col-md-12'>
                                 <div class='well' style='margin-top:10px'>
                                     <p> <span class='label label-danger label-md'>BOLO</span> {bolo.Motivo}</p> 
@@ -2216,14 +2202,14 @@ namespace Roleplay
                                 </div>
                             </div>
                             </div>";
-                        }
                     }
-                    else if (veh.Faccao > 0)
-                    {
-                        proprietario = Global.Faccoes.FirstOrDefault(x => x.Codigo == veh.Faccao)?.Nome ?? string.Empty;
-                    }
+                }
+                else if (veh.Faccao > 0)
+                {
+                    proprietario = Global.Faccoes.FirstOrDefault(x => x.Codigo == veh.Faccao)?.Nome ?? string.Empty;
+                }
 
-                    html += $@"<div class='row'>
+                html += $@"<div class='row'>
                     <div class='col-md-6'>
                         <h3>{veh.Placa}</h3>
                     </div>
@@ -2244,33 +2230,30 @@ namespace Roleplay
                         </div>
                     </div>
                     {strBolo}";
-                }
+            }
 
-                player.Emit("Server:AtualizarMDC", "btn-pesquisarveiculo", "div-pesquisarveiculo", html);
-            });
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarveiculo", "div-pesquisarveiculo", html);
         }
 
-        private void MDCPesquisarPropriedade(IPlayer player, string pesquisa)
+        private async void MDCPesquisarPropriedade(IPlayer player, string pesquisa)
         {
-            AltAsync.Do(async () =>
+            var html = string.Empty;
+            var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo.ToString() == pesquisa);
+            if (prop == null)
             {
-                var html = string.Empty;
-                var prop = Global.Propriedades.FirstOrDefault(x => x.Codigo.ToString() == pesquisa);
-                if (prop == null)
+                html = $@"<div class='alert alert-danger'>Nenhuma propriedade foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+            }
+            else
+            {
+                var proprietario = "N/A";
+                if (prop.Personagem > 0)
                 {
-                    html = $@"<div class='alert alert-danger'>Nenhuma propriedade foi encontrada com a pesquisa <strong>{pesquisa}</strong>.</div>";
+                    using var context = new DatabaseContext();
+                    var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == prop.Personagem);
+                    proprietario = per?.Nome ?? string.Empty;
                 }
-                else
-                {
-                    var proprietario = "N/A";
-                    if (prop.Personagem > 0)
-                    {
-                        using var context = new DatabaseContext();
-                        var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == prop.Personagem);
-                        proprietario = per?.Nome ?? string.Empty;
-                    }
 
-                    html = $@"<h3>Propriedade Nº {prop.Codigo}</h3>
+                html = $@"<h3>Propriedade Nº {prop.Codigo}</h3>
                     <div class='row'>
                         <div class='col-md-6'>
                             <p>Endereço: <strong>{prop.Endereco}</strong></p>
@@ -2282,10 +2265,9 @@ namespace Roleplay
                             <p>Valor: <strong>${prop.Valor:N0}</strong></p>
                         </div>
                     </div>";
-                }
+            }
 
-                player.Emit("Server:AtualizarMDC", "btn-pesquisarpropriedade", "div-pesquisarpropriedade", html);
-            });
+            player.Emit("Server:AtualizarMDC", "btn-pesquisarpropriedade", "div-pesquisarpropriedade", html);
         }
 
         private void MDCRastrearVeiculo(IPlayer player, int codigo)
@@ -2301,59 +2283,53 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, "A posição do veículo foi marcada no seu GPS.", notify: true);
         }
 
-        private void MDCAdicionarBOLO(IPlayer player, int tipo, int codigo, string motivo, string pesquisa)
+        private async void MDCAdicionarBOLO(IPlayer player, int tipo, int codigo, string motivo, string pesquisa)
         {
-            AltAsync.Do(async () =>
+            var p = Functions.ObterPersonagem(player);
+            var bolo = new Procurado
             {
-                var p = Functions.ObterPersonagem(player);
-                var bolo = new Procurado
-                {
-                    PersonagemPolicial = p.Codigo,
-                    Motivo = motivo,
-                };
+                PersonagemPolicial = p.Codigo,
+                Motivo = motivo,
+            };
 
-                if (tipo == 1)
-                    bolo.Personagem = codigo;
-                else
-                    bolo.Veiculo = codigo;
+            if (tipo == 1)
+                bolo.Personagem = codigo;
+            else
+                bolo.Veiculo = codigo;
 
-                using var context = new DatabaseContext();
-                await context.Procurados.AddAsync(bolo);
-                await context.SaveChangesAsync();
+            using var context = new DatabaseContext();
+            await context.Procurados.AddAsync(bolo);
+            await context.SaveChangesAsync();
 
-                if (tipo == 1)
-                    MDCPesquisarPessoa(player, pesquisa);
-                else
-                    MDCPesquisarVeiculo(player, pesquisa);
+            if (tipo == 1)
+                MDCPesquisarPessoa(player, pesquisa);
+            else
+                MDCPesquisarVeiculo(player, pesquisa);
 
-                var procurados = await Functions.ObterHTMLProcurados();
-                player.Emit("Server:AtualizarMDC", string.Empty, "tab-apb", procurados.Item1);
-                player.Emit("Server:AtualizarMDC", string.Empty, "tab-bolo", procurados.Item2);
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{(tipo == 1 ? "APB" : "BOLO")} adicionado.", notify: true);
-            });
+            var procurados = await Functions.ObterHTMLProcurados();
+            player.Emit("Server:AtualizarMDC", string.Empty, "tab-apb", procurados.Item1);
+            player.Emit("Server:AtualizarMDC", string.Empty, "tab-bolo", procurados.Item2);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{(tipo == 1 ? "APB" : "BOLO")} adicionado.", notify: true);
         }
 
-        private void MDCRemoverBOLO(IPlayer player, int codigo, string pesquisa)
+        private async void MDCRemoverBOLO(IPlayer player, int codigo, string pesquisa)
         {
-            AltAsync.Do(async () =>
-            {
-                var p = Functions.ObterPersonagem(player);
-                using var context = new DatabaseContext();
-                var bolo = await context.Procurados.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
-                bolo.PersonagemPolicialExclusao = p.Codigo;
-                bolo.DataExclusao = DateTime.Now;
-                context.Procurados.Update(bolo);
-                await context.SaveChangesAsync();
-                if (bolo.Personagem > 0)
-                    MDCPesquisarPessoa(player, pesquisa);
-                else
-                    MDCPesquisarVeiculo(player, pesquisa);
+            var p = Functions.ObterPersonagem(player);
+            using var context = new DatabaseContext();
+            var bolo = await context.Procurados.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
+            bolo.PersonagemPolicialExclusao = p.Codigo;
+            bolo.DataExclusao = DateTime.Now;
+            context.Procurados.Update(bolo);
+            await context.SaveChangesAsync();
+            if (bolo.Personagem > 0)
+                MDCPesquisarPessoa(player, pesquisa);
+            else
+                MDCPesquisarVeiculo(player, pesquisa);
 
-                var procurados = await Functions.ObterHTMLProcurados();
-                player.Emit("Server:AtualizarMDC", string.Empty, "tab-apb", procurados.Item1);
-                player.Emit("Server:AtualizarMDC", string.Empty, "tab-bolo", procurados.Item2);
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{(bolo.Personagem > 0 ? "APB" : "BOLO")} removido.", notify: true);
-            });
+            var procurados = await Functions.ObterHTMLProcurados();
+            player.Emit("Server:AtualizarMDC", string.Empty, "tab-apb", procurados.Item1);
+            player.Emit("Server:AtualizarMDC", string.Empty, "tab-bolo", procurados.Item2);
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"{(bolo.Personagem > 0 ? "APB" : "BOLO")} removido.", notify: true);
         }
 
         private void MDCRastrear911(IPlayer player, int codigo)
@@ -2363,74 +2339,69 @@ namespace Roleplay
             Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"A localização da ligação de emergência #{codigo} foi marcada no seu GPS.", notify: true);
         }
 
-        private void MDCMultar(IPlayer player, int codigo, string nome, int valor, string motivo, string descricao)
+        private async void MDCMultar(IPlayer player, int codigo, string nome, int valor, string motivo, string descricao)
         {
-            AltAsync.Do(async () =>
+
+            if (valor <= 0)
             {
-                if (valor <= 0)
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.", notify: true);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(motivo))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não foi informado.", notify: true);
+                return;
+            }
+
+            if (motivo.Length > 255)
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.", notify: true);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(descricao))
+            {
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Descrição não foi informada.", notify: true);
+                return;
+            }
+
+            var p = Functions.ObterPersonagem(player);
+            using (var context = new DatabaseContext())
+            {
+                await context.Multas.AddAsync(new Multa()
                 {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Valor inválido.", notify: true);
-                    return;
-                }
+                    Motivo = motivo,
+                    PersonagemMultado = codigo,
+                    PersonagemPolicial = p.Codigo,
+                    Valor = valor,
+                    Descricao = descricao,
+                });
+                await context.SaveChangesAsync();
+            }
 
-                if (string.IsNullOrWhiteSpace(motivo))
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não foi informado.", notify: true);
-                    return;
-                }
+            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {nome} por ${valor:N0}. Motivo: {motivo}", notify: true);
 
-                if (motivo.Length > 255)
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo não pode ter mais que 255 caracteres.", notify: true);
-                    return;
-                }
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
+            if ((target?.Celular ?? 0) > 0)
+                Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(911)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CorCelular);
 
-                if (string.IsNullOrWhiteSpace(descricao))
-                {
-                    Functions.EnviarMensagem(player, TipoMensagem.Erro, "Descrição não foi informada.", notify: true);
-                    return;
-                }
-
-                var p = Functions.ObterPersonagem(player);
-                using (var context = new DatabaseContext())
-                {
-                    await context.Multas.AddAsync(new Multa()
-                    {
-                        Motivo = motivo,
-                        PersonagemMultado = codigo,
-                        PersonagemPolicial = p.Codigo,
-                        Valor = valor,
-                        Descricao = descricao,
-                    });
-                    await context.SaveChangesAsync();
-                }
-
-                Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você multou {nome} por ${valor:N0}. Motivo: {motivo}", notify: true);
-
-                var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
-                if ((target?.Celular ?? 0) > 0)
-                    Functions.EnviarMensagem(target.Player, TipoMensagem.Nenhum, $"[CELULAR] SMS de {target.ObterNomeContato(911)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CorCelular);
-
-                MDCPesquisarPessoa(player, nome);
-            });
+            MDCPesquisarPessoa(player, nome);
         }
 
-        private void MDCRevogarLicencaMotorista(IPlayer player, int codigo)
+        private async void MDCRevogarLicencaMotorista(IPlayer player, int codigo)
         {
-            AltAsync.Do(async () =>
-            {
-                var p = Functions.ObterPersonagem(player);
-                using var context = new DatabaseContext();
+            var p = Functions.ObterPersonagem(player);
+            using var context = new DatabaseContext();
 
-                var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
-                if (target != null)
-                    target.PolicialRevogacaoLicencaMotorista = p.Codigo;
+            var target = Global.PersonagensOnline.FirstOrDefault(x => x.Codigo == codigo);
+            if (target != null)
+                target.PolicialRevogacaoLicencaMotorista = p.Codigo;
 
-                var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
-                per.PolicialRevogacaoLicencaMotorista = p.Codigo;
-                context.Personagens.Update(per);
-                await context.SaveChangesAsync();
-            });
+            var per = await context.Personagens.AsQueryable().FirstOrDefaultAsync(x => x.Codigo == codigo);
+            per.PolicialRevogacaoLicencaMotorista = p.Codigo;
+            context.Personagens.Update(per);
+            await context.SaveChangesAsync();
         }
         #endregion
     }
