@@ -71,7 +71,7 @@ async function drawPlayerNametag(player) {
     native.setTextColour(255, 106, 77, 255);
     native.setTextOutline();
     native.addTextComponentSubstringPlayerName(name);
-    native.endTextCommandDisplayText(0, 0);
+    native.endTextCommandDisplayText(0, 0, 0);
     native.clearDrawOrigin();
 }
 

@@ -62,7 +62,7 @@ async function drawVehicleNametag(vehicle) {
     native.setTextColour(174, 106, 178, 255);
     native.setTextOutline();
     native.addTextComponentSubstringPlayerName(name);
-    native.endTextCommandDisplayText(0, 0);
+    native.endTextCommandDisplayText(0, 0, 0);
     native.clearDrawOrigin();
 }
 
