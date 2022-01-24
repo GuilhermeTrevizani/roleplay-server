@@ -2,12 +2,12 @@ import * as alt from 'alt';
 import * as native from 'natives';
 import { showCursor } from '/helpers/cursor.js';
 import { activateChat, toggleInput } from '/chat/client.mjs';
-import { playAnimation } from '/helpers/animation.js';
+import * as animation from '/helpers/animation.js';
 import { drawText2d } from '/helpers/text.js';
 import * as blips from '/helpers/blip.js';
 import * as systemsInteriors from '/helpers/interiors.js';
 import * as nametags from '/helpers/nametags.js';
-//import * as enterVehicles from '/helpers/enterVehicles.js';
+import * as enterVehicles from '/helpers/enterVehicles.js';
 import * as charCreator from '/charcreator/editor.js';
 import * as vehtags from '/helpers/vehtags.js';
 import * as clothes from '/clothes/editor.js';
@@ -394,14 +394,6 @@ alt.onServer('Server:RemoveIpl', (ipl) => {
 
 alt.onServer('Server:SetWaypoint', (x, y) => {
     native.setNewWaypoint(x, y);
-});
-
-alt.onServer('Server:PlayAnim', (dict, name, flag) => {
-    playAnimation(player, dict, name, -1, flag);
-});
-
-alt.onServer('Server:StopAnim', () => {
-    native.clearPedTasks(player.scriptID);
 });
 
 alt.onServer('Server:ConfirmacaoRegistro', (nome, email) => {

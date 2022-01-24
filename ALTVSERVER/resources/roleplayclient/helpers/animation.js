@@ -22,15 +22,18 @@ const maxCountLoadTry = 255;
 	unk6_rot90 = 1024
 */
 
-alt.on('animation:Play', (data) => {
-    playAnimation(alt.Player.local, data.dict, data.name, data.duration, data.flag);
+alt.onServer('animation:Play', (dict, name, flag) => {
+    playAnimation(alt.Player.local, dict, name, -1, flag);
 });
 
-alt.on('animation:Clear', () => {
+alt.onServer('animation:Clear', () => {
     if (timeout != null) {
         alt.clearTimeout(timeout);
         timeout = null;
     }
+
+    alt.Player.local.setMeta('animation_dic', '');
+    alt.Player.local.setMeta('animation_name', '');
 
     alt.Player.local.laying = false;
     native.clearPedTasks(alt.Player.local.scriptID);

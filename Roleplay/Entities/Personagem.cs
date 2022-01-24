@@ -289,9 +289,9 @@ namespace Roleplay.Entities
             }
         }
 
-        public void PlayAnimation(string dic, string name, int flag) => Player.Emit("Server:PlayAnim", dic, name, flag);
+        public void PlayAnimation(string dic, string name, int flag) => Player.Emit("animation:Play", dic, name, flag);
 
-        public void StopAnimation() => Player.Emit("Server:StopAnim");
+        public void StopAnimation() => Player.Emit("animation:Clear");
 
         public void SetPosition(Position position, bool spawn)
         {
