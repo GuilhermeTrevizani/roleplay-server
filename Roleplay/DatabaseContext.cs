@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
-using System;
 
 namespace Roleplay
 {
@@ -40,7 +39,7 @@ namespace Roleplay
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(Global.ConnectionString, new MySqlServerVersion(new Version(8, 0, 26)));
+            optionsBuilder.UseMySQL(Global.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -2007,7 +2007,7 @@ namespace Roleplay
         {
             if (player.Position.Distance(new Position(x, y, z)) > 2)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na parte de trás de um caminho de lixo.");
+                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está na parte de trás de um caminhão de lixo.");
                 return;
             }
 
