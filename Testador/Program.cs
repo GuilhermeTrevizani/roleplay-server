@@ -1,21 +1,182 @@
-﻿using System;
+﻿using ExcelDataReader;
+using MySql.Data.MySqlClient;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Testador
 {
     class Program
     {
+        class Base
+        {
+            public List<Opa> ClothData { get; set; }
+        }
+
+        class Opa
+        {
+            public int DrawableType { get; set; }
+            public int Position { get; set; }
+            public int TargetGender { get; set; }
+
+            public List<Filho> Textures { get; set; }
+        }
+
+        class Filho
+        {
+            public int Position { get; set; }
+        }
+
+        public enum AnimationFlags
+        {
+            Loop = 1 << 0,
+            StopOnLastFrame = 1 << 1,
+            OnlyAnimateUpperBody = 1 << 4,
+            AllowPlayerControl = 1 << 5,
+            Cancellable = 1 << 7
+        };
+
+
         static void Main(string[] args)
         {
-            var aaaaa = Criptografar("123");
+            var con = new MySqlConnection("Server=localhost;Database=bdbackup;Uid=root;Password=159357");
+            con.Open();
+            var cmd = new MySqlCommand("SELECT Email from Usuarios where Codigo >= 272", con);
+            var dr = cmd.ExecuteReader();
+            var clienteSmtp = new SmtpClient("smtp.titan.email")
+            {
+                UseDefaultCredentials = false,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Credentials = new NetworkCredential("naoresponda@segundavida.com.br", "aDGi^O&deHoG"),
+                Port = 587,
+            };
+            while (dr.Read())
+            {
+                var msg = new MailMessage
+                {
+                    IsBodyHtml = true,
+                    From = new MailAddress("naoresponda@segundavida.com.br", "Segunda Vida Roleplay"),
+                    Subject = "Segunda Vida Roleplay está online!",
+                    Body = "Nós sentimos sua falta... Segunda Vida Roleplay está online! Entre no nosso Discord e saiba mais: https://discord.gg/segundavidaroleplay",
+                    BodyEncoding = Encoding.UTF8,
+                };
+                msg.To.Add(dr[0].ToString());
+                clienteSmtp.Send(msg);
+            }
+            dr?.Close();
+            dr?.Dispose();
+            cmd?.Dispose();
+            con?.Close();
+            con?.Dispose();
+
+            using (var stream = File.Open(@"C:\test.xlsx", FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    // Choose one of either 1 or 2:
+
+                    // 1. Use the reader methods
+                    var category = "Cozinha";
+                    var sql = string.Empty;
+
+                    do
+                    {
+                        while (reader.Read())
+                        {
+                            var prop = reader.GetString(0);
+                            if (!string.IsNullOrWhiteSpace(prop))
+                            {
+                                var name = reader.GetString(1);
+                                var value = reader.GetDouble(2);
+
+                                sql += $@"('{category}', '{name}', '{prop}', {value}), ";
+                            }
+                        }
+                    } while (reader.NextResult());
+
+                    sql = sql;
+
+                    // 2. Use the AsDataSet extension method
+                    //var result = reader.AsDataSet();
+
+                    // The result of each spreadsheet is in result.Tables
+                }
+            }
+
+            //var args2 = args;
+
+            //var a1 = (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody); // 49
+            //var a2 = (int)(AnimationFlags.Loop | AnimationFlags.AllowPlayerControl); // 33
+            //var a3 = (int)(AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody); // 48
+            //var a4 = (int)AnimationFlags.Loop; // 1
+            //var a5 = (int)AnimationFlags.StopOnLastFrame; // 2
+
+            //var files = Directory.GetFiles(@"C:\Projetos\SegundaVida\ALTVSERVER\resources\roleplayclient\inventory\img\1");
+            //foreach (var file in files)
+            //{
+            //    File.Move(file, file.Replace(".webp", ".png"));
+            //}
+
+            var json = JsonSerializer.Deserialize<Base>(File.ReadAllText(@"C:\Projetos\SegundaVida\ALTVSERVER\sgv.durty-cloth.json"));
+            var sb = new StringBuilder();
+            var lastPosition = -1;
+            var lastDrawableType = 0;
+            // Gender: 0 Male | 1 Female
+            foreach (var x in json.ClothData.Where(x => x.TargetGender == 1 && x.DrawableType != 2).OrderBy(x => x.DrawableType).ThenBy(x => x.Position))
+            {
+                if (lastPosition + 1 != x.Position)
+                {
+                    if (x.DrawableType == lastDrawableType)
+                    {
+                    }
+                }
+
+                lastPosition = x.Position;
+                lastDrawableType = x.DrawableType;
+
+                sb.AppendLine($"{{ \"component\": {x.DrawableType}, \"drawable\": {x.Position}, \"dlc\": \"mp_f_sgv\", \"tipoFaccao\": 0, \"maxTexture\": {x.Textures.Max(y => y.Position)} }},");
+            }
+
+            File.WriteAllText(@"C:\HomemDoKevorkians.txt", sb.ToString());
+
+            //var text = File.ReadAllText(@"C:\EUP_MULHER_V3.txt");
+            //text = text.Replace("drawable", "\"drawable\"");
+            //text = text.Replace("dlc", "\"dlc\"");
+            //text = text.Replace("tipoFaccao", "\"tipoFaccao\"");
+            //text = text.Replace("maxTexture", "\"maxTexture\"");
+            //text = text.Replace("'mp_m_eup'", "\"mp_m_eup\"");
+            //text = text.Replace("'mp_f_eup'", "\"mp_f_eup\"");
+            /*text = text.Replace(Environment.NewLine, string.Empty);
+            text = text.Replace("    ", string.Empty);
+            text = text.Replace(" ", string.Empty);*/
+
+            //var a = JsonSerializer.Deserialize<List<ClotheAccessory>>(text);
+
+            /*var aaaaa = Criptografar("123");
             var txt = "const accessories7Female = {";
             for (var i = 0; i <= 14; i++)
                 txt += $"{Environment.NewLine}{i}: {{ drawable: {i}, tipoFaccao: 0 }},";
-            txt += $"{Environment.NewLine}}};";
+            txt += $"{Environment.NewLine}}};";*/
         }
 
-        private void MigrarPrecos()
+        public class ClotheAccessory
+        {
+            public string DLC { get; set; }
+            public int Drawable { get; set; }
+            public int? TipoFaccao { get; set; }
+            public byte? MaxTexture { get; set; }
+        }
+
+        /*private void MigrarPrecos()
         {
             var str = $@"dagger|2500
 hatchet|500
@@ -92,7 +253,7 @@ stickybomb|80000";
             }
             var a = ret;
         }
-
+        */
         public static string Criptografar(string texto)
         {
             var encodedValue = Encoding.UTF8.GetBytes(texto);

@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
     <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
     <link href="../resources/css/nifty.min.css" rel="stylesheet">
     <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
@@ -14,20 +13,14 @@
 		<div class="cls-content">
 		    <div class="cls-content-sm panel" style="background-color:#ededed;">
 		        <div class="panel-body">
-		            <div class="mar-ver pad-btm">
-                        <img src="../resources/img/logo.png" style="width:300px;"  />
-                        <p class="pad-top">Caso o usuário e e-mail corresponderem a uma conta em nosso banco de dados, um e-mail será enviado com sua nova senha.</p>
-		            </div>
-                    <div id="sucesso" class="alert alert-success" style="display:none;"></div>
-                    <form>
-		                <div class="form-group">
-		                    <input id="usuario" type="text" class="form-control" placeholder="Usuário" spellcheck="false" autofocus>
-		                </div>
-		                <div class="form-group">
-		                    <input id="email" type="email" class="form-control" placeholder="E-mail">
-		                </div>
-		                <button id="btn-resetarSenha" onclick="resetarSenha()" class="btn btn-primary btn-lg btn-block" type="button">Resetar Senha</button>
-		            </form>
+					<div class="mar-ver pad-btm">
+						<img src="../resources/img/logo.png" style="width:300px;"  />
+						<p class="pad-top">Caso o e-mail corresponder a uma conta em nosso banco de dados, um e-mail será enviado contendo um token para ser informado a seguir.</p>
+					</div>
+					<div class="form-group">
+						<input id="email" type="email" class="form-control" placeholder="E-mail" spellcheck="false" autofocus>
+					</div>
+					<button id="btn-enviartoken" class="btn btn-primary btn-lg btn-block" type="button">Enviar Token</button>
 		        </div>
 		        <div class="pad-all text-center">
 		            <a onclick="voltarLogin()" href="#" class="btn-link mar-rgt">Voltar para o login</a>

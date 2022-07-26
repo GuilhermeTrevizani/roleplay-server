@@ -1,4 +1,4 @@
-function showHTML(nome, x, slots) {
+function showHTML(nome, x, slots, alerta) {
     let players = JSON.parse(x);
 
     if (players.length != slots)
@@ -14,13 +14,21 @@ function showHTML(nome, x, slots) {
         $('#tbody-personagens').html('<tr><td scope="row" colspan="4" class="text-center">Você não possui personagens.</td></tr>');
     } else {
         players.forEach(function(p) {
-            $('#tbody-personagens').append(`<tr><td>${p.Codigo}</td><td>${p.Nome}</td><td class='text-center'>${p.Status}</td><td class='text-center'>${p.Opcoes}</td></tr>`);
+            $('#tbody-personagens').append(`<tr>
+                <td>${p.Id}</td>
+                <td>${p.Name}</td>
+                <td class='text-center'>${p.Status}</td>
+                <td class='text-center'>${p.Options}</td>
+            </tr>`);
         });
     }
+
+    if (alerta)
+        $.alert(alerta);
 }
 
 function selecionarPersonagem(id, namechange) {
-    $(`#btn-selecionarpersonagem${id}`).LoadingOverlay('show');
+    $(`.btn-selecionarpersonagem${id}`).LoadingOverlay('show');
     alt.emit('selecionarPersonagem', id, namechange);
 }
 
@@ -65,5 +73,11 @@ function deletarPersonagem(id) {
     });
 }
 
-if('alt' in window) 
+if('alt' in window) {
     alt.on('showHTML', showHTML);
+    
+    alt.on('mostrarErro', (message, component) => {
+        $.alert(message);
+        $(component).LoadingOverlay('hide');
+    });
+}

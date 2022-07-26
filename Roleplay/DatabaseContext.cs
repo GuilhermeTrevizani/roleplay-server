@@ -5,77 +5,163 @@ namespace Roleplay
 {
     public class DatabaseContext : DbContext
     {
-        public DbSet<Apreensao> Apreensoes { get; set; }
-        public DbSet<Armario> Armarios { get; set; }
-        public DbSet<ArmarioComponente> ArmariosComponentes { get; set; }
-        public DbSet<ArmarioItem> ArmariosItens { get; set; }
-        public DbSet<Banimento> Banimentos { get; set; }
+        public DbSet<Animation> Animations { get; set; }
+        public DbSet<Banishment> Banishments { get; set; }
         public DbSet<Blip> Blips { get; set; }
-        public DbSet<Confisco> Confiscos { get; set; }
-        public DbSet<Faccao> Faccoes { get; set; }
-        public DbSet<Ligacao911> Ligacoes911 { get; set; }
+        public DbSet<Character> Characters { get; set; }
+        public DbSet<CharacterItem> CharactersItems { get; set; }
+        public DbSet<CrackDen> CrackDens { get; set; }
+        public DbSet<CrackDenItem> CrackDensItems { get; set; }
+        public DbSet<CrackDenSell> CrackDensSells { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<CompanyCharacter> CompaniesCharacters { get; set; }
+        public DbSet<Confiscation> Confiscations { get; set; }
+        public DbSet<ConfiscationItem> ConfiscationsItems { get; set; }
+        public DbSet<Door> Doors { get; set; }
+        public DbSet<EmergencyCall> EmergencyCalls { get; set; }
+        public DbSet<Faction> Factions { get; set; }
+        public DbSet<FactionArmory> FactionsArmories { get; set; }
+        public DbSet<FactionArmoryWeapon> FactionsArmoriesWeapons { get; set; }
+        public DbSet<FactionDrugHouse> FactionsDrugsHouses { get; set; }
+        public DbSet<FactionDrugHouseItem> FactionsDrugsHousesItems { get; set; }
+        public DbSet<FactionRank> FactionsRanks { get; set; }
+        public DbSet<FactionUnit> FactionsUnits { get; set; }
+        public DbSet<FactionUnitCharacter> FactionsUnitsCharacters { get; set; }
+        public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
+        public DbSet<Fine> Fines { get; set; }
+        public DbSet<Furniture> Furnitures { get; set; }
+        public DbSet<HelpRequest> HelpRequests { get; set; }
+        public DbSet<Info> Infos { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<Jail> Jails { get; set; }
         public DbSet<Log> Logs { get; set; }
-        public DbSet<Multa> Multas { get; set; }
-        public DbSet<Parametro> Parametros { get; set; }
-        public DbSet<Pergunta> Perguntas { get; set; }
-        public DbSet<Personagem> Personagens { get; set; }
-        public DbSet<Ponto> Pontos { get; set; }
-        public DbSet<Preco> Precos { get; set; }
-        public DbSet<Prisao> Prisoes { get; set; }
-        public DbSet<Procurado> Procurados { get; set; }
-        public DbSet<Propriedade> Propriedades { get; set; }
-        public DbSet<Punicao> Punicoes { get; set; }
-        public DbSet<Rank> Ranks { get; set; }
-        public DbSet<Resposta> Respostas { get; set; }
-        public DbSet<SOS> SOSs { get; set; }
-        public DbSet<Unidade> Unidades { get; set; }
-        public DbSet<Usuario> Usuarios { get; set; }
-        public DbSet<Veiculo> Veiculos { get; set; }
-
-        // Não representam tabelas exatas no banco de dados
-        public DbSet<PunicaoAdministrativa> PunicoesAdministrativas { get; set; }
-        public DbSet<ProcuradoInfo> ProcuradosInfos { get; set; }
-        public DbSet<LogInfo> LogsInfos { get; set; }
+        public DbSet<Parameter> Parameters { get; set; }
+        public DbSet<Price> Prices { get; set; }
+        public DbSet<Property> Properties { get; set; }
+        public DbSet<PropertyFurniture> PropertiesFurnitures { get; set; }
+        public DbSet<PropertyItem> PropertiesItems { get; set; }
+        public DbSet<Punishment> Punishments { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<QuestionAnswer> QuestionsAnswers { get; set; }
+        public DbSet<SeizedVehicle> SeizedVehicles { get; set; }
+        public DbSet<Session> Sessions { get; set; }   
+        public DbSet<Spot> Spots { get; set; }
+        public DbSet<TruckerLocation> TruckerLocations { get; set; }
+        public DbSet<TruckerLocationDelivery> TruckerLocationsDeliveries { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<VehicleItem> VehiclesItems { get; set; }
+        public DbSet<Wanted> Wanted { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL(Global.ConnectionString);
+            optionsBuilder.UseMySql(Global.Settings.ConnectionString, new MySqlServerVersion(Global.Settings.MySQLVersion))
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging()
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Apreensao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Armario>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<ArmarioComponente>().HasKey(x => new { x.Codigo, x.Arma, x.Componente });
-            modelBuilder.Entity<ArmarioItem>().HasKey(x => new { x.Codigo, x.Arma });
-            modelBuilder.Entity<Banimento>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Blip>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Confisco>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Faccao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Ligacao911>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Log>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Multa>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Parametro>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Parametro>().Property(e => e.Weather).HasConversion<int>();
-            modelBuilder.Entity<Pergunta>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Personagem>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Ponto>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Preco>().HasKey(x => new { x.Tipo, x.Nome });
-            modelBuilder.Entity<Prisao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Procurado>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Propriedade>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Punicao>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Rank>().HasKey(x => new { x.Faccao, x.Codigo });
-            modelBuilder.Entity<Resposta>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<SOS>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Unidade>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Usuario>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<Veiculo>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<Animation>().HasKey(x => x.Id);
 
-            // Não representam tabelas exatas no banco de dados
-            modelBuilder.Entity<PunicaoAdministrativa>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<ProcuradoInfo>().HasKey(x => x.Codigo);
-            modelBuilder.Entity<LogInfo>().HasKey(x => x.Codigo);
+            modelBuilder.Entity<Banishment>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Blip>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Character>().HasKey(x => x.Id);
+            modelBuilder.Entity<Character>().HasOne(x => x.User).WithMany(x => x.Characters).HasForeignKey(x => x.UserId);
+            modelBuilder.Entity<Character>().HasOne(x => x.EvaluatingStaffUser).WithMany(x => x.EvaluatingCharacters).HasForeignKey(x => x.EvaluatingStaffUserId);
+            modelBuilder.Entity<Character>().HasOne(x => x.EvaluatorStaffUser).WithMany(x => x.EvaluatorCharacters).HasForeignKey(x => x.EvaluatorStaffUserId);
+
+            modelBuilder.Entity<CharacterItem>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<CrackDen>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<CrackDenItem>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<CrackDenSell>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Company>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<CompanyCharacter>().HasKey(x => x.Id);
+            modelBuilder.Entity<CompanyCharacter>().HasOne(x => x.Company).WithMany(x => x.Characters).HasForeignKey(x => x.CompanyId);
+
+            modelBuilder.Entity<Confiscation>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<ConfiscationItem>().HasKey(x => x.Id);
+            modelBuilder.Entity<ConfiscationItem>().HasOne(x => x.Confiscation).WithMany(x => x.Items).HasForeignKey(x => x.ConfiscationId);
+            modelBuilder.Entity<Door>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<EmergencyCall>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Faction>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionArmory>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionArmoryWeapon>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionDrugHouse>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionDrugHouseItem>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionRank>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionUnit>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<FactionUnitCharacter>().HasKey(x => x.Id);
+            modelBuilder.Entity<FactionUnitCharacter>().HasOne(x => x.FactionUnit).WithMany(x => x.Characters).HasForeignKey(x => x.FactionUnitId);
+
+            modelBuilder.Entity<FinancialTransaction>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Fine>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Furniture>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Info>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Item>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Jail>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Log>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Parameter>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Price>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Property>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<PropertyFurniture>().HasKey(x => x.Id);
+            modelBuilder.Entity<PropertyFurniture>().HasOne(x => x.Property).WithMany(x => x.Furnitures).HasForeignKey(x => x.PropertyId);
+
+            modelBuilder.Entity<PropertyItem>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Punishment>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Question>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<QuestionAnswer>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<SeizedVehicle>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Session>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Spot>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<HelpRequest>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<TruckerLocation>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<TruckerLocationDelivery>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<User>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Vehicle>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<VehicleItem>().HasKey(x => x.Id);
+
+            modelBuilder.Entity<Wanted>().HasKey(x => x.Id);
         }
     }
 }

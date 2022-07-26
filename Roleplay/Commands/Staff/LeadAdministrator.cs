@@ -1,158 +1,97 @@
-﻿using AltV.Net.Elements.Entities;
+﻿using AltV.Net;
 using AltV.Net.Enums;
+using Roleplay.Factories;
 using Roleplay.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Staff
 {
     public class LeadAdministrator
     {
-        [Command("ck", "/ck (ID ou nome) (motivo)", GreedyArg = true)]
-        public void CMD_ck(IPlayer player, string idNome, string motivo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            if (motivo.Length > 255)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Motivo deve ter até 255 caracteres.");
-                return;
-            }
-
-            target.DataMorte = DateTime.Now;
-            target.MotivoMorte = motivo;
-            Functions.SalvarPersonagem(target, false);
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} aplicou CK no personagem {target.Nome}. Motivo: {motivo}", false);
-            target.Player.Kick($"{p.UsuarioBD.Nome} aplicou CK no seu personagem. Motivo: {motivo}");
-
-            Functions.GravarLog(TipoLog.Staff, $"/ck {motivo}", p, target);
-        }
-
-        [Command("unck", "/unck (personagem)")]
-        public void CMD_unck(IPlayer player, int personagem)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            using var context = new DatabaseContext();
-            var per = context.Personagens.FirstOrDefault(x => x.Codigo == personagem);
-            if (per == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Personagem {personagem} não existe.");
-                return;
-            }
-
-            per.DataMorte = null;
-            per.MotivoMorte = string.Empty;
-            context.Personagens.Update(per);
-            context.SaveChanges();
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} removeu o CK do personagem {per.Nome}.", true);
-            Functions.GravarLog(TipoLog.Staff, $"/unck {personagem}", p, null);
-        }
-
         [Command("tempo", "/tempo (tempo)")]
-        public void CMD_tempo(IPlayer player, int tempo)
+        public static async Task CMD_tempo(MyPlayer player, uint tempo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            if (player.User.Staff < UserStaff.LeadAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (tempo < 0 || tempo > 14)
+            if (!Enum.IsDefined(typeof(WeatherType), tempo))
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Tempo deve ser entre 0 e 14.");
+                player.SendMessage(MessageType.Error, "Tempo inválido.");
                 return;
             }
 
-            Global.Parametros.Weather = (WeatherType)tempo;
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} alterou o tempo para {Global.Parametros.Weather}.", true);
-            foreach (var x in Global.PersonagensOnline)
-                x.Player.SetWeather(Global.Parametros.Weather);
+            Global.WeatherInfo.WeatherType = (WeatherType)tempo;
+            Alt.EmitAllClients("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
 
-            using (var context = new DatabaseContext())
-            {
-                context.Parametros.Update(Global.Parametros);
-                context.SaveChanges();
-            }
-
-            Functions.GravarLog(TipoLog.Staff, $"/tempo {tempo}", p, null);
-        }
-
-        [Command("bloquearnc", "/bloquearnc (ID ou nome)")]
-        public void CMD_bloquearnc(IPlayer player, string idNome)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            target.StatusNamechange = target.StatusNamechange == TipoStatusNamechange.Liberado ? TipoStatusNamechange.Bloqueado : TipoStatusNamechange.Liberado;
-
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você {(target.StatusNamechange == TipoStatusNamechange.Liberado ? "des" : string.Empty)}bloqueou a troca de nome de {target.Nome}.");
-            Functions.GravarLog(TipoLog.Staff, $"/bloquearnc", p, target);
+            await Functions.SendStaffMessage($"{player.User.Name} alterou o tempo para {Global.WeatherInfo.WeatherType}.", true);
+            await player.GravarLog(LogType.Staff, $"/tempo {Global.WeatherInfo.WeatherType}", null);
         }
 
         [Command("limparchatgeral")]
-        public void CMD_limparchatgeral(IPlayer player)
+        public static async Task CMD_limparchatgeral(MyPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            if (player.User.Staff < UserStaff.LeadAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            foreach (var x in Global.PersonagensOnline.Where(x => x.Codigo > 0))
+            foreach (var x in Global.Players.Where(x => x.Character.Id > 0))
             {
-                x.Player.Emit("chat:clearMessages");
-                Functions.EnviarMensagem(x.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} limpou o chat de todos.", notify: true);
+                x.LimparChat();
+                x.SendMessage(MessageType.Success, $"{player.User.Name} limpou o chat de todos.", notify: true);
             }
 
-            Functions.GravarLog(TipoLog.Staff, $"/limparchatgeral", p, null);
+            await player.GravarLog(LogType.Staff, "/limparchatgeral", null);
         }
 
         [Command("areparar", "/areparar (veículo)")]
-        public void CMD_areparar(IPlayer player, int veiculo)
+        public static async Task CMD_areparar(MyPlayer player, int veiculo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.LeadAdministrator)
+            if (player.User.Staff < UserStaff.LeadAdministrator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {veiculo} não está spawnado.");
                 return;
             }
 
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} reparou o veículo {veh.Codigo}.", true);
-            veh.Reparar();
+            veh = await veh.Reparar();
+            await Functions.SendStaffMessage($"{player.User.Name} reparou o veículo {veiculo}.", true);
+            await player.GravarLog(LogType.Staff, $"/areparar {veiculo}", null);
+        }
 
-            Functions.GravarLog(TipoLog.Staff, $"/areparar {veiculo}", p, null);
+        [Command("jetpack")]
+        public static async Task CMD_jetpack(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.LeadAdministrator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            if (player.IsInVehicle)
+            {
+                player.SendMessage(MessageType.Error, "Você não pode executar esse comando em um veículo.");
+                return;
+            }
+
+            var veh = Alt.CreateVehicle(VehicleModel.Thruster, player.Position, player.Rotation);
+            veh.Dimension = player.Dimension;
+            player.SetIntoVehicle(veh, 1);
+            veh.ManualEngineControl = true;
+            veh.EngineOn = true;
+            await player.GravarLog(LogType.Staff, "/jetpack", null);
         }
     }
 }

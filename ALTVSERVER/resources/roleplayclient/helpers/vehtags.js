@@ -1,71 +1,67 @@
 import alt from 'alt-client';
 import * as native from 'natives';
+import { drawText3d } from './text';
 
-let drawDistance = 20;
+let drawDistance = 10;
 let interval;
 
 alt.onServer('dl:Config', handleConfig);
 
 function handleConfig(showTags) {
-    if (!showTags) {
-        if (interval) {
-            alt.clearInterval(interval);
-            interval = null;
-        }
-        return;
+    if (interval) {
+        alt.clearInterval(interval);
+        interval = null;
     }
 
-    interval = alt.setInterval(drawNametags, 1);
+    if (!showTags)
+        return;
+
+    interval = alt.setInterval(drawVehciletags, 0);
 }
 
-async function drawNametags() {
-    const vehicles = [...alt.Vehicle.all];
+async function drawVehciletags() {
+    if (alt.Player.local.getMeta('f7'))
+        return;
+
+    const vehicles = [...alt.Vehicle.streamedIn];
     vehicles.forEach(vehicle => {
         drawVehicleNametag(vehicle);
     });
 }
 
 async function drawVehicleNametag(vehicle) {
-    let placa = vehicle.getSyncedMeta('placa');
+    const placa = vehicle.getSyncedMeta('placa');
     if (!placa) 
         return;
 
-    let id = vehicle.getSyncedMeta('id');
+    const id = vehicle.getSyncedMeta('id');
     if (!id) 
         return;
 
-    let modelo = vehicle.getSyncedMeta('modelo');
+    const modelo = vehicle.getSyncedMeta('modelo');
     if (!modelo) 
         return;
 
-    if (!native.isEntityOnScreen(vehicle.scriptID))
-        return;
-
-    let dist = distance2d(alt.Player.local.pos, vehicle.pos);
+    const dist = alt.Player.local.pos.distanceTo(vehicle.pos);
     if (dist > drawDistance)
         return;
 
-    if (!native.hasEntityClearLosToEntity(alt.Player.local.scriptID, vehicle.scriptID, 17))
+    if (!native.hasEntityClearLosToEntity(alt.Player.local, vehicle, 17))
         return;
 
     let name = `~w~ID: ~s~${id}\n`;
     name += `~w~Modelo: ~s~${modelo}\n`;
     name += `~w~Placa: ~s~${placa}\n`;
-    name += `~w~Motor: ~s~${native.getVehicleEngineHealth(vehicle.scriptID).toFixed(2)}`;
+    name += `~w~Motor: ~s~${native.getVehicleEngineHealth(vehicle.scriptID).toFixed(0)}`;
 
-    native.setDrawOrigin(vehicle.pos.x, vehicle.pos.y, vehicle.pos.z, 0);
-    native.beginTextCommandDisplayText('STRING');
-    native.setTextFont(4);
-    native.setTextScale(0.4, 0.4);
-    native.setTextProportional(true);
-    native.setTextCentre(true);
-    native.setTextColour(174, 106, 178, 255);
-    native.setTextOutline();
-    native.addTextComponentSubstringPlayerName(name);
-    native.endTextCommandDisplayText(0, 0, 0);
-    native.clearDrawOrigin();
-}
+    const vector = native.getEntityVelocity(vehicle);
+    const frameTime = native.getFrameTime();
 
-function distance2d(vector1, vector2) {
-    return Math.sqrt(Math.pow(vector1.x - vector2.x, 2) + Math.pow(vector1.y - vector2.y, 2) + Math.pow(vector1.z - vector2.z, 2));
+    drawText3d(name,
+        vehicle.pos.x + vector.x * frameTime, 
+        vehicle.pos.y + vector.y * frameTime, 
+        vehicle.pos.z + vector.z * frameTime,
+        0.4,
+        4,
+        174, 106, 178, 255);
 }

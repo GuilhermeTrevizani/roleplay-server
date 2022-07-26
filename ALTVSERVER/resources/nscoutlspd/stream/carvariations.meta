@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<CVehicleModelInfoVariation>
+  <variationData>
+        <Item> 
+			<modelName>nscoutrhpd</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="150" />
+		</Item>
+        <Item> 
+			<modelName>nscoutlssd2</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="31" />
+		</Item>
+        <Item> 
+			<modelName>nscoutsahp</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="196" />
+		</Item>
+        <Item> 
+			<modelName>nscoutsahp2</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="196" />
+		</Item>
+        <Item> 
+			<modelName>nscoutbcso</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="33" />
+		</Item>
+        <Item> 
+			<modelName>nscoutnps</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="209" />
+		</Item>
+        <Item> 
+			<modelName>nscoutlspd</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="221" />
+		</Item>
+        <Item> 
+			<modelName>nscoutlssd</modelName> 
+			<colors> 
+				<Item> 
+					<indices content="char_array"> 
+						0
+						134 
+						156 
+						0
+						0
+						0
+					</indices> 
+					<liveries /> 
+				</Item> 
+			</colors> 
+			<kits> 
+				<Item>0_default_modkit</Item> 
+			</kits> 
+			<windowsWithExposedEdges /> 
+			<plateProbabilities>
+				<Probabilities>
+					<Item>
+						<Name>Police guv plate</Name>
+						<Value value="100"/>
+					</Item>
+				</Probabilities>
+			</plateProbabilities>
+			<lightSettings value="1" /> 
+			<sirenSettings value="33" />
+		</Item>
+  </variationData>
+</CVehicleModelInfoVariation>

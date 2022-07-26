@@ -1,122 +1,4 @@
-import * as alt from 'alt';
 import * as native from 'natives';
-
-let textActions = [];
-let textDraws = [];
-
-alt.setInterval(() => {
-    if (alt.Player.local.getMeta('STOP_DRAWS'))
-        return;
-        
-    let closeTextDraws = textDraws.filter(x => alt.Player.local.pos.distance(x.pos) < x.range);
-    for (let x of closeTextDraws) {
-        drawText3d(
-            x.nome,
-            x.pos.x,
-            x.pos.y,
-            x.pos.z,
-            x.size, 
-            x.font,
-            x.color.r, 
-            x.color.g, 
-            x.color.b,
-            x.color.a,
-            true,
-            false
-        );
-    }
-}, 1);
-
-alt.onServer('textDraw:create', (codigo, nome, pos, range, size, font, color, dimension) => {
-    var x = textDraws.findIndex(x => x.codigo === codigo);
-    if (x !== -1)
-        return;
-
-    textDraws.push({
-        codigo,
-        nome,
-        pos,
-        range,
-        size,
-        font,
-        color,
-        dimension
-    });
-});
-
-alt.onServer('textDraw:remove', (codigo) => {
-    var x = textDraws.findIndex(x => x.codigo === codigo);
-    if (x === -1)
-        return;
-
-    textDraws.splice(x, 1);
-});
-
-alt.onServer('text:playerAction', (player, msg) => {
-    var x = textActions.findIndex(x => x.player === player);
-    if (x !== -1) {
-        alt.clearTimeout(textActions[x].timeoutAction);
-        alt.clearInterval(textActions[x].intervalAction);
-        textActions.splice(x, 1);
-    }
-
-    let intervalAction = alt.setInterval(() => {
-        let pos = {...player.pos};
-        pos.z += player.vehicle ? 1.55 : 1.45;
-
-        drawText3d(
-            msg,
-            pos.x,
-            pos.y,
-            pos.z,
-            0.35,
-            4,
-            194, 
-            162, 
-            218,
-            255,
-            true,
-            false
-        );
-    }, 0);
-    let timeoutAction = alt.setTimeout(() => {
-        alt.clearInterval(intervalAction);
-    }, 7000);
-    textActions.push({
-        player,
-        intervalAction,
-        timeoutAction
-    });
-});
-
-alt.onServer('text:Animated', (text, duration) => {
-    let pos = alt.Player.local.pos;
-    let alpha = 255;
-    const interval = alt.setInterval(() => {
-        if (alpha <= 0) alpha = 0;
-        alt.nextTick(() => {
-            drawText3d(
-                text,
-                pos.x,
-                pos.y,
-                pos.z + 1,
-                0.5,
-                4,
-                255,
-                255,
-                255,
-                alpha,
-                true,
-                false
-            );
-        });
-        pos.z += 0.0075;
-        alpha -= 3;
-    }, 0);
-    alt.setTimeout(() => {
-        alt.clearInterval(interval);
-    }, duration);
-});
 
 export async function drawText3d(
     msg,
@@ -137,6 +19,7 @@ export async function drawText3d(
     native.addTextComponentSubstringPlayerName(msg);
     native.setTextFont(fontType);
     native.setTextScale(1, scale);
+    native.setTextProportional(true);
     native.setTextWrap(0.0, 1.0);
     native.setTextCentre(true);
     native.setTextColour(r, g, b, a);
@@ -163,12 +46,26 @@ export async function drawText2d(
     a,
     useOutline = true,
     useDropShadow = true,
-    align = 0
+    align = 0,
+    useSafeZoneSize = true
 ) {
+    let safeZoneSizeX = 0;
+    let safeZoneSizeY = 0;
+
+    if (useSafeZoneSize) {
+        safeZoneSizeX = (1.0 - native.getSafeZoneSize()) * 0.5;
+        safeZoneSizeY = safeZoneSizeX;
+
+        const [z, x, y] = native.getActiveScreenResolution(0,0);
+        if (x != 1920) {
+            safeZoneSizeX += ((1920 - x) / 1920) / 10;
+        }
+    }
+
     native.beginTextCommandDisplayText('STRING');
     native.addTextComponentSubstringPlayerName(msg);
     native.setTextFont(fontType);
-    native.setTextScale(1, scale);
+    native.setTextScale(scale, scale);
     native.setTextWrap(0.0, 1.0);
     native.setTextCentre(true);
     native.setTextColour(r, g, b, a);
@@ -180,5 +77,5 @@ export async function drawText2d(
     if (useDropShadow) 
         native.setTextDropShadow();
 
-    native.endTextCommandDisplayText(x, y, 0);
+    native.endTextCommandDisplayText(x + safeZoneSizeX, y - safeZoneSizeY, 0);
 }

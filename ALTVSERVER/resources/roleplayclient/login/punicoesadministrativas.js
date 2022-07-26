@@ -8,7 +8,14 @@ function showHTML(nome, data, x) {
         $('#tbody-punicoes').html('<tr><td scope="row" colspan="6" class="text-center">Você não possui punições administrativas.</td></tr>');
     } else {
         players.forEach(function(p) {
-            $('#tbody-punicoes').append(`<tr><td>${p.Personagem}</td><td>${p.Data}</td><td>${p.Tipo}</td><td>${p.Duracao}</td><td>${p.Staffer}</td><td>${p.Motivo}</td></tr>`);
+            $('#tbody-punicoes').append(`<tr>
+                <td>${p.Character}</td>
+                <td>${p.Date}</td>
+                <td>${p.Type}</td>
+                <td>${p.Duration}</td>
+                <td>${p.Staffer}</td>
+                <td>${p.Reason}</td>
+            </tr>`);
         });
     }
 }

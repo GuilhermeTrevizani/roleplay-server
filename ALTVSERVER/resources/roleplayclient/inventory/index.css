@@ -1,0 +1,205 @@
+@font-face {
+    font-family: "Roboto";
+    src: url("../resources/Roboto/Roboto-Regular.ttf") format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+body
+{
+	font-family: Roboto, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+    background-color: transparent;
+}
+
+.inv-main {
+    display: flex; 
+    justify-content: space-between;
+    margin:20px;
+}
+
+.inv-row {
+    display: flex; 
+    justify-content: space-between;
+}
+
+.inv-title {
+    background-color: #AE6AB2;
+    color: white;
+    padding: 7px;
+}
+
+.inv-title span {
+    margin-left:5px;
+}
+
+.inv-content {
+    background-color: #3f3f3f93;
+    min-height: 600px;
+    max-height: 600px;
+    min-width: 25vw;
+    overflow-y:auto;
+    overflow-x:auto;
+}
+
+.inv-slot, .inv-right-slot {
+    background-color: #4d4d4d;
+    min-width: 75px;
+    min-height: 75px;
+    margin: 5px;
+    max-width: 75px;
+    max-height: 75px;
+    color: #d6d6d6;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 75px;
+}
+
+.inv-slot:empty::before{
+    background-position: 50%, 50%;
+    background-size: 75%;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    filter: grayscale(100%);
+    display: block;
+}
+
+.inv-slot:empty:before {
+    content:attr(data-text);
+}
+
+.inv-slot-torso:empty::before {
+    content: '.';
+    background-image: url('img/4.png');
+}
+
+.inv-slot-jaqueta:empty::before {
+    content: '.';
+    background-image: url('img/12.png');
+}
+
+.inv-slot-camisa:empty::before {
+    content: '.';
+    background-image: url('img/9.png');
+}
+
+.inv-slot-calca:empty::before {
+    content: '.';
+    background-image: url('img/5.png');
+}
+
+.inv-slot-sapato:empty::before {
+    content: '.';
+    background-image: url('img/7.png');
+}
+
+.inv-slot-extra:empty::before {
+    content: '.';
+    background-image: url('img/8.png');
+}
+
+.inv-slot-bordado:empty::before {
+    content: '.';
+    background-image: url('img/11.png');
+}
+
+.inv-slot-colete:empty::before {
+    content: '.';
+    background-image: url('img/10.png');
+}
+
+.inv-slot-mascara:empty::before {
+    content: '.';
+    background-image: url('img/3.png');
+}
+
+.inv-slot-mascara:empty::before {
+    content: '.';
+    background-image: url('img/3.png');
+}
+
+.inv-slot-chapeu:empty::before {
+    content: '.';
+    background-image: url('img/13.png');
+}
+
+.inv-slot-oculos:empty::before {
+    content: '.';
+    background-image: url('img/14.png');
+}
+
+.inv-slot-orelha:empty::before {
+    content: '.';
+    background-image: url('img/15.png');
+}
+
+.inv-slot-relogio:empty::before {
+    content: '.';
+    background-image: url('img/16.png');
+}
+
+.inv-slot-bracelete:empty::before {
+    content: '.';
+    background-image: url('img/17.png');
+}
+
+.inv-slot-mochila:empty::before {
+    content: '.';
+    background-image: url('img/6.png');
+}
+
+.inv-slot-radio:empty::before {
+    content: '.';
+    background-image: url('img/21.png');
+}
+
+.inv-slot-celular:empty::before {
+    content: '.';
+    background-image: url('img/22.png');
+}
+
+.inv-icon, .inv-right-icon {
+    width: 65px;
+    height: 65px;
+}
+
+@media only screen 
+and (max-width : 1320px) {
+    .inv-content {
+        min-width: 30vw;
+        max-width: 30vw;
+    }
+
+    .inv-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 30vw;
+    }
+}
+@media only screen 
+and (max-height : 728px) {
+    .inv-content {
+        min-height: 65vh;
+        max-height: 65vh;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #3f3f3f;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+    padding-top:20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #4d4d4d;
+}

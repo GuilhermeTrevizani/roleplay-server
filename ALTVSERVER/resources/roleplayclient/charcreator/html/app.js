@@ -6,45 +6,26 @@ const app = new Vue({
     data() {
         return {
             selection: 0,
-            barbearia: 0,
             data: {
-                sex: 0,
-                faceFather: 33,
-                faceMother: 45,
-                skinFather: 45,
-                skinMother: 45,
-                faceMix: 0.5,
-                skinMix: 0.5,
-                structure: new Array(20).fill(0),
-                hair: 11,
-                hairColor1: 5,
-                hairColor2: 2,
-                hairOverlay: '',
-                facialHair: 29,
-                facialHairColor1: 62,
-                facialHairOpacity: 0,
-                eyebrows: 0,
-                eyebrowsOpacity: 1,
-                eyebrowsColor1: 0,
-                eyes: 0,
-                opacityOverlays: [],
-                colorOverlays: []
+                info: {},
+                barbearia: false,
+                cabelo: 0,
+                sexo: 0,
+                cabeloDetalhe: 0,
             },
             navOptions: ['Sex', 'Structure', 'Hair', 'Overlays', 'Decor', 'Done']
         };
     },
     computed: {
         isInactiveNext() {
-            if (this.selection >= this.navOptions.length - 1) {
+            if (this.selection >= this.navOptions.length - 1) 
                 return { inactive: true };
-            }
 
             return { inactive: false };
         },
         isInactiveBack() {
-            if (this.selection <= 0) {
+            if (this.selection <= 0) 
                 return { inactive: true };
-            }
 
             return { inactive: false };
         },
@@ -53,50 +34,37 @@ const app = new Vue({
         }
     },
     methods: {
-        setData(oldData, _barbearia) {
-            if (!oldData) {
-                this.updateCharacter();
-                return;
-            }
+        setData(_sexo, _info, _barbearia) {
+            if (_barbearia)
+                this.navOptions = ['Hair', 'Decor', 'Done'];
 
-            if (_barbearia == 1)
-                this.navOptions = ['Hair', 'Done'];
-            else if (_barbearia == 2)
-                this.navOptions = ['Decor', 'Done'];
-
-            this.data = oldData;
-            this.barbearia = _barbearia;
-            this.updateCharacter();
+            this.data.sexo = _sexo;
+            this.data.info = _info;
+            this.data.barbearia = _barbearia;
+            
+            this.data.cabelo = (this.sexo === 0 ? femaleHairs : maleHairs).findIndex(x => x.drawable == this.data.info.Hair && x.dlc == this.data.info.HairDLC);
+            if (this.data.cabelo === -1)
+                this.data.cabelo = 0;
+            
+            this.data.cabeloDetalhe = (this.sexo === 0 ? femaleHairOverlays : maleHairOverlays).findIndex(x => x.collection == this.data.info.HairCollection && x.overlay == this.data.info.HairOverlay);
+            if (this.data.cabeloDetalhe === -1)
+                this.data.cabeloDetalhe = 0;
         },
         goNext() {
-            if (this.selection >= this.navOptions.length - 1) {
+            if (this.selection >= this.navOptions.length - 1)
                 return;
-            }
 
             this.selection += 1;
         },
         goBack() {
-            if (this.selection <= 0) {
+            if (this.selection <= 0)
                 return;
-            }
 
             this.selection -= 1;
         },
         updateCharacter() {
-            const isFemale = this.data.sex === 0;
-            this.data.hairOverlay = isFemale ? femaleHairOverlays[this.data.hair] : maleHairOverlays[this.data.hair];
-
-            if (isFemale) {
-                this.data.facialHair = 30;
-                this.data.facialHairOpacity = 0;
-            }
-
-            // Update Floats
-            this.data.skinMix = parseFloat(this.data.skinMix);
-            this.data.faceMix = parseFloat(this.data.faceMix);
-
             if ('alt' in window)
-                alt.emit('character:Sync', this.data);
+                alt.emit('character:Sync', this.data.info);
         },
         resetSelection() {
             this.selection = 0;
@@ -105,30 +73,6 @@ const app = new Vue({
     mounted() {
         this.$root.$on('updateCharacter', this.updateCharacter);
         this.$root.$on('resetSelection', this.resetSelection);
-
-        opacityOverlays.forEach(overlay => {
-            const overlayData = { ...overlay };
-            overlayData.value = 0;
-            delete overlayData.key;
-            delete overlayData.max;
-            delete overlayData.min;
-            delete overlayData.label;
-            delete overlayData.increment;
-
-            this.data.opacityOverlays.push(overlayData);
-        });
-
-        colorOverlays.forEach(overlay => {
-            const overlayData = { ...overlay };
-            overlayData.value = 0;
-            delete overlayData.key;
-            delete overlayData.max;
-            delete overlayData.min;
-            delete overlayData.label;
-            delete overlayData.increment;
-
-            this.data.colorOverlays.push(overlayData);
-        });
 
         if ('alt' in window)
             alt.on('character:SetData', this.setData);

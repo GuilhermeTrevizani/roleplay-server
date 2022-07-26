@@ -2,6 +2,7 @@
 var _MAX_MESSAGES_ON_CHAT = 10;
 var _HIDE_INPUT_BAR_ON_BLUR = true;
 var _MAX_INPUT_HISTORIES = 5;
+var _LINE_HEIGHT = 22;
 
 // Data
 var chatActive = false;
@@ -40,12 +41,6 @@ toastr.options = {
 
 // Initiation
 $(document).ready(() => {
-    const messagesListHeight = _MAX_MESSAGES_ON_CHAT * 22;
-    const chatBoxHeight = messagesListHeight + 50;
-
-    chatBox.css('height', chatBoxHeight + 'px');
-    chatMessagesList.css('height', messagesListHeight + 'px');
-
     alt.emit('chat:onLoaded');
 });
 
@@ -55,6 +50,13 @@ $(document).keydown(function(e) {
     }
 });
 
+function activateChat(state) {
+    chatActive = state;
+    (state) ? chatBox.removeClass('hide') : chatBox.addClass('hide');
+
+    alt.emit('chat:onChatStateChange', state);
+}
+
 if (_HIDE_INPUT_BAR_ON_BLUR) $(chatInputBar).focusout(() => inputActive && activateInput(false));
 chatMessagesList.bind('mousewheel DOMMouseScroll', (e) => e.preventDefault());
 chatInputBar.bind('propertychange change click keyup input paste', () => inputActive && setInputBarLengthCounterCurrent(chatInputBar.val().length));
@@ -63,26 +65,20 @@ function clearMessages() {
     chatMessagesList.html('');
 }
 
-// Functions - Actions
-function pushMessage(text, color = '#FFFFFF', icon = "") {
-    if (text.length < 1) return;
-
-    let style = `color:${color};`
-
-    if (icon != "")
-        text = `<i class="fi-${icon}" style="padding:0 2px 0 2px"></i> ${text}`;
+function pushMessage(text, color = '#FFFFFF') {
+    if (text.length < 1) 
+        return;
 
     let data = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
+    let scroll = getScrolledUpMessagesAmount();
 
-    chatMessagesList.append(`<div class="chat-message stroke" style="${style}"><span class='timestamp' style='display:${(timeStampActive ? 'inline' : 'none')};'>[${data}] </span>${text}</div>`);
+    chatMessagesList.append(`<div class="chat-message stroke" style="color:${color};display:flex;flex-direction:row;"><div class='timestamp' style='color:${color};display:${(timeStampActive ? 'inline' : 'none')};'>[${data}]</div><div class="chat-message" style="color:${color};margin-left:3px;">${text}</div></div>`);
 
-    // Check if player's chat is scrolled all the way to the bottom. If true, then scroll down for new message to appear,
-    // if false, inform player about new message(s).
-    (getScrolledUpMessagesAmount() >= 4) ? toggleWarningText(true) : scrollMessagesList('bottom');
+    (scroll >= 4) ? toggleWarningText(true) : scrollMessagesList('bottom');
 }
 
 function scrollMessagesList(direction) {
-    const pixels = 22 * 5;
+    const pixels = _LINE_HEIGHT * 5;
 
     switch (direction) {
         case 'up':
@@ -101,16 +97,46 @@ function scrollMessagesList(direction) {
     }, 250);
 }
 
-function activateChat(state) {
-    chatActive = state;
-    (state) ? chatBox.removeClass('hide') : chatBox.addClass('hide');
+function configure(timeStamp, tipoFonte, tamanhoFonte, linhas) {
+    timeStampActive = timeStamp;
+    (timeStampActive) ? $('.timestamp').css('display', 'inline') : $('.timestamp').css('display', 'none');
 
-    alt.emit('chat:onChatStateChange', state);
-}
+    let nomeFonte = "Arial, Helvetica, sans-serif";
+    switch(tipoFonte) {
+        case 1:
+            nomeFonte = "Georgia, 'Times New Roman', Times, serif";
+            break;
+        case 2:
+            nomeFonte = "'Times New Roman', Times, serif";
+            break;
+        case 3:
+            nomeFonte = "'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif";
+            break;
+        case 4:
+            nomeFonte = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            break;
+        case 5:
+            nomeFonte = "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif";
+            break;
+        case 6:
+            nomeFonte = "'Monospaced', sans-serif";
+            break;
+    }
 
-function activateTimeStamp(state) {
-    timeStampActive = state;
-    (state) ? $('.timestamp').css('display', 'inline') : $('.timestamp').css('display', 'none');
+    _MAX_MESSAGES_ON_CHAT = linhas;
+
+    _LINE_HEIGHT = tamanhoFonte + 8;
+    const messagesListHeight = _MAX_MESSAGES_ON_CHAT * _LINE_HEIGHT;
+    const chatBoxHeight = messagesListHeight + 50;
+
+    $('.chat-message').css('line-height', `${_LINE_HEIGHT}px`);
+    chatBox.css('font-family', nomeFonte);
+    chatBox.css('font-size', `${tamanhoFonte}px`);
+    chatBox.css('max-height', `${chatBoxHeight}px`);
+    chatBox.css('height', `${chatBoxHeight}px`);
+    chatMessagesList.css('max-height', `${messagesListHeight}px`);
+    chatMessagesList.css('height', `${messagesListHeight}px`);
+    scrollMessagesList('bottom');
 }
 
 function activateInput(state) {
@@ -182,20 +208,20 @@ function shiftHistoryDown() {
 function toggleWarningText(state) {
     switch (state) {
         case true:
-            chatNewMessagesWarning.removeClass('hide');
+            chatNewMessagesWarning.removeClass('animated-hide');
             break;
         case false:
-            chatNewMessagesWarning.addClass('hide');
+            chatNewMessagesWarning.addClass('animated-hide');
             break;
     }
 }
 
 function setInputBarLengthCounterCurrent(amount) {
-    chatInputBarLength.html(`<i class="fi-pencil" style="padding-right:2px"></i> ${amount}/150`);
+    chatInputBarLength.html(`${amount}/150`);
 }
 
 function getScrolledUpMessagesAmount() {
-    const amount = Math.round((chatMessagesList.prop('scrollHeight') - chatMessagesList.scrollTop() - _MAX_MESSAGES_ON_CHAT * 22) / 22);
+    const amount = Math.round((chatMessagesList.prop('scrollHeight') - chatMessagesList.scrollTop() - _MAX_MESSAGES_ON_CHAT * _LINE_HEIGHT) / _LINE_HEIGHT);
     return (amount > 0) ? amount : 0;
 }
 
@@ -270,9 +296,57 @@ alt.on('chat:addInputToHistory', addInputToHistory);
 alt.on('chat:shiftHistoryUp', shiftHistoryUp);
 alt.on('chat:shiftHistoryDown', shiftHistoryDown);
 alt.on('chat:notify', notify);
-alt.on('chat:activateTimeStamp', activateTimeStamp);
+alt.on('chat:configure', configure);
 alt.on('chat:toggleTelaPreta', toggleTelaPreta);
 alt.on('chat:exibirConfirmacao', exibirConfirmacao);
 alt.on('chat:toggleTelaVerde', toggleTelaVerde);
 alt.on('chat:toggleTelaLaranja', toggleTelaLaranja);
 alt.on('chat:toggleTelaCinza', toggleTelaCinza);
+
+let audioSpots = [];
+alt.on('Audio:Setup', (id, source, maxRange, dimension, volume, loop, fixVolume) => {
+    const x = audioSpots.findIndex(x => x.id === id);
+    if (x === -1) {
+        const howl = new Howl({
+            src: source,
+            html5: true,
+            volume: 0,
+            loop: loop,
+        });
+        howl.play();
+        audioSpots.push({
+            id, 
+            howl, 
+            maxRange,
+            dimension,
+            volume,
+            fixVolume,
+        });
+    } else {
+        audioSpots[x].volume = volume;
+    }
+});
+
+alt.on('Audio:Remove', (id,) => {
+    const x = audioSpots.findIndex(x => x.id === id);
+    if (x === -1) 
+        return;
+
+    audioSpots[x].howl.stop();
+
+    audioSpots.splice(x, 1);
+});
+
+alt.on('Audio:UpdateVolume', (id, distance, dimension) => {
+    const x = audioSpots.findIndex(x => x.id === id);
+    if (x === -1) 
+        return;
+    
+    const audioSpot = audioSpots[x];
+    const dist = parseInt(distance) <= 1 ? 1 : parseInt(distance);
+    let volume = 0;
+    if (distance <= audioSpot.maxRange && dimension == audioSpot.dimension)
+        volume = audioSpot.fixVolume ? audioSpot.volume : audioSpot.volume / dist;
+
+    audioSpot.howl.volume(volume);
+});

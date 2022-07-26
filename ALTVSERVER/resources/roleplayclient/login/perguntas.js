@@ -4,20 +4,28 @@ function showHTML(x) {
     perguntas = JSON.parse(x);
     $("#perguntas").html('');
     perguntas.forEach(function(p) {
-        $("#perguntas").append(`<p class='mar-top'>${p.Nome}</p>`);
-        p.Respostas.forEach(function(r) {
-            $("#perguntas").append(`<div class='radio'><input type='radio' class='magic-radio' id='resposta${r.Codigo}' name='pergunta${p.Codigo}' value='${r.Codigo}'><label for='resposta${r.Codigo}'>${r.Nome}</label></div>`);
+        $("#perguntas").append(`<p class='mar-top'><strong>${p.Name}</strong></p>`);
+        p.Answers.forEach(function(r) {
+            $("#perguntas").append(`<div class='radio'>
+                <input type='radio' class='magic-radio' id='resposta${r.Id}' name='pergunta${p.Id}' value='${r.Id}'>
+                <label for='resposta${r.Id}'>${r.Name}</label>
+            </div>`);
         });
     });
 }
 
 function confirmar() {
-    let temSemResposta = false;
+    $('#btn-confirmar').LoadingOverlay('show');
 
-    perguntas.forEach(function(p) {
-        p.RespostaSelecionada = parseInt($(`input[name='pergunta${p.Codigo}']:checked`).val());
-        if (isNaN(p.RespostaSelecionada))
+    let temSemResposta = false;
+    let acertos = 0;
+
+    perguntas.forEach((p) => {
+        const answer = parseInt($(`input[name='pergunta${p.Id}']:checked`).val());
+        if (isNaN(answer))
             temSemResposta = true;
+        else if (answer == p.CorrectQuestionAnswerId)
+            acertos++;
     });
 
     if (temSemResposta) {
@@ -25,8 +33,12 @@ function confirmar() {
         return;
     }
 
-    $('#btn-confirmar').LoadingOverlay('show');
-    alt.emit('confirmar', JSON.stringify(perguntas));
+    if (acertos < perguntas.length) {
+        mostrarErro(`Você não acertou todas as perguntas. Acertos: ${acertos} de ${perguntas.length}.`, true);
+        return;
+    }
+
+    alt.emit('confirmar');
 }
 
 function copiar() {
@@ -41,10 +53,7 @@ function voltarLogin() {
 
 function mostrarErro(erro, limpar = true) {
     $('#btn-confirmar').LoadingOverlay('hide');
-    if (erro != "") {
-        $('#erro').html(erro);
-        $('#erro').css('display', 'block');
-    }
+    $.alert(erro);
 
     if (limpar)
         $('input').prop('checked', false);

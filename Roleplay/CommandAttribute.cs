@@ -14,7 +14,7 @@ namespace Roleplay
             HelpText = helpText;
         }
 
-        public string Alias { get; set; } = string.Empty;
-        public bool GreedyArg { get; set; } = false;
+        public string[] Aliases { get; set; }
+        public bool GreedyArg { get; set; }   
     }
 }

@@ -1,14 +1,9 @@
 Vue.component('tab-done', {
-    props: ['data', 'barbearia'],
+    props: ['data'],
     methods: {
         saveCharacter() {
-            if (this.data.sex === 0) {
-                this.data.facialHair = 29;
-                this.data.facialHairColor1 = 0;
-            }
-
             if ('alt' in window) 
-                alt.emit('character:Done', this.data);
+                alt.emit('character:Done', this.data.info);
         },
         cancel() {
             if ('alt' in window) 
@@ -18,9 +13,12 @@ Vue.component('tab-done', {
     template: `
         <div class="options">
             <p>Clique no botão abaixo para confirmar a customização do seu personagem.</p>
+            <template v-if="!data.barbearia">
+                <p>ATENÇÃO! Estas informações e as tatuagens não poderão ser removidas/alteradas posteriormente.</p>
+            </template>
             <div class="option">
                 <button class="full" @click="saveCharacter" style="margin-bottom: 12px">Confirmar</button>
-                <template v-if="barbearia != 0">
+                <template v-if="data.barbearia">
                     <button class="full danger" @click="cancel" style="margin-bottom: 12px">Cancelar</button>
                 </template>
             </div>

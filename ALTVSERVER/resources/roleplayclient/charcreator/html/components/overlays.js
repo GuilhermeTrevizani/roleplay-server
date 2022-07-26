@@ -3,11 +3,11 @@ Vue.component('tab-overlays', {
     methods: {
         handleChange(e, parameter, index) {
             const value = parseFloat(e.target.value);
-            this.data.opacityOverlays[index][parameter] = value;
+            this.data.info.OpacityOverlays[index][parameter] = value;
             this.$root.$emit('updateCharacter');
         },
         getOverlayColorCount() {
-            return overlayColors.length - 1;
+            return 63;
         }
     },
     template: `
@@ -18,22 +18,22 @@ Vue.component('tab-overlays', {
                         {{ opacityOverlays[i].label }}
                     </div>
                     <div class="value">
-                        {{ data.opacityOverlays[i].value }} | {{ opacityOverlays[i].max }}
+                        {{ data.info.OpacityOverlays[i].Value }} | {{ opacityOverlays[i].max }}
                     </div>
                 </div>
                 <div class="inputHolder">
-                    <input type="range" :min="opacityOverlays[i].min" :max="opacityOverlays[i].max" v-model.number="opacityOverlays[i].value" :step="opacityOverlays[i].increment" @input="e => handleChange(e, 'value', i)" />
+                    <input type="range" :min="opacityOverlays[i].min" :max="opacityOverlays[i].max" v-model.number="opacityOverlays[i].value" :step="opacityOverlays[i].increment" @input="e => handleChange(e, 'Value', i)" />
                 </div>
                 <div class="labelContainer">
                     <div class="label">
                         Opacidade
                     </div>
                     <div class="value">
-                        {{ data.opacityOverlays[i].opacity.toFixed(1) }} | 1.0
+                        {{ data.info.OpacityOverlays[i].Opacity.toFixed(1) }} | 1.0
                     </div>
                 </div>
                 <div class="inputHolder">
-                    <input type="range" :min="0" :max="1" v-model.number="opacityOverlays[i].opacity" :step="0.1" @input="e => handleChange(e, 'opacity', i)" />
+                    <input type="range" :min="0" :max="1" v-model.number="opacityOverlays[i].Opacity" :step="0.1" @input="e => handleChange(e, 'Opacity', i)" />
                 </div>
             </div>
         </div>

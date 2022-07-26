@@ -1,15 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roleplay", "Roleplay\Roleplay.csproj", "{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testador", "Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoleplayBOT", "RoleplayBOT\RoleplayBOT.csproj", "{11D5FB16-45AA-4B96-9D90-4BE90101255E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoleplayUCP", "RoleplayUCP\RoleplayUCP.csproj", "{AF62156F-C8E2-4549-B693-166300F36FC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +21,6 @@ Global
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11D5FB16-45AA-4B96-9D90-4BE90101255E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF62156F-C8E2-4549-B693-166300F36FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF62156F-C8E2-4549-B693-166300F36FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF62156F-C8E2-4549-B693-166300F36FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF62156F-C8E2-4549-B693-166300F36FC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

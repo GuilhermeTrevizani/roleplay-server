@@ -3,13 +3,22 @@ $(window).keyup((e) => {
         closeView();
 });
 
-function abrirSpawnVeiculos(titulo, x) {
+function abrirSpawnVeiculos(titulo, itens) {
     $('#titulo').text(titulo);
     $('#tbody-veiculos').html('');
 
-    let itens = JSON.parse(x);
     itens.forEach(function(p) {
-	    $("#tbody-veiculos").append(`<tr><td>${p.Codigo}</td> <td>${p.Modelo}</td> <td>${p.Placa}</td> <td class='text-center'>${p.Spawnado}</td> <td class='text-center'>${p.Apreendido}</td> <td class="text-center"><button class="btn btn-xs btn-primary" type="button" onclick="spawnarVeiculo(${p.Codigo})">Spawnar</button></td></tr>`);
+	    $("#tbody-veiculos").append(`<tr>
+            <td>${p.Id}</td> 
+            <td>${p.Model}</td> 
+            <td>${p.Plate}</td> 
+            <td class='text-center'>${p.Spawn}</td> 
+            <td class='text-center'>${p.Seized}</td> 
+            <td class='text-center'>${p.Dismantled}</td> 
+            <td class="text-center">
+                <button class="btn btn-xs btn-primary" type="button" onclick="spawnarVeiculo(${p.Id})">Spawnar</button>
+            </td>
+        </tr>`);
     });
 }
 

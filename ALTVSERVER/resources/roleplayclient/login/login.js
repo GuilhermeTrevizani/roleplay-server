@@ -26,20 +26,17 @@ function esqueciMinhaSenha() {
 
 function showHTML(usuario) {
     $('#user').val(usuario);
-    if (usuario != "")
-    {
+    if (usuario != "") {
         $('#password').focus();
         $('#btn-registrar').hide();
+        $('#user').attr('readonly', 'readonly');
     }
 }
 
 function mostrarErro(erro) {
     $('#btn-entrar').LoadingOverlay('hide');
-    if (erro != "") {
-        $('#password').val('');
-        $('#erro').html(erro);
-        $('#erro').css('display', 'block');
-    }
+    $.alert(erro);
+    $('#password').val('');
 }
 
 if('alt' in window) {

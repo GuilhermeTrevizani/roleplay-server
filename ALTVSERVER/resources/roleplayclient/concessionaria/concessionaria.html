@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
     <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
     <link href="../resources/css/nifty.min.css" rel="stylesheet">
     <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
@@ -25,20 +24,31 @@
                     <input id="veiculo" type="text" class="form-control" placeholder="Digite o modelo do veículo aqui..."/>
                 </div>
                 <div class="col-md-4">
-                    <label style="vertical-align: middle;">Cores:</label>
-					<button id="corprimaria" class="jscolor {valueElement:null,value:'000000',onFineChange:'updateCor1(this)'}" style="vertical-align: middle;width:35px; height:35px;"></button>   
-                    <button id="corsecundaria" class="jscolor {valueElement:null,value:'000000',onFineChange:'updateCor2(this)'}" style="vertical-align: middle;width:35px; height:35px;"></button>   
+                    <label class="mar-top" style="vertical-align: middle;">Cores:</label>
+                    <input type="color" id="color1" value="#000000" />
+                    <input type="color" id="color2" value="#000000" />
                 </div>
                 <div class="col-md-2">
-                    <button onclick="copiarCorPrimaria()" type="button" class="btn btn-dark btn-block">Copiar Cor</button>
+                    <button onclick="copyColor()" type="button" class="btn btn-dark btn-block mar-top">Copiar Cor</button>
                 </div>
                 <div class="col-md-2">
-                    <button onclick="comprarVeiculo()" type="button" class="btn btn-primary btn-block">Comprar</button>
+                    <button onclick="comprarVeiculo()" type="button" class="btn btn-primary btn-block mar-top">Comprar</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="pad-top">Lista com as prévias dos veículos.</p>
+                    <div class="input-group mar-btm">
+                        <input id="link" type="text" value="https://wiki.altv.mp/wiki/GTA:Vehicle_Models" class="form-control" readonly>
+                        <span class="input-group-btn">
+                            <button onclick="copy()" class="btn btn-dark" type="button">Copiar</button>
+                        </span>
+                    </div>
                 </div>
             </div>
             <hr/>
             <input id="pesquisa" type="text" autofocus class="form-control" placeholder="Pesquise os veículos..." /> <br/>
-            <div class="table-responsive" style="max-height:50vh;overflow-y:auto;overflow-x:hidden;">
+            <div class="table-responsive" style="max-height:35vh;overflow-y:auto;overflow-x:auto;">
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr class="bg-dark">
@@ -56,7 +66,7 @@
     <script src="../resources/js/jquery.min.js"></script>
     <script src="../resources/js/bootstrap.min.js"></script>
     <script src="../resources/js/nifty.min.js"></script>
-    <script src="../resources/js/jscolor.js"></script>
-    <script src="concessionaria.js"></script>
+    <script src="../resources/js/core.js" defer></script>
+    <script src="concessionaria.js" defer></script>
 </body>
 </html>

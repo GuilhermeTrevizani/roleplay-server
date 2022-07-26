@@ -1,55 +1,59 @@
 import * as alt from 'alt';
 import * as native from 'natives';
 
-let timeout = null;
-
 const maxCountLoadTry = 255;
+const player = alt.Player.local;
 
-/*
-	Flags need to be added together for desired effects.
-	ie. Upper Body + Last Frame = 16 + 2 = 18 <-- This value.
-	normal = 0
-	repeat = 1
-	stop_last_frame = 2
-	unk1 = 4
-	unk2_air = 8
-	upperbody = 16
-	enablePlCtrl = 32
-	unk3 = 64
-	cancelable = 128
-	unk4_creature = 256
-	unk5_freezePos = 512
-	unk6_rot90 = 1024
-*/
+alt.onServer('animation:Clear', clearAnimation);
+function clearAnimation() {
+    player.setMeta('animation_dic', '');
+    player.setMeta('animation_name', '');
+    player.setMeta('animation_duration', 0);
+    player.setMeta('animation_flag', 0);
+    player.setMeta('animation_freeze', false);
 
-alt.onServer('animation:Play', (dict, name, flag) => {
-    playAnimation(alt.Player.local, dict, name, -1, flag);
-});
-
-alt.onServer('animation:Clear', () => {
-    if (timeout != null) {
-        alt.clearTimeout(timeout);
-        timeout = null;
-    }
-
-    alt.Player.local.setMeta('animation_dic', '');
-    alt.Player.local.setMeta('animation_name', '');
-
-    alt.Player.local.laying = false;
-    native.clearPedTasks(alt.Player.local.scriptID);
-    if (!alt.Player.local.vehicle)
-        native.clearPedSecondaryTask(alt.Player.local.scriptID);
-});
-
-export async function playAnimation(player, dict, name, duration, flag) {
-    startAnimation(player, dict, name, duration, flag);
+    native.clearPedTasks(player);
+    if (!player.vehicle)
+        native.clearPedSecondaryTask(player);
 }
 
-async function startAnimation(player, dict, name, duration, flag) {
-    native.clearPedTasks(alt.Player.local.scriptID);
+function checkAnimation(dict, name) {
+    return new Promise(resolve => {
+        native.requestAnimDict(dict);
+
+        let count = 0;
+        let inter = alt.setInterval(() => {
+            if (count > maxCountLoadTry) {
+                alt.clearInterval(inter);
+                return;
+            }
+
+            if (native.isEntityPlayingAnim(player, dict, name, 3)) {
+                resolve(true);
+                alt.clearInterval(inter);
+                return;
+            }
+
+            count += 1;
+        }, 5);
+    });
+}
+
+function setAnimation(dict, name, duration, flag, freeze) {
+    player.setMeta('animation_duration', duration);
+    player.setMeta('animation_flag', flag);
+    player.setMeta('animation_freeze', freeze);
+    player.setMeta('animation_dic', dict);
+    player.setMeta('animation_name', name);
+}
+
+alt.onServer('animation:Play', playAnimation);
+export async function playAnimation(dict, name, flag, duration, freeze) {
+    clearAnimation();
+
     if (native.hasAnimDictLoaded(dict)) {
         native.taskPlayAnim(
-            player.scriptID,
+            player,
             dict,
             name,
             1,
@@ -62,17 +66,15 @@ async function startAnimation(player, dict, name, duration, flag) {
             false
         );
         
-        timeout = alt.setTimeout(() => {
-            alt.Player.local.setMeta('animation_dic', dict);
-            alt.Player.local.setMeta('animation_name', name);
-        }, 3000);
+        checkAnimation(dict, name).then(() => {
+            setAnimation(dict, name, duration, flag, freeze);
+        });
         return;
     }
 
-    let res = loadAnim(dict);
-    res.then(() => {
+    loadAnim(dict).then(() => {
         native.taskPlayAnim(
-            player.scriptID,
+            player,
             dict,
             name,
             1,
@@ -85,10 +87,9 @@ async function startAnimation(player, dict, name, duration, flag) {
             false
         );
         
-        timeout = alt.setTimeout(() => {
-            alt.Player.local.setMeta('animation_dic', dict);
-            alt.Player.local.setMeta('animation_name', name);
-        }, 3000);
+        checkAnimation(dict, name).then(() => {
+            setAnimation(dict, name, duration, flag, freeze);
+        });
     });
 }
 
@@ -104,6 +105,28 @@ export async function loadAnim(dict) {
             }
 
             if (native.hasAnimDictLoaded(dict)) {
+                resolve(true);
+                alt.clearInterval(inter);
+                return;
+            }
+
+            count += 1;
+        }, 5);
+    });
+}
+
+export async function loadAnimSet(dict) {
+    return new Promise(resolve => {
+        native.requestAnimSet(dict);
+
+        let count = 0;
+        let inter = alt.setInterval(() => {
+            if (count > maxCountLoadTry) {
+                alt.clearInterval(inter);
+                return;
+            }
+
+            if (native.hasAnimSetLoaded(dict)) {
                 resolve(true);
                 alt.clearInterval(inter);
                 return;

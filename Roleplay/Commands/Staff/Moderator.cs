@@ -1,439 +1,354 @@
 ﻿using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
+using Roleplay.Factories;
 using Roleplay.Models;
 using System;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Staff
 {
     public class Moderator
     {
         [Command("ir", "/ir (ID ou nome)")]
-        public void CMD_ir(IPlayer player, string idNome)
+        public static void CMD_ir(MyPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = player.ObterPersonagemPorIdNome(idNome, false);
             if (target == null)
                 return;
 
-            p.LimparIPLs();
-            p.IPLs = target.IPLs;
-            p.SetarIPLs();
-            var pos = target.Player.Position;
-            pos.X += Global.DistanciaRP;
-            p.SetPosition(pos, false);
-            player.Dimension = target.Player.Dimension;
+            player.LimparIPLs();
+            player.IPLs = target.IPLs;
+            player.SetarIPLs();
+            var pos = target.Position;
+            pos.X += Global.RP_DISTANCE;
+            player.SetPosition(pos, target.Dimension, false);
         }
 
         [Command("trazer", "/trazer (ID ou nome)")]
-        public void CMD_trazer(IPlayer player, string idNome)
+        public static void CMD_trazer(MyPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = player.ObterPersonagemPorIdNome(idNome, false);
             if (target == null)
                 return;
 
             target.LimparIPLs();
-            target.IPLs = p.IPLs;
+            target.IPLs = player.IPLs;
             target.SetarIPLs();
             var pos = player.Position;
-            pos.X += Global.DistanciaRP;
-            target.SetPosition(pos, false);
-            target.Player.Dimension = player.Dimension;
+            pos.X += Global.RP_DISTANCE;
+            target.SetPosition(pos, player.Dimension, false);
         }
 
         [Command("tp", "/tp (ID ou nome) (ID ou nome)")]
-        public void CMD_tp(IPlayer player, string idNome, string idNomeDestino)
+        public static void CMD_tp(MyPlayer player, string idNome, string idNomeDestino)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = player.ObterPersonagemPorIdNome(idNome, false);
             if (target == null)
                 return;
 
-            var targetDest = Functions.ObterPersonagemPorIdNome(player, idNomeDestino, false);
+            var targetDest = player.ObterPersonagemPorIdNome(idNomeDestino, false);
             if (targetDest == null)
                 return;
 
             target.LimparIPLs();
             target.IPLs = targetDest.IPLs;
             target.SetarIPLs();
-            var pos = targetDest.Player.Position;
-            pos.X += Global.DistanciaRP;
-            target.SetPosition(pos, false);
-            target.Player.Dimension = targetDest.Player.Dimension;
+            var pos = targetDest.Position;
+            pos.X += Global.RP_DISTANCE;
+            target.SetPosition(pos, targetDest.Dimension, false);
 
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} teleportou você para {targetDest.Nome}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você teleportou {target.Nome} para {targetDest.Nome}.");
-        }
-
-        [Command("vw", "/vw (ID ou nome) (vw)")]
-        public void CMD_vw(IPlayer player, string idNome, int vw)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
-            if (target == null)
-                return;
-
-            target.Player.Dimension = vw;
-
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} alterou sua dimensão para {vw}.");
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você alterou a dimensão de {target.Nome} para {vw}.");
+            target.SendMessage(MessageType.Success, $"{player.User.Name} teleportou você para {targetDest.Character.Name}.");
+            player.SendMessage(MessageType.Success, $"Você teleportou {target.Character.Name} para {targetDest.Character.Name}.");
         }
 
         [Command("a", "/a (mensagem)", GreedyArg = true)]
-        public void CMD_a(IPlayer player, string mensagem)
+        public static async Task CMD_a(MyPlayer player, string mensagem)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (p.UsuarioBD.TogChatStaff)
+            if (player.User.StaffChatToggle)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você está com o chat da staff desabilitado.");
+                player.SendMessage(MessageType.Error, "Você está com o chat da staff desabilitado.");
                 return;
             }
 
-            foreach (var pl in Global.PersonagensOnline.Where(x => x.UsuarioBD.Staff != TipoStaff.Nenhum && !x.UsuarioBD.TogChatStaff))
-                Functions.EnviarMensagem(pl.Player, TipoMensagem.Nenhum, $"(( {Functions.ObterDisplayEnum(p.UsuarioBD.Staff)} {p.UsuarioBD.Nome} [{p.ID}]: {mensagem} ))", "#33EE33");
+            foreach (var x in Global.Players.Where(x => x.User.Staff != UserStaff.None && !x.User.StaffChatToggle))
+                x.SendMessage(MessageType.None, $"(( {Functions.GetEnumDisplay(player.User.Staff)} {player.User.Name} [{player.SessionId}]: {mensagem} ))", "#33EE33");
+
+            await player.GravarLog(LogType.StaffChat, mensagem, null);
         }
 
         [Command("kick", "/kick (ID ou nome) (motivo)", GreedyArg = true)]
-        public void CMD_kick(IPlayer player, string idNome, string motivo)
+        public static async Task CMD_kick(MyPlayer player, string idNome, string motivo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = player.ObterPersonagemPorIdNome(idNome, false);
             if (target == null)
                 return;
 
-            if (target.UsuarioBD.Staff >= p.UsuarioBD.Staff)
+            if (target.User.Staff >= player.User.Staff)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            using (var context = new DatabaseContext())
+            await using var context = new DatabaseContext();
+            await context.Punishments.AddAsync(new Punishment()
             {
-                context.Punicoes.Add(new Punicao()
-                {
-                    Data = DateTime.Now,
-                    Duracao = 0,
-                    Motivo = motivo,
-                    Personagem = target.Codigo,
-                    Tipo = TipoPunicao.Kick,
-                    UsuarioStaff = p.UsuarioBD.Codigo,
-                });
-                context.SaveChanges();
-            }
+                Date = DateTime.Now,
+                Reason = motivo,
+                CharacterId = target.Character.Id,
+                Type = PunishmentType.Kick,
+                StaffUserId = player.User.Id,
+            });
+            await context.SaveChangesAsync();
 
-            Functions.SalvarPersonagem(target, false);
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} kickou {target.Nome}. Motivo: {motivo}", false);
-            target.Player.Kick($"{p.UsuarioBD.Nome} kickou você. Motivo: {motivo}");
+            await target.Save();
+            await Functions.SendStaffMessage($"{player.User.Name} kickou {target.Character.Name}. Motivo: {motivo}", false);
+            target.Kick($"{player.User.Name} kickou você. Motivo: {motivo}");
         }
 
         [Command("irveh", "/irveh (código)")]
-        public void CMD_irveh(IPlayer player, int codigo)
+        public static void CMD_irveh(MyPlayer player, int codigo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
+                player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
                 return;
             }
 
-            p.LimparIPLs();
-            var pos = veh.Vehicle.Position;
-            pos.X += Global.DistanciaRP;
-            p.SetPosition(pos, false);
-            player.Dimension = veh.Vehicle.Dimension;
+            player.LimparIPLs();
+            var pos = veh.Position;
+            pos.X += Global.RP_DISTANCE;
+            player.SetPosition(pos, veh.Dimension, false);
         }
 
         [Command("trazerveh", "/trazerveh (código)")]
-        public void CMD_trazerveh(IPlayer player, int codigo)
+        public static void CMD_trazerveh(MyPlayer player, int codigo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
             if (player.Dimension > 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não é possível usar esse comando em um interior.");
+                player.SendMessage(MessageType.Error, "Não é possível usar esse comando em um interior.");
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
+                player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
                 return;
             }
 
             var pos = player.Position;
-            pos.X += Global.DistanciaRP;
-            veh.Vehicle.Position = pos;
-            veh.Vehicle.Dimension = player.Dimension;
+            pos.X += Global.RP_DISTANCE;
+            veh.Position = pos;
+            veh.Dimension = player.Dimension;
         }
 
-        [Command("aduty", "/atrabalho")]
-        public void CMD_aduty(IPlayer player)
+        [Command("aduty", Aliases = new string[] { "atrabalho" })]
+        public async static void CMD_aduty(MyPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            p.EmTrabalhoAdministrativo = !p.EmTrabalhoAdministrativo;
-            p.SetNametag();
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} {(p.EmTrabalhoAdministrativo ? "entrou em" : "saiu de")} serviço administrativo.", true);
+            await using var context = new DatabaseContext();
+            if (player.OnAdminDuty)
+            {
+                player.AdminDutySession.FinalDate = DateTime.Now;
+                context.Sessions.Update(player.AdminDutySession);
+                player.AdminDutySession = new();
+            }
+            else
+            {
+                player.AdminDutySession = new Session
+                {
+                    CharacterId = player.Character.Id,
+                    Type = SessionType.StaffDuty,
+                };
+                await context.Sessions.AddAsync(player.AdminDutySession);
+            }
+            await context.SaveChangesAsync();
+
+            player.OnAdminDuty = !player.OnAdminDuty;
+            player.Invincible = player.OnAdminDuty;
+            player.SetNametag();
+            await Functions.SendStaffMessage($"{player.User.Name} {(player.OnAdminDuty ? "entrou em" : "saiu de")} serviço administrativo.", true);
         }
 
-        [Command("listasos")]
-        public void CMD_listasos(IPlayer player)
+        [Command("at", "/at (código)")]
+        public static async Task CMD_at(MyPlayer player, int codigo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (Global.SOSs.Count == 0)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Não há nenhum SOS pendente.");
-                return;
-            }
-
-            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
-            <table class='table table-bordered table-striped'>
-                <thead>
-                    <tr class='bg-dark'>
-                        <th>ID</th>
-                        <th>Data</th>
-                        <th>Personagem</th>
-                        <th>Usuário</th>
-                        <th>Mensagem</th>
-                    </tr>
-                </thead>
-                <tbody>";
-
-            foreach (var x in Global.SOSs.OrderBy(x => x.Data))
-                html += $@"<tr><td>{x.IDPersonagem}</td><td>{x.Data}</td><td>{x.NomePersonagem}</td><td>{x.NomeUsuario}</td><td>{x.Mensagem}</td></tr>";
-
-            html += $@"</tbody></table></div>";
-
-            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"{Global.NomeServidor} • SOS", html));
-        }
-
-        [Command("aj", "/aj (código)")]
-        public void CMD_aj(IPlayer player, int codigo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var sos = Global.SOSs.FirstOrDefault(x => x.IDPersonagem == codigo);
+            var sos = Global.HelpRequests.FirstOrDefault(x => x.CharacterSessionId == codigo);
             if (sos == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe.");
+                player.SendMessage(MessageType.Error, $"SOS {codigo} não existe.");
                 return;
             }
 
-            var target = sos.Verificar(p.Usuario);
+            var target = await sos.Check();
             if (target == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado.");
+                player.SendMessage(MessageType.Error, $"Jogador do SOS não está conectado.");
                 return;
             }
 
-            sos.DataResposta = DateTime.Now;
-            sos.UsuarioStaff = p.UsuarioBD.Codigo;
-            sos.TipoResposta = TipoRespostaSOS.Aceito;
+            sos.AnswerDate = DateTime.Now;
+            sos.StaffUserId = player.User.Id;
 
-            using var context = new DatabaseContext();
-            context.SOSs.Update(sos);
-            context.SaveChanges();
-            Global.SOSs.Remove(sos);
+            await using var context = new DatabaseContext();
+            context.HelpRequests.Update(sos);
+            await context.SaveChangesAsync();
+            Global.HelpRequests.Remove(sos);
 
-            p.UsuarioBD.QuantidadeSOSAceitos++;
+            player.User.HelpRequestsAnswersQuantity++;
 
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} aceitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).", true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} aceitou seu SOS.");
-        }
+            await Functions.SendStaffMessage($"{player.User.Name} atendeu o pedido de ajuda de {sos.CharacterName} [{sos.CharacterSessionId}] ({sos.UserName}).", true);
+            target.SendMessage(MessageType.Success, $"{player.User.Name} atendeu o seu pedido de ajuda.");
 
-        [Command("rj", "/rj (código) (motivo)", GreedyArg = true)]
-        public void CMD_rj(IPlayer player, int codigo, string motivo)
-        {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
-                return;
-            }
-
-            var sos = Global.SOSs.FirstOrDefault(x => x.IDPersonagem == codigo);
-            if (sos == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"SOS {codigo} não existe.");
-                return;
-            }
-
-            var target = sos.Verificar(p.Usuario);
-            if (target == null)
-            {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, $"Jogador do SOS não está conectado.");
-                return;
-            }
-
-            sos.DataResposta = DateTime.Now;
-            sos.UsuarioStaff = p.UsuarioBD.Codigo;
-            sos.TipoResposta = TipoRespostaSOS.Rejeitado;
-            sos.MotivoRejeicao = motivo;
-
-            using var context = new DatabaseContext();
-            context.SOSs.Update(sos);
-            context.SaveChanges();
-            Global.SOSs.Remove(sos);
-
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} rejeitou o SOS de {sos.NomePersonagem} [{sos.IDPersonagem}] ({sos.NomeUsuario}).", true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Erro, $"{p.UsuarioBD.Nome} rejeitou seu SOS. Motivo: {motivo}");
+            var html = Functions.GetSOSJSON();
+            foreach (var targetStaff in Global.Players.Where(x => x.User.Staff != UserStaff.None))
+                targetStaff.Emit("ACPUpdateSOS", html);
         }
 
         [Command("spec", "/spec (ID ou nome)")]
-        public void CMD_spec(IPlayer player, string idNome)
+        public static async Task CMD_spec(MyPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (p.Algemado || p.TimerFerido != null)
+            if (player.Cuffed || player.Character.Wound != CharacterWound.Nenhum)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não pode usar esse comando algemado ou ferido.");
+                player.SendMessage(MessageType.Error, "Você não pode usar esse comando algemado ou ferido.");
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome, false);
+            var target = player.ObterPersonagemPorIdNome(idNome, false);
             if (target == null)
                 return;
 
-            if (target.PosicaoSpec.HasValue)
+            if (target.SPECPosition.HasValue)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador está observando outro jogador.");
+                player.SendMessage(MessageType.Error, "Jogador está observando outro jogador.");
                 return;
             }
 
-            if (!p.PosicaoSpec.HasValue)
+            if (!player.SPECPosition.HasValue)
             {
-                p.PosicaoSpec = player.Position;
-                p.DimensaoSpec = player.Dimension;
-                p.IPLsSpec = p.IPLs;
+                player.SPECPosition = player.Position;
+                player.SPECDimension = player.Dimension;
+                player.SPECIPLs = player.IPLs;
 
-                foreach (var x in Global.PersonagensOnline.Where(x => x.IDSpec == p.ID))
-                    x.Unspectate();
+                foreach (var x in Global.Players.Where(x => x.SPECId == player.SessionId))
+                    await x.Unspectate();
             }
 
             player.CurrentWeapon = (uint)WeaponModel.Fist;
-            p.LimparIPLs();
-            p.IPLs = target.IPLs;
-            p.SetarIPLs();
-            p.IDSpec = target.ID;
-            player.Dimension = target.Player.Dimension;
-            p.SetPosition(new Position(target.Player.Position.X, target.Player.Position.Y, target.Player.Position.Z + 5), true);
-            p.SetNametag();
-            player.Emit("SpectatePlayer", target.Player);
+            player.LimparIPLs();
+            player.IPLs = target.IPLs;
+            player.SetarIPLs();
+            player.SPECId = target.SessionId;
+            player.Invincible = true;
+            player.Visible = false;
+            player.SetNametag();
+            player.SetPosition(new Position(target.Position.X, target.Position.Y, target.Position.Z), target.Dimension, true);
+            player.Emit("SpectatePlayer", target);
+            await player.GravarLog(LogType.Staff, "/spec", target);
         }
 
         [Command("specoff")]
-        public void CMD_specoff(IPlayer player)
+        public static async Task CMD_specoff(MyPlayer player)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (!p.PosicaoSpec.HasValue)
+            if (!player.SPECPosition.HasValue)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não está observando um jogador.");
+                player.SendMessage(MessageType.Error, "Você não está observando um jogador.");
                 return;
             }
 
-            p.Unspectate();
+            await player.Unspectate();
         }
 
         [Command("aferimentos", "/aferimentos (ID ou nome)")]
-        public void CMD_aferimentos(IPlayer player, string idNome)
+        public static void CMD_aferimentos(MyPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            var target = player.ObterPersonagemPorIdNome(idNome);
             if (target == null)
                 return;
 
             if (target.Ferimentos.Count == 0)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não possui ferimentos.");
+                player.SendMessage(MessageType.Error, "Jogador não possui ferimentos.");
                 return;
             }
 
-            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:hidden;'>
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
             <table class='table table-bordered table-striped'>
                 <thead>
                     <tr>
@@ -442,70 +357,460 @@ namespace Roleplay.Commands.Staff
                         <th>Dano</th>
                         <th>Parte do Corpo</th>
                         <th>Autor</th>
+                        <th>Distância</th>
                     </tr>
                 </thead>
                 <tbody>";
 
             foreach (var x in target.Ferimentos)
-            {
-                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.Arma}</td><td>{x.Dano}</td><td>{Functions.ObterParteCorpo(x.BodyPart)}</td><td>{x.Attacker}</td></tr>";
-            }
+                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.Arma}</td><td>{x.Dano}</td><td>{Functions.GetBodyPartName(x.BodyPart)}</td><td>{x.Attacker}</td><td>{x.Distancia}</td></tr>";
 
             html += $@"
                 </tbody>
             </table>
             </div>";
 
-            player.Emit("Server:BaseHTML", Functions.GerarBaseHTML($"Ferimentos de {target.Nome}", html));
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Ferimentos de {target.Character.Name}", html));
         }
 
-        [Command("respawnarveiculo", "/respawnarveiculo (código)")]
-        public void CMD_respawnarveiculo(IPlayer player, int codigo)
+        [Command("aestacionar", "/aestacionar (veículo)")]
+        public static async Task CMD_aestacionar(MyPlayer player, int veiculo)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var veh = Global.Veiculos.FirstOrDefault(x => x.Codigo == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
             if (veh == null)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Veículo não está spawnado.");
+                player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
                 return;
             }
 
-            veh.Despawnar();
-            Functions.EnviarMensagemStaff($"{p.UsuarioBD.Nome} respawnou o veículo {codigo}.", true);
+            await veh.Estacionar(player);
+            await Functions.SendStaffMessage($"{player.User.Name} estacionou o veículo {veiculo}.", true);
         }
 
-        [Command("reviver", "/reviver (ID ou nome)")]
-        public void CMD_reviver(IPlayer player, string idNome)
+        [Command("acurar", "/acurar (ID ou nome)")]
+        public static async Task CMD_acurar(MyPlayer player, string idNome)
         {
-            var p = Functions.ObterPersonagem(player);
-            if ((int)p?.UsuarioBD?.Staff < (int)TipoStaff.Moderator)
+            if (player.User.Staff < UserStaff.Moderator)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Você não possui autorização para usar esse comando.");
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var target = Functions.ObterPersonagemPorIdNome(player, idNome);
+            var target = player.ObterPersonagemPorIdNome(idNome);
             if (target == null)
                 return;
 
             if (!target.Ferido)
             {
-                Functions.EnviarMensagem(player, TipoMensagem.Erro, "Jogador não está ferido.");
+                player.SendMessage(MessageType.Error, "Jogador não está ferido.");
                 return;
             }
 
             target.Curar();
+            player.SendMessage(MessageType.Success, $"Você curou {target.Character.Name}.");
+            target.SendMessage(MessageType.Success, $"{player.User.Name} curou você.");
 
-            Functions.EnviarMensagem(player, TipoMensagem.Sucesso, $"Você reviveu {target.Nome}.", notify: true);
-            Functions.EnviarMensagem(target.Player, TipoMensagem.Sucesso, $"{p.UsuarioBD.Nome} reviveu você.", notify: true);
+            await player.GravarLog(LogType.Staff, "/acurar", target);
+        }
 
-            Functions.GravarLog(TipoLog.Staff, $"/reviver", p, target);
+        [Command("adanos", "/adanos (veículo)")]
+        public static void CMD_adanos(MyPlayer player, int veiculo)
+        {
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            if (veh == null)
+            {
+                player.SendMessage(MessageType.Error, $"Nenhum veículo encontrado com o código {veiculo}.");
+                return;
+            }
+
+            if (veh.Damages.Count == 0)
+            {
+                player.SendMessage(MessageType.Error, "Veículo não possui danos.");
+                return;
+            }
+
+            var html = $@"<div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+                <table class='table table-bordered table-striped'>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Arma</th>
+                        <th>Dano na Lataria</th>
+                        <th>Dano Adicional na Lataria</th>
+                        <th>Dano no Motor</th>
+                        <th>Dano no Tanque de Combustível</th>
+                        <th>Autor</th>
+                        <th>Distância</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+            foreach (var x in veh.Damages)
+                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.WeaponHash}</td><td>{x.BodyHealthDamage}</td><td>{x.AdditionalBodyHealthDamage}</td><td>{x.EngineHealthDamage}</td><td>{x.PetrolTankDamage}</td><td>{x.Attacker}</td><td>{x.Distance}</td></tr>";
+
+            html += $@"
+                </tbody>
+            </table>
+            </div>";
+
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Danos do veículo {veh.Vehicle.Model.ToUpper()} [{veh.Vehicle.Id}] ({veh.Vehicle.Plate})", html));
+        }
+
+        [Command("checarveh", "/checarveh (código)")]
+        public static async Task CMD_checarveh(MyPlayer player, int codigo)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
+            if (veh == null)
+            {
+                player.SendMessage(MessageType.Error, $"Veículo {codigo} não está spawnado.");
+                return;
+            }
+
+            var dono = string.Empty;
+            if (veh.Vehicle.FactionId.HasValue)
+            {
+                dono = $"{Global.Factions.FirstOrDefault(x => x.Id == veh.Vehicle.FactionId).Name} [{veh.Vehicle.FactionId}]";
+            }
+            else if (veh.Vehicle.CharacterId.HasValue)
+            {
+                await using var context = new DatabaseContext();
+                dono = $"{(await context.Characters.FirstOrDefaultAsync(x => x.Id == veh.Vehicle.CharacterId)).Name} [{veh.Vehicle.CharacterId}]";
+            }
+            else if (veh.Vehicle.Job != CharacterJob.None)
+            {
+                dono = $"{Functions.GetEnumDisplay(veh.Vehicle.Job)} ({veh.NomeEncarregado}){{#FFFFFF}} | Término Aluguel: {{{Global.MAIN_COLOR}}}{veh.DataExpiracaoAluguel}";
+            }
+
+            player.SendMessage(MessageType.None, $"Veículo: {{{Global.MAIN_COLOR}}}{codigo}{{#FFFFFF}} | Modelo: {{{Global.MAIN_COLOR}}}{veh.Vehicle.Model}{{#FFFFFF}} | Proprietário: {{{Global.MAIN_COLOR}}}{dono}");
+        }
+
+        [Command("acp")]
+        public static async Task CMD_acp(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var jsonLogs = JsonSerializer.Serialize(
+                Enum.GetValues(typeof(LogType))
+                .Cast<LogType>()
+                .Select(x => new
+                {
+                    Id = x,
+                    Name = Functions.GetEnumDisplay(x),
+                })
+            );
+
+            using var context = new DatabaseContext();
+            var staffersJson = JsonSerializer.Serialize(
+                (await context.Users.Where(x => x.Staff != UserStaff.None)
+                    .Include(x => x.Characters)
+                    .OrderByDescending(x => x.Staff)
+                    .ThenBy(x => x.Name)
+                    .ToListAsync())
+                    .Select(x => new
+                    {
+                        Staff = Functions.GetEnumDisplay(x.Staff),
+                        x.Id,
+                        x.Name,
+                        x.HelpRequestsAnswersQuantity,
+                        x.CharacterApplicationsQuantity,
+                        x.StaffDutyTime,
+                        ConnectedTime = x.Characters.Sum(x => x.ConnectedTime)
+                    })
+            );
+
+            player.Emit("ACPShow",
+                player.User.StaffFlagsJSON,
+                await Functions.GetBansJSON(),
+                Functions.GetSOSJSON(),
+                jsonLogs,
+                staffersJson);
+        }
+
+        [Command("checar", "/checar (ID ou nome)")]
+        public static async Task CMD_checar(MyPlayer player, string idNome)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var target = player.ObterPersonagemPorIdNome(idNome);
+            if (target == null)
+                return;
+
+            var htmlStats = $"<div style='max-height:80vh;overflow-y:auto;overflow-x:hidden;'>{await target.ObterHTMLStats()}</div>";
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"{target.Character.Name} [{target.Character.Id}] ({DateTime.Now})", htmlStats));
+        }
+
+        [Command("proximo", Aliases = new string[] { "prox" })]
+        public static void CMD_proximo(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var isTemAlgoProximo = false;
+            var distanceVer = 5f;
+
+            foreach (var x in Global.Blips)
+            {
+                if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Blip {x.Id}");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.Spots)
+            {
+                if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Ponto {x.Id} | Tipo: {Functions.GetEnumDisplay(x.Type)} ({(byte)x.Type})");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.FactionsArmories)
+            {
+                if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Arsenal {x.Id}");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.Vehicles)
+            {
+                if (player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Veículo {x.Vehicle.Id} | Modelo: {x.Vehicle.Model.ToUpper()}");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.Doors)
+            {
+                if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Porta {x.Id}");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.Infos)
+            {
+                if (x.Dimension == player.Dimension
+                    && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Info {x.Id} | Data: {x.Date} | Expiração: {x.ExpirationDate} | Usuário: {x.User.Name} [{x.UserId}]");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            foreach (var x in Global.Companies)
+            {
+                if (player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= distanceVer)
+                {
+                    player.SendMessage(MessageType.None, $"Empresa {x.Id}");
+                    isTemAlgoProximo = true;
+                }
+            }
+
+            if (!isTemAlgoProximo)
+                player.SendMessage(MessageType.Error, "Você não está próximo de nenhum item.");
+        }
+
+        [Command("ainfos")]
+        public static void CMD_ainfos(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            player.Emit("StaffInfos", false, Functions.GetInfosHTML(null));
+        }
+
+        [Command("debug")]
+        public static void CMD_debug(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var html = $"<h3>Pontos de Áudio</h3>";
+            foreach (var audioSpot in Global.AudioSpots)
+                html += $@"Id: {audioSpot.Id} | Position: {audioSpot.Position.X} {audioSpot.Position.Y} {audioSpot.Position.Z} | VehicleId: {audioSpot.VehicleId} <br/><br/>";
+
+            html += $"<h3>Pontos de Luz</h3>";
+            foreach (var spotlight in Global.Spotlights)
+                html += $@"Id: {spotlight.Id} | Position: {spotlight.Position.X} {spotlight.Position.Y} {spotlight.Position.Z} | Player: {spotlight.Player} <br/><br/>";
+
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"{Global.SERVER_NAME} • Debug", html));
+        }
+
+        [Command("app")]
+        public static async Task CMD_app(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            await using var context = new DatabaseContext();
+            var app = await context.Characters.Where(x => x.EvaluatingStaffUserId == player.User.Id)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync();
+
+            void ShowHTML()
+            {
+                var html = $@"<h4>Nome: {app.Name}<h4/> 
+                    <h4>Nascimento: {app.BirthdayDate.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - app.BirthdayDate).TotalDays / 365):N0} anos)<h4/> 
+                    <h4>Caracteres História: {app.History.Length} de 4096<h4/> 
+                    <h4>OOC: {app.User.Name} [{app.User.Id}]<h4/> 
+                    <h4>Enviada: {app.RegisterDate}<h4/> 
+                    {app.History}
+                    <h4>Use /aceitarapp ou /negarapp (motivo)</h4>";
+
+                player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Aplicação de {app.Name} [{app.Id}]", html));
+            }
+
+            if (app != null)
+            {
+                ShowHTML();
+                return;
+            }
+
+            app = await context.Characters
+                .Where(x => !x.EvaluatorStaffUserId.HasValue && !x.EvaluatingStaffUserId.HasValue)
+                .Include(x => x.User)
+                .OrderByDescending(x => x.User.VIP >= UserVIP.Silver ? 1 : 0)
+                .FirstOrDefaultAsync();
+            if (app == null)
+            {
+                player.SendMessage(MessageType.Error, "Nenhuma aplicação está aguardando avaliação.");
+                return;
+            }
+
+            app.EvaluatingStaffUserId = player.User.Id;
+            context.Update(app);
+            await context.SaveChangesAsync();
+
+            player.User.CharacterApplicationsQuantity++;
+
+            ShowHTML();
+        }
+
+        [Command("aceitarapp")]
+        public static async Task CMD_aceitarapp(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            await using var context = new DatabaseContext();
+            var app = await context.Characters.Where(x => x.EvaluatingStaffUserId == player.User.Id)
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync();
+            if (app == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está avaliando uma aplicação.");
+                return;
+            }
+
+            app.EvaluatorStaffUserId = player.User.Id;
+            app.EvaluatingStaffUserId = null;
+            context.Update(app);
+            await context.SaveChangesAsync();
+
+            _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Aceita", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
+
+            player.SendMessage(MessageType.Success, $"Você aceitou a aplicação de **{app.Name} [{app.Id}]**.");
+        }
+
+        [Command("negarapp", "/negarapp (motivo)", GreedyArg = true)]
+        public static async Task CMD_negarapp(MyPlayer player, string motivo)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            await using var context = new DatabaseContext();
+            var app = await context.Characters.Where(x => x.EvaluatingStaffUserId == player.User.Id)
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync();
+            if (app == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está avaliando uma aplicação.");
+                return;
+            }
+
+            app.EvaluatorStaffUserId = player.User.Id;
+            app.EvaluatingStaffUserId = null;
+            app.RejectionReason = motivo;
+            context.Update(app);
+            await context.SaveChangesAsync();
+
+            _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Negada", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
+
+            player.SendMessage(MessageType.Success, $"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{motivo}**");
+        }
+
+        [Command("apps")]
+        public static async Task CMD_apps(MyPlayer player)
+        {
+            if (player.User.Staff < UserStaff.Moderator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            await using var context = new DatabaseContext();
+            var apps = await context.Characters
+                .Where(x => !x.EvaluatorStaffUserId.HasValue)
+                .Include(x => x.User)
+                .Include(x => x.EvaluatingStaffUser)
+                .OrderByDescending(x => x.User.VIP >= UserVIP.Silver ? 1 : 0)
+                .ToListAsync();
+            if (!apps.Any())
+            {
+                player.SendMessage(MessageType.Error, "Nenhuma aplicação está aguardando avaliação.");
+                return;
+            }
+
+            var html = string.Empty;
+
+            foreach (var app in apps)
+                html += $"<h4>Aplicação de {app.Name} [{app.Id}] (Responsável: {(!app.EvaluatingStaffUserId.HasValue ? "N/A" : $"{app.EvaluatingStaffUser.Name} [{app.EvaluatingStaffUserId}]")})</h4>";
+
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Aplicações Aguardando Avaliação", html));
         }
     }
 }

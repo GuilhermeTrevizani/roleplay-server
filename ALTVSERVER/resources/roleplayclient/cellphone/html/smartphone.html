@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="css/fontawesome.css" />
+		<link rel="stylesheet" href="css/app.css" />
+		<title>Smartphone</title>
+	</head>
+	<body>
+		<div id="smartphone">
+			<div id="head">
+				<div id="clock"></div>
+				<div id="notch"></div>
+				<div id="headInfo">
+					<i class="fas fa-signal" id="signal"></i>
+					<i class="fas fa-battery-full" id="battery"></i>
+				</div>
+			</div>
+			<div id="homeScreen">
+				<div id="apps">
+					<div class="app" id="appWeatherButton">
+						<i class="fas fa-sun"></i>
+					</div>
+					<div class="app" id="appAirplaneButton">
+						<i class="fas fa-plane"></i>
+					</div>
+				</div>
+				<div id="fav">
+					<!--
+					<div class="app" id="appPhoneButton">
+						<i class="fas fa-phone"></i>
+					</div>
+					-->
+					<div class="app" id="appContactsButton">
+						<i class="fas fa-address-book"></i>
+					</div>
+					<!--
+					<div class="app" id="appMessagesButton">
+						<i class="fas fa-comment"></i>
+					</div>
+					-->
+					<div class="app" id="appGpsButton">
+						<i class="fas fa-map-marker-alt"></i>
+					</div>
+				</div>
+			</div>
+			<div id="appScreen">
+				<div id="appContacts">
+					<div id="appContactsOverview">
+						<h5>Contatos</h5>
+						<input type="text" id="appContactsSearch" placeholder="Pesquisa" spellcheck="false"/>
+						<div id="btnNovoContato" style="text-align: center;cursor:pointer;margin-left:15px;">Novo Contato</div>
+						<div id="appContactsList"></div>
+					</div>
+					<div id="appContactsEdit">
+						<div id="editContactHead">
+							<i class="fas fa-chevron-left"></i> Contatos
+						</div>
+						<div id="editContactLetter">
+							<span></span>
+						</div>
+						<div id="editContact">
+							<input type="number" placeholder="Número" id="contactNewPhone" spellcheck="false" min="0"/>
+							<input type="text" placeholder="Nome" id="contactNewName" maxlength="25" spellcheck="false"/>
+						</div>
+						<div id="editContactButtons">
+							<div id="editContactCallButton">
+								<i class="fas fa-phone"></i>
+							</div>
+							<div id="editContactLocationButton">
+								<i class="fas fa-map-marker-alt"></i>
+							</div>
+							<div id="editContactSaveButton">
+								<i class="fas fa-save"></i>
+							</div>
+							<div id="editContactDeleteButton">
+								<i class="fas fa-trash"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="appWeather">
+					<div id="appWeatherOverview" style="text-align: center;">
+						<h5>Temperatura</h5>
+						<div id="temperature"></div>
+					</div>
+				</div>
+				<div id="appGps">
+					<div id="appGpsOverview">
+						<h5>GPS</h5>
+						Informe o número da propriedade para marcar a localização.
+						<input type="number" placeholder="Número" id="numeroPropriedade" spellcheck="false" min="0"/>
+						<div id="editContactButtons" style="align-content: center !important;">
+							<div id="rastrearPropriedade">
+								<i class="fas fa-check"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="homeButton"></div>
+		</div>
+		<script src="../../resources/js/jquery.min.js"></script>
+		<script src="js/app.js" defer></script>
+	</body>
+</html>

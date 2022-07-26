@@ -1,198 +1,192 @@
-﻿using AltV.Net.Data;
+﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Enums;
 using Discord.WebSocket;
 using Roleplay.Entities;
+using Roleplay.Factories;
 using Roleplay.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Roleplay
 {
-    public static class Global
+    public sealed class Global
     {
-        public static string CorSucesso { get; set; } = "#6EB469";
+        public const string SUCCESS_COLOR = "#6EB469";
 
-        public static string CorPrincipal { get; set; } = "#AE6AB2";
+        public const string MAIN_COLOR = "#AE6AB2";
 
-        public static string CorErro { get; set; } = "#FF6A4D";
+        public const string ERROR_COLOR = "#FF6A4D";
 
-        public static Rgba RgbaPrincipal { get; set; } = new Rgba(174, 106, 178, 255);
+        public const string SERVER_NAME = "Segunda Vida Roleplay";
 
-        public static string NomeServidor { get; set; } = "Segunda Vida Roleplay";
+        public const string SERVER_INITIALS = "SGV:RP";
 
-        public static Position PosicaoPrisao { get; } = new Position(461.7921f, -989.0697f, 24.91488f);
+        public const float RP_DISTANCE = 3.5f;
 
-        public static string CorCelular { get; } = "#F0E90D";
+        public const string STAFF_COLOR = "#AE6AB2";
 
-        public static string CorCelularSecundaria { get; } = "#F2FF43";
+        public const string CELLPHONE_MAIN_COLOR = "#F0E90D";
 
-        public static float DistanciaRP { get; } = 2;
+        public const string CELLPHONE_SECONDARY_COLOR = "#F2FF43";
 
-        public static int MaxPlayers { get; set; }
+        public const string MENSAGEM_SEM_AUTORIZACAO = "Você não possui autorização para usar esse comando.";
 
-        public static string ConnectionString { get; set; }
+        public const string MENSAGEM_PK = "Você morreu e perdeu a memória.";
 
-        public static Parametro Parametros { get; set; }
+        public const string MENSAGEM_ERRO_DISCORD = "Não foi possível recuperar informações do banco de dados. Reporte o bug no fórum.";
 
-        public static List<Personagem> PersonagensOnline { get; set; } = new List<Personagem>();
+        public const string MENSAGEM_DISCORD_NAO_VINCULADO = "Seu Discord não foi vinculado em nenhum usuário.";
+
+        public const float PESO_MAXIMO_INVENTARIO = 30;
+
+        public const string MENSAGEM_GRAVEMENTE_FERIDO = "Você não pode executar esse comando pois está gravemente ferido.";
+
+        public const int QUANTIDADE_SLOTS_INVENTARIO = 30;
+
+        public const string PATH_JSON_CLOTHES = "resources/roleplayclient/resources/json/";
+
+        public const int EMERGENCY_NUMBER = 911;
+
+        public const int TAXI_NUMBER = 5555555;
+
+        public const int MECHANIC_NUMBER = 7777777;
+
+        public const string VEHICLE_DRIVER_ERROR_MESSAGE = "Você não é o motorista de um veículo.";
+
+        public const string VEHICLE_ACCESS_ERROR_MESSAGE = "Você não possui acesso ao veículo.";
+
+        public const string VEHICLE_OWNER_ERROR_MESSAGE = "Você não é o proprietário do veículo.";
+
+        public const string INSUFFICIENT_MONEY_ERROR_MESSAGE = "Você não possui dinheiro suficiente (${0:N0}).";
+
+        public const string MENSAGEM_ERRO_FORA_VEICULO = "Você não está em um veículo.";
+
+        public const string BLOCKED_CELLPHONE_ERROR_MESSAGE = "Você não pode usar o celular agora.";
+
+        public const string UNEQUIPPED_CELPPHONE_ERROR_MESSAGE = "Você não possui um celular equipado.";
+
+        public const string MENSAGEM_ERRO_SALDO_INSUFICIENTE = "Você não possui saldo suficiente na sua conta bancária (${0:N0}).";
+
+        public const string ROBBED_PROPERTY_ERROR_MESSAGE = "A propriedade foi roubada. Use /pliberar.";
+
+        public const uint BOOMBOX_DEFAULT_DISTANCE = 20;
+
+        public static Position PosicaoSpawn { get; } = new Position(-430.0717f, 1039.26f, 372.1287f);
+
+        public static Rgba MainRgba { get; } = new Rgba(174, 106, 178, 75);
+
+        public static Parameter Parameter { get; set; }
 
         public static List<Blip> Blips { get; set; }
 
-        public static List<Faccao> Faccoes { get; set; }
+        public static List<Faction> Factions { get; set; }
 
-        public static List<Rank> Ranks { get; set; }
+        public static List<FactionRank> FactionsRanks { get; set; }
 
-        public static List<Propriedade> Propriedades { get; set; }
+        public static List<Property> Properties { get; set; }
 
-        public static List<Preco> Precos { get; set; }
+        public static List<Price> Prices { get; set; }
 
-        public static List<Veiculo> Veiculos { get; set; } = new List<Veiculo>();
+        public static List<Spot> Spots { get; set; }
 
-        public static List<Ponto> Pontos { get; set; }
+        public static List<FactionArmory> FactionsArmories { get; set; }
 
-        public static List<Armario> Armarios { get; set; }
+        public static List<FactionArmoryWeapon> FactionsArmoriesWeapons { get; set; }
 
-        public static List<ArmarioItem> ArmariosItens { get; set; }
+        public static List<Question> Questions { get; set; }
 
-        public static List<Pergunta> Perguntas { get; set; } = new List<Pergunta>();
+        public static List<QuestionAnswer> QuestionsAnswers { get; set; }
 
-        public static List<Resposta> Respostas { get; set; } = new List<Resposta>();
-
-        public static List<Concessionaria> Concessionarias { get; set; } = new List<Concessionaria>()
+        public static List<Dealership> Dealerships { get; } = new()
         {
-            new Concessionaria()
+            new()
             {
-                Nome = "Luxury Autos",
-                Tipo = TipoPreco.LuxuryAutos,
-                PosicaoCompra = new Position(-802.7736f, -224.05714f, 37.216064f),
-                PosicaoSpawn = new Position(-768.9363f, -243.6f, 36.744263f),
-                RotacaoSpawn = new Position(0f, 0f, -2.75f),
+                Name = "CONCESSIONÁRIA DE BARCOS",
+                PriceType = PriceType.Barcos,
+                Position = new Position(-787.1262f, -1354.725f, 5.150271f),
+                VehiclePosition = new Position(-805.2659f, -1418.4264f, 0.33190918f),
+                VehicleRotation = new Position(-0.015625f, 0, 0.859375f),
             },
-            new Concessionaria()
+            new()
             {
-                Nome = "Concessionária de Barcos",
-                Tipo = TipoPreco.Barcos,
-                PosicaoCompra = new Position(-787.1262f, -1354.725f, 5.150271f),
-                PosicaoSpawn = new Position(-805.2659f, -1418.4264f, 0.33190918f),
-                RotacaoSpawn = new Position(-0.015625f, 0, 0.859375f),
+                Name = "CONCESSIONÁRIA DE HELICÓPTEROS",
+                PriceType = PriceType.Helicopteros,
+                Position = new Position(-753.5287f, -1512.43f, 5.020952f),
+                VehiclePosition = new Position(-745.4902f, -1468.695f, 5.099712f),
+                VehicleRotation = new Position(0, 0, 328.6675f),
             },
-            new Concessionaria()
+            new()
             {
-                Nome = "Concessionária de Helicópteros",
-                Tipo = TipoPreco.Helicopteros,
-                PosicaoCompra = new Position(-753.5287f, -1512.43f, 5.020952f),
-                PosicaoSpawn = new Position(- 745.4902f, -1468.695f, 5.099712f),
-                RotacaoSpawn = new Position(0, 0, 328.6675f),
+                Name = "CONCESSIONÁRIA DE AVIÕES",
+                PriceType = PriceType.Avioes,
+                Position = new Position(-941.34064f, -2954.8748f, 13.9296875f),
+                VehiclePosition = new Position(-979.5824f, -2996.3472f, 13.457886f),
+                VehicleRotation = new Position(0f, 0f, 1.046875f),
             },
-            new Concessionaria()
+            new()
             {
-                Nome = "Concessionária Industrial",
-                Tipo = TipoPreco.Industrial,
-                PosicaoCompra = new Position(967.7275f, -1829.3539f, 31.234375f),
-                PosicaoSpawn = new Position(970.2066f, -1816.4044f, 30.610962f),
-                RotacaoSpawn = new Position(0f, 0f, 1.484375f),
+                Name = "CONCESSIONÁRIA DE MOTOCICLETAS E BICICLETAS",
+                PriceType = PriceType.MotocicletasBicicletas,
+                Position = new Position(268.73407f, -1155.455f, 29.279907f),
+                VehiclePosition = new Position(255.13846f, -1155.9165f, 28.774414f),
+                VehicleRotation = new Position(0f, -0.015625f, 1.578125f),
             },
-            new Concessionaria()
+            new()
             {
-                Nome = "Concessionária de Aviões",
-                Tipo = TipoPreco.Avioes,
-                PosicaoCompra = new Position(-941.34064f, -2954.8748f, 13.9296875f),
-                PosicaoSpawn = new Position(-979.5824f, -2996.3472f, 13.457886f),
-                RotacaoSpawn = new Position(0f, 0f, 1.046875f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Concessionária de Bicicletas",
-                Tipo = TipoPreco.Bicicletas,
-                PosicaoCompra = new Position(-1108.4572f, -1693.5824f, 4.359009f),
-                PosicaoSpawn = new Position(-1103.9341f, -1690.5363f, 3.8198242f),
-                RotacaoSpawn = new Position(0f, 0.015625f, 0.59375f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Sanders Motorcycles Dealership",
-                Tipo = TipoPreco.SandersMotorcyclesDealership,
-                PosicaoCompra = new Position(268.73407f, -1155.455f, 29.279907f),
-                PosicaoSpawn = new Position(255.13846f, -1155.9165f, 28.774414f),
-                RotacaoSpawn = new Position(0f, -0.015625f, 1.578125f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Premium Deluxe Motorsport",
-                Tipo = TipoPreco.PremiumDeluxeMotorsport,
-                PosicaoCompra = new Position(-56.096703f, -1099.3978f, 26.415405f),
-                PosicaoSpawn = new Position(-57.81099f, -1107.6263f, 25.96045f),
-                RotacaoSpawn = new Position(0f, 0f, 1.25f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Dinka Oriental Autos",
-                Tipo = TipoPreco.DinkaOrientalAutos,
-                PosicaoCompra = new Position(-903.7978f, -225.08571f, 40.013184f),
-                PosicaoSpawn = new Position(-903.33624f, -241.7011f, 39.238037f),
-                RotacaoSpawn = new Position(0.0625f, 0f, 2.609375f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Benefactor Euro Cars",
-                Tipo = TipoPreco.BenefactorEuroCars,
-                PosicaoCompra = new Position(-69.00659f, 63.65275f, 71.87622f),
-                PosicaoSpawn = new Position(-72.42198f, 84.5011f, 71f),
-                RotacaoSpawn = new Position(0f, 0f, 1.15625f),
-            },
-            new Concessionaria()
-            {
-                Nome = "Albany & Declasse Autos",
-                Tipo = TipoPreco.AlbanyDeclasseAutos,
-                PosicaoCompra = new Position(-40.826374f, -1674.4484f, 29.46521f),
-                PosicaoSpawn = new Position(-24.474724f, -1678.3912f, 28.976562f),
-                RotacaoSpawn = new Position(0f, 0f, 2.078125f),
-            },
-            new Concessionaria()
-            {
-                Nome = "VAPID",
-                Tipo = TipoPreco.VAPID,
-                PosicaoCompra = new Position(-202.14066f, -1158.6329f, 23.80371f),
-                PosicaoSpawn = new Position(-222.14505f, -1161.9956f, 22.539917f),
-                RotacaoSpawn = new Position(0f, 0f, 0f),
+                Name = "CONCESSIONÁRIA DE CARROS",
+                PriceType = PriceType.Carros,
+                Position = new Position(-56.096703f, -1099.3978f, 26.415405f),
+                VehiclePosition = new Position(-57.81099f, -1107.6263f, 25.96045f),
+                VehicleRotation = new Position(0f, 0f, 1.25f),
             },
         };
 
-        public static List<Emprego> Empregos { get; set; } = new List<Emprego>()
+        public static List<Job> Jobs { get; } = new()
         {
-            new Emprego()
+            new Job
             {
-                Tipo = TipoEmprego.Taxista,
-                Posicao = new Position(895.0308f, -179.1359f, 74.70036f),
-                Veiculo = VehicleModel.Taxi,
-                PosicaoAluguel = new Position(906.8967f, -175.66153f, 73.71277f),
-                RotacaoAluguel = new Rotation(0.015625f, 0.015625f, -2.140625f),
-                CorVeiculo = new Rgba(252, 186, 3, 255),
+                CharacterJob = CharacterJob.TaxiDriver,
+                Position = new Position(895.0308f, -179.1359f, 74.70036f),
+                VehicleModel = VehicleModel.Taxi,
+                VehicleRentPosition = new Position(907.33185f, -175.21318f, 74.11719f),
+                VehicleRentRotation = new Rotation(0f, 0f, -2.1273777f),
+                VehicleColor = new Rgba(252, 186, 3, 255),
             },
-            new Emprego()
+            new Job
             {
-                Tipo = TipoEmprego.Mecanico,
-                Posicao = new Position(-1148.2417f, -1999.5297f, 13.171387f),
-                Veiculo = VehicleModel.TowTruck2,
-                PosicaoAluguel = new Position(-1151.433f, -1982.4923f, 12.632202f),
-                RotacaoAluguel = new Rotation(0.015625f, -0.109375f, -0.796875f),
-                CorVeiculo = new Rgba(0, 0, 0, 255),
+                CharacterJob = CharacterJob.Mechanic,
+                Position = new Position(-27.178022f, -1673.1956f, 29.482056f),
+                VehicleModel = VehicleModel.TowTruck2,
+                VehicleRentPosition = new Position(-27.96923f, -1680.8967f, 29.431519f),
+                VehicleRentRotation = new Rotation(0f, 0f, 2.0779037f),
+                VehicleColor = new Rgba(0, 0, 0, 255),
             },
-            new Emprego()
+            new Job
             {
-                Tipo = TipoEmprego.Lixeiro,
-                Posicao = new Position(-355.18683f, -1513.411f, 27.712769f),
-                Veiculo = VehicleModel.Trash,
-                PosicaoAluguel = new Position(-351.25714f, -1520.6241f, 27.19043f),
-                RotacaoAluguel = new Rotation(0.03125f, -0.140625f, -1.546875f),
-                CorVeiculo = new Rgba(0, 0, 0, 255),
+                CharacterJob = CharacterJob.Garbageman,
+                Position = new Position(-355.18683f, -1513.411f, 27.712769f),
+                VehicleModel = VehicleModel.Trash,
+                VehicleRentPosition = new Position(-350.62418f, -1520.6901f, 27.712769f),
+                VehicleRentRotation = new Rotation(0f, 0f, -1.6326387f),
+                VehicleColor = new Rgba(0, 0, 0, 255),
+            },
+            new Job
+            {
+                CharacterJob = CharacterJob.Trucker,
+                Position = new Position(895.1341f, -896.2813f, 27.780273f),
+                VehicleModel = VehicleModel.Burrito,
+                VehicleRentPosition = new Position(886.87915f, -889.3714f, 26.533325f),
+                VehicleRentRotation = new Rotation(0f, 0f, 1.5831648f),
+                VehicleColor = new Rgba(0, 0, 0, 255),
             },
         };
 
-        public static List<SOS> SOSs { get; set; } = new List<SOS>();
+        public static List<HelpRequest> HelpRequests { get; set; } = new();
 
-        public static List<TextDraw> TextDraws { get; set; } = new List<TextDraw>();
-
-        public static List<WeaponComponent> WeaponComponents { get; set; } = new List<WeaponComponent>()
+        public static List<WeaponComponent> WeaponComponents { get; } = new()
         {
             new WeaponComponent(WeaponModel.BrassKnuckles, "BaseModel", 0xF3462F33),
             new WeaponComponent(WeaponModel.BrassKnuckles, "ThePimp", 0xC613F685),
@@ -716,32 +710,213 @@ namespace Roleplay
             new WeaponComponent(WeaponModel.GrenadeLauncher, "Scope", 0xAA2C45B4),
         };
 
-        public static List<Ligacao911> Ligacoes911 { get; set; } = new List<Ligacao911>();
-
-        public static List<ArmarioComponente> ArmariosComponentes { get; set; } = new List<ArmarioComponente>();
-
-        public static List<string> VeiculosSemCombustivel { get; set; } = new List<string> { "BOAT", "CYCLE", "PLANE", "HELICOPTER", "TRAILER", "TRAINS" };
-
-        public static List<VehicleInfo> VehicleInfos { get; set; } = new List<VehicleInfo>();
-
-        public static bool Development { get; set; }
+        public static List<EmergencyCall> EmergencyCalls { get; set; }
 
         public static DiscordSocketClient DiscordClient { get; set; }
 
-        public static string TokenBot { get; set; } 
+        public static List<Spotlight> Spotlights { get; set; } = new();
 
-        public static ulong CanalAnuncios { get; set; }
+        public static IEnumerable<MyPlayer> Players { get => Alt.GetAllPlayers().Cast<MyPlayer>(); }
 
-        public static ulong CanalAnunciosGovernamentais { get; set; }
+        public static IEnumerable<MyVehicle> Vehicles { get => Alt.GetAllVehicles().Cast<MyVehicle>(); }
 
-        public static string EmailHost { get; set; }
+        public static List<FactionUnit> FactionsUnits { get; set; }
 
-        public static string EmailAddress { get; set; }
+        public static List<FactionUnitCharacter> FactionsUnitsCharacters { get; set; } = new();
 
-        public static string EmailName { get; set; }
+        public static List<Item> Items { get; set; }
 
-        public static string EmailPassword { get; set; }
+        public static List<ClotheAccessory> Clothes1Male { get; set; }
 
-        public static int EmailPort { get; set; }
+        public static List<ClotheAccessory> Clothes1Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes3Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes3Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes4Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes4Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes5Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes5Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes6Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes6Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes7Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes7Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes8Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes8Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes9Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes9Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes10Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes10Female { get; set; }
+
+        public static List<ClotheAccessory> Clothes11Male { get; set; }
+
+        public static List<ClotheAccessory> Clothes11Female { get; set; }
+
+        public static List<ClotheAccessory> Accessories0Male { get; set; }
+
+        public static List<ClotheAccessory> Accessories0Female { get; set; }
+
+        public static List<ClotheAccessory> Accessories1Male { get; set; }
+
+        public static List<ClotheAccessory> Accessories1Female { get; set; }
+
+        public static List<ClotheAccessory> Accessories2Male { get; set; }
+
+        public static List<ClotheAccessory> Accessories2Female { get; set; }
+
+        public static List<ClotheAccessory> Accessories6Male { get; set; }
+
+        public static List<ClotheAccessory> Accessories6Female { get; set; }
+
+        public static List<ClotheAccessory> Accessories7Male { get; set; }
+
+        public static List<ClotheAccessory> Accessories7Female { get; set; }
+
+        public static WeatherInfo WeatherInfo { get; set; }
+
+        public static List<Door> Doors { get; set; }
+
+        public static List<string> IPLs { get; set; }
+
+        public static List<Info> Infos { get; set; }
+
+        public static List<FactionDrugHouse> FactionsDrugsHouses { get; set; }
+
+        public static List<FactionDrugHouseItem> FactionsDrugsHousesItems { get; set; }
+
+        public static List<CrackDen> CrackDens { get; set; }
+
+        public static List<CrackDenItem> CrackDensItems { get; set; }
+
+        public static List<TruckerLocation> TruckerLocations { get; set; }
+
+        public static List<TruckerLocationDelivery> TruckerLocationsDeliveries { get; set; }
+
+        public static List<AudioSpot> AudioSpots { get; set; } = new();
+
+        public static List<Furniture> Furnitures { get; set; } = new();
+
+        public static Settings Settings { get; set; }
+
+        public static List<Animation> Animations { get; set; } = new();
+
+        public static List<Company> Companies { get; set; } = new();
+
+        public static List<Tuple<string, string>> Scenarios { get; set; } = new()
+        {
+            new("WORLD_HUMAN_AA_COFFEE", "Spawna um copo de café e segura com as duas mãos a frente do peito"),
+            new("WORLD_HUMAN_AA_SMOKE", "Spawna um cigarro aceso na mão direita e dá tragos"),
+            new("WORLD_HUMAN_BINOCULARS", "Spawna um binóculo e observa através dele algumas vezes"),
+            new("WORLD_HUMAN_BUM_FREEWAY", "Spawna uma papelão de mendigo e segura com as duas mãos a frente do peito "),
+            new("WORLD_HUMAN_BUM_SLUMPED", "Deita no chão e faz alguns movimentos"),
+            new("WORLD_HUMAN_BUM_STANDING", "Faz uma pose com os ombros arqueados e faz alguns movimentos"),
+            new("WORLD_HUMAN_BUM_WASH", "Abaixa-se e faz alguns movimentos jogando água no próprio corpo"),
+            new("WORLD_HUMAN_VALET", "Mãos para trás com alguns movimentos"),
+            new("WORLD_HUMAN_CAR_PARK_ATTENDANT", "Utiliza um sinalizador para orientar o trânsito"),
+            new("WORLD_HUMAN_CHEERING", "Aplaude de baixo para cima"),
+            new("WORLD_HUMAN_CLIPBOARD", "Spawna uma prancheta na mão esquerda e fazer alguns movimentos"),
+            new("WORLD_HUMAN_CLIPBOARD_FACILITY", "Spawna uma prancheta na mão esquerda e fazer alguns movimentos"),
+            new("WORLD_HUMAN_CONST_DRILL", "Spawna uma britadeira e faz algumas animações"),
+            new("WORLD_HUMAN_COP_IDLES", "Coloca as mãos na cintura segurando o cinto e faz alguns movimentos"),
+            new("WORLD_HUMAN_DRINKING", "Spawna uma garrafa ensacada ou não (aleatório) na mão direita, bebe alguns goles e faz algumas animações"),
+            new("WORLD_HUMAN_DRINKING_FACILITY", "Spawna uma garrafa ensacada ou não (aleatório) na mão direita, bebe alguns goles e faz algumas animações"),
+            new("WORLD_HUMAN_DRINKING_CASINO_TERRACE", "Spawna uma garrafa ensacada ou não (aleatório) na mão direita, bebe alguns goles e faz algumas animações"),
+            new("WORLD_HUMAN_DRUG_DEALER", "Spawna um baseado na mão esquerda e dá tragos"),
+            new("WORLD_HUMAN_DRUG_DEALER_HARD", "Faz alguns movimentos simulando tragos"),
+            new("WORLD_HUMAN_MOBILE_FILM_SHOCKING", "Retira um celular do bolso traseiro da calça e o usa para filmar algo a frente"),
+            new("WORLD_HUMAN_GARDENER_LEAF_BLOWER", "Spawna um soprador na mão direita, balança ele algumas vezes a sua frente"),
+            new("WORLD_HUMAN_GARDENER_PLANT", "Pega uma pequena pá no chão e cava alguns buracos"),
+            new("WORLD_HUMAN_GUARD_PATROL", "Olha várias vezes de um lado para o outro desconfiado e faz alguns movimentos"),
+            new("WORLD_HUMAN_GUARD_STAND", "Mãos na frente do corpo na altura da cintura e faz alguns movimentos"),
+            new("WORLD_HUMAN_GUARD_STAND_CASINO", "Mãos na frente do corpo na altura da cintura e faz alguns movimentos"),
+            new("WORLD_HUMAN_GUARD_STAND_CLUBHOUSE", "Mãos na frente do corpo na altura da cintura e faz alguns movimentos"),
+            new("WORLD_HUMAN_GUARD_STAND_FACILITY", "Mãos na frente do corpo na altura da cintura e faz alguns movimentos"),
+            new("WORLD_HUMAN_HAMMERING", "Spawna um martelo na mão direita e dá marteladas"),
+            new("WORLD_HUMAN_HANG_OUT_STREET", "Conversa e dá risadas gesticulando com as mãos e com a cabeça"),
+            new("WORLD_HUMAN_HANG_OUT_STREET_CLUBHOUSE", "Conversa e dá risadas gesticulando com as mãos e com a cabeça"),
+            new("WORLD_HUMAN_HIKER_STANDING", "Faz movimentos como se estivesse segurando as alças de uma mochila"),
+            new("WORLD_HUMAN_HUMAN_STATUE", "Faz uma pose para foto"),
+            new("WORLD_HUMAN_JANITOR", "Spawna uma vassoura na mão direita e fica apoiado nela "),
+            new("WORLD_HUMAN_JOG", "Faz alguns trotes no lugar, se preparando para correr"),
+            new("WORLD_HUMAN_JOG_STANDING", "Faz alguns trotes no lugar, se preparando para correr e faz alguns alongamentos"),
+            new("WORLD_HUMAN_LEANING", "Apoia-se de costas em uma parede e faz alguns movimentos com os braços e mãos"),
+            new("WORLD_HUMAN_LEANING_CASINO_TERRACE", "Apoia-se de costas em uma parede e faz alguns movimentos com os braços e mãos"),
+            new("WORLD_HUMAN_MAID_CLEAN", "Spawna um pano amarelo na mão direita e esfrega/limpa algo"),
+            new("WORLD_HUMAN_MUSCLE_FLEX", "Flexiona os dois braços e exibe os músculos"),
+            new("WORLD_HUMAN_MUSCLE_FREE_WEIGHTS", "Spawna uma barra W com duas anilhas de cada lado e faz musculação"),
+            new("WORLD_HUMAN_MUSICIAN", "Spawna um bongô embaixo do braço esquerdo e toca o instrumento"),
+            new("WORLD_HUMAN_PAPARAZZI", "Spawna uma câmera profissional e tira algumas fotos"),
+            new("WORLD_HUMAN_PARTYING", "Spawna uma garrafa na mão esquerda, toma alguns goles enquanto dança e conversa"),
+            new("WORLD_HUMAN_PICNIC", "Senta-se no chão com as pernas esticadas como se estivesse tomando sol na praia"),
+            new("WORLD_HUMAN_PROSTITUTE_HIGH_CLASS", "Spawna um cigarro na mão direita, traga algumas vezes e faz movimentos sugestivos com mãos na cintura rebolando"),
+            new("WORLD_HUMAN_PROSTITUTE_LOW_CLASS", "Faz movimentos sugestivos com mãos na cintura rebolando"),
+            new("WORLD_HUMAN_PUSH_UPS", "Faz flexões de braço no chão, com pequenos intervalos"),
+            new("WORLD_HUMAN_SEAT_LEDGE", "Se senta em uma mureta/local alto"),
+            new("WORLD_HUMAN_SEAT_LEDGE_EATING", "Se senta em uma mureta/local alto e spawna uma rosquinha em mãos e dá algumas mastigadas"),
+            new("WORLD_HUMAN_SEAT_WALL", "Se senta em uma mureta/local alto"),
+            new("WORLD_HUMAN_SEAT_WALL_EATING", "Se senta em uma mureta/local alto e spawna uma rosquinha em mãos e dá algumas mastigadas"),
+            new("WORLD_HUMAN_SECURITY_SHINE_TORCH", "Retira uma lanterna do bolso"),
+            new("WORLD_HUMAN_SIT_UPS", "Deita-se no chão e faz abdominais"),
+            new("WORLD_HUMAN_SMOKING", "Retira um cigarro do bolso traseiro da calça, acende e dá alguns tragos"),
+            new("WORLD_HUMAN_SMOKING_CLUBHOUSE", "Retira um cigarro do bolso traseiro da calça, acende e dá alguns tragos"),
+            new("WORLD_HUMAN_SMOKING_POT", "Spawna um baseado na mão esquerda e fuma"),
+            new("WORLD_HUMAN_SMOKING_POT_CLUBHOUSE", "Spawna um baseado na mão esquerda e fuma"),
+            new("WORLD_HUMAN_STAND_FIRE", "Aquece as mãos em uma fogueira"),
+            new("WORLD_HUMAN_STAND_FISHING", "Spawna uma vara de pescar e a segura com ambas as mãos"),
+            new("WORLD_HUMAN_STAND_IMPATIENT", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("WORLD_HUMAN_STAND_IMPATIENT_CLUBHOUSE", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("WORLD_HUMAN_STAND_IMPATIENT_FACILITY", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("WORLD_HUMAN_STAND_IMPATIENT_UPRIGHT", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("WORLD_HUMAN_STAND_IMPATIENT_UPRIGHT_FACILITY", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("PROP_HUMAN_STAND_IMPATIENT", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("CODE_HUMAN_CROSS_ROAD_WAIT", "Balança os braços, olha no relógio e procura por algo/alguém ao longe"),
+            new("WORLD_HUMAN_STAND_MOBILE", "Retira um celular do bolso e mexe nele algumas vezes"),
+            new("WORLD_HUMAN_STAND_MOBILE_CLUBHOUSE", "Retira um celular do bolso e mexe nele algumas vezes"),
+            new("WORLD_HUMAN_STAND_MOBILE_FACILITY", "Retira um celular do bolso e mexe nele algumas vezes"),
+            new("WORLD_HUMAN_STAND_MOBILE_UPRIGHT", "Retira um celular do bolso e mexe nele algumas vezes"),
+            new("WORLD_HUMAN_STAND_MOBILE_UPRIGHT_CLUBHOUSE", "Retira um celular do bolso e mexe nele algumas vezes"),
+            new("WORLD_HUMAN_STRIP_WATCH_STAND", "Conversa animada com dancinhas e aplausos"),
+            new("WORLD_HUMAN_STUPOR", "Deitado no chão com as pernas esticadas, tosse e faz menção a cochilar mas acaba acordando"),
+            new("WORLD_HUMAN_STUPOR_CLUBHOUSE", "Sentado no chão olhando para baixo e ao redor"),
+            new("WORLD_HUMAN_SUNBATHE", "Deita de bruços na posição de tomar sol"),
+            new("WORLD_HUMAN_SUNBATHE_BACK", "Deita de barriga pra cima na posição de tomar sol"),
+            new("WORLD_HUMAN_TENNIS_PLAYER", "Spawna uma raqueta rosa e faz alguns movimentos"),
+            new("WORLD_HUMAN_TOURIST_MAP", "Spawna uma mapa turístico de Los santos"),
+            new("WORLD_HUMAN_TOURIST_MOBILE", "Spawna um celular na mão esquerda e faz alguns movimentos como se estivesse tirando uma selfie"),
+            new("WORLD_HUMAN_VEHICLE_MECHANIC", "Deita no chão com os braços para cima como se estivesse mexendo na parte inferior de um carro"),
+            new("WORLD_HUMAN_WELDING", "Spawna uma maçarico e segura ele com as duas mãos liga ele em um objeto a frente"),
+            new("WORLD_HUMAN_WINDOW_SHOP_BROWSE", "Observa algo com atenção e cruza o braço algumas vezes"),
+            new("WORLD_HUMAN_YOGA", "Pose de yoga"),
+            new("PROP_HUMAN_ATM", "Usa uma ATM"),
+            new("PROP_HUMAN_BBQ", "Spawna uma espátula de cozinha na mão direita e a usa para mexer na churrasqueira"),
+            new("PROP_HUMAN_BUM_BIN", "Abaixa-se como se estivesse tentando pegar algo dentro de uma caixa"),
+            new("PROP_HUMAN_BUM_SHOPPING_CART", "Apoia-se em um balcão e faz alguns movimentos"),
+            new("PROP_HUMAN_MUSCLE_CHIN_UPS", "Faz exercícios em uma barra paralela"),
+            new("PROP_HUMAN_MUSCLE_CHIN_UPS_ARMY", "Faz exercícios em uma barra paralela"),
+            new("PROP_HUMAN_MUSCLE_CHIN_UPS_PRISON", "Faz exercícios em uma barra paralela"),
+            new("PROP_HUMAN_PARKING_METER", "Separa droga pequenas com as mãos"),
+            new("PROP_HUMAN_SEAT_BAR", "Sentado em uma banqueta com as mãos apoiadas em um balcão"),
+            new("CODE_HUMAN_MEDIC_KNEEL", "Procura algo no chão investigando"),
+            new("CODE_HUMAN_MEDIC_TEND_TO_DEAD", "Procura algo no chão investigando"),
+            new("CODE_HUMAN_MEDIC_TIME_OF_DEATH", "Spawna um bloco de notas e escreve algo nele"),
+            new("CODE_HUMAN_POLICE_CROWD_CONTROL", "Orienta algumas pessoas próximas"),
+            new("CODE_HUMAN_POLICE_INVESTIGATE", "Coloca as mãos na cintura e investiga o local e fala no rádio algumas vezes"),
+        };
+
+        public static List<MethodInfo> Commands { get; set; }
     }
 }

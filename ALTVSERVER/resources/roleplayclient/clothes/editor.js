@@ -1,82 +1,87 @@
 import * as alt from 'alt';
 import * as native from 'natives';
 import { createPedEditCamera, destroyPedEditCamera, setFov, setZPos } from '/helpers/camera.js';
-import { showCursor } from '/helpers/cursor.js';
+import { view, setView, toggleView, closeView } from '/helpers/cursor.js';
+import { activateChat } from '/chat/index.mjs';
 
-let view;
-let oldRoupas = [];
-let oldAcessorios = [];
 let sexo = 0;
-let slots = 1;
-let roupa = 1;
-let tipo = 0;
 let tipoFaccao = 0;
 
-alt.on('character:EditClothes', handleEdit);
-alt.on('character:SyncClothes', handleSync);
+// 0 - Criação do Personagem
+// 1 - Loja de Roupas
+// 2 - Uniforme
+let tipo = 0;
 
-function handleEdit(_oldRoupas, _oldAcessorios, _sexo, _slots = 1, _roupa = 1, _tipo = 0, _tipoFaccao = 0) {
-    oldRoupas = _oldRoupas;
-    oldAcessorios = _oldAcessorios;
+alt.onServer('AbrirLojaRoupas', (sexo, tipo, tipoFaccao) => {
+    native.displayHud(false);
+    native.displayRadar(false);
+    activateChat(false);
+    alt.emit('character:EditClothes', sexo, tipo, tipoFaccao);
+});
+
+alt.on('character:EditClothes', handleEdit);
+alt.onServer('Character:CloseClothes', handleClose);
+
+function handleEdit(_sexo, _tipo = 0, _tipoFaccao = 0) {
     sexo = _sexo;
-    slots = _slots;
-    roupa = _roupa;
     tipo = _tipo;
     tipoFaccao = _tipoFaccao;
 
-    view = new alt.WebView('http://resource/clothes/html/index.html');
+    setView(new alt.WebView('http://resource/clothes/html/index.html'));
     view.on('load', handleReadyDone);
     view.on('character:Done', handleDone);
     view.on('character:Cancel', handleCancel);
-    view.on('character:SyncClothes', handleSync);
-    view.on('log', (txt) => {
-        alt.log(txt);
+    view.on('character:SetClothes', handleSetClothes);
+    view.on('character:SetProps', handleSetProps);
+    view.on('character:GetClothMaxTexture', (component, drawable) => {
+        view.emit('character:SetMaxTexture', native.getNumberOfPedTextureVariations(alt.Player.local, component, drawable));
+    });
+    view.on('character:GetPropMaxTexture', (component, drawable) => {
+        view.emit('character:SetMaxTexture', native.getNumberOfPedPropTextureVariations(alt.Player.local, component, drawable));
     });
     view.focus();
 
-    showCursor(true);
+    native.freezeEntityPosition(alt.Player.local, true);
+    toggleView(true, false);
     if (_tipo == 0)
-        native.setEntityHeading(alt.Player.local.scriptID, 169.24);
+        native.setEntityHeading(alt.Player.local, 169.24);
     createPedEditCamera(false);
     setFov(50);
     setZPos(0.6);
 }
 
-function closeView() {
-    if (view)
-        view.destroy();
-
-    view = null;
-    showCursor(false);
-    native.freezeEntityPosition(alt.Player.local.scriptID, false);
+function handleClose() {
+    closeView();
+    native.freezeEntityPosition(alt.Player.local, false);
     destroyPedEditCamera();
 }
 
-function handleDone(newRoupas, newAcessorios, newRoupa) {
-    alt.emitServer('ConfirmarLojaRoupas', JSON.stringify(newRoupas), JSON.stringify(newAcessorios), newRoupa, tipo, true);
-    closeView();
+function handleDone(newRoupas, newAcessorios) {
+    if (tipo == 0)
+        handleClose();
+
+    alt.emitServer('ConfirmarLojaRoupas', JSON.stringify(newRoupas), JSON.stringify(newAcessorios), tipo, true);
 }
 
 function handleCancel() {
-    alt.emitServer('ConfirmarLojaRoupas', JSON.stringify(oldRoupas), JSON.stringify(oldAcessorios), roupa, tipo, false);
-    closeView();
+    if (tipo == 0)
+        handleClose();
+
+    alt.emitServer('ConfirmarLojaRoupas', '', '', tipo, false);
+}
+
+function handleSetClothes(component, drawable, texture, dlc) {
+    alt.emitServer('SetClothes', component, drawable, texture, dlc);
+}
+
+function handleSetProps(component, drawable, texture, dlc) {
+    alt.emitServer('SetProps', component, drawable, texture, dlc);
 }
 
 function handleReadyDone() {
-    view.emit('character:SetData', oldRoupas, oldAcessorios, sexo, slots, roupa, tipo, tipoFaccao);
+    view.emit('character:SetData', sexo, tipo, tipoFaccao);
 }
 
-function handleSync(dataRoupas, dataAcessorios) {
-    for (let i = 0; i < dataRoupas.length; i++) {
-        let value = dataRoupas[i];
-        native.setPedComponentVariation(alt.Player.local.scriptID, value.Slot, value.Drawable, value.Texture, 0);
-    }
-
-    for (let i = 0; i < dataAcessorios.length; i++) {
-        let value = dataAcessorios[i];
-        if (value.Drawable != -1)
-            native.setPedPropIndex(alt.Player.local.scriptID, value.Slot, value.Drawable, value.Texture, true);
-        else
-            native.clearPedProp(alt.Player.local.scriptID, value.Slot);
-    }
-}
+alt.onServer('Character:ShowMessage', (message) => {
+    view.emit('character:ShowMessage', message);
+});

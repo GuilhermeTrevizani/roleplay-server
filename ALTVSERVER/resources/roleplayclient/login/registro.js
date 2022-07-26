@@ -14,10 +14,7 @@ function voltarLogin() {
 
 function mostrarErro(erro) {
     $('#btn-registrar').LoadingOverlay('hide');
-    if (erro != "")  {
-        $('#erro').html(erro);
-        $('#erro').css('display', 'block');
-    }
+    $.alert(erro);
 }
 
 if('alt' in window)

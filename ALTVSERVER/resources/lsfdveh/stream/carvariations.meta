@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<CVehicleModelInfoVariation>
+  <variationData>
+	<Item>
+         <modelName>lsfdtruck</modelName>
+         <colors>
+            <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item> 
+         </colors>
+         <kits />
+         <windowsWithExposedEdges />
+         <plateProbabilities>
+            <Probabilities>
+               <Item>
+                  <Name>Police Guv Plate</Name>
+                  <Value value="100" />
+               </Item>
+            </Probabilities>
+         </plateProbabilities>
+         <lightSettings value="22" />
+         <sirenSettings value="29" />
+      </Item>
+	<Item>
+         <modelName>lsfdtruck2</modelName>
+         <colors>
+            <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item> 
+				<Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            44
+          </indices>
+          <liveries/>
+        </Item> 
+         </colors>
+         <kits />
+         <windowsWithExposedEdges />
+         <plateProbabilities>
+            <Probabilities>
+               <Item>
+                  <Name>Police Guv Plate</Name>
+                  <Value value="100" />
+               </Item>
+            </Probabilities>
+         </plateProbabilities>
+         <lightSettings value="0" />
+         <sirenSettings value="31" />
+      </Item>
+	<Item>
+         <modelName>lsfdtruck3</modelName>
+         <colors>
+            <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item> 
+         </colors>
+         <kits />
+         <windowsWithExposedEdges />
+         <plateProbabilities>
+            <Probabilities>
+               <Item>
+                  <Name>Police Guv Plate</Name>
+                  <Value value="100" />
+               </Item>
+            </Probabilities>
+         </plateProbabilities>
+         <lightSettings value="22" />
+         <sirenSettings value="30" />
+      </Item>
+  <Item>
+      <modelName>lsfd</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item>     
+      </colors>
+      <kits>
+        <Item>0_default_modkit</Item>
+      </kits>
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police Guv Plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="4" />
+    </Item>
+  <Item>
+      <modelName>lsfd2</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item>     
+      </colors>
+      <kits>
+        <Item>0_default_modkit</Item>
+      </kits>
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police Guv Plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="33" />
+    </Item>
+  <Item>
+      <modelName>lsfd3</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item>     
+      </colors>
+      <kits>
+        <Item>0_default_modkit</Item>
+      </kits>
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police Guv Plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="1" />
+      <sirenSettings value="35" />
+    </Item>
+  <Item>
+      <modelName>lsfd4</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item>     
+      </colors>
+      <kits>
+        <Item>0_default_modkit</Item>
+      </kits>
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police Guv Plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="35" />
+    </Item>
+  <Item>
+      <modelName>lsfd5</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+            111
+            111
+            0
+            156
+          </indices>
+          <liveries/>
+        </Item>     
+      </colors>
+      <kits>
+        <Item>0_default_modkit</Item>
+      </kits>
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>Police Guv Plate</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="34" />
+    </Item>
+  </variationData>
+</CVehicleModelInfoVariation>

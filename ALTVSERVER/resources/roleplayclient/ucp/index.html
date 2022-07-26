@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:80%;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button class="btn btn-default" onclick="closeView();">
+                    Fechar
+                </button>
+            </div>
+            <h3 id="titulo" class="panel-title">Painel de Controle do Usuário</h3>
+        </div>
+        <div class="panel-body">
+            <div class="tab-base tab-stacked-left">
+                <ul class="nav nav-tabs" style="width:20vh">
+                    <li id="li-minhasinformacoes"  class="active">
+                        <a data-toggle="tab" href="#tab-minhasinformacoes">Minhas Informações</a>
+                    </li>
+                    <li id="li-comandos">
+                        <a data-toggle="tab" href="#tab-comandos">Comandos</a>
+                    </li>
+                    <li id="li-configuracoes">
+                        <a data-toggle="tab" href="#tab-configuracoes">Configurações</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-minhasinformacoes" class="tab-pane fade active in"></div>
+                    <div id="tab-comandos" class="tab-pane fade"></div>
+                    <div id="tab-configuracoes" class="tab-pane fade"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="index.js" defer></script>
+</body>
+</html>

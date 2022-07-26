@@ -1,80 +1,98 @@
 import alt from 'alt-client';
 import * as native from 'natives';
+import { drawText3d } from './text';
 
-let drawDistance = 20;
+let drawDistance = 10;
 let interval;
 
 alt.onServer('nametags:Config', handleConfig);
 
 function handleConfig(showNametags) {
-    if (!showNametags) {
-        if (interval) {
-            alt.clearInterval(interval);
-            interval = null;
-        }
-        return;
+    if (interval) {
+        alt.clearInterval(interval);
+        interval = null;
     }
 
-    interval = alt.setInterval(drawNametags, 1);
+    if (!showNametags)
+        return;
+
+    interval = alt.setInterval(drawNametags, 0);
 }
 
 async function drawNametags() {
-    if (alt.Player.local.getMeta('STOP_DRAWS'))
+    if (alt.Player.local.getMeta('f7'))
         return;
 
-    const players = [...alt.Player.all];
+    const players = [...alt.Player.streamedIn];
     players.forEach(player => {
         drawPlayerNametag(player);
     });
 }
 
 async function drawPlayerNametag(player) {
-    if (player.scriptID === alt.Player.local.scriptID) 
+    if (!player.valid)
+        return;
+
+    if (player === alt.Player.local) 
         return;
 
     let name = player.getSyncedMeta('nametag');
     if (!name) 
         return;
 
-    if (!native.isEntityOnScreen(player.scriptID))
+    const distance = alt.Player.local.pos.distanceTo(player.pos);
+    if (distance > drawDistance)
         return;
 
-    let dist = distance2d(alt.Player.local.pos, player.pos);
-    if (dist > drawDistance)
+    if (!native.hasEntityClearLosToEntity(alt.Player.local, player, 17))
         return;
 
-    if (!native.hasEntityClearLosToEntity(alt.Player.local.scriptID, player.scriptID, 17))
-        return;
+    name = `~${player.getSyncedMeta("Damaged") ? 'r' : 'w'}~${name}`;
+    const ferido = parseInt(player.getSyncedMeta('ferido'));
+    if (ferido == 1 || ferido == 2)
+        name = `(( Este jogador está gravemente ferido. ))\n${name}`;
+    else if (ferido >= 3)
+        name = `(( Este jogador está morto. ))\n${name}`;
 
-    name = `~w~${name}`;
-    let ferido = parseInt(player.getSyncedMeta('ferido'));
-    if (ferido == 1)
-        name = `(( Esse jogador está gravemente ferido. ))\n${name}`;
-    else if (ferido == 2)
-        name = `(( Esse jogador perdeu a consciência. ))\n${name}`;
-
-    name += ` [${player.getSyncedMeta('id')}]`;
-    if (player.isTalking)
-        name += `~y~*`;
-    else if (player.getSyncedMeta('chatting'))
+    if (player.hasSyncedMeta('GameUnfocused'))
         name += `~r~*`;
+    else if (player.getSyncedMeta('chatting'))
+        name += `~y~*`;
+    else if (player.isTalking)
+        name += `~b~*`;
 
     let pos = {...player.pos};
     pos.z += player.vehicle ? 1.40 : 1.30;
 
-    native.setDrawOrigin(pos.x, pos.y, pos.z, 0);
-    native.beginTextCommandDisplayText('STRING');
-    native.setTextFont(4);
-    native.setTextScale(0.4, 0.4);
-    native.setTextProportional(true);
-    native.setTextCentre(true);
-    native.setTextColour(255, 106, 77, 255);
-    native.setTextOutline();
-    native.addTextComponentSubstringPlayerName(name);
-    native.endTextCommandDisplayText(0, 0, 0);
-    native.clearDrawOrigin();
-}
+    const entity = player.vehicle ? player.vehicle : player;
+    const vector = native.getEntityVelocity(entity);
+    const frameTime = native.getFrameTime();
 
-function distance2d(vector1, vector2) {
-    return Math.sqrt(Math.pow(vector1.x - vector2.x, 2) + Math.pow(vector1.y - vector2.y, 2) + Math.pow(vector1.z - vector2.z, 2));
+    drawText3d(name,
+        pos.x + vector.x * frameTime, 
+        pos.y + vector.y * frameTime, 
+        pos.z + vector.z * frameTime,
+        0.4,
+        4,
+        255, 106, 77, 255
+    );
+    
+    const action = player.getSyncedMeta('TextAction');
+    if (action) {
+        pos.z += 0.15;
+        drawText3d(
+            action,
+            pos.x + vector.x * frameTime, 
+            pos.y + vector.y * frameTime, 
+            pos.z + vector.z * frameTime,
+            0.35,
+            4,
+            194, 
+            162, 
+            218,
+            255,
+            true,
+            false
+        );
+    }
 }

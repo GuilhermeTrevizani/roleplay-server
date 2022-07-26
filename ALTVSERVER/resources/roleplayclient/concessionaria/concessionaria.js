@@ -1,12 +1,3 @@
-let r1 = 0, g1 = 0, b1 = 0;
-let r2 = 0, g2 = 0, b2 = 0;
-let cor1 = '#000000';
-
-$(window).keyup((e) => {
-    if (e.which === 27)
-        closeView();
-});
-
 $(document).ready(function () {
     $("#pesquisa").on('input', function () {
         var pesquisa = removerAcentos($("#pesquisa").val());
@@ -21,25 +12,19 @@ $(document).ready(function () {
     });
 });
 
-function removerAcentos(s) {
-    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-}
-
 function comprarVeiculo() {
-    alt.emit("confirmarCompra", $("#veiculo").val(), r1, g1, b1, r2, g2, b2);
-}
+    const rgb1 = hexToRgb($('#color1').val());
+    const rgb2 = hexToRgb($('#color2').val());
 
-function updateCor1(picker) {
-    r1 = parseInt(picker.rgb[0]);
-    g1 = parseInt(picker.rgb[1]);
-    b1 = parseInt(picker.rgb[2]);
-    cor1 = picker.toHEXString();
-}
-
-function updateCor2(picker) {
-    r2 = parseInt(picker.rgb[0]);
-    g2 = parseInt(picker.rgb[1]);
-    b2 = parseInt(picker.rgb[2]);
+    alt.emit("confirmarCompra", 
+        $("#veiculo").val(),
+        Number(rgb1.r),  
+        Number(rgb1.g),  
+        Number(rgb1.b),  
+        Number(rgb2.r),  
+        Number(rgb2.g),  
+        Number(rgb2.b)
+    );
 }
 
 function showHTML(titulo, x) {
@@ -50,15 +35,14 @@ function showHTML(titulo, x) {
     });
 }
 
-function copiarCorPrimaria() {
-    r2 = r1;
-    g2 = g1;
-    b2 = b1;
-    document.querySelector('#corsecundaria').jscolor.fromString(cor1);
+function copyColor() {
+    $('#color2').val($('#color1').val());
 }
 
-function closeView() {
-    alt.emit('closeView');
+function copy() {
+    var copyText = document.getElementById("link");
+    copyText.select();
+    document.execCommand("copy");
 }
 
 if('alt' in window)

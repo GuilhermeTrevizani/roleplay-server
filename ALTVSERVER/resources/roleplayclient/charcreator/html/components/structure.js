@@ -2,12 +2,12 @@ Vue.component('tab-structure', {
     props: ['data'],
     methods: {
         setParameter(parameter, value) {
-            this.data[parameter] = value;
+            this.data.info[parameter] = value;
             this.$root.$emit('updateCharacter');
         }
     },
     watch: {
-        'data.structure': function(newVal, oldVal) {
+        'data.info.Structure': function(newVal, oldVal) {
             this.$root.$emit('updateCharacter');
         }
     },
@@ -19,11 +19,11 @@ Vue.component('tab-structure', {
                         {{ structureLabels[i] }}
                     </div>
                     <div class="value">
-                        {{ parseFloat(data.structure[i]).toFixed(1) }} | 1.0
+                        {{ parseFloat(data.info.Structure[i]).toFixed(1) }} | 1.0
                     </div>
                 </div>
                 <div class="inputHolder">
-                    <input type="range" min="-1" max="1" step="0.1" v-model.number="data.structure[i]"/>
+                    <input type="range" min="-1" max="1" step="0.1" v-model.number="data.info.Structure[i]"/>
                 </div>
             </div>
         </div>

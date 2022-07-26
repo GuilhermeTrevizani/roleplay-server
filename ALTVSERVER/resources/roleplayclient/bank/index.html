@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../resources/css/nifty.min.css" rel="stylesheet">
+    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+</head>
+<body style="background-color:transparent;text-align:center;">
+    <div class="panel panel-bordered panel-primary" style="width:60%;text-align: left;display: inline-block;margin-top:3%;">
+        <div class="panel-heading">
+            <div class="panel-control">
+                <button class="btn btn-default" onclick="closeView();">
+                    Fechar
+                </button>
+            </div>
+            <h3 class="panel-title">Número da sua conta bancária: <strong id="accountId">0</strong></h3>
+        </div>
+        <div class="panel-body">
+            <div class="tab-base tab-stacked-left">
+                <ul class="nav nav-tabs" style="width:20vh">
+                    <li id="li-principal" class="active">
+                        <a data-toggle="tab" href="#tab-principal" aria-expanded="true">Principal</a>
+                    </li>
+                    <li id="li-transactions">
+                        <a data-toggle="tab" href="#tab-transactions">Transações</a>
+                    </li>
+                    <li id="li-multas">
+                        <a data-toggle="tab" href="#tab-tickets">Multas <span id="badge-tickets" class="badge badge-danger">0</span></a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-principal" class="tab-pane fade active in">
+                        <div class="well">
+                            Boas vindas,
+                            <h1 id="name"></h1>
+                            Saldo
+                            <h3 id="accountAmount" class="text-dark">$0</h3>
+                            <button id="btn-deposit" class="btn btn-success btn-lg">Depositar</button>
+                            <button id="btn-withdraw" class="btn btn-danger btn-lg">Sacar</button>
+                            <button id="btn-transfer" class="btn btn-dark btn-lg">Transferir</button>
+                        </div>
+                        <div class="well">
+                            Poupança
+                            <h3 id="savings" class="text-dark">$0</h3>
+                            <button id="btn-savings" class="btn btn-dark btn-lg">Sacar Poupança</button>
+                        </div>
+                    </div>
+                    <div id="tab-transactions" class="tab-pane fade">
+                        <div class="table-responsive" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr class="bg-dark">
+                                        <th>Código</th>
+                                        <th>Data</th>
+                                        <th>Valor</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-transactions"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="tab-tickets" class="tab-pane fade">
+                        <div class="table-responsive" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr class="bg-dark">
+                                        <th>Código</th>
+                                        <th>Data</th>
+                                        <th>Valor</th>
+                                        <th>Motivo</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-tickets"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../resources/js/jquery.min.js"></script>
+    <script src="../resources/js/bootstrap.min.js"></script>
+    <script src="../resources/js/nifty.min.js"></script>
+    <script src="../resources/js/jquery-confirm.js"></script>
+    <script src="index.js" defer></script>
+</body>
+</html>

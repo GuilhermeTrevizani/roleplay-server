@@ -18,10 +18,7 @@ function mostrarErro(erro) {
     $('#senhaAntiga').val('');
     $('#novaSenha').val('');
     $('#novaSenha2').val('');
-    if (erro != "")  {
-        $('#erro').html(erro);
-        $('#erro').css('display', 'block');
-    }
+    $.alert(erro);
 }
 
 function mostrarSucesso(sucesso) {
@@ -30,10 +27,7 @@ function mostrarSucesso(sucesso) {
     $('#senhaAntiga').val('');
     $('#novaSenha').val('');
     $('#novaSenha2').val('');
-    if (sucesso != "")  {
-        $('#sucesso').html(sucesso);
-        $('#sucesso').css('display', 'block');
-    }
+    $.alert(sucesso);
 }
 
 if('alt' in window) {

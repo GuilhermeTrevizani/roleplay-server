@@ -2,16 +2,15 @@
 
 namespace Roleplay.Models
 {
-    public enum TipoMensagem
+    public enum MessageType
     {
-        Nenhum,
-        Erro,
-        Sucesso,
-        Titulo,
-        Punicao,
+        None,
+        Error,
+        Success,
+        Title,
     }
 
-    public enum TipoMensagemJogo
+    public enum MessageCategory
     {
         Me,
         Do,
@@ -24,39 +23,44 @@ namespace Roleplay.Models
         Ame,
         Radio,
         Ado,
+        DadosMoeda,
+        Microphone,
     }
 
-    public enum TipoFaccao
+    public enum FactionType : byte
     {
-        Policial = 1,
+        [Display(Name = "Policial")]
+        Police = 1,
 
-        [Display(Name = "Médica")]
-        Medica = 2,
+        [Display(Name = "Bombeiros")]
+        Firefighter = 2,
 
-        Criminosa = 3,
+        Criminal = 3,
 
-        Governo = 4,
+        [Display(Name = "Imprensa")]
+        Press = 4,
 
-        Jornalismo = 5,
+        [Display(Name = "Legista")]
+        Coroner = 5,
     }
 
-    public enum TipoPunicao
+    public enum PunishmentType : byte
     {
         Kick = 1,
         Ban = 2,
     }
 
-    public enum TipoLog
+    public enum LogType : byte
     {
         Todos = 0,
 
         Staff = 1,
 
-        [Display(Name = "Líder Facção")]
-        FaccaoLider = 2,
+        [Display(Name = "Facção")]
+        Faction = 2,
 
-        [Display(Name = "Gestor Facção")]
-        FaccaoGestor = 3,
+        [Display(Name = "Chat da Facção")]
+        FactionChat = 3,
 
         Dinheiro = 4,
 
@@ -72,7 +76,7 @@ namespace Roleplay.Models
         Arma = 9,
 
         [Display(Name = "Troca de Nome")]
-        Namechange = 10,
+        NameChange = 10,
 
         [Display(Name = "Exclusão de Personagem")]
         ExclusaoPersonagem = 11,
@@ -92,23 +96,133 @@ namespace Roleplay.Models
         [Display(Name = "Falha Esqueci Minha Senha")]
         EsqueciMinhaSenhaFalha = 16,
 
-        [Display(Name = "Entrada UCP")]
-        EntradaUCP = 17,
+        [Display(Name = "Entregar Item")]
+        EntregarItem = 17,
 
-        [Display(Name = "Falha Login UCP")]
-        LoginFalhaUCP = 18,
+        [Display(Name = "Dropar Item")]
+        DroparItem = 18,
+
+        [Display(Name = "Pegar Item Chão")]
+        PegarItemChao = 19,
+
+        [Display(Name = "Roubar Item")]
+        RoubarItem = 20,
+
+        [Display(Name = "Descartar Item")]
+        DescartarItem = 21,
+
+        [Display(Name = "Dar Item")]
+        DarItem = 22,
+
+        [Display(Name = "Armazenar Item Propriedade")]
+        ArmazenarItemPropriedade = 23,
+
+        [Display(Name = "Pegar Item Propriedade")]
+        PegarItemPropriedade = 24,
+
+        [Display(Name = "Armazenar Item Veículo")]
+        ArmazenarItemVeiculo = 25,
+
+        [Display(Name = "Pegar Item Veículo")]
+        PegarItemVeiculo = 26,
+
+        [Display(Name = "Reparar Veículo Facção")]
+        RepararVeiculoFaccao = 27,
+
+        [Display(Name = "Reparar Veículo Jogador")]
+        RepararVeiculoJogador = 28,
+
+        [Display(Name = "Spawnar Veículo")]
+        SpawnarVeiculo = 29,
+
+        [Display(Name = "Estacionar Veículo")]
+        EstacionarVeiculo = 30,
+
+        [Display(Name = "Me Curar")]
+        MeCurar = 31,
+
+        [Display(Name = "Mensagens Privadas")]
+        MensagensPrivadas = 32,
+
+        [Display(Name = "Máscara")]
+        Mascara = 33,
+
+        [Display(Name = "Destruição de Veículo")]
+        DestruicaoVeiculo = 34,
+
+        Hack = 35,
+
+        Droga = 36,
+
+        [Display(Name = "Quebrar Trava")]
+        QuebrarTrava = 37,
+
+        [Display(Name = "Ligação Direta")]
+        LigacaoDireta = 38,
+
+        Desmanche = 39,
+
+        Arrombar = 40,
+
+        [Display(Name = "Roubar Propriedade")]
+        RoubarPropriedade = 41,
+
+        [Display(Name = "Roubar Armazenamento")]
+        RoubarArmazenamento = 42,
+
+        [Display(Name = "Visualizar Vendas Boca de Fumo")]
+        VisualizarVendasBocaFumo = 43,
+        
+        [Display(Name = "Editar Mobília Propriedade")]
+        EditPropertyFurniture = 44,
+
+        [Display(Name = "Chat OOC Global")]
+        GlobalOOCChat = 45,
+
+        [Display(Name = "Chat Staff")]
+        StaffChat = 46,
+
+        [Display(Name = "Colocar no Veículo")]
+        ColocarVeiculo = 47,
+
+        [Display(Name = "Retirar do Veículo")]
+        RetirarVeiculo = 48,
+
+        Empresa = 49,
+
+        [Display(Name = "Anúncio Empresa")]
+        AnuncioEmpresa = 50,
+
+        [Display(Name = "Tunar Veículo Mecânico")]
+        TunarVeiculoMecanico = 51,
+
+        Emprego = 52,
     }
 
-    public enum TipoConvite
+    public enum InviteType
     {
+        [Display(Name = "Facção")]
         Faccao = 1,
+
+        [Display(Name = "Venda de Propriedade")]
         VendaPropriedade = 2,
+
         Revista = 3,
+
+        [Display(Name = "Venda de Veículo")]
         VendaVeiculo = 4,
+
+        [Display(Name = "Localização de Celular")]
         LocalizacaoCelular = 5,
+
+        [Display(Name = "Empresa")]
+        Company = 6,
+
+        [Display(Name = "Mecânico")]
+        Mechanic = 7,
     }
 
-    public enum TipoInterior
+    public enum PropertyInterior : byte
     {
         Motel = 1,
         CasaBaixa = 2,
@@ -188,12 +302,23 @@ namespace Roleplay.Models
         MazeBankWestPowerBrokerIce = 76,
         MazeBankWestPowerBrokeConservative = 77,
         MazeBankWestPowerBrokePolished = 78,
+        Clubhouse1 = 79,
+        Clubhouse2 = 80,
+        MethLab = 81,
+        WeedFarm = 82,
+        CocaineLockup = 83,
+        CounterfeitCashFactory = 84,
+        DocumentForgeryOffice = 85,
+        WarehouseSmall = 86,
+        WarehouseMedium = 87,
+        WarehouseLarge = 88,
+        Nightclub = 89,
     }
 
-    public enum TipoPreco
+    public enum PriceType : byte
     {
-        [Display(Name = "Luxury Autos")]
-        LuxuryAutos = 1,
+        [Display(Name = "Aluguel de Veículos de Empregos")]
+        AluguelEmpregos = 1,
 
         [Display(Name = "Conveniência")]
         Conveniencia = 2,
@@ -203,7 +328,7 @@ namespace Roleplay.Models
         [Display(Name = "Helicópteros")]
         Helicopteros = 4,
 
-        Industrial = 5,
+        Carros = 5,
 
         [Display(Name = "Aviões")]
         Avioes = 6,
@@ -212,63 +337,85 @@ namespace Roleplay.Models
 
         Empregos = 8,
 
-        Bicicletas = 9,
+        [Display(Name = "Motocicletas e Bicicletas")]
+        MotocicletasBicicletas = 9,
 
-        [Display(Name = "Sanders Motorcycles Dealership")]
-        SandersMotorcyclesDealership = 10,
+        Drogas = 10,
 
-        [Display(Name = "Premium Deluxe Motorsport")]
-        PremiumDeluxeMotorsport = 11,
-
-        [Display(Name = "Dinka Oriental Autos")]
-        DinkaOrientalAutos = 12,
-
-        [Display(Name = "Benefactor Euro Cars")]
-        BenefactorEuroCars = 13,
-
-        [Display(Name = "Albany & Declasse Autos")]
-        AlbanyDeclasseAutos = 14,
-
-        [Display(Name = "VAPID")]
-        VAPID = 15,
-
-        [Display(Name = "Aluguel de Veículos de Empregos")]
-        AluguelEmpregos = 16,
+        Tuning = 11,
     }
 
-    public enum TipoPonto
+    public enum SpotType : byte
     {
         Banco = 1,
+
+        [Display(Name = "Loja de Conveniência")]
         LojaConveniencia = 2,
+
+        [Display(Name = "Loja de Roupas")]
         LojaRoupas = 3,
+
+        [Display(Name = "Spawn de Veículos da Facção")]
         SpawnVeiculosFaccao = 4,
+
+        [Display(Name = "Apreensão de Veículos")]
         ApreensaoVeiculos = 5,
+
+        [Display(Name = "Liberação de Veículos")]
         LiberacaoVeiculos = 6,
+
         Barbearia = 7,
+
         Uniforme = 8,
+
         MDC = 9,
+
         DMV = 10,
+
         Entrada = 11,
+
+        [Display(Name = "Me Curar")]
         MeCurar = 12,
-        FerroVelho = 13,
+
+        [Display(Name = "Prisão")]
+        Prisao = 13,
+
         Lixeiro = 14,
+
+        [Display(Name = "Atendimento LSPD")]
+        AtendimentoLSPD = 15,
+
+        Confisco = 16,
+
+        [Display(Name = "Estúdio de Tatuagens")]
+        TattooShop = 17,
+
+        [Display(Name = "Oficina Mecânica")]
+        MechanicWorkshop = 18,
     }
 
-    public enum TipoEmprego
+    public enum CharacterJob : byte
     {
-        Nenhum = 0,
+        [Display(Name = "Nenhum")]
+        None = 0,
 
-        Taxista = 1,
+        [Display(Name = "Taxista")]
+        TaxiDriver = 1,
 
         [Display(Name = "Mecânico")]
-        Mecanico = 2,
+        Mechanic = 2,
 
-        Lixeiro = 3,
+        [Display(Name = "Lixeiro")]
+        Garbageman = 3,
+
+        [Display(Name = "Caminhoneiro")]
+        Trucker = 4,
     }
 
-    public enum TipoStaff
+    public enum UserStaff
     {
-        Nenhum = 0,
+        [Display(Name = "Nenhum")]
+        None = 0,
 
         Moderator = 1,
 
@@ -278,68 +425,57 @@ namespace Roleplay.Models
         [Display(Name = "Lead Administrator")]
         LeadAdministrator = 100,
 
+        [Display(Name = "Head Administrator")]
+        HeadAdministrator = 200,
+
         Manager = 1337,
     }
 
-    public enum TipoRespostaSOS
+    public enum VehicleModelMods : uint
     {
-        Aguardando = 0,
-
-        Aceito = 1,
-
-        Rejeitado = 2,
-
-        [Display(Name = "Sem Resposta")]
-        SemResposta = 3,
-    }
-
-    public enum TipoStatusLigacao
-    {
-        Nenhum = 0,
-        EmLigacao = 1,
-        AguardandoInformacao = 2,
-    }
-
-    public enum ModeloVeiculo : uint
-    {
-        PoliceSlick,
-        PoliceOld,
-        PScout,
-        BeachP,
-        Polmerit2,
-        Police42,
-        PolSpeedo,
-        PolRiot,
+        #region LSPD
+        UMKSCOUT,
+        PDUMKSX,
+        NSCOUTLSPD,
+        POLTHRUST,
+        SWATSTALKER,
+        PSCOUT,
         LSPDB,
-        POLThrust,
-
-        LSPDPolmav,
+        LSPDHELI,
+        POLICE42,
+        VVPI,
+        VVPI2,
+        BCAT,
+        #endregion LSPD
+        #region LSFD
         LSFD,
         LSFD2,
         LSFD3,
         LSFD4,
         LSFD5,
-        LSFDTruck,
-        LSFDTruck2,
-        LSFDTruck3,
-
-        Newsvan,
-        Newsvan2,
-        Newsmav,
+        LSFDTRUCK,
+        LSFDTRUCK2,
+        LSFDTRUCK3,
+        LADDER,
+        #endregion LSFD
+        #region Coroner
+        CORONER2,
+        #endregion Coroner
     }
 
-    public enum TipoStatusNamechange
+    public enum CharacterNameChangeStatus : byte
     {
         Liberado = 0,
         Bloqueado = 1,
         Realizado = 2,
     }
 
-    public enum TipoEtapaPersonalizacao
+    public enum CharacterPersonalizationStep : byte
     {
-        Caracteristicas = 0,
-        Roupas = 1,
-        Concluido = 2,
+        Character = 0,
+        Tattoos = 1,
+        Clothes = 2,
+        Ready = 3,
     }
 
     public enum AnimationFlags
@@ -351,11 +487,266 @@ namespace Roleplay.Models
         Cancellable = 1 << 7
     };
 
-    public enum TipoVIP
+    public enum UserVIP : byte
+    {
+        [Display(Name = "Nenhum")]
+        None = 0,
+
+        Bronze = 1,
+
+        [Display(Name = "Prata")]
+        Silver = 2,
+
+        [Display(Name = "Ouro")]
+        Gold = 3,
+    }
+
+    public enum EmergencyCallType : byte
+    {
+        [Display(Name = "Polícia")]
+        Police = 1,
+
+        Medic = 2,
+
+        Both = 3,
+    }
+
+    public enum CharacterSex : byte
+    {
+        [Display(Name = "Mulher")]
+        Woman = 0,
+
+        [Display(Name = "Homem")]
+        Man = 1,
+    }
+
+    public enum CharacterWound : byte
     {
         Nenhum = 0,
-        Bronze = 1,
-        Prata = 2,
-        Ouro = 3,
+        GravementeFeridoInvencivel = 1,
+        GravementeFerido = 2,
+        PK = 3,
+        PodeHospitalCK = 4
+    }
+
+    public enum ItemCategory : byte
+    {
+        [Display(Name = "Arma")]
+        Weapon = 1,
+
+        [Display(Name = "Chave de Propriedade")]
+        PropertyKey = 2,
+
+        [Display(Name = "Máscara")]
+        Cloth1 = 3,
+
+        [Display(Name = "Torso")]
+        Cloth3 = 4,
+
+        [Display(Name = "Calça")]
+        Cloth4 = 5,
+
+        [Display(Name = "Mochila")]
+        Cloth5 = 6,
+
+        [Display(Name = "Sapato")]
+        Cloth6 = 7,
+
+        [Display(Name = "Extra")]
+        Cloth7 = 8,
+
+        [Display(Name = "Camisa")]
+        Cloth8 = 9,
+
+        [Display(Name = "Colete")]
+        Cloth9 = 10,
+
+        [Display(Name = "Bordado")]
+        Cloth10 = 11,
+
+        [Display(Name = "Jaqueta")]
+        Cloth11 = 12,
+
+        [Display(Name = "Chapéu")]
+        Accessory0 = 13,
+
+        [Display(Name = "Óculos")]
+        Accessory1 = 14,
+
+        [Display(Name = "Orelha")]
+        Accessory2 = 15,
+
+        [Display(Name = "Relógio")]
+        Accessory6 = 16,
+
+        [Display(Name = "Bracelete")]
+        Accessory7 = 17,
+
+        [Display(Name = "Dinheiro")]
+        Money = 18,
+
+        // 19
+
+        [Display(Name = "Chave de Veículo")]
+        VehicleKey = 20,
+
+        [Display(Name = "Rádio Comunicador")]
+        WalkieTalkie = 21,
+
+        [Display(Name = "Celular")]
+        Cellphone = 22,
+
+        [Display(Name = "Maconha")]
+        Weed = 23,
+
+        [Display(Name = "Cocaína")]
+        Cocaine = 24,
+
+        Crack = 25,
+
+        [Display(Name = "Heroína")]
+        Heroin = 26,
+
+        MDMA = 27,
+
+        Xanax = 28,
+
+        Oxycontin = 29,
+
+        Metanfetamina = 30,
+
+        Boombox = 31,
+
+        [Display(Name = "Microfone")]
+        Microphone = 32,
+    }
+
+    public enum InventoryShowType : byte
+    {
+        Default = 0,
+        Inspect = 1,
+        Property = 2,
+        Vehicle = 3,
+    }
+
+    public enum CellphoneMessageType : byte
+    {
+        Text = 0,
+        Location = 1,
+    }
+
+    public enum CellphoneCallType : byte
+    {
+        Perdida = 0,
+        Atendida = 1,
+    }
+
+    public enum SessionType : byte
+    {
+        Login = 1,
+        FactionDuty = 2,
+        StaffDuty = 3,
+    }
+
+    public enum FinancialTransactionType : byte
+    {
+        Deposit = 1,
+        Withdraw = 2,
+    }
+
+    public enum StaffFlag : byte
+    {
+        [Display(Name = "Desbanimento")]
+        Unban = 1,
+
+        [Display(Name = "Portas")]
+        Doors = 2,
+
+        [Display(Name = "Preços")]
+        Prices = 3,
+
+        [Display(Name = "Facções")]
+        Factions = 4,
+
+        [Display(Name = "Arsenais de Facções")]
+        FactionsArmories = 5,
+
+        [Display(Name = "Propriedades")]
+        Properties = 6,
+
+        [Display(Name = "Pontos")]
+        Spots = 7,
+
+        Blips = 8,
+
+        [Display(Name = "Veículos")]
+        Vehicles = 9,
+
+        CK = 10,
+
+        [Display(Name = "Dar Item")]
+        GiveItem = 11,
+
+        [Display(Name = "Drug Houses")]
+        FactionsDrugsHouses = 12,
+
+        [Display(Name = "Bocas de Fumo")]
+        CrackDens = 13,
+
+        [Display(Name = "Localizações de Caminhoneiro")]
+        TruckerLocations = 14,
+
+        [Display(Name = "Mobílias")]
+        Furnitures = 16,
+
+        [Display(Name = "Animações")]
+        Animations = 17,
+
+        [Display(Name = "Empresas")]
+        Companies = 18,
+    }
+
+    public enum FactionFlag : byte
+    {
+        [Display(Name = "Adicionar Membro")]
+        InviteMember = 1,
+
+        [Display(Name = "Editar Membro")]
+        EditMember = 2,
+
+        [Display(Name = "Remover Membro")]
+        RemoveMember = 3,
+
+        [Display(Name = "Bloquear Chat")]
+        BlockChat = 4,
+
+        [Display(Name = "Anúncio do Governo")]
+        GovernmentAnnouncement = 5,
+
+        HQ = 6,
+
+        [Display(Name = "Arsenal")]
+        Armory = 7,
+
+        [Display(Name = "Drogas")]
+        DrugHouse = 8,
+
+        [Display(Name = "Deletar Todas Barreiras")]
+        RemoveAllBarriers = 9,
+    }
+
+    public enum CompanyFlag : byte
+    {
+        [Display(Name = "Adicionar Funcionário")]
+        InviteCharacter = 1,
+
+        [Display(Name = "Editar Funcionário")]
+        EditCharacter = 2,
+
+        [Display(Name = "Remover Funcionário")]
+        RemoveCharacter = 3,
+
+        [Display(Name = "Abrir")]
+        Open = 4,
     }
 }
