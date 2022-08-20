@@ -4,7 +4,7 @@ namespace Roleplay.Models
 {
     public class Settings
     {
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; } = "Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357";
 
         public string DiscordBotToken { get; set; }
 
@@ -24,7 +24,7 @@ namespace Roleplay.Models
 
         public int EmailPort { get; set; }
 
-        public string MySQLVersion { get; set; }
+        public string MySQLVersion { get; set; } = "8.0.26";
 
         public List<ulong> RolesStaffMessage { get; set; }
 

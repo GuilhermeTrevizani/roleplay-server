@@ -8,6 +8,7 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 
 namespace Roleplay
@@ -810,7 +811,7 @@ namespace Roleplay
 
         public static List<Furniture> Furnitures { get; set; } = new();
 
-        public static Settings Settings { get; set; }
+        public static Settings Settings { get; set; } = new();
 
         public static List<Animation> Animations { get; set; } = new();
 
