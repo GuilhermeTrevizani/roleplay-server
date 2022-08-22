@@ -1163,6 +1163,36 @@ namespace Roleplay.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Parameters");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AnnouncementValue = 1,
+                            BarberValue = 1,
+                            Blackout = false,
+                            ClothesValue = 1,
+                            CooldownDismantleHours = 0,
+                            CooldownPropertyRobberyPropertyHours = 0,
+                            CooldownPropertyRobberyRobberHours = 0,
+                            DriverLicenseBuyValue = 1,
+                            DriverLicenseRenewValue = 1,
+                            EndTimeCrackDen = (byte)0,
+                            ExtraPaymentGarbagemanValue = 1,
+                            FirefightersBlockHeal = 0,
+                            FuelValue = 1,
+                            HospitalValue = 1,
+                            IPLsJSON = "[]",
+                            InitialTimeCrackDen = (byte)0,
+                            KeyValue = 1,
+                            LockValue = 1,
+                            MaxCharactersOnline = 0,
+                            Paycheck = 1,
+                            PoliceOfficersPropertyRobbery = 0,
+                            PropertyRobberyConnectedTime = 0,
+                            TattooValue = 1,
+                            VehicleParkValue = 1
+                        });
                 });
 
             modelBuilder.Entity("Roleplay.Entities.Price", b =>

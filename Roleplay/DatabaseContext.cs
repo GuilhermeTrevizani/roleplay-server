@@ -127,6 +127,7 @@ namespace Roleplay
             modelBuilder.Entity<Log>().HasKey(x => x.Id);
 
             modelBuilder.Entity<Parameter>().HasKey(x => x.Id);
+            modelBuilder.Entity<Parameter>().HasData(new Parameter());
 
             modelBuilder.Entity<Price>().HasKey(x => x.Id);
 
