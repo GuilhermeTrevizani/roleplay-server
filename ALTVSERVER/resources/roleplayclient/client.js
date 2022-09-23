@@ -762,16 +762,16 @@ alt.onServer('Server:SelecionarPersonagem', (personalizationStep, sex, personali
     const personalization = JSON.parse(personalizationJSON);
     syncDecorations(personalization);
 
-    if (personalizationStep == 3) {
+    if (personalizationStep == 4) {
         native.freezeEntityPosition(player, false);
         activateChat(true);
         native.displayHud(true);
         native.displayRadar(true);
-    } else if (personalizationStep == 0) {
-        alt.emit('character:Edit', sex, personalization, false);
     } else if (personalizationStep == 1) {
-        alt.emit('character:EditTattoos', sex, personalization);
+        alt.emit('character:Edit', sex, personalization, false);
     } else if (personalizationStep == 2) {
+        alt.emit('character:EditTattoos', sex, personalization);
+    } else if (personalizationStep == 3) {
         alt.emit('character:EditClothes', sex);
     }
 });
