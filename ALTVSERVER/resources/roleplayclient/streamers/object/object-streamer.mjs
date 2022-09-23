@@ -1,4 +1,4 @@
-import * as alt from 'alt';
+import * as alt from 'alt-client';
 import * as natives from 'natives';
 
 async function loadModel(modelText) {
@@ -108,7 +108,7 @@ class ObjectStreamer {
     }
     slideToPosition( entityId, pos, time ) {
         let count = 0;
-        native.slideObject(this.objects[entityId].handle, pos.x, pos.y, pos.z, 8, 8, 8, true);
+        natives.slideObject(this.objects[entityId].handle, pos.x, pos.y, pos.z, 8, 8, 8, true);
         /*
         var slide = alt.setInterval(() =>
         {

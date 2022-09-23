@@ -1,4 +1,4 @@
-import * as alt from 'alt';
+import * as alt from 'alt-client';
 import { markerStreamer } from "./marker-streamer";
 
 // when an object is streamed in

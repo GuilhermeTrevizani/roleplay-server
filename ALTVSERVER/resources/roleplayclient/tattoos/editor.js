@@ -1,4 +1,4 @@
-import * as alt from 'alt';
+import * as alt from 'alt-client';
 import * as native from 'natives';
 import { createPedEditCamera, destroyPedEditCamera, setFov, setZPos } from '/helpers/camera.js';
 import { view, setView, toggleView, closeView, syncDecorations } from '/helpers/cursor.js';

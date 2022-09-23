@@ -1,4 +1,4 @@
-import * as alt from 'alt';
+import * as alt from 'alt-client';
 import * as native from 'natives';
 import { view, setView, toggleView, closeView, getAddress } from '/helpers/cursor.js';
 

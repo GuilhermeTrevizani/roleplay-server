@@ -1,4 +1,4 @@
-import * as alt from 'alt';
+import * as alt from 'alt-client';
 import { showCursor } from '/helpers/cursor.js';
 import { toggleInput } from '/chat/index.mjs';
 
