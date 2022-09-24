@@ -54,7 +54,7 @@ namespace Roleplay.Commands.Faction
 
             await player.GravarLog(LogType.AnuncioGov, message, null);
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken))
+            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken))
             {
                 var cor = ColorTranslator.FromHtml($"#{player.Faction.Color}");
                 var x = new EmbedBuilder
@@ -65,7 +65,7 @@ namespace Roleplay.Commands.Faction
                 };
                 x.WithFooter($"Enviado em {DateTime.Now}.");
 
-                await (Global.DiscordClient.GetChannel(Global.Settings.GovernmentAnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
+                await (Global.DiscordClient.GetChannel(Global.GovernmentAnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
             }
         }
 

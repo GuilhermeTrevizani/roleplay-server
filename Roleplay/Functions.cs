@@ -305,25 +305,25 @@ namespace Roleplay
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(Global.Settings.EmailHost))
+                if (string.IsNullOrWhiteSpace(Global.EmailHost))
                     return;
 
                 var msg = new MailMessage
                 {
                     IsBodyHtml = true,
-                    From = new MailAddress(Global.Settings.EmailAddress, Global.Settings.EmailName),
+                    From = new MailAddress(Global.EmailAddress, Global.EmailName),
                     Subject = subject,
                     Body = body,
                     BodyEncoding = Encoding.UTF8,
                 };
                 msg.To.Add(email);
 
-                var clienteSmtp = new SmtpClient(Global.Settings.EmailHost)
+                var clienteSmtp = new SmtpClient(Global.EmailHost)
                 {
                     UseDefaultCredentials = false,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Credentials = new NetworkCredential(Global.Settings.EmailAddress, Global.Settings.EmailPassword),
-                    Port = Global.Settings.EmailPort,
+                    Credentials = new NetworkCredential(Global.EmailAddress, Global.EmailPassword),
+                    Port = Global.EmailPort,
                 };
 
                 await clienteSmtp.SendMailAsync(msg);
@@ -369,10 +369,10 @@ namespace Roleplay
             foreach (var player in players)
                 player.SendMessage(Models.MessageType.None, $"[{Global.SERVER_INITIALS}] {message}", Global.STAFF_COLOR);
 
-            if (discord && !string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken))
+            if (discord && !string.IsNullOrWhiteSpace(Global.DiscordBotToken))
             {
                 var mentions = string.Empty;
-                foreach (var role in Global.Settings.RolesStaffMessage)
+                foreach (var role in Global.RolesStaffMessage)
                     mentions += $@" {MentionUtils.MentionRole(role)}";
 
                 var embedBuilder = new EmbedBuilder
@@ -383,7 +383,7 @@ namespace Roleplay
                 };
                 embedBuilder.WithFooter($"Enviada em {DateTime.Now}.");
 
-                var channel = Global.DiscordClient.GetChannel(Global.Settings.StaffDiscordChannel) as SocketTextChannel;
+                var channel = Global.DiscordClient.GetChannel(Global.StaffDiscordChannel) as SocketTextChannel;
                 await channel.SendMessageAsync(embed: embedBuilder.Build());
 
                 if (!string.IsNullOrWhiteSpace(mentions))
@@ -667,13 +667,10 @@ namespace Roleplay
                 .Where(x => player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)));
 
-            if (prox == null)
-            {
-                prox = Global.Properties
+            prox ??= Global.Properties
                 .Where(x => x.Id == player.Dimension
                     && player.Position.Distance(new Position(x.ExitPosX, x.ExitPosY, x.ExitPosZ)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.ExitPosX, x.ExitPosY, x.ExitPosZ)));
-            }
 
             if (prox != null)
             {

@@ -132,7 +132,7 @@ namespace Roleplay.Entities
                     x.SendMessage(Models.MessageType.None, $"{player.Character.Name} [{player.SessionId}] ({player.User.Name}) enviou o anúncio da empresa.", Global.STAFF_COLOR);
             }
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken))
+            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken))
             {
                 var cor = ColorTranslator.FromHtml($"#{Color}");
                 var x = new EmbedBuilder
@@ -143,7 +143,7 @@ namespace Roleplay.Entities
                 };
                 x.WithFooter($"Enviado em {DateTime.Now}.");
 
-                await (Global.DiscordClient.GetChannel(Global.Settings.CompanyAnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
+                await (Global.DiscordClient.GetChannel(Global.CompanyAnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
             }
 
             await player.GravarLog(LogType.AnuncioEmpresa, $"{Id} | {message}", null);

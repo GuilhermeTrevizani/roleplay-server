@@ -810,8 +810,6 @@ namespace Roleplay
 
         public static List<Furniture> Furnitures { get; set; } = new();
 
-        public static Settings Settings { get; set; } = new();
-
         public static List<Animation> Animations { get; set; } = new();
 
         public static List<Company> Companies { get; set; } = new();
@@ -918,5 +916,31 @@ namespace Roleplay
         };
 
         public static List<MethodInfo> Commands { get; set; }
+
+        public static string DbConnectionString { get; set; } = "Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357";
+
+        public static string DiscordBotToken { get; set; }
+
+        public static ulong AnnouncementDiscordChannel { get; set; }
+
+        public static ulong GovernmentAnnouncementDiscordChannel { get; set; }
+
+        public static ulong StaffDiscordChannel { get; set; }
+
+        public static string EmailHost { get; set; }
+
+        public static string EmailAddress { get; set; }
+
+        public static string EmailName { get; set; }
+
+        public static string EmailPassword { get; set; }
+
+        public static int EmailPort { get; set; }
+
+        public static string DbVersion { get; set; } = "8.0.26";
+
+        public static List<ulong> RolesStaffMessage { get; set; }
+
+        public static ulong CompanyAnnouncementDiscordChannel { get; set; }
     }
 }

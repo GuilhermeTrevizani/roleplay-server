@@ -213,7 +213,7 @@ namespace Roleplay.Commands
 
             await player.GravarLog(LogType.Anuncio, message, null);
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken))
+            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken))
             {
                 var x = new EmbedBuilder
                 {
@@ -223,7 +223,7 @@ namespace Roleplay.Commands
                 };
                 x.WithFooter($"Enviado em {DateTime.Now}.");
 
-                _ = (Global.DiscordClient.GetChannel(Global.Settings.AnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
+                _ = (Global.DiscordClient.GetChannel(Global.AnnouncementDiscordChannel) as SocketTextChannel).SendMessageAsync(embed: x.Build());
             }
         }
     }

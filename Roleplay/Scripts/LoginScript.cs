@@ -86,7 +86,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken) && !string.IsNullOrWhiteSpace(player.User.DiscordConfirmationToken))
+            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken) && !string.IsNullOrWhiteSpace(player.User.DiscordConfirmationToken))
             {
                 player.Emit("Server:ConfirmacaoDiscord", player.User.Name, player.User.DiscordConfirmationToken);
                 return;
@@ -352,7 +352,7 @@ namespace Roleplay.Scripts
                 RegisterHardwareIdExHash = player.HardwareIdExHash,
                 LastAccessHardwareIdHash = player.HardwareIdHash,
                 LastAccessHardwareIdExHash = player.HardwareIdExHash,
-                EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.Settings.EmailHost) ? string.Empty : Functions.GenerateRandomString(6),
+                EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.EmailHost) ? string.Empty : Functions.GenerateRandomString(6),
                 DiscordConfirmationToken = Functions.GenerateRandomString(6),
             };
             await context.Users.AddAsync(user);
@@ -607,14 +607,14 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            player.User.EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.Settings.EmailHost) ? string.Empty : Functions.GenerateRandomString(6);
+            player.User.EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.EmailHost) ? string.Empty : Functions.GenerateRandomString(6);
             player.User.Email = email;
             context.Users.Update(player.User);
             await context.SaveChangesAsync();
 
             await Functions.SendEmail(email, "Confirmação de E-mail", $"Você alterou seu e-mail. Seu token de confirmação é<strong>{player.User.EmailConfirmationToken}</strong>.");
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.EmailHost))
+            if (!string.IsNullOrWhiteSpace(Global.EmailHost))
             {
                 await VerificarRegistro(player);
                 return;

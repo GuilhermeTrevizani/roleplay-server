@@ -397,30 +397,30 @@ namespace Roleplay.Models
     public enum CharacterJob : byte
     {
         [Display(Name = "Nenhum")]
-        None = 0,
+        None = 1,
 
         [Display(Name = "Taxista")]
-        TaxiDriver = 1,
+        TaxiDriver = 2,
 
         [Display(Name = "Mecânico")]
-        Mechanic = 2,
+        Mechanic = 3,
 
         [Display(Name = "Lixeiro")]
-        Garbageman = 3,
+        Garbageman = 4,
 
         [Display(Name = "Caminhoneiro")]
-        Trucker = 4,
+        Trucker = 5,
     }
 
     public enum UserStaff
     {
         [Display(Name = "Nenhum")]
-        None = 0,
+        None = 1,
 
-        Moderator = 1,
+        Moderator = 2,
 
         [Display(Name = "Game Administrator")]
-        GameAdministrator = 2,
+        GameAdministrator = 3,
 
         [Display(Name = "Lead Administrator")]
         LeadAdministrator = 100,
@@ -465,17 +465,17 @@ namespace Roleplay.Models
 
     public enum CharacterNameChangeStatus : byte
     {
-        Liberado = 0,
-        Bloqueado = 1,
-        Realizado = 2,
+        Liberado = 1,
+        Bloqueado = 2,
+        Realizado = 3,
     }
 
     public enum CharacterPersonalizationStep : byte
     {
-        Character = 0,
-        Tattoos = 1,
-        Clothes = 2,
-        Ready = 3,
+        Character = 1,
+        Tattoos = 2,
+        Clothes = 3,
+        Ready = 4,
     }
 
     public enum AnimationFlags
@@ -490,15 +490,15 @@ namespace Roleplay.Models
     public enum UserVIP : byte
     {
         [Display(Name = "Nenhum")]
-        None = 0,
+        None = 1,
 
-        Bronze = 1,
+        Bronze = 2,
 
         [Display(Name = "Prata")]
-        Silver = 2,
+        Silver = 3,
 
         [Display(Name = "Ouro")]
-        Gold = 3,
+        Gold = 4,
     }
 
     public enum EmergencyCallType : byte
@@ -514,19 +514,19 @@ namespace Roleplay.Models
     public enum CharacterSex : byte
     {
         [Display(Name = "Mulher")]
-        Woman = 0,
+        Woman = 1,
 
         [Display(Name = "Homem")]
-        Man = 1,
+        Man = 2,
     }
 
     public enum CharacterWound : byte
     {
-        Nenhum = 0,
-        GravementeFeridoInvencivel = 1,
-        GravementeFerido = 2,
-        PK = 3,
-        PodeHospitalCK = 4
+        Nenhum = 1,
+        GravementeFeridoInvencivel = 2,
+        GravementeFerido = 3,
+        PK = 4,
+        PodeHospitalCK = 5,
     }
 
     public enum ItemCategory : byte
@@ -623,22 +623,22 @@ namespace Roleplay.Models
 
     public enum InventoryShowType : byte
     {
-        Default = 0,
-        Inspect = 1,
-        Property = 2,
-        Vehicle = 3,
+        Default = 1,
+        Inspect = 2,
+        Property = 3,
+        Vehicle = 4,
     }
 
     public enum CellphoneMessageType : byte
     {
-        Text = 0,
-        Location = 1,
+        Text = 1,
+        Location = 2,
     }
 
     public enum CellphoneCallType : byte
     {
-        Perdida = 0,
-        Atendida = 1,
+        Perdida = 1,
+        Atendida = 2,
     }
 
     public enum SessionType : byte

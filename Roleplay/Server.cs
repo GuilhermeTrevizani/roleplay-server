@@ -49,7 +49,20 @@ namespace Roleplay
                },
                new AltV.Net.EntitySync.IdProvider());
 
-            Global.Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("settings.json"));
+            var config = Alt.GetServerConfig();
+            Global.DbConnectionString = config.Get("dbConnectionString").GetString();
+            Global.DbVersion = config.Get("dbVersion").GetString();
+            Global.DiscordBotToken = config.Get("discordBotToken").GetString();
+            Global.AnnouncementDiscordChannel = config.Get("announcementDiscordChannel").GetULong() ?? 0;
+            Global.GovernmentAnnouncementDiscordChannel = config.Get("governmentAnnouncementDiscordChannel").GetULong() ?? 0;
+            Global.StaffDiscordChannel = config.Get("staffDiscordChannel").GetULong() ?? 0;
+            Global.EmailHost = config.Get("emailHost").GetString();
+            Global.EmailAddress = config.Get("emailAddress").GetString();
+            Global.EmailName = config.Get("emailName").GetString();
+            Global.EmailPassword = config.Get("emailPassword").GetString();
+            Global.EmailPort = config.Get("emailPort").GetInt() ?? 0;
+            Global.CompanyAnnouncementDiscordChannel = config.Get("companyAnnouncementDiscordChannel").GetULong() ?? 0;
+            Global.RolesStaffMessage = config.Get("rolesStaffMessage").GetList().Select(x => x.GetULong() ?? 0).ToList();
 
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             Global.Clothes1Male = JsonSerializer.Deserialize<List<ClotheAccessory>>(File.ReadAllText($"{Global.PATH_JSON_CLOTHES}clothes1male.json"),
@@ -316,7 +329,7 @@ namespace Roleplay
             MainTimer.Start();
             MainTimer_Elapsed(null, null);
 
-            if (!string.IsNullOrWhiteSpace(Global.Settings.DiscordBotToken))
+            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken))
                 DiscordBOT.Main.MainAsync();
 
             Alt.Log("Successfully loaded.");

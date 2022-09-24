@@ -1136,6 +1136,5 @@ alt.onServer('SetAreaName', () => {
 });
 
 alt.on('windowFocusChange', (isFocused) => {
-    console.log(`windowFocusChange ${isFocused}`);
     alt.emitServer('AtualizarInformacoes', isFocused);
 });

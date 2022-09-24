@@ -26,7 +26,7 @@ namespace Roleplay.DiscordBOT
                         Global.DiscordClient.Log += LogAsync;
 
                         await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
-                        await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.Settings.DiscordBotToken);
+                        await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.DiscordBotToken);
                         await Global.DiscordClient.StartAsync();
 
                         await Task.Delay(Timeout.Infinite);

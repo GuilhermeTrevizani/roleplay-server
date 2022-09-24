@@ -55,7 +55,7 @@ namespace Roleplay
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(Global.Settings.ConnectionString, new MySqlServerVersion(Global.Settings.MySQLVersion))
+            optionsBuilder.UseMySql(Global.DbConnectionString, new MySqlServerVersion(Global.DbVersion))
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
