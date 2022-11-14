@@ -14,7 +14,6 @@
           "Discord.Net.Commands": "3.8.1",
           "Discord.Net.Core": "3.8.1",
           "Discord.Net.WebSocket": "3.8.1",
-          "Microsoft.EntityFrameworkCore": "6.0.10",
           "Microsoft.EntityFrameworkCore.Tools": "6.0.10",
           "Pomelo.EntityFrameworkCore.MySql": "6.0.2"
         },
