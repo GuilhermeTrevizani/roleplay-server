@@ -51,7 +51,6 @@ namespace Roleplay
 
             var config = Alt.GetServerConfig();
             Global.DbConnectionString = config.Get("dbConnectionString").GetString();
-            Global.DbVersion = config.Get("dbVersion").GetString();
             Global.DiscordBotToken = config.Get("discordBotToken").GetString();
             Global.AnnouncementDiscordChannel = config.Get("announcementDiscordChannel").GetULong() ?? 0;
             Global.GovernmentAnnouncementDiscordChannel = config.Get("governmentAnnouncementDiscordChannel").GetULong() ?? 0;

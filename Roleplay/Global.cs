@@ -937,8 +937,6 @@ namespace Roleplay
 
         public static int EmailPort { get; set; }
 
-        public static string DbVersion { get; set; } = "8.0.26";
-
         public static List<ulong> RolesStaffMessage { get; set; }
 
         public static ulong CompanyAnnouncementDiscordChannel { get; set; }
