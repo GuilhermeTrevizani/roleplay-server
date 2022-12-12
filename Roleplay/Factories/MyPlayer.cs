@@ -1,7 +1,7 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Roleplay.Factories
 {
-    public class MyPlayer : Player
+    public class MyPlayer : AsyncPlayer
     {
         public MyPlayer(ICore server, IntPtr nativePointer, ushort id) : base(server, nativePointer, id)
         {

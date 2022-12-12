@@ -1,0 +1,3 @@
+deps = [ 'roleplayclient' ]
+main = 'Roleplay.dll'
+type = 'csharp'

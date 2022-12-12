@@ -70,7 +70,7 @@ namespace Roleplay.Entities
 
         public bool Sold { get; set; }
 
-        public CharacterJob Job { get; set; }
+        public CharacterJob Job { get; set; } = CharacterJob.None;
 
         public string DamagesJSON { get; set; } = "[]";
 

@@ -13,7 +13,7 @@ export default class Fingerpointing {
             if (!this.active) {
                 this.active = true;
 
-                this.requestAnimDictPromise("anim@mp_point").then(()=>{
+                alt.Utils.requestAnimDict("anim@mp_point").then(()=>{
                     game.setPedCurrentWeaponVisible(this.localPlayer.scriptID, false, true, true, true);
                     game.setPedConfigFlag(this.localPlayer.scriptID, 36, true);
                     game.taskMoveNetworkByName(this.localPlayer.scriptID,"task_mp_pointing", 0.5, false, "anim@mp_point", 24);
@@ -98,22 +98,4 @@ export default class Fingerpointing {
 
             }
         }
-
-    requestAnimDictPromise(dict) {
-        game.requestAnimDict(dict);
-        return new Promise((resolve, reject) => {
-            let check = alt.setInterval(() => {
-
-                if(game.hasAnimDictLoaded(dict))
-                {
-                    alt.clearInterval(check);
-                    //alt.log('Anim dict loaded');
-                    resolve(true);
-                } else {
-                    //alt.log('Requesting Animdict.');
-                }
-
-            },(5));
-        });
-    }
 }

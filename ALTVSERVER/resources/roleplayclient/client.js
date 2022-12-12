@@ -2,7 +2,7 @@ import * as alt from 'alt-client';
 import * as native from 'natives';
 import { view, setView, toggleView, closeView, getAddress, syncDecorations, getRightCoordsZ } from '/helpers/cursor.js';
 import { activateChat } from '/chat/index.mjs';
-import { playAnimation, loadAnimSet } from '/helpers/animation.js';
+import { playAnimation } from '/helpers/animation.js';
 import { drawText2d } from '/helpers/text.js';
 import * as nametags from '/helpers/nametags.js';
 import { enterVehicleAsDriver, enterVehicleAsPassenger} from '/helpers/enterVehicles.js';
@@ -161,6 +161,8 @@ const WeaponDamage = [
     { Weapon: WeaponModel.DoubleActionRevolver, Damage: 0.3 },
 ];
 
+setWeaponDamageModifier();
+
 const bombasCombustivel = [ 'prop_gas_pump_1a', 'prop_gas_pump_1b', 'prop_gas_pump_1c', 'prop_gas_pump_1d', 'prop_gas_pump_old2', 
     'prop_gas_pump_old3', 'prop_vintage_pump', 'v_serv_metro_wallbin', 'v_serv_tc_bin3_'
 ];
@@ -197,11 +199,12 @@ function isDriver() {
     return player.vehicle && player.seat == 1;
 }
 
-async function setWeaponDamageModifier() {
-    for(const weapon in WeaponModel) {
+function setWeaponDamageModifier() {
+    for (const weapon in WeaponModel) {
         const damage = WeaponDamage.find(x => x.Weapon == WeaponModel[weapon]);
         const damageModifier = damage ? damage.Damage : 0.7;
-        native.setWeaponDamageModifierThisFrame(WeaponModel[weapon], damageModifier);
+        const weaponData = alt.WeaponData.getForHash(WeaponModel[weapon]);
+        weaponData.playerDamageModifier = damageModifier;
     }
 }
 
@@ -210,10 +213,9 @@ alt.setInterval(() => {
         return;
 
     playersCount = alt.Player.all.length;
+
     updateCellphone();
-
-    setWeaponDamageModifier();
-
+    
     const animationDic = player.getMeta('animation_dic');
     if (animationDic != '' && animationDic !== undefined) {
         const animationName = player.getMeta('animation_name');
@@ -267,6 +269,7 @@ alt.everyTick(() => {
         native.setPedHelmet(player, false);
 
         native.setVehicleRadioEnabled(player.vehicle, player.vehicle.getSyncedMeta('RadioEnabled'));
+
         if (isDriver()) {
             // Desabilitar X em motos
             if (player.vehicle.wheelsCount == 2) {
@@ -458,8 +461,8 @@ function toggleCrouch() {
     if (player.vehicle || player.getSyncedMeta('ferido') != 0) 
         return;
 
-    loadAnimSet('move_ped_crouched').then(() => {
-        loadAnimSet('move_ped_crouched_strafing').then(() => {
+    alt.Utils.requestAnimSet('move_ped_crouched').then(() => {
+        alt.Utils.requestAnimSet('move_ped_crouched_strafing').then(() => {
             if (crouch) {
                 native.resetPedStrafeClipset(player);
                 native.resetPedMovementClipset(player, 0.2);
@@ -527,7 +530,7 @@ alt.onServer('SetVehicleDoorState', (vehicle, porta, state) => {
 });
 
 alt.onServer('Server:setArtificialLightsState', (state) => {
-    native.setArtificialLightsStateAffectsVehicles(false);
+    native.setArtificialVehicleLightsState(false);
     native.setArtificialLightsState(state);
 });
 
@@ -966,46 +969,9 @@ alt.onServer('Server:ListarPlayers', (nomeServidor, players, rodape) => {
 });
 
 alt.onServer('RegistrarImagemDMV', (valor) => {
-    const pedHeadshotHandle = native.registerPedheadshot3(player);
-    let attempts = 0;
-
-    let pedHeadshotInterval = alt.setInterval(() => {
-        if (native.isPedheadshotReady(pedHeadshotHandle) && native.isPedheadshotValid(pedHeadshotHandle)) {
-            let pedHeadshot = alt.getHeadshotBase64(pedHeadshotHandle);
-            native.unregisterPedheadshot(pedHeadshotHandle);
-            alt.clearInterval(pedHeadshotInterval);
-            alt.emitServer('RegistrarImagemDMV', pedHeadshot, valor);
-        }
-        
-        attempts++;
-        if (attempts >= 20) {
-            attempts = 0;
-            native.unregisterPedheadshot(pedHeadshotHandle);
-            alt.clearInterval(pedHeadshotInterval);
-            alt.emitServer('RegistrarImagemDMV', '', valor);
-        }
-    }, 100);
-});
-
-let currentShots = 0;
-let currentWeapon = null;
-
-alt.everyTick(() => {
-    const weapon = player.currentWeapon;
-
-    if (weapon != currentWeapon) {
-        currentWeapon = weapon;
-        currentShots = native.getAmmoInPedWeapon(player, weapon);
-    }
-
-    const shots = native.getAmmoInPedWeapon(player, weapon);
-    if (shots < currentShots) {
-        currentShots = shots;
-
-        const tint = native.getPedWeaponTintIndex(player, currentWeapon);
-        if (tint != -1)
-            alt.emitServer('UpdateWeaponAmmo', currentWeapon, currentShots);
-    }
+    alt.Utils.registerPedheadshot3Base64(player).then((pedHeadshot) => {
+        alt.emitServer('RegistrarImagemDMV', pedHeadshot, valor);
+    });
 });
 
 alt.onServer('PlayScenario', (scenarioName) => {
@@ -1023,7 +989,7 @@ alt.onServer('SyncWeather', (weather) => {
         let intervalWeather = alt.setInterval(() => {
             i++;
             if (i < 100) {
-                native.setWeatherTypeTransition(alt.hash(oldWeather), alt.hash(weather), (i / 100));
+                native.setCurrWeatherState(alt.hash(oldWeather), alt.hash(weather), (i / 100));
             } else {
                 alt.clearInterval(intervalWeather);
                 oldWeather = weather;
@@ -1033,11 +999,11 @@ alt.onServer('SyncWeather', (weather) => {
     }
 
     if (weather === 'XMAS') {
-        native.setForceVehicleTrails(true);
-        native.setForcePedFootstepsTracks(true);
+        native.useSnowWheelVfxWhenUnsheltered(true);
+        native.useSnowFootVfxWhenUnsheltered(true);
     } else {
-        native.setForceVehicleTrails(false);
-        native.setForcePedFootstepsTracks(false);
+        native.useSnowWheelVfxWhenUnsheltered(false);
+        native.useSnowFootVfxWhenUnsheltered(false);
     }
 });
 
@@ -1055,7 +1021,7 @@ alt.onServer('SetDrugEffect', (drug) => {
         native.setPedMotionBlur(player, true);
 
         player.setMeta('movement', 'MOVE_M@QUICK');
-        loadAnimSet('MOVE_M@QUICK').then(() => {
+        alt.Utils.requestAnimSet('MOVE_M@QUICK').then(() => {
             native.setPedMovementClipset(player, 'MOVE_M@QUICK', 1.0);
         });
 
@@ -1077,7 +1043,7 @@ alt.onServer('SetDrugEffect', (drug) => {
         native.shakeGameplayCam("DRUNK_SHAKE", 0.4);
 
         player.setMeta('movement', 'move_m@hobo@a');
-        loadAnimSet('move_m@hobo@a').then(() => {
+        alt.Utils.requestAnimSet('move_m@hobo@a').then(() => {
             native.setPedMovementClipset(player, 'move_m@hobo@a', 1.0);
         });
     } else if (drug == 27 || drug == 30) { // MDMA, Metanfetamina
@@ -1088,7 +1054,7 @@ alt.onServer('SetDrugEffect', (drug) => {
         native.shakeGameplayCam("DRUNK_SHAKE", 0.5);
 
         player.setMeta('movement', 'move_m@drunk@slightlydrunk');
-        loadAnimSet('move_m@drunk@slightlydrunk').then(() => {
+        alt.Utils.requestAnimSet('move_m@drunk@slightlydrunk').then(() => {
             native.setPedMovementClipset(player, 'move_m@drunk@slightlydrunk', 1.0);
         });
     }
@@ -1137,4 +1103,8 @@ alt.onServer('SetAreaName', () => {
 
 alt.on('windowFocusChange', (isFocused) => {
     alt.emitServer('AtualizarInformacoes', isFocused);
+});
+
+alt.on('playerWeaponShoot', (weaponHash, totalAmmo, ammoInClip) => {
+    alt.emitServer('UpdateWeaponAmmo', weaponHash, totalAmmo);
 });

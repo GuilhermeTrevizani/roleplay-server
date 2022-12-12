@@ -1,0 +1,5 @@
+files = [ 'stream/decorations/*' ]
+
+[meta]
+'stream/shop_tattoo.meta' = 'TATTOO_SHOP_DLC_FILE'
+'stream/tattoo_overlays.xml' = 'PED_OVERLAY_FILE'

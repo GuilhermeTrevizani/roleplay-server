@@ -56,7 +56,7 @@ export async function drawText2d(
         safeZoneSizeX = (1.0 - native.getSafeZoneSize()) * 0.5;
         safeZoneSizeY = safeZoneSizeX;
 
-        const [z, x, y] = native.getActiveScreenResolution(0,0);
+        const [z, x, y] = native.getActualScreenResolution(0,0);
         if (x != 1920) {
             safeZoneSizeX += ((1920 - x) / 1920) / 10;
         }

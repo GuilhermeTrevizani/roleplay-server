@@ -1,0 +1,10 @@
+files = [ 'stream/assets/*' ]
+
+[meta]
+'stream/audio/umkscout_game.dat' = 'AUDIO_GAMEDATA'
+'stream/caraddoncontentunlocks.meta' = 'CONTENT_UNLOCKING_META_FILE'
+'stream/carcols.meta' = 'CARCOLS_FILE'
+'stream/carvariations.meta' = 'VEHICLE_VARIATION_FILE'
+'stream/handling.meta' = 'HANDLING_FILE'
+'stream/vehiclelayouts_NAME.meta' = 'VEHICLE_LAYOUTS_FILE'
+'stream/vehicles.meta' = 'VEHICLE_METADATA_FILE'

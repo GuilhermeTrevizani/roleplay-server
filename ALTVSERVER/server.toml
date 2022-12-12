@@ -1,0 +1,45 @@
+announce = false
+announcementDiscordChannel = 938605204427919360
+cdnUrl = 'https://play.segundavida.com.br/'
+companyAnnouncementDiscordChannel = 968258071732310144
+dbConnectionString = 'Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357'
+debug = true
+description = 'Primeiro servidor luso-brasileiro de roleplay baseado em texto no GTA V.'
+discordBotToken = ''
+emailAddress = 'naoresponda@segundavida.com.br'
+emailHost = ''
+emailName = 'Segunda Vida Roleplay'
+emailPassword = 'aDGi^O&deHoG'
+emailPort = 587
+gamemode = 'Roleplay'
+governmentAnnouncementDiscordChannel = 938605270991511552
+host = '0.0.0.0'
+language = 'pt'
+modules = [ 'csharp-module', 'js-module' ]
+name = 'Segunda Vida Roleplay'
+players = 100
+port = 7788
+resources = [
+    'sgv',
+    'eup',
+    'tattoo',
+    'umkscout',
+    'buffalostxunmarked',
+    'nscoutlspd',
+    'polthrust',
+    'lspdveh',
+    'lsfdveh',
+    'ladder',
+    'coroner2',
+    'bcat',
+    'vvpi',
+    'body',
+    'roleplayclient',
+    'roleplay'
+]
+rolesStaffMessage = [ 938597977474367488, 938597975721148416 ]
+staffDiscordChannel = 938607853630025856
+tags = [ 'Text' ]
+token = 'bLIozqCClZdVtIOI2J6HVDGbElsOnpbF5XnI17Ki8WRQa154CVKMUBLz6wz6lfB3gFJh2h5iiAc3+OQT25CImCsdXzIRZ2HkTvkYjGj3g0M/UCty5juQjJ8yw/V4HiJX1fkx9jkCahb7BPFngarcVJSgQ36le71SGljqzvZbT+e2aQXvPI9JFZAJwgei/7btjSfhct8Ak456BiuXoO0cKCDl0yiX7FJLCMMVUsJs+NzsOoDO7izYRFsDY4apN6Bm67c5oJJlZcUK0nmbKtcujS3eZ6+GP5pe3Kd2JqyuzQ9o9Z5Q1Zz9AQzEZO5PhN+jDHKVnkVp8PIeL2EqjiFd4A=='
+useCdn = false
+website = 'segundavida.com.br'

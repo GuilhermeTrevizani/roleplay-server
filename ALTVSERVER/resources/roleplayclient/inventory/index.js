@@ -5,10 +5,10 @@ $(window).keyup((e) => {
 });
 
 const InventoryShowType = {
-    Default: 0,
-    Inspect: 1,
-    Property: 2,
-    Vehicle: 3,
+    Default: 1,
+    Inspect: 2,
+    Property: 3,
+    Vehicle: 4,
 };
 
 var contextMenuItems = [

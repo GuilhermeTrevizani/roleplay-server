@@ -1,0 +1,25 @@
+client-files = [
+    'client.js',
+    'resources/*',
+    'chat/*',
+    'login/*',
+    'concessionaria/*',
+    'conveniencia/*',
+    'faction/*',
+    'helpers/*',
+    'charcreator/*',
+    'clothes/*',
+    'ucp/*',
+    'streamers/*',
+    'players/*',
+    'inventory/*',
+    'staff/*',
+    'cellphone/*',
+    'bank/*',
+    'tattoos/*',
+    'tuning/*'
+]
+client-main = 'client.js'
+client-type = 'jsb'
+required-permissions = []
+type = 'js'

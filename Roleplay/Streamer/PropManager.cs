@@ -122,61 +122,6 @@ namespace Roleplay.Streamer
             }
         }
 
-        public Vector3 Velocity
-        {
-            get
-            {
-                if (!TryGetData("velocity", out Dictionary<string, object> data))
-                    return default;
-
-                return new Vector3()
-                {
-                    X = Convert.ToSingle(data["x"]),
-                    Y = Convert.ToSingle(data["y"]),
-                    Z = Convert.ToSingle(data["z"]),
-                };
-            }
-            set
-            {
-                if (Velocity.X == value.X && Velocity.Y == value.Y && Velocity.Z == value.Z && value != new Vector3(0, 0, 0))
-                    return;
-
-                var dict = new Dictionary<string, object>()
-                {
-                    ["x"] = value.X,
-                    ["y"] = value.Y,
-                    ["z"] = value.Z,
-                };
-                SetData("velocity", dict);
-            }
-        }
-
-        public Vector3 SlideToPosition
-        {
-            get
-            {
-                if (!TryGetData("SlideToPosition", out Dictionary<string, object> data))
-                    return default;
-
-                return new Vector3()
-                {
-                    X = Convert.ToSingle(data["x"]),
-                    Y = Convert.ToSingle(data["y"]),
-                    Z = Convert.ToSingle(data["z"]),
-                };
-            }
-            set
-            {
-                var dict = new Dictionary<string, object>()
-                {
-                    ["x"] = value.X,
-                    ["y"] = value.Y,
-                    ["z"] = value.Z,
-                };
-                SetData("SlideToPosition", dict);
-            }
-        }
-
         public string Model
         {
             get
@@ -373,8 +318,6 @@ namespace Roleplay.Streamer
             }
         }
 
-        public Vector3 PositionInitial { get; internal set; }
-
         public bool? Collision
         {
             get
@@ -431,7 +374,6 @@ namespace Roleplay.Streamer
                 OnFire = onFire ?? null,
                 TextureVariation = textureVariation ?? null,
                 Visible = visible ?? null,
-                PositionInitial = position,
                 Collision = collision,
                 CharacterId = characterId,
                 FactionId = factionId,

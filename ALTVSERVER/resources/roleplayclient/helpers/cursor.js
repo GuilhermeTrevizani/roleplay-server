@@ -44,7 +44,7 @@ alt.onServer('Server:CloseView', closeView);
 
 export function getAddress(pos) {
     let [discard, street, street2] = native.getStreetNameAtCoord(pos.x, pos.y, pos.z, 0, 0);
-    let zoneName = native.getLabelText(native.getNameOfZone(pos.x, pos.y, pos.z));
+    let zoneName = native.getFilenameForAudioConversation(native.getNameOfZone(pos.x, pos.y, pos.z));
     let streetName = native.getStreetNameFromHashKey(street);
 
     let streetName2 = native.getStreetNameFromHashKey(street2);

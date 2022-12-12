@@ -1,5 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Roleplay.Factories
 {
-    public class MyVehicle : AltV.Net.Elements.Entities.Vehicle
+    public class MyVehicle : AsyncVehicle
     {
         public MyVehicle(ICore server, uint model, Position position, Rotation rotation) : base(server, model, position, rotation)
         {

@@ -19,8 +19,6 @@ function clearAnimation() {
 
 function checkAnimation(dict, name) {
     return new Promise(resolve => {
-        native.requestAnimDict(dict);
-
         let count = 0;
         let inter = alt.setInterval(() => {
             if (count > maxCountLoadTry) {
@@ -51,7 +49,7 @@ alt.onServer('animation:Play', playAnimation);
 export async function playAnimation(dict, name, flag, duration, freeze) {
     clearAnimation();
 
-    if (native.hasAnimDictLoaded(dict)) {
+    alt.Utils.requestAnimDict(dict).then(() => {
         native.taskPlayAnim(
             player,
             dict,
@@ -69,70 +67,5 @@ export async function playAnimation(dict, name, flag, duration, freeze) {
         checkAnimation(dict, name).then(() => {
             setAnimation(dict, name, duration, flag, freeze);
         });
-        return;
-    }
-
-    loadAnim(dict).then(() => {
-        native.taskPlayAnim(
-            player,
-            dict,
-            name,
-            1,
-            -1,
-            duration,
-            flag,
-            1.0,
-            false,
-            false,
-            false
-        );
-        
-        checkAnimation(dict, name).then(() => {
-            setAnimation(dict, name, duration, flag, freeze);
-        });
-    });
-}
-
-export async function loadAnim(dict) {
-    return new Promise(resolve => {
-        native.requestAnimDict(dict);
-
-        let count = 0;
-        let inter = alt.setInterval(() => {
-            if (count > maxCountLoadTry) {
-                alt.clearInterval(inter);
-                return;
-            }
-
-            if (native.hasAnimDictLoaded(dict)) {
-                resolve(true);
-                alt.clearInterval(inter);
-                return;
-            }
-
-            count += 1;
-        }, 5);
-    });
-}
-
-export async function loadAnimSet(dict) {
-    return new Promise(resolve => {
-        native.requestAnimSet(dict);
-
-        let count = 0;
-        let inter = alt.setInterval(() => {
-            if (count > maxCountLoadTry) {
-                alt.clearInterval(inter);
-                return;
-            }
-
-            if (native.hasAnimSetLoaded(dict)) {
-                resolve(true);
-                alt.clearInterval(inter);
-                return;
-            }
-
-            count += 1;
-        }, 5);
     });
 }

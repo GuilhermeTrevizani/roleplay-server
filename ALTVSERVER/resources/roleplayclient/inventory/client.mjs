@@ -98,7 +98,7 @@ function clearDropObject() {
         alt.clearEveryTick(dropObjectTick);
     dropObjectTick = null;
     if (dropObject)
-        native.deleteObject(dropObject);
+        dropObject.destroy();
     dropObject = null;
     native.freezeEntityPosition(player, false);
 }
@@ -118,14 +118,14 @@ function dropObjectKeyDown(key) {
             name = 'ConfirmDropBarrier';
         else if (dropObjectType == 2)
             name = 'ConfirmDropFurniture';
-        alt.emitServer(name, native.getEntityCoords(dropObject, false), native.getEntityRotation(dropObject, 2));
+        alt.emitServer(name, dropObject.pos, dropObject.rot);
         clearDropObject();
     }
 }
 
 const rotSum = 0.1;
 function setDropObjectRotation(type) {
-    let rot = { ... native.getEntityRotation(dropObject, 2) };
+    let rot = { ... dropObject.rot };
 
     if (type == 1)
         rot.x += rotSum;
@@ -140,12 +140,12 @@ function setDropObjectRotation(type) {
     else if (type == 6)
         rot.z -= rotSum;
 
-    native.setEntityRotation(dropObject, rot.x, rot.y, rot.z, 0, true);
+    dropObject.rot = new alt.Vector3(rot.x, rot.y, rot.z);
 }
 
 const posSum = 0.05;
 function setDropObjectPosition(type) {
-    let pos = { ... native.getEntityCoords(dropObject, false) };
+    let pos = { ... dropObject.pos };
 
     if (type == 1)
         pos.x += posSum;
@@ -161,7 +161,7 @@ function setDropObjectPosition(type) {
         pos.z -= posSum;
 
     if (player.pos.distanceTo(pos) <= 2.5 && pos.z >= dropObjectMinZ)
-        native.setEntityCoordsNoOffset(dropObject, pos.x, pos.y, pos.z, true, true, true);
+        dropObject.pos = new alt.Vector3(pos.x, pos.y, pos.z);
 }
 
 let dropObjectTick;
@@ -180,8 +180,8 @@ alt.onServer('DropObject', (model, type) => {
         setView(new alt.WebView('http://resource/inventory/dropitem.html', true));
 
         dropObjectMinZ = minPos.z;
-        dropObject = native.createObjectNoOffset(alt.hash(model), player.pos.x, player.pos.y, minPos.z, false, false, false);
-        native.setEntityCollision(dropObject, false, false);
+        dropObject = new alt.Object(model, new alt.Vector3(player.pos.x, player.pos.y, minPos.z), alt.Vector3.zero, false, false);
+        dropObject.toggleCollision(false, false);
     
         dropObjectTick = alt.everyTick(() => {
             if (native.isControlPressed(0, 189)) { // LEFT

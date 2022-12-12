@@ -11,19 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="resource.cfg" />
+    <None Remove="resource.toml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="resource.cfg">
+    <Content Include="resource.toml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="12.0.4" />
-    <PackageReference Include="AltV.Net.Async" Version="12.0.4" />
-    <PackageReference Include="AltV.Net.EntitySync.ServerEvent" Version="12.0.4" />
+    <PackageReference Include="AltV.Net" Version="13.0.9" />
+    <PackageReference Include="AltV.Net.Async" Version="13.0.9" />
+    <PackageReference Include="AltV.Net.EntitySync.ServerEvent" Version="13.0.9" />
     <PackageReference Include="Discord.Net.Commands" Version="3.8.1" />
     <PackageReference Include="Discord.Net.Core" Version="3.8.1" />
     <PackageReference Include="Discord.Net.WebSocket" Version="3.8.1" />

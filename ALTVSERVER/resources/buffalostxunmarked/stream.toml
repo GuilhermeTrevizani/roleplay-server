@@ -1,0 +1,9 @@
+files = [ 'stream/assets/*' ]
+
+[meta]
+'stream/audio/buffalosc_game.dat' = 'AUDIO_GAMEDATA'
+'stream/audio/buffalosc_sounds.dat' = 'AUDIO_SOUNDDATA'
+'stream/carcols.meta' = 'CARCOLS_FILE'
+'stream/carvariations.meta' = 'VEHICLE_VARIATION_FILE'
+'stream/handling.meta' = 'HANDLING_FILE'
+'stream/vehicles.meta' = 'VEHICLE_METADATA_FILE'
