@@ -42,7 +42,7 @@ alt.onServer('StaffDoors', (update, htmlPortas) => {
 });
 
 alt.onServer('DoorControl', (hash, pos, closed) => {
-    native.doorControl(hash, pos.x, pos.y, pos.z, closed, 0.0, 0.0, 0.0);
+    native.setLockedUnstreamedInDoorOfType(hash, pos.x, pos.y, pos.z, closed, 0.0, 0.0, 0.0);
 });
 
 alt.onServer('ACPShow', (flags, bans, sos, logTypes, staff) => {
