@@ -334,7 +334,7 @@ namespace Roleplay
             }
         }
 
-        public static void GetException(Exception ex) => Alt.LogError($"{ex.Message} - {ex.Source} - {ex.StackTrace}");
+        public static void GetException(Exception ex) => Alt.LogError($"{ex.InnerException?.Message ?? ex.Message} - {ex.Source} - {ex.StackTrace}");
 
         public static string GenerateRandomString(int length)
         {
