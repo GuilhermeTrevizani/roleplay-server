@@ -107,7 +107,7 @@ namespace Roleplay.Entities
 
         public string WoundsJSON { get; set; } = "[]";
 
-        public CharacterWound Wound { get; set; }
+        public CharacterWound Wound { get; set; } = CharacterWound.Nenhum;
 
         public CharacterSex Sex { get; set; }
 
