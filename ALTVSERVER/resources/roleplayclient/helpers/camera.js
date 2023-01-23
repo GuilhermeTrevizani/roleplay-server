@@ -78,7 +78,7 @@ function handleControls() {
     native.disableControlAction(0, 34, true); // a
     native.disableControlAction(0, 35, true); // d
 
-    const [_, width] = native.getActiveScreenResolution(0, 0);
+    const [_, width] = native.getActualScreenResolution(0, 0);
     const cursor = alt.getCursorPos();
     const _x = cursor.x;
     let oldHeading = native.getEntityHeading(alt.Player.local.scriptID);
