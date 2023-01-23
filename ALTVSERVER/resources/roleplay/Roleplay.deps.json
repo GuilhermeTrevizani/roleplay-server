@@ -8,9 +8,9 @@
     ".NETCoreApp,Version=v7.0": {
       "Roleplay/1.0.0": {
         "dependencies": {
-          "AltV.Net": "13.0.16",
-          "AltV.Net.Async": "13.0.16",
-          "AltV.Net.EntitySync.ServerEvent": "13.0.16",
+          "AltV.Net": "13.0.18",
+          "AltV.Net.Async": "13.0.18",
+          "AltV.Net.EntitySync.ServerEvent": "13.0.18",
           "Discord.Net.Commands": "3.9.0",
           "Discord.Net.Core": "3.9.0",
           "Discord.Net.WebSocket": "3.9.0",
@@ -21,9 +21,9 @@
           "Roleplay.dll": {}
         }
       },
-      "AltV.Net/13.0.16": {
+      "AltV.Net/13.0.18": {
         "dependencies": {
-          "AltV.Net.Shared": "13.0.16"
+          "AltV.Net.Shared": "13.0.18"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.dll": {
@@ -32,9 +32,9 @@
           }
         }
       },
-      "AltV.Net.Async/13.0.16": {
+      "AltV.Net.Async/13.0.18": {
         "dependencies": {
-          "AltV.Net": "13.0.16",
+          "AltV.Net": "13.0.18",
           "System.Threading.Channels": "6.0.0"
         },
         "runtime": {
@@ -44,7 +44,7 @@
           }
         }
       },
-      "AltV.Net.CApi/13.0.16": {
+      "AltV.Net.CApi/13.0.18": {
         "runtime": {
           "lib/net6.0/AltV.Net.CApi.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -63,10 +63,10 @@
           }
         }
       },
-      "AltV.Net.EntitySync.ServerEvent/13.0.16": {
+      "AltV.Net.EntitySync.ServerEvent/13.0.18": {
         "dependencies": {
-          "AltV.Net": "13.0.16",
-          "AltV.Net.Async": "13.0.16",
+          "AltV.Net": "13.0.18",
+          "AltV.Net.Async": "13.0.18",
           "AltV.Net.EntitySync": "1.18.0",
           "System.Threading.Channels": "6.0.0"
         },
@@ -77,9 +77,9 @@
           }
         }
       },
-      "AltV.Net.Shared/13.0.16": {
+      "AltV.Net.Shared/13.0.18": {
         "dependencies": {
-          "AltV.Net.CApi": "13.0.16"
+          "AltV.Net.CApi": "13.0.18"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.Shared.dll": {
@@ -392,26 +392,26 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AltV.Net/13.0.16": {
+    "AltV.Net/13.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-IEEO5Mf6wSG3B6T8flRB/OLDeH+b+I1L29DxkggBMvFyCvcD18Zk8YS6GnTM1MZAZO6whAP68u5QbRFrplnxqg==",
-      "path": "altv.net/13.0.16",
-      "hashPath": "altv.net.13.0.16.nupkg.sha512"
+      "sha512": "sha512-sekCSD3bProT5JW/Y6qvEvN/vTWSpy5KFtmIKnOAeVjjtHzcTeawzEB76j5dxrQDGjF7zxNVnZCzpc+2PvNx7w==",
+      "path": "altv.net/13.0.18",
+      "hashPath": "altv.net.13.0.18.nupkg.sha512"
     },
-    "AltV.Net.Async/13.0.16": {
+    "AltV.Net.Async/13.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-v1/BgQDGMDQZFW7umRR1JAj50RoY8M2mTl7Ml8ORqZHJKOqcVsHr2CGMPS18JrFmLNgFqDoD8soO8xBr8+21bg==",
-      "path": "altv.net.async/13.0.16",
-      "hashPath": "altv.net.async.13.0.16.nupkg.sha512"
+      "sha512": "sha512-kYZCdrp3XTRR0sWMUcCCcmJwNK1sBpKdQ+kODHzn9vbiiYGuEqjIETARB4ReFUfRNgk8gfVoZbYwZ9jzCIE+aw==",
+      "path": "altv.net.async/13.0.18",
+      "hashPath": "altv.net.async.13.0.18.nupkg.sha512"
     },
-    "AltV.Net.CApi/13.0.16": {
+    "AltV.Net.CApi/13.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-5q6KxW+CyTxTj92+Z6RCqvOS0raSQSZxIsbU6sazQiBoEw/TeQ1VYARmjEDZRQh6aKpt16AESTmGXlaG6kOdpA==",
-      "path": "altv.net.capi/13.0.16",
-      "hashPath": "altv.net.capi.13.0.16.nupkg.sha512"
+      "sha512": "sha512-ZVQ8JdueliPlmKE3+y5kgYrm/WoXc4rauScJwpsFG9HGcuR+EtE8yZX3wcsmcknV95ejm3hMiDjBQngRAsV0Bg==",
+      "path": "altv.net.capi/13.0.18",
+      "hashPath": "altv.net.capi.13.0.18.nupkg.sha512"
     },
     "AltV.Net.EntitySync/1.18.0": {
       "type": "package",
@@ -420,19 +420,19 @@
       "path": "altv.net.entitysync/1.18.0",
       "hashPath": "altv.net.entitysync.1.18.0.nupkg.sha512"
     },
-    "AltV.Net.EntitySync.ServerEvent/13.0.16": {
+    "AltV.Net.EntitySync.ServerEvent/13.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NtzMyo1xt6D6Ziq1JkG82e/38hvgWIOjBzZ/oN6+5S55aBuYpVS6r18k4vi3MKYIlGbqWvx85NLAcQX7jYI7xA==",
-      "path": "altv.net.entitysync.serverevent/13.0.16",
-      "hashPath": "altv.net.entitysync.serverevent.13.0.16.nupkg.sha512"
+      "sha512": "sha512-nxB3yWF2kZbsLf2rCJFSmLQVm0BSWOHgcRzL9jJ2UUmVRScQPZ0WMgS29F+OjVfmIOda/rfNaMFMpD5LPVSp7g==",
+      "path": "altv.net.entitysync.serverevent/13.0.18",
+      "hashPath": "altv.net.entitysync.serverevent.13.0.18.nupkg.sha512"
     },
-    "AltV.Net.Shared/13.0.16": {
+    "AltV.Net.Shared/13.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-cwK6t5c20NH6grMl37jY/OUFbnGIHZ8QdWu5BDauuHZNXzqkS0q4FqOXK9XS8M2CYfaCeAWS1/iA+Ac7mzApvQ==",
-      "path": "altv.net.shared/13.0.16",
-      "hashPath": "altv.net.shared.13.0.16.nupkg.sha512"
+      "sha512": "sha512-O3Udbb4sF2+/3MlTot7ODEDI9PDK+xj96I70ah+fK4tcTBKHqbW1RmaXyOaFNUe/g2tSDaXDwreuG+ODsEeCQw==",
+      "path": "altv.net.shared/13.0.18",
+      "hashPath": "altv.net.shared.13.0.18.nupkg.sha512"
     },
     "Discord.Net.Commands/3.9.0": {
       "type": "package",
