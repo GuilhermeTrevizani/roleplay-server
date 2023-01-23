@@ -274,7 +274,7 @@ namespace Roleplay.Scripts
                 await player.GravarLog(LogType.Entrada, string.Empty, null);
 
                 if (player.Character.PersonalizationStep != CharacterPersonalizationStep.Ready)
-                    player.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), player.SessionId, false);
+                    player.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), player.SessionId, true);
                 else
                     await player.Spawnar();
 
