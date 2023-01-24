@@ -76,14 +76,11 @@ namespace Roleplay.Scripts
 
             await player.RemoveItem(new CharacterItem(item.ItemCategory) { Quantity = quantity });
 
-            lock (crackDen)
+            crackDen.Quantity += quantity;
+            if (crackDen.Quantity >= crackDen.CooldownQuantityLimit)
             {
-                crackDen.Quantity += quantity;
-                if (crackDen.Quantity >= crackDen.CooldownQuantityLimit)
-                {
-                    crackDen.CooldownDate = DateTime.Now.AddHours(crackDen.CooldownHours);
-                    crackDen.Quantity = 0;
-                }
+                crackDen.CooldownDate = DateTime.Now.AddHours(crackDen.CooldownHours);
+                crackDen.Quantity = 0;
             }
 
             await using var context = new DatabaseContext();

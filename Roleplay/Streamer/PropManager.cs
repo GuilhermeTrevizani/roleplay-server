@@ -76,22 +76,7 @@ namespace Roleplay.Streamer
 
     public class Prop : Entity, IEntity
     {
-        private static List<Prop> propList = new();
-
-        public static List<Prop> PropList
-        {
-            get
-            {
-                lock (propList)
-                {
-                    return propList;
-                }
-            }
-            set
-            {
-                propList = value;
-            }
-        }
+        public static List<Prop> PropList { get; set; }
 
         public Vector3 Rotation
         {
