@@ -372,7 +372,7 @@ namespace Roleplay.Streamer
             }
         }
 
-        public static List<Marker> MarkerList { get; set; }
+        public static List<Marker> MarkerList { get; set; } = new();
 
         public Marker(Vector3 position, int dimension, uint range, ulong entityType) : base(entityType, position, dimension, range)
         {
