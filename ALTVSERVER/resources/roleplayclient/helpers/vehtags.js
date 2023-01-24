@@ -1,6 +1,5 @@
 import alt from 'alt-client';
 import * as native from 'natives';
-import { drawText3d } from './text';
 
 let drawDistance = 10;
 let interval;
@@ -57,11 +56,13 @@ async function drawVehicleNametag(vehicle) {
     const vector = native.getEntityVelocity(vehicle);
     const frameTime = native.getFrameTime();
 
-    drawText3d(name,
-        vehicle.pos.x + vector.x * frameTime, 
-        vehicle.pos.y + vector.y * frameTime, 
-        vehicle.pos.z + vector.z * frameTime,
-        0.4,
+    alt.Utils.drawText3dThisFrame(
+        name,
+        new alt.Vector3(vehicle.pos.x + vector.x * frameTime, vehicle.pos.y + vector.y * frameTime, vehicle.pos.z + vector.z * frameTime),
         4,
-        174, 106, 178, 255);
+        0.4,
+        new alt.RGBA(174, 106, 178, 255),
+        true,
+        true
+    );
 }

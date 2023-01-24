@@ -1,6 +1,5 @@
 import alt from 'alt-client';
 import * as native from 'natives';
-import { drawText3d } from './text';
 
 let drawDistance = 10;
 let interval;
@@ -68,29 +67,25 @@ async function drawPlayerNametag(player) {
     const vector = native.getEntityVelocity(entity);
     const frameTime = native.getFrameTime();
 
-    drawText3d(name,
-        pos.x + vector.x * frameTime, 
-        pos.y + vector.y * frameTime, 
-        pos.z + vector.z * frameTime,
-        0.4,
+    alt.Utils.drawText3dThisFrame(
+        name,
+        new alt.Vector3(pos.x + vector.x * frameTime, pos.y + vector.y * frameTime, pos.z + vector.z * frameTime),
         4,
-        255, 106, 77, 255
+        0.4,
+        new alt.RGBA(255, 106, 77, 255),
+        true,
+        true
     );
     
     const action = player.getSyncedMeta('TextAction');
     if (action) {
         pos.z += 0.15;
-        drawText3d(
+        alt.Utils.drawText3dThisFrame(
             action,
-            pos.x + vector.x * frameTime, 
-            pos.y + vector.y * frameTime, 
-            pos.z + vector.z * frameTime,
-            0.35,
+            new alt.Vector3(pos.x + vector.x * frameTime, pos.y + vector.y * frameTime, pos.z + vector.z * frameTime),
             4,
-            194, 
-            162, 
-            218,
-            255,
+            0.35,
+            new alt.RGBA(194, 162, 218, 255),
             true,
             false
         );
