@@ -563,25 +563,17 @@ alt.onServer('Server:BaseHTML', (html) => {
     toggleView(true);
 });
 
-alt.onServer('Server:RenderLoginCam', renderLoginCam);
-function renderLoginCam() {
+alt.onServer('Server:DisableHUD', disableHud);
+function disableHud() {
     native.displayHud(false);
     native.displayRadar(false);
     activateChat(false);
     player.setMeta('f7', false);
-
-    native.destroyAllCams(true);
-    native.renderScriptCams(false, false, 0, false, false, 0);
-
-    const cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', -436.0717, 1039.26, 372.1287, 0, 0, 0, 60, true, 0);
-    native.pointCamAtCoord(cam, 3.063985, 0.0, -170.8151);
-    native.setCamActive(cam, true);
-    native.renderScriptCams(true, false, 0, true, false, 0);
 }
 
 alt.onServer('Server:Login', serverLogin);
 function serverLogin() {
-    renderLoginCam();
+    disableHud();
 
     if (view) 
         view.destroy();
@@ -760,7 +752,6 @@ alt.onServer('Server:SelecionarPersonagem', (personalizationStep, sex, personali
     native.destroyAllCams(true);
     native.renderScriptCams(false, false, 0, false, false, 0);
     native.clearPedTasks(player);
-    native.setEntityCollision(player, true, true);
     
     const personalization = JSON.parse(personalizationJSON);
     syncDecorations(personalization);
@@ -851,8 +842,6 @@ alt.onServer('Server:Abastecer', (veiculo) => {
 
 let intervalSpec = null;
 alt.onServer('SpectatePlayer', (target) => {
-    native.setEntityCollision(player, false, false);
-
     if (intervalSpec != null) 
         alt.clearInterval(intervalSpec);
 
@@ -860,7 +849,7 @@ alt.onServer('SpectatePlayer', (target) => {
         if (target.scriptID != 0) {
             alt.clearInterval(intervalSpec);
             native.attachEntityToEntity(player.scriptID, target.scriptID, 0, 0.0, 0.0, 5.0, 0.0, 0.0, 0.0, true, false, false, false, 0, false);
-            let cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', target.pos.x, target.pos.y, target.pos.z, 0, 0, 0, 60, true, 0);
+            const cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', target.pos.x, target.pos.y, target.pos.z, 0, 0, 0, 60, true, 0);
             native.setCamActive(cam, true);
             native.renderScriptCams(true, false, 0, true, false, 0);
             native.setCamAffectsAiming(cam, false);
@@ -878,7 +867,6 @@ alt.onServer('UnspectatePlayer', () => {
     native.destroyAllCams(true);
     native.renderScriptCams(false, false, 0, false, false, 0);
     native.detachEntity(player.scriptID, true, true);
-    native.setEntityCollision(player.scriptID, true, true);
 });
 
 alt.onServer('Server:PintarVeiculo', (veiculo) => {

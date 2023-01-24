@@ -11,7 +11,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Roleplay.Entities
@@ -258,36 +257,25 @@ namespace Roleplay.Entities
                 try
                 {
                     Alt.Log($"Vehicle Timer {veh.Vehicle.Id}");
-                    new Thread(() =>
+                    if (veh.DataExpiracaoAluguel.HasValue)
                     {
-                        try
+                        if (veh.DataExpiracaoAluguel.Value < DateTime.Now)
                         {
-                            if (veh.DataExpiracaoAluguel.HasValue)
-                            {
-                                if (veh.DataExpiracaoAluguel.Value < DateTime.Now)
-                                {
-                                    veh.EngineOn = false;
-                                    veh.NomeEncarregado = string.Empty;
-                                    veh.DataExpiracaoAluguel = null;
-                                    if (veh.Driver is MyPlayer driver)
-                                        driver.SendMessage(Models.MessageType.Error, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora. Se você sair do veículo, ele será levado para a central.");
-                                }
-                            }
+                            veh.EngineOn = false;
+                            veh.NomeEncarregado = string.Empty;
+                            veh.DataExpiracaoAluguel = null;
+                            if (veh.Driver is MyPlayer driver)
+                                driver.SendMessage(MessageType.Error, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora. Se você sair do veículo, ele será levado para a central.");
+                        }
+                    }
 
-                            if (veh.EngineOn && veh.Vehicle.Fuel > 0 && veh.TemTanqueCombustivel)
-                            {
-                                veh.Vehicle.Fuel--;
-                                veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
-                                if (veh.Vehicle.Fuel == 0)
-                                    veh.EngineOn = false;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.Source = veh.Vehicle.Id.ToString();
-                            Functions.GetException(ex);
-                        }
-                    }).Start();
+                    if (veh.EngineOn && veh.Vehicle.Fuel > 0 && veh.TemTanqueCombustivel)
+                    {
+                        veh.Vehicle.Fuel--;
+                        veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+                        if (veh.Vehicle.Fuel == 0)
+                            veh.EngineOn = false;
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -303,6 +303,7 @@ namespace Roleplay.Commands.Staff
             player.IPLs = target.IPLs;
             player.SetarIPLs();
             player.SPECId = target.SessionId;
+            player.Collision = false;
             player.Invincible = true;
             player.Visible = false;
             player.SetNametag();

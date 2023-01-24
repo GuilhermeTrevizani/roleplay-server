@@ -1,5 +1,4 @@
 ﻿using AltV.Net;
-using AltV.Net.Async;
 using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Enums;
@@ -348,8 +347,7 @@ namespace Roleplay.Factories
 
         public void SetarIPLs()
         {
-            if (IPLs == null)
-                IPLs = new List<string>();
+            IPLs ??= new List<string>();
 
             foreach (var ipl in IPLs)
                 Emit("Server:RequestIpl", ipl);
@@ -412,6 +410,7 @@ namespace Roleplay.Factories
             SetNametag();
             Visible = true;
             Invincible = false;
+            Collision = true;
             StopAnimation();
         }
 
@@ -486,10 +485,11 @@ namespace Roleplay.Factories
             Emit("nametags:Config", true);
             ConfigurarChat();
             SetSyncedMetaData("ferido", 0);
+            Invincible = false;
+            Frozen = false;
             SetPosition(new Position(Character.PosX, Character.PosY, Character.PosZ), Character.Dimension, true);
             Character.LastAccessDate = DateTime.Now;
             Emit("Server:setArtificialLightsState", Global.Parameter.Blackout);
-            Invincible = false;
             Health = Character.Health;
             Armor = Character.Armor;
             Emit("dl:Config", User.VehicleTagToggle);
@@ -531,32 +531,21 @@ namespace Roleplay.Factories
             SetupDrugTimer(Character.DrugEndDate.HasValue);
 
             Timer = new System.Timers.Timer(60000);
-            Timer.Elapsed += (s, e) =>
+            Timer.Elapsed += async (s, e) =>
             {
                 try
                 {
                     Alt.Log($"Player Timer {Character.Id}");
-                    new Thread(async () =>
-                    {
-                        try
-                        {
-                            Character.ConnectedTime++;
+                    Character.ConnectedTime++;
 
-                            if (OnAdminDuty)
-                                User.StaffDutyTime++;
+                    if (OnAdminDuty)
+                        User.StaffDutyTime++;
 
-                            if (Character.ConnectedTime % 60 == 0)
-                                await Paycheck(false);
+                    if (Character.ConnectedTime % 60 == 0)
+                        await Paycheck(false);
 
-                            if (Character.ConnectedTime % 5 == 0)
-                                await Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.Source = Character.Id.ToString();
-                            Functions.GetException(ex);
-                        }
-                    }).Start();
+                    if (Character.ConnectedTime % 5 == 0)
+                        await Save();
                 }
                 catch (Exception ex)
                 {
@@ -1098,11 +1087,9 @@ namespace Roleplay.Factories
         {
             await Disconnect(reason, false);
 
-            Spawn(Global.PosicaoSpawn, 0);
-            Invincible = true;
-            Visible = false;
+            Despawn();
 
-            Emit("Server:RenderLoginCam");
+            Emit("Server:DisableHUD");
             await LoginScript.ListarPersonagens(this, alerta);
         }
 
@@ -1199,7 +1186,7 @@ namespace Roleplay.Factories
             return html;
         }
 
-        public async Task SetCanDoDriveBy(byte seat, bool? status = null)
+        public void SetCanDoDriveBy(byte seat, bool? status = null)
         {
             seat--;
 
@@ -1208,7 +1195,7 @@ namespace Roleplay.Factories
             Emit("SetPlayerCanDoDriveBy", status.HasValue ?
                 status
                 :
-                !((MyVehicle)Vehicle).TemJanelas || await Vehicle.IsWindowOpenedAsync(seat));
+                !((MyVehicle)Vehicle).TemJanelas || Vehicle.IsWindowOpened(seat));
         }
 
         public async Task<string> Paycheck(bool previa)

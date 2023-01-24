@@ -53,8 +53,8 @@ namespace Roleplay.Scripts
             }
         }
 
-        [AsyncScriptEvent(ScriptEventType.PlayerEnterVehicle)]
-        public static async Task OnPlayerEnterVehicle(MyVehicle vehicle, MyPlayer player, byte seat)
+        [ScriptEvent(ScriptEventType.PlayerEnterVehicle)]
+        public static void OnPlayerEnterVehicle(MyVehicle vehicle, MyPlayer player, byte seat)
         {
             if (vehicle.Vehicle.Id == 0)
                 return;
@@ -62,7 +62,7 @@ namespace Roleplay.Scripts
             if (seat == 1)
                 player.Emit("Spotlight:Toggle", vehicle.SpotlightActive);
 
-            await player.SetCanDoDriveBy(seat);
+            player.SetCanDoDriveBy(seat);
             vehicle.SetSyncedMetaData("RadioEnabled", !vehicle.Vehicle.FactionId.HasValue);
 
             if (vehicle.EngineOn)
@@ -443,13 +443,12 @@ namespace Roleplay.Scripts
             if (vehicle == null)
                 return;
 
-            if (vehicle.AudioSpot == null)
-                vehicle.AudioSpot = new AudioSpot
-                {
-                    MaxRange = 10,
-                    Dimension = vehicle.Dimension,
-                    VehicleId = vehicle.Id,
-                };
+            vehicle.AudioSpot ??= new AudioSpot
+            {
+                MaxRange = 10,
+                Dimension = vehicle.Dimension,
+                VehicleId = vehicle.Id,
+            };
 
             if (vehicle.AudioSpot.Source != url)
                 vehicle.AudioSpot.RemoveAllClients();

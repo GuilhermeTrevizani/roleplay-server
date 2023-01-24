@@ -1,6 +1,7 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
@@ -223,7 +224,6 @@ namespace Roleplay.Scripts
                 player.Character.LastAccessHardwareIdExHash = player.HardwareIdExHash;
                 player.Character.JailFinalDate = null;
 
-                player.Visible = true;
                 player.IPLs = JsonSerializer.Deserialize<List<string>>(player.Character.IPLsJSON);
                 player.SetarIPLs();
                 player.Model = (uint)player.Character.Model;
@@ -272,6 +272,11 @@ namespace Roleplay.Scripts
                 }
 
                 await player.GravarLog(LogType.Entrada, string.Empty, null);
+
+                player.SetDateTime(DateTime.Now.AddHours(2));
+                player.Emit("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
+                player.Invincible = true;
+                player.Frozen = true;
 
                 if (player.Character.PersonalizationStep != CharacterPersonalizationStep.Ready)
                     player.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), player.SessionId, true);
@@ -462,7 +467,7 @@ namespace Roleplay.Scripts
                     await player.GravarLog(LogType.NameChange, $"{oldCharacter.Name} [{oldCharacter.Id}] > {personagem.Name} [{personagem.Id}]", null);
 
                     await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.Properties)} SET {nameof(Property.CharacterId)} = {personagem.Id} WHERE {nameof(Property.CharacterId)} = {oldCharacter.Id}");
-                    await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.Vehicles)} SET {nameof(Vehicle.CharacterId)} = {personagem.Id} WHERE {nameof(Vehicle.CharacterId)} = {oldCharacter.Id}");
+                    await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.Vehicles)} SET {nameof(Entities.Vehicle.CharacterId)} = {personagem.Id} WHERE {nameof(Entities.Vehicle.CharacterId)} = {oldCharacter.Id}");
                     await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.CharactersItems)} SET {nameof(CharacterItem.CharacterId)} = {personagem.Id} WHERE {nameof(CharacterItem.CharacterId)} = {oldCharacter.Id}");
 
                     foreach (var x in Global.Properties.Where(x => x.CharacterId == oldCharacter.Id))

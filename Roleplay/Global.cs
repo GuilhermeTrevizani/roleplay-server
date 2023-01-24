@@ -74,8 +74,6 @@ namespace Roleplay
 
         public const uint BOOMBOX_DEFAULT_DISTANCE = 20;
 
-        public static Position PosicaoSpawn { get; } = new Position(-430.0717f, 1039.26f, 372.1287f);
-
         public static Rgba MainRgba { get; } = new Rgba(174, 106, 178, 75);
 
         public static Parameter Parameter { get; set; }

@@ -672,7 +672,7 @@ namespace Roleplay.Commands
             }
 
             foreach (var target in Global.Players.Where(x => x.Vehicle == veh))
-                await target.SetCanDoDriveBy(target.Seat, target == player || idJanela == 255 ? status : null);
+                target.SetCanDoDriveBy(target.Seat, target == player || idJanela == 255 ? status : null);
 
             player.SendMessageToNearbyPlayers($"{(status ? "abaixa" : "levanta")} {texto} do veículo.", MessageCategory.Ame, 5);
         }

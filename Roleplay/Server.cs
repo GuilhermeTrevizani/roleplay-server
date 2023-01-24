@@ -15,7 +15,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading;
 using System.Timers;
 
 namespace Roleplay
@@ -28,7 +27,7 @@ namespace Roleplay
 
         public override IBaseObjectFactory<IColShape> GetColShapeFactory() => new MyColShapeFactory();
 
-        System.Timers.Timer MainTimer { get; set; }
+        Timer MainTimer { get; set; }
 
         public override async void OnStart()
         {
@@ -345,128 +344,118 @@ namespace Roleplay
                 await player.Disconnect("OnStop", true);
         }
 
-        private void MainTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private async void MainTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                new Thread(async () =>
+                if ((Global.Parameter.InactivePropertiesDate ?? DateTime.MinValue) < DateTime.Now)
                 {
-                    try
-                    {
-                        if ((Global.Parameter.InactivePropertiesDate ?? DateTime.MinValue) < DateTime.Now)
-                        {
-                            await using var context = new DatabaseContext();
-                            var properties = (await context.Properties
-                                .Where(x => x.CharacterId.HasValue)
-                                .Include(x => x.Character).ThenInclude(x => x.User)
-                                .ToListAsync())
-                                .Where(x => (DateTime.Now - x.Character.LastAccessDate).TotalDays
-                                    > (x.Character.User.VIP switch
-                                    {
-                                        UserVIP.Gold => 21,
-                                        UserVIP.Silver => 14,
-                                        _ => 7,
-                                    })
-                                );
-                            foreach (var x in properties)
+                    await using var context = new DatabaseContext();
+                    var properties = (await context.Properties
+                        .Where(x => x.CharacterId.HasValue)
+                        .Include(x => x.Character).ThenInclude(x => x.User)
+                        .ToListAsync())
+                        .Where(x => (DateTime.Now - x.Character.LastAccessDate).TotalDays
+                            > (x.Character.User.VIP switch
                             {
-                                var prop = Global.Properties.FirstOrDefault(y => y.Id == x.Id);
-                                if (prop == null)
-                                    continue;
+                                UserVIP.Gold => 21,
+                                UserVIP.Silver => 14,
+                                _ => 7,
+                            })
+                        );
+                    foreach (var x in properties)
+                    {
+                        var prop = Global.Properties.FirstOrDefault(y => y.Id == x.Id);
+                        if (prop == null)
+                            continue;
 
-                                prop.CharacterId = null;
-                                prop.CreateIdentifier();
+                        prop.CharacterId = null;
+                        prop.CreateIdentifier();
 
-                                context.Properties.Update(prop);
+                        context.Properties.Update(prop);
+                    }
+
+                    Global.Parameter.InactivePropertiesDate = DateTime.Now.AddDays(1);
+                    context.Parameters.Update(Global.Parameter);
+                    await context.SaveChangesAsync();
+                }
+
+                var companies = Global.Companies.Where(x => x.CharacterId.HasValue && (x.RentPaymentDate ?? DateTime.MinValue) <= DateTime.Now).ToList();
+                if (companies.Any())
+                {
+                    await using var context = new DatabaseContext();
+                    foreach (var company in companies)
+                    {
+                        var target = Global.Players.FirstOrDefault(x => x.Character.Id == company.CharacterId);
+                        if (target != null)
+                        {
+                            if (target.Character.Bank - company.WeekRentValue <= 0)
+                            {
+                                await company.RemoveOwner();
+                                continue;
                             }
 
-                            Global.Parameter.InactivePropertiesDate = DateTime.Now.AddDays(1);
-                            context.Parameters.Update(Global.Parameter);
+                            target.Character.Bank -= company.WeekRentValue;
+                            await target.Save();
+                        }
+                        else
+                        {
+                            var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == company.CharacterId);
+                            if (character.Bank - company.WeekRentValue <= 0)
+                            {
+                                await company.RemoveOwner();
+                                continue;
+                            }
+
+                            character.Bank -= company.WeekRentValue;
+                            context.Characters.Update(character);
                             await context.SaveChangesAsync();
                         }
 
-                        var companies = Global.Companies.Where(x => x.CharacterId.HasValue && (x.RentPaymentDate ?? DateTime.MinValue) <= DateTime.Now).ToList();
-                        if (companies.Any())
+                        company.RentPaymentDate = DateTime.Now.AddDays(7);
+                        context.Companies.Update(company);
+                        await context.SaveChangesAsync();
+
+                        await context.FinancialTransactions.AddAsync(new FinancialTransaction
                         {
-                            await using var context = new DatabaseContext();
-                            foreach (var company in companies)
-                            {
-                                var target = Global.Players.FirstOrDefault(x => x.Character.Id == company.CharacterId);
-                                if (target != null)
-                                {
-                                    if (target.Character.Bank - company.WeekRentValue <= 0)
-                                    {
-                                        await company.RemoveOwner();
-                                        continue;
-                                    }
-
-                                    target.Character.Bank -= company.WeekRentValue;
-                                    await target.Save();
-                                }
-                                else
-                                {
-                                    var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == company.CharacterId);
-                                    if (character.Bank - company.WeekRentValue <= 0)
-                                    {
-                                        await company.RemoveOwner();
-                                        continue;
-                                    }
-
-                                    character.Bank -= company.WeekRentValue;
-                                    context.Characters.Update(character);
-                                    await context.SaveChangesAsync();
-                                }
-
-                                company.RentPaymentDate = DateTime.Now.AddDays(7); 
-                                context.Companies.Update(company);
-                                await context.SaveChangesAsync();
-
-                                await context.FinancialTransactions.AddAsync(new FinancialTransaction
-                                {
-                                    Type = FinancialTransactionType.Withdraw,
-                                    CharacterId = company.CharacterId ?? 0,
-                                    Value = company.WeekRentValue,
-                                    Description = $"Pagamento do Aluguel da Empresa #{company.Id}",
-                                });
-                                await context.SaveChangesAsync();
-                            }
-                        }
-
-                        var url = "https://api.openweathermap.org/data/2.5/weather?lat=34.0536909&lon=-118.242766&appid=401a061ac0ba4fb46e01ec97d0fb5593&units=metric";
-
-                        using var httpClient = new HttpClient();
-                        var request = new HttpRequestMessage(HttpMethod.Get, url);
-                        var response = httpClient.Send(request);
-                        using var reader = new StreamReader(response.Content.ReadAsStream());
-                        var json = reader.ReadToEnd();
-
-                        Global.WeatherInfo = JsonSerializer.Deserialize<WeatherInfo>(json, new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true,
+                            Type = FinancialTransactionType.Withdraw,
+                            CharacterId = company.CharacterId ?? 0,
+                            Value = company.WeekRentValue,
+                            Description = $"Pagamento do Aluguel da Empresa #{company.Id}",
                         });
-                        Global.WeatherInfo.WeatherType = Global.WeatherInfo.Weather.FirstOrDefault()?.Main switch
-                        {
-                            "Drizzle" => WeatherType.Clearing,
-                            "Clouds" => WeatherType.Clouds,
-                            "Rain" => WeatherType.Rain,
-                            "Thunderstorm" or "Thunder" => WeatherType.Thunder,
-                            "Foggy" or "Fog" or "Mist" or "Smoke" => WeatherType.Foggy,
-                            "Smog" => WeatherType.Smog,
-                            "Overcast" => WeatherType.Overcast,
-                            "Snowing" or "Snow" => WeatherType.Snow,
-                            "Blizzard" => WeatherType.Blizzard,
-                            _ => WeatherType.Clear,
-                        };
+                        await context.SaveChangesAsync();
+                    }
+                }
 
-                        Alt.SetSyncedMetaData("Temperature", $"{Global.WeatherInfo.Main.Temp:N0}ºC");
-                        Alt.SetSyncedMetaData("WeatherType", Global.WeatherInfo.WeatherType.ToString().ToUpper());
-                        Alt.EmitAllClients("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
-                    }
-                    catch (Exception ex)
-                    {
-                        Functions.GetException(ex);
-                    }
-                }).Start();
+                var url = "https://api.openweathermap.org/data/2.5/weather?lat=34.0536909&lon=-118.242766&appid=401a061ac0ba4fb46e01ec97d0fb5593&units=metric";
+
+                using var httpClient = new HttpClient();
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                var response = httpClient.Send(request);
+                using var reader = new StreamReader(response.Content.ReadAsStream());
+                var json = reader.ReadToEnd();
+
+                Global.WeatherInfo = JsonSerializer.Deserialize<WeatherInfo>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
+                Global.WeatherInfo.WeatherType = Global.WeatherInfo.Weather.FirstOrDefault()?.Main switch
+                {
+                    "Drizzle" => WeatherType.Clearing,
+                    "Clouds" => WeatherType.Clouds,
+                    "Rain" => WeatherType.Rain,
+                    "Thunderstorm" or "Thunder" => WeatherType.Thunder,
+                    "Foggy" or "Fog" or "Mist" or "Smoke" => WeatherType.Foggy,
+                    "Smog" => WeatherType.Smog,
+                    "Overcast" => WeatherType.Overcast,
+                    "Snowing" or "Snow" => WeatherType.Snow,
+                    "Blizzard" => WeatherType.Blizzard,
+                    _ => WeatherType.Clear,
+                };
+
+                Alt.SetSyncedMetaData("Temperature", $"{Global.WeatherInfo.Main.Temp:N0}ºC");
+                Alt.SetSyncedMetaData("WeatherType", Global.WeatherInfo.WeatherType.ToString().ToUpper());
+                Alt.EmitAllClients("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
             }
             catch (Exception ex)
             {

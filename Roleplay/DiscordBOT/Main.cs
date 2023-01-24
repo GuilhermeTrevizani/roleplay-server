@@ -5,37 +5,24 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Roleplay.DiscordBOT
 {
     public class Main
     {
-        public static void MainAsync()
+        public static async void MainAsync()
         {
             try
             {
-                new Thread(async () =>
-                {
-                    try
-                    {
-                        using var services = ConfigureServices();
-                        Global.DiscordClient = services.GetRequiredService<DiscordSocketClient>();
+                using var services = ConfigureServices();
+                Global.DiscordClient = services.GetRequiredService<DiscordSocketClient>();
 
-                        Global.DiscordClient.Log += LogAsync;
+                Global.DiscordClient.Log += LogAsync;
 
-                        await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
-                        await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.DiscordBotToken);
-                        await Global.DiscordClient.StartAsync();
-
-                        await Task.Delay(Timeout.Infinite);
-                    }
-                    catch (Exception ex)
-                    {
-                        Alt.LogError(ex.Message);
-                    }
-                }).Start();
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+                await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.DiscordBotToken);
+                await Global.DiscordClient.StartAsync();
             }
             catch (Exception ex)
             {

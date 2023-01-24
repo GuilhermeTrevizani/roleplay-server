@@ -13,52 +13,33 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Roleplay.Scripts
 {
     public class PlayerScript : IScript
     {
-        [ScriptEvent(ScriptEventType.PlayerConnect)]
-        public static void OnPlayerConnect(MyPlayer player, string reason)
+        [AsyncScriptEvent(ScriptEventType.PlayerConnect)]
+        public static async Task OnPlayerConnect(MyPlayer player, string reason)
         {
             try
             {
-                new Thread(async () =>
-                {
-                    try
-                    {
-                        Alt.Log($"OnPlayerConnect | Start | {player.Id} | {player.Name} | {player.Ip}");
-                        player.SessionId = Convert.ToInt16(Enumerable.Range(0, 1000).FirstOrDefault(i => !Global.Players.Any(x => x.SessionId == i)));
-                        player.Dimension = player.SessionId;
-                        player.SetDateTime(DateTime.Now.AddHours(2));
-                        player.Emit("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
-                        player.Spawn(Global.PosicaoSpawn, 0);
-                        player.Invincible = true;
-                        player.Visible = false;
-                        player.Collision = false;
-                        player.Frozen = true;
+                player.SessionId = Convert.ToInt16(Enumerable.Range(0, 1000).FirstOrDefault(i => !Global.Players.Any(x => x.SessionId == i)));
+                player.Dimension = player.SessionId;
 
-                        var hardwareIdHash = player?.HardwareIdHash ?? 0; ;
-                        var hardwareIdExHash = player?.HardwareIdExHash ?? 0;
+                var hardwareIdHash = player?.HardwareIdHash ?? 0; ;
+                var hardwareIdExHash = player?.HardwareIdExHash ?? 0;
 
-                        await using var context = new DatabaseContext();
+                await using var context = new DatabaseContext();
 
-                        var user = (await context.Users.FirstOrDefaultAsync(x =>
-                            (x.RegisterHardwareIdHash == hardwareIdHash && x.RegisterHardwareIdExHash == hardwareIdExHash)
-                            ||
-                            (x.LastAccessHardwareIdHash == hardwareIdHash && x.LastAccessHardwareIdExHash == hardwareIdExHash)))?.Name ?? string.Empty;
-                        player.SetSyncedMetaData("usuario", user);
+                var user = (await context.Users.FirstOrDefaultAsync(x =>
+                    (x.RegisterHardwareIdHash == hardwareIdHash && x.RegisterHardwareIdExHash == hardwareIdExHash)
+                    ||
+                    (x.LastAccessHardwareIdHash == hardwareIdHash && x.LastAccessHardwareIdExHash == hardwareIdExHash)))?.Name ?? string.Empty;
+                player.SetSyncedMetaData("usuario", user);
 
-                        player.Emit("Server:Login");
-                        Alt.Log($"OnPlayerConnect | End | {player.Id} | {player.Name} | {player.Ip} | {user}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Functions.GetException(ex);
-                    }
-                }).Start();
+                player.Emit("Server:Login");
+                Alt.Log($"OnPlayerConnect | {player.Id} | {player.Name} | {player.Ip} | {user}");
             }
             catch (Exception ex)
             {
@@ -201,217 +182,206 @@ namespace Roleplay.Scripts
         {
             try
             {
-                new Thread(async () =>
+                if (message.Contains("<script>") || message.Contains("{#"))
+                    return;
+
+                if (message[0] != '/')
                 {
-                    try
+                    if (string.IsNullOrWhiteSpace(message))
+                        return;
+
+                    if (!player.OnAdminDuty)
+                        message = Functions.CheckFinalDot(message);
+
+                    if (player.Character.Wound != CharacterWound.Nenhum)
                     {
-                        if (message.Contains("<script>") || message.Contains("{#"))
-                            return;
+                        player.SendMessage(MessageType.Error, Global.MENSAGEM_GRAVEMENTE_FERIDO);
+                        return;
+                    }
 
-                        if (message[0] != '/')
+                    if (player.CellphoneCall.Tipo == CellphoneCallType.Atendida)
+                    {
+                        player.SendMessageToNearbyPlayers(message, MessageCategory.Celular, player.Dimension > 0 ? 7.5f : 10.0f, false);
+
+                        if (player.CellphoneCall.Numero == Global.EMERGENCY_NUMBER)
                         {
-                            if (string.IsNullOrWhiteSpace(message))
-                                return;
-
-                            if (!player.OnAdminDuty)
-                                message = Functions.CheckFinalDot(message);
-
-                            if (player.Character.Wound != CharacterWound.Nenhum)
+                            if (!player.EmergencyCallType.HasValue)
                             {
-                                player.SendMessage(MessageType.Error, Global.MENSAGEM_GRAVEMENTE_FERIDO);
-                                return;
-                            }
+                                if (message.ToUpper().Contains("AMBOS"))
+                                    player.EmergencyCallType = EmergencyCallType.Both;
+                                else if (message.ToUpper().Contains("POLÍCIA") || message.ToUpper().Contains("POLICIA"))
+                                    player.EmergencyCallType = EmergencyCallType.Police;
+                                else if (message.ToUpper().Contains("BOMBEIRO"))
+                                    player.EmergencyCallType = EmergencyCallType.Medic;
 
-                            if (player.CellphoneCall.Tipo == CellphoneCallType.Atendida)
-                            {
-                                player.SendMessageToNearbyPlayers(message, MessageCategory.Celular, player.Dimension > 0 ? 7.5f : 10.0f, false);
-
-                                if (player.CellphoneCall.Numero == Global.EMERGENCY_NUMBER)
+                                if (!player.EmergencyCallType.HasValue)
                                 {
-                                    if (!player.EmergencyCallType.HasValue)
-                                    {
-                                        if (message.ToUpper().Contains("AMBOS"))
-                                            player.EmergencyCallType = EmergencyCallType.Both;
-                                        else if (message.ToUpper().Contains("POLÍCIA") || message.ToUpper().Contains("POLICIA"))
-                                            player.EmergencyCallType = EmergencyCallType.Police;
-                                        else if (message.ToUpper().Contains("BOMBEIRO"))
-                                            player.EmergencyCallType = EmergencyCallType.Medic;
-
-                                        if (!player.EmergencyCallType.HasValue)
-                                        {
-                                            player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Não entendi sua mensagem. Deseja falar com polícia, bombeiros ou ambos?", Global.CELLPHONE_MAIN_COLOR);
-                                            return;
-                                        }
-
-                                        player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Qual sua emergência?", Global.CELLPHONE_MAIN_COLOR);
-                                    }
-                                    else
-                                    {
-                                        player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Nossas unidades foram alertadas.", Global.CELLPHONE_MAIN_COLOR);
-
-                                        var emergencyCall = new EmergencyCall
-                                        {
-                                            Type = player.EmergencyCallType.Value,
-                                            Number = player.Cellphone,
-                                            PosX = player.ICPosition.X,
-                                            PosY = player.ICPosition.Y,
-                                            Message = message,
-                                        };
-
-                                        player.AreaNameType = 2;
-                                        player.AreaNameJSON = JsonSerializer.Serialize(emergencyCall);
-                                        await player.EmitAsync("SetAreaName");
-                                    }
-                                }
-                                else if (player.CellphoneCall.Numero == Global.TAXI_NUMBER)
-                                {
-                                    player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.TAXI_NUMBER)} diz: Nossos taxistas em serviço foram avisados e você receberá um SMS de confirmação.", Global.CELLPHONE_MAIN_COLOR);
-                                    player.AguardandoTipoServico = CharacterJob.TaxiDriver;
-                                    player.AreaNameType = 3;
-                                    player.AreaNameJSON = message;
-                                    await player.EmitAsync("SetAreaName");
-                                }
-                                else if (player.CellphoneCall.Numero == Global.MECHANIC_NUMBER)
-                                {
-                                    player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.MECHANIC_NUMBER)} diz: Nossos mecânicos em serviço foram avisados e você receberá um SMS de confirmação.", Global.CELLPHONE_MAIN_COLOR);
-                                    player.AguardandoTipoServico = CharacterJob.Mechanic;
-                                    player.AreaNameType = 4;
-                                    player.AreaNameJSON = message;
-                                    await player.EmitAsync("SetAreaName");
-                                }
-                                else
-                                {
-                                    var target = Global.Players.FirstOrDefault(x => x.CellphoneCall.Numero == player.Cellphone);
-                                    if (target != null)
-                                        target.SendMessage(MessageType.None, $"[CELULAR] {target.ObterNomeContato(player.Cellphone)} diz: {message}", Global.CELLPHONE_MAIN_COLOR);
+                                    player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Não entendi sua mensagem. Deseja falar com polícia, bombeiros ou ambos?", Global.CELLPHONE_MAIN_COLOR);
+                                    return;
                                 }
 
-                                return;
-                            }
-
-                            if (player.IsInVehicle && player.Seat <= 4 && !player.OnAdminDuty)
-                            {
-                                var veh = (MyVehicle)player.Vehicle;
-                                if (veh.TemJanelas)
-                                {
-                                    if (!veh.IsWindowOpened(0) && !veh.IsWindowOpened(1) && !veh.IsWindowOpened(2) && !veh.IsWindowOpened(3))
-                                    {
-                                        foreach (var target in Global.Players.Where(x => x.Vehicle == veh))
-                                            target.SendMessage(MessageType.None, $"{player.ICName} diz [veículo]: {message}");
-                                        return;
-                                    }
-                                }
-                            }
-
-                            player.SendMessageToNearbyPlayers(message,
-                            player.OnAdminDuty ? MessageCategory.ChatOOC : MessageCategory.ChatICNormal,
-                            player.Dimension > 0 ? 7.5f : 10.0f);
-
-                            return;
-                        }
-
-                        var split = message.Split(" ");
-                        var cmd = split[0].Replace("/", string.Empty).Trim().ToLower();
-                        var method = Global.Commands.FirstOrDefault(x => x.GetCustomAttribute<CommandAttribute>().Command.ToLower() == cmd
-                        || (x.GetCustomAttribute<CommandAttribute>().Aliases?.Any(y => y.ToLower() == cmd) ?? false));
-                        if (method == null)
-                        {
-                            player.SendMessage(MessageType.None, $"O comando {{{Global.MAIN_COLOR}}}{message}{{#FFFFFF}} não existe. Pressione {{{Global.MAIN_COLOR}}}F1{{#FFFFFF}} para visualizar os comandos disponíveis.");
-                            return;
-                        }
-
-                        var methodParams = method.GetParameters();
-                        var obj = Activator.CreateInstance(method.DeclaringType);
-                        var command = method.GetCustomAttribute<CommandAttribute>();
-
-                        var arr = new List<object>();
-
-                        var list = methodParams.ToList();
-                        foreach (var x in list)
-                        {
-                            var index = list.IndexOf(x);
-                            if (index == 0)
-                            {
-                                arr.Add(player);
+                                player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Qual sua emergência?", Global.CELLPHONE_MAIN_COLOR);
                             }
                             else
                             {
-                                if (split.Length <= index)
-                                    break;
+                                player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Nossas unidades foram alertadas.", Global.CELLPHONE_MAIN_COLOR);
 
-                                var p = split[index];
-
-                                if (x.ParameterType == typeof(int))
+                                var emergencyCall = new EmergencyCall
                                 {
-                                    if (!int.TryParse(p, out int val))
-                                        break;
+                                    Type = player.EmergencyCallType.Value,
+                                    Number = player.Cellphone,
+                                    PosX = player.ICPosition.X,
+                                    PosY = player.ICPosition.Y,
+                                    Message = message,
+                                };
 
-                                    if (val == 0 && p != "0")
-                                        break;
-
-                                    arr.Add(val);
-                                }
-                                else if (x.ParameterType == typeof(string))
-                                {
-                                    if (string.IsNullOrWhiteSpace(p))
-                                        break;
-
-                                    if (command.GreedyArg && index + 1 == list.Count)
-                                        p = string.Join(" ", split.Skip(index).Take(split.Length - index));
-
-                                    arr.Add(p);
-                                }
-                                else if (x.ParameterType == typeof(float))
-                                {
-                                    if (!float.TryParse(p, out float val))
-                                        break;
-
-                                    if (val == 0 && p != "0")
-                                        break;
-
-                                    arr.Add(val);
-                                }
-                                else if (x.ParameterType == typeof(byte))
-                                {
-                                    if (!byte.TryParse(p, out byte val))
-                                        break;
-
-                                    if (val == 0 && p != "0")
-                                        break;
-
-                                    arr.Add(val);
-                                }
-                                else if (x.ParameterType == typeof(uint))
-                                {
-                                    if (!uint.TryParse(p, out uint val))
-                                        break;
-
-                                    if (val == 0 && p != "0")
-                                        break;
-
-                                    arr.Add(val);
-                                }
+                                player.AreaNameType = 2;
+                                player.AreaNameJSON = JsonSerializer.Serialize(emergencyCall);
+                                player.Emit("SetAreaName");
                             }
                         }
-
-                        if (methodParams.Length != arr.Count)
+                        else if (player.CellphoneCall.Numero == Global.TAXI_NUMBER)
                         {
-                            player.SendMessage(MessageType.None, $"Use: {{{Global.MAIN_COLOR}}}{command.HelpText}");
-                            return;
+                            player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.TAXI_NUMBER)} diz: Nossos taxistas em serviço foram avisados e você receberá um SMS de confirmação.", Global.CELLPHONE_MAIN_COLOR);
+                            player.AguardandoTipoServico = CharacterJob.TaxiDriver;
+                            player.AreaNameType = 3;
+                            player.AreaNameJSON = message;
+                            player.Emit("SetAreaName");
+                        }
+                        else if (player.CellphoneCall.Numero == Global.MECHANIC_NUMBER)
+                        {
+                            player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.MECHANIC_NUMBER)} diz: Nossos mecânicos em serviço foram avisados e você receberá um SMS de confirmação.", Global.CELLPHONE_MAIN_COLOR);
+                            player.AguardandoTipoServico = CharacterJob.Mechanic;
+                            player.AreaNameType = 4;
+                            player.AreaNameJSON = message;
+                            player.Emit("SetAreaName");
+                        }
+                        else
+                        {
+                            var target = Global.Players.FirstOrDefault(x => x.CellphoneCall.Numero == player.Cellphone);
+                            target?.SendMessage(MessageType.None, $"[CELULAR] {target.ObterNomeContato(player.Cellphone)} diz: {message}", Global.CELLPHONE_MAIN_COLOR);
                         }
 
-                        method.Invoke(obj, arr.ToArray());
+                        return;
                     }
-                    catch (Exception ex)
+
+                    if (player.IsInVehicle && player.Seat <= 4 && !player.OnAdminDuty)
                     {
-                        Functions.GetException(ex);
-                        player.SendMessage(MessageType.Error, "Não foi possível interpretar o comando.");
+                        var veh = (MyVehicle)player.Vehicle;
+                        if (veh.TemJanelas)
+                        {
+                            if (!veh.IsWindowOpened(0) && !veh.IsWindowOpened(1) && !veh.IsWindowOpened(2) && !veh.IsWindowOpened(3))
+                            {
+                                foreach (var target in Global.Players.Where(x => x.Vehicle == veh))
+                                    target.SendMessage(MessageType.None, $"{player.ICName} diz [veículo]: {message}");
+                                return;
+                            }
+                        }
                     }
-                }).Start();
+
+                    player.SendMessageToNearbyPlayers(message,
+                    player.OnAdminDuty ? MessageCategory.ChatOOC : MessageCategory.ChatICNormal,
+                    player.Dimension > 0 ? 7.5f : 10.0f);
+
+                    return;
+                }
+
+                var split = message.Split(" ");
+                var cmd = split[0].Replace("/", string.Empty).Trim().ToLower();
+                var method = Global.Commands.FirstOrDefault(x => x.GetCustomAttribute<CommandAttribute>().Command.ToLower() == cmd
+                || (x.GetCustomAttribute<CommandAttribute>().Aliases?.Any(y => y.ToLower() == cmd) ?? false));
+                if (method == null)
+                {
+                    player.SendMessage(MessageType.None, $"O comando {{{Global.MAIN_COLOR}}}{message}{{#FFFFFF}} não existe. Pressione {{{Global.MAIN_COLOR}}}F1{{#FFFFFF}} para visualizar os comandos disponíveis.");
+                    return;
+                }
+
+                var methodParams = method.GetParameters();
+                var obj = Activator.CreateInstance(method.DeclaringType);
+                var command = method.GetCustomAttribute<CommandAttribute>();
+
+                var arr = new List<object>();
+
+                var list = methodParams.ToList();
+                foreach (var x in list)
+                {
+                    var index = list.IndexOf(x);
+                    if (index == 0)
+                    {
+                        arr.Add(player);
+                    }
+                    else
+                    {
+                        if (split.Length <= index)
+                            break;
+
+                        var p = split[index];
+
+                        if (x.ParameterType == typeof(int))
+                        {
+                            if (!int.TryParse(p, out int val))
+                                break;
+
+                            if (val == 0 && p != "0")
+                                break;
+
+                            arr.Add(val);
+                        }
+                        else if (x.ParameterType == typeof(string))
+                        {
+                            if (string.IsNullOrWhiteSpace(p))
+                                break;
+
+                            if (command.GreedyArg && index + 1 == list.Count)
+                                p = string.Join(" ", split.Skip(index).Take(split.Length - index));
+
+                            arr.Add(p);
+                        }
+                        else if (x.ParameterType == typeof(float))
+                        {
+                            if (!float.TryParse(p, out float val))
+                                break;
+
+                            if (val == 0 && p != "0")
+                                break;
+
+                            arr.Add(val);
+                        }
+                        else if (x.ParameterType == typeof(byte))
+                        {
+                            if (!byte.TryParse(p, out byte val))
+                                break;
+
+                            if (val == 0 && p != "0")
+                                break;
+
+                            arr.Add(val);
+                        }
+                        else if (x.ParameterType == typeof(uint))
+                        {
+                            if (!uint.TryParse(p, out uint val))
+                                break;
+
+                            if (val == 0 && p != "0")
+                                break;
+
+                            arr.Add(val);
+                        }
+                    }
+                }
+
+                if (methodParams.Length != arr.Count)
+                {
+                    player.SendMessage(MessageType.None, $"Use: {{{Global.MAIN_COLOR}}}{command.HelpText}");
+                    return;
+                }
+
+                method.Invoke(obj, arr.ToArray());
             }
             catch (Exception ex)
             {
                 Functions.GetException(ex);
+                player.SendMessage(MessageType.Error, "Não foi possível interpretar o comando.");
             }
         }
 
@@ -615,26 +585,16 @@ namespace Roleplay.Scripts
         [ClientEvent(nameof(AtualizarInformacoes))]
         public void AtualizarInformacoes(MyPlayer player, bool isGameFocused)
         {
-            try
+            var hasData = player.HasSyncedMetaData("GameUnfocused");
+            if (isGameFocused)
             {
-                new Thread(() =>
-                {
-                    var hasData = player.HasSyncedMetaData("GameUnfocused");
-                    if (isGameFocused)
-                    {
-                        if (hasData)
-                            player.DeleteSyncedMetaData("GameUnfocused");
-                    }
-                    else
-                    {
-                        if (!hasData)
-                            player.SetSyncedMetaData("GameUnfocused", DateTime.Now.ToString());
-                    }
-                }).Start();
+                if (hasData)
+                    player.DeleteSyncedMetaData("GameUnfocused");
             }
-            catch (Exception ex)
+            else
             {
-                Functions.GetException(ex);
+                if (!hasData)
+                    player.SetSyncedMetaData("GameUnfocused", DateTime.Now.ToString());
             }
         }
 
@@ -1433,48 +1393,45 @@ namespace Roleplay.Scripts
             await player.SetarRoupas();
         }
 
-        [ClientEvent(nameof(UpdateWeaponAmmo))]
-        public static void UpdateWeaponAmmo(MyPlayer player, uint weapon, int ammo)
+        [AsyncClientEvent(nameof(UpdateWeaponAmmo))]
+        public static async Task UpdateWeaponAmmo(MyPlayer player, uint weapon, int ammo)
         {
             try
             {
-                new Thread(async () =>
+                var weap = (WeaponModel)weapon;
+
+                var item = player.Items.FirstOrDefault(x => x.Slot < 0 && x.Category == ItemCategory.Weapon && x.Type == weapon);
+                if (item == null)
                 {
-                    var weap = (WeaponModel)weapon;
+                    await Functions.SendStaffMessage($"{player.Character.Name} tem a arma {weap} para {ammo} sem um item no inventário.", true, true);
+                    await player.GravarLog(LogType.Hack, $"Arma sem item no inventário | {weap} | {ammo}", null);
+                    return;
+                }
 
-                    var item = player.Items.FirstOrDefault(x => x.Slot < 0 && x.Category == ItemCategory.Weapon && x.Type == weapon);
-                    if (item == null)
+                if (ammo == 0)
+                {
+                    if (weap == WeaponModel.Grenade || weap == WeaponModel.BZGas
+                        || weap == WeaponModel.MolotovCocktail || weap == WeaponModel.StickyBomb
+                        || weap == WeaponModel.ProximityMines || weap == WeaponModel.Snowballs
+                        || weap == WeaponModel.PipeBombs || weap == WeaponModel.Baseball
+                        || weap == WeaponModel.TearGas || weap == WeaponModel.Flare
+                        || weap == WeaponModel.JerryCan)
                     {
-                        await Functions.SendStaffMessage($"{player.Character.Name} tem a arma {weap} para {ammo} sem um item no inventário.", true, true);
-                        await player.GravarLog(LogType.Hack, $"Arma sem item no inventário | {weap} | {ammo}", null);
+                        await player.RemoveItem(item);
                         return;
                     }
+                }
 
-                    if (ammo == 0)
-                    {
-                        if (weap == WeaponModel.Grenade || weap == WeaponModel.BZGas
-                            || weap == WeaponModel.MolotovCocktail || weap == WeaponModel.StickyBomb
-                            || weap == WeaponModel.ProximityMines || weap == WeaponModel.Snowballs
-                            || weap == WeaponModel.PipeBombs || weap == WeaponModel.Baseball
-                            || weap == WeaponModel.TearGas || weap == WeaponModel.Flare
-                            || weap == WeaponModel.JerryCan)
-                        {
-                            await player.RemoveItem(item);
-                            return;
-                        }
-                    }
+                var extra = JsonSerializer.Deserialize<WeaponItem>(item.Extra);
 
-                    var extra = JsonSerializer.Deserialize<WeaponItem>(item.Extra);
+                if (ammo > extra.Ammo)
+                {
+                    _ = player.GravarLog(LogType.Hack, $"{JsonSerializer.Serialize(item)} | {ammo}", null);
+                    return;
+                }
 
-                    if (ammo > extra.Ammo)
-                    {
-                        _ = player.GravarLog(LogType.Hack, $"{JsonSerializer.Serialize(item)} | {ammo}", null);
-                        return;
-                    }
-
-                    extra.Ammo = ammo;
-                    item.Extra = JsonSerializer.Serialize(extra);
-                }).Start();
+                extra.Ammo = ammo;
+                item.Extra = JsonSerializer.Serialize(extra);
             }
             catch (Exception ex)
             {
@@ -1717,14 +1674,13 @@ namespace Roleplay.Scripts
             if (item == null)
                 return;
 
-            if (item.AudioSpot == null)
-                item.AudioSpot = new AudioSpot
-                {
-                    Position = new Vector3(item.PosX, item.PosY, item.PosZ),
-                    MaxRange = item.Type,
-                    Dimension = item.Dimension,
-                    FixVolume = item.Type > Global.BOOMBOX_DEFAULT_DISTANCE,
-                };
+            item.AudioSpot ??= new AudioSpot
+            {
+                Position = new Vector3(item.PosX, item.PosY, item.PosZ),
+                MaxRange = item.Type,
+                Dimension = item.Dimension,
+                FixVolume = item.Type > Global.BOOMBOX_DEFAULT_DISTANCE,
+            };
 
             if (item.AudioSpot.Source != url)
                 item.AudioSpot.RemoveAllClients();
