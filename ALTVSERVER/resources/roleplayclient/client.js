@@ -894,11 +894,10 @@ alt.onServer('Server:SpawnarVeiculos', (titulo, veiculos) => {
 
 let objetoEmMaos = null;
 alt.onServer('Server:PegarSacoLixo', () => {
-    if (objetoEmMaos != null) 
-        native.deleteObject(objetoEmMaos);
+    objetoEmMaos?.destroy();
 
-    objetoEmMaos = native.createObjectNoOffset(alt.hash('ng_proc_binbag_01a'), player.pos.x, player.pos.y, player.pos.z, true, true, true);
-    native.attachEntityToEntity(objetoEmMaos, player.scriptID, native.getPedBoneIndex(player.scriptID, 0xdead), 0.0, -0.1, -0.4, 0.0, 0.0, 0.0, true, false, false, false, 0, false);
+    objetoEmMaos = new alt.Object('ng_proc_binbag_01a', player.pos, alt.Vector3.zero, false, true);
+    objetoEmMaos.attachToEntity(player, native.getPedBoneIndex(player, 0xdead), new alt.Vector3(0.0, -0.1, -0.4), alt.Vector3.zero, false, false, false);
 });
 
 alt.onServer('Server:VerificarSoltarSacoLixo', (veh) => {
@@ -908,8 +907,8 @@ alt.onServer('Server:VerificarSoltarSacoLixo', (veh) => {
 });
 
 alt.onServer('Server:SoltarSacoLixo', () => {
-    if (objetoEmMaos != null) 
-        native.deleteObject(objetoEmMaos);
+    objetoEmMaos?.destroy();
+    objetoEmMaos = null;
 });
 
 alt.onServer('Server:AbrirPainelControleUsuario', (htmlComandos, htmlMinhasInformacoes, htmlConfiguracoes) => {
