@@ -1559,6 +1559,9 @@ namespace Roleplay.Factories
             await using var context = new DatabaseContext();
             foreach (var item in items.ToList())
             {
+                if (item.Quantity <= 0)
+                    continue;
+
                 if (item.IsStack)
                 {
                     var it = Items.FirstOrDefault(x => x.Category == item.Category);
