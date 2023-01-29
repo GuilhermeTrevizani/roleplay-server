@@ -796,7 +796,7 @@ namespace Roleplay.Commands
                 combustivelNecessario = combustivel;
 
             veh.Vehicle.Fuel += combustivelNecessario;
-            veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
 
             combustivel -= combustivelNecessario;
             if (combustivel == 0)
@@ -1186,7 +1186,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            attachedVehicle.SetSyncedMetaData("Attached", true);
+            attachedVehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_ATTACHED, true);
             attachedVehicle.Position = attachedVehicle.Position;
             attachedVehicle.AttachToEntity(veh, 0, 0, new Position(0, -10.5f, 4.5f), new Rotation(0, 0, 0), true, false);
             player.SendMessage(MessageType.Success, $"Você rebocou o veículo {id}.");

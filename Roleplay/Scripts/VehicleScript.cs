@@ -63,7 +63,7 @@ namespace Roleplay.Scripts
                 player.Emit("Spotlight:Toggle", vehicle.SpotlightActive);
 
             player.SetCanDoDriveBy(seat);
-            vehicle.SetSyncedMetaData("RadioEnabled", !vehicle.Vehicle.FactionId.HasValue);
+            vehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_RADIO_ENABLED, !vehicle.Vehicle.FactionId.HasValue);
 
             if (vehicle.EngineOn)
             {
@@ -256,7 +256,7 @@ namespace Roleplay.Scripts
                 Task.Run(async () =>
                 {
                     veh.Vehicle.Fuel = veh.Vehicle.MaxFuel;
-                    veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+                    veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
                     if (!veh.Vehicle.FactionId.HasValue)
                     {
                         await player.RemoveItem(new CharacterItem(ItemCategory.Money)

@@ -1,5 +1,6 @@
 import * as alt from 'alt-client'
 import { showCursor, toggleView } from '/helpers/cursor.js';
+import * as Constants from '/helpers/constants.js';
 
 let chatActive = false;
 let inputActive = false;
@@ -161,7 +162,7 @@ function shiftHistoryDown() {
 
 let audioSpots = [];
 alt.setInterval(() => {
-    const dimension = alt.Player.local.getSyncedMeta('dimension');
+    const dimension = alt.getLocalMeta(Constants.PLAYER_META_DATA_DIMENSION);
     for (const audioSpot of audioSpots) {
         let position = audioSpot.position;
         if (audioSpot.vehicleId) {

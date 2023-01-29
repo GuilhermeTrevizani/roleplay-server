@@ -36,9 +36,8 @@ namespace Roleplay.Scripts
                     (x.RegisterHardwareIdHash == hardwareIdHash && x.RegisterHardwareIdExHash == hardwareIdExHash)
                     ||
                     (x.LastAccessHardwareIdHash == hardwareIdHash && x.LastAccessHardwareIdExHash == hardwareIdExHash)))?.Name ?? string.Empty;
-                player.SetSyncedMetaData("usuario", user);
 
-                player.Emit("Server:Login");
+                player.Emit("Server:Login", user);
                 Alt.Log($"OnPlayerConnect | {player.Id} | {player.Name} | {player.Ip} | {user}");
             }
             catch (Exception ex)
@@ -94,7 +93,7 @@ namespace Roleplay.Scripts
                     {
                         playerTarget.SendMessage(MessageType.Error, Global.MENSAGEM_PK);
                         playerTarget.Character.Wound = CharacterWound.PK;
-                        playerTarget.SetSyncedMetaData("ferido", (int)playerTarget.Character.Wound);
+                        playerTarget.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)playerTarget.Character.Wound);
                     }
 
                     hasDamage = false;
@@ -147,7 +146,7 @@ namespace Roleplay.Scripts
                 {
                     player.SendMessage(MessageType.Error, Global.MENSAGEM_PK);
                     player.Character.Wound = CharacterWound.PK;
-                    player.SetSyncedMetaData("ferido", (int)player.Character.Wound);
+                    player.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)player.Character.Wound);
                 }
 
                 var ferimento = new MyPlayer.Ferimento
@@ -585,16 +584,16 @@ namespace Roleplay.Scripts
         [ClientEvent(nameof(AtualizarInformacoes))]
         public void AtualizarInformacoes(MyPlayer player, bool isGameFocused)
         {
-            var hasData = player.HasSyncedMetaData("GameUnfocused");
+            var hasData = player.HasStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED);
             if (isGameFocused)
             {
                 if (hasData)
-                    player.DeleteSyncedMetaData("GameUnfocused");
+                    player.DeleteStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED);
             }
             else
             {
                 if (!hasData)
-                    player.SetSyncedMetaData("GameUnfocused", DateTime.Now.ToString());
+                    player.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED, DateTime.Now.ToString());
             }
         }
 
@@ -746,7 +745,7 @@ namespace Roleplay.Scripts
         }
 
         [ClientEvent(nameof(Chatting))]
-        public void Chatting(MyPlayer player, bool chatting) => player.SetSyncedMetaData("chatting", chatting);
+        public void Chatting(MyPlayer player, bool chatting) => player.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_CHATTING, chatting);
 
         [ClientEvent(nameof(SoltarSacoLixo))]
         public void SoltarSacoLixo(MyPlayer player, float x, float y, float z)

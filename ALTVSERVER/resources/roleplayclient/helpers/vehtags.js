@@ -1,5 +1,6 @@
 import alt from 'alt-client';
 import * as native from 'natives';
+import * as Constants from '/helpers/constants.js';
 
 let drawDistance = 10;
 let interval;
@@ -29,15 +30,15 @@ async function drawVehciletags() {
 }
 
 async function drawVehicleNametag(vehicle) {
-    const placa = vehicle.getSyncedMeta('placa');
+    const placa = vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_PLATE);
     if (!placa) 
         return;
 
-    const id = vehicle.getSyncedMeta('id');
+    const id = vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_ID);
     if (!id) 
         return;
 
-    const modelo = vehicle.getSyncedMeta('modelo');
+    const modelo = vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_MODEL);
     if (!modelo) 
         return;
 

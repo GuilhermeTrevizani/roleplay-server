@@ -20,6 +20,7 @@ import * as factionSystem from '/faction/client.mjs';
 import * as tattoos from '/tattoos/editor.js';
 import * as inventorySystem from '/inventory/client.mjs';
 import * as tuningSystem from '/tuning/client.mjs';
+import * as Constants from '/helpers/constants.js';
 
 const WeaponModel = {
     AntiqueCavalryDagger: 2460120199,
@@ -209,7 +210,7 @@ function setWeaponDamageModifier() {
 }
 
 alt.setInterval(() => {
-    if (!player.hasSyncedMeta('nametag')) 
+    if (!player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG)) 
         return;
 
     playersCount = alt.Player.all.length;
@@ -237,7 +238,7 @@ alt.setInterval(() => {
 }, 1000);
 
 alt.everyTick(() => {
-    if (!player.hasSyncedMeta('nametag')) 
+    if (!player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG)) 
         return;
 
     drawText2d(`~s~Segunda Vida ~w~Roleplay`, 1, 0.90, 0.5, 4, 174, 106, 178, 180, true, true, 2, false);
@@ -261,14 +262,14 @@ alt.everyTick(() => {
     native.setPedSuffersCriticalHits(player, false);
 
     if (player.vehicle) {
-        if (player.vehicle.hasSyncedMeta('Attached')) {
+        if (player.vehicle.hasStreamSyncedMeta(Constants.VEHICLE_META_DATA_ATTACHED)) {
             native.disableControlAction(0, 71, true); // INPUT_VEH_ACCELERATE
             native.disableControlAction(0, 72, true); // INPUT_VEH_BRAKE
         }
         
         native.setPedHelmet(player, false);
 
-        native.setVehicleRadioEnabled(player.vehicle, player.vehicle.getSyncedMeta('RadioEnabled'));
+        native.setVehicleRadioEnabled(player.vehicle, player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_RADIO_ENABLED));
 
         if (isDriver()) {
             // Desabilitar X em motos
@@ -345,7 +346,7 @@ alt.everyTick(() => {
         }
 
         if (isDriver()) {
-            drawText2d(player.vehicle.getSyncedMeta('combustivel'), 0.15, 0.905, 0.4, 4, 255, 255, 255, 230, true, true, 1);
+            drawText2d(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL), 0.15, 0.905, 0.4, 4, 255, 255, 255, 230, true, true, 1);
             drawText2d(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`, 
                 0.15, 0.925,
                 0.4, 4, 
@@ -448,8 +449,10 @@ const functionsKeyDown = {
 alt.on('keydown', (key) => {
     const func = functionsKeyDown[key];
     if (func) {
-        if (!player.hasSyncedMeta('nametag') || player.getSyncedMeta('chatting') || alt.isMenuOpen() || view != null 
-        || isCellphoneOpened || playersViewLoading || (!alt.gameControlsEnabled() && key != 46)) 
+        if (!player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG) || player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_CHATTING) 
+        || alt.isMenuOpen() || view != null 
+        || isCellphoneOpened || playersViewLoading 
+        || (!alt.gameControlsEnabled() && key != 46)) 
             return;
 
         func();
@@ -458,7 +461,7 @@ alt.on('keydown', (key) => {
 
 let crouch = false;
 function toggleCrouch() {
-    if (player.vehicle || player.getSyncedMeta('ferido') != 0) 
+    if (player.vehicle || player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED) != 0) 
         return;
 
     alt.Utils.requestAnimSet('move_ped_crouched').then(() => {
@@ -571,7 +574,12 @@ function disableHud() {
     player.setMeta('f7', false);
 }
 
-alt.onServer('Server:Login', serverLogin);
+let loginUser;
+alt.onServer('Server:Login', (user) => {
+    loginUser = user;
+    serverLogin();
+});
+
 function serverLogin() {
     disableHud();
 
@@ -582,7 +590,7 @@ function serverLogin() {
 
     setView(new alt.WebView('http://resource/login/login.html'));
     view.on('load', () => {
-        view.emit('showHTML', player.getSyncedMeta('usuario'));
+        view.emit('showHTML', loginUser);
     });
     view.on('entrarUsuario', (usuario, senha) => {
         alt.emitServer('EntrarUsuario', usuario, senha);

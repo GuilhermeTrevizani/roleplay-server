@@ -1,5 +1,6 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
+import * as Constants from '/helpers/constants.js';
 
 const player = alt.Player.local;
 const timeout = 7000;
@@ -11,7 +12,7 @@ export async function enterVehicleAsDriver() {
     if (player.getMeta('animation_freeze'))
         return;
     
-    if (player.getSyncedMeta('ferido') != 0) 
+    if (player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED) != 0) 
         return;
 
     let vehicle;
@@ -45,7 +46,7 @@ export async function enterVehicleAsPassenger() {
     if (player.getMeta('animation_freeze'))
         return;
     
-    if (player.getSyncedMeta('ferido') != 0) 
+    if (player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED) != 0) 
         return;
     
     let vehicle;

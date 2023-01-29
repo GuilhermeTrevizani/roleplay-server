@@ -187,12 +187,12 @@ namespace Roleplay.Entities
             veh.NumberplateText = veh.Vehicle.Plate;
             veh.LockState = VehicleLockState.Locked;
             veh.Livery = veh.Vehicle.Livery;
-            veh.SetSyncedMetaData("id", veh.Vehicle.Id);
-            veh.SetSyncedMetaData("placa", veh.Vehicle.Plate);
-            veh.SetSyncedMetaData("modelo", veh.Vehicle.Model.ToUpper());
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_ID, veh.Vehicle.Id);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_PLATE, veh.Vehicle.Plate);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_MODEL, veh.Vehicle.Model.ToUpper());
 
             if (veh.TemTanqueCombustivel)
-                veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+                veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
 
             veh.SetDefaultMods();
 
@@ -272,7 +272,7 @@ namespace Roleplay.Entities
                     if (veh.EngineOn && veh.Vehicle.Fuel > 0 && veh.TemTanqueCombustivel)
                     {
                         veh.Vehicle.Fuel--;
-                        veh.SetSyncedMetaData("combustivel", veh.CombustivelHUD);
+                        veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
                         if (veh.Vehicle.Fuel == 0)
                             veh.EngineOn = false;
                     }

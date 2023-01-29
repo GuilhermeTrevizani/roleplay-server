@@ -1,6 +1,7 @@
 ﻿using AltV.Net;
 using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
@@ -379,7 +380,7 @@ namespace Roleplay.Factories
         public void SetPosition(Position position, int dimension, bool spawn)
         {
             Dimension = dimension;
-            SetSyncedMetaData("dimension", Dimension);
+            this.SetLocalMetaData(Constants.PLAYER_META_DATA_DIMENSION, Dimension);
             if (spawn)
                 Spawn(position, 0);
             else
@@ -429,7 +430,7 @@ namespace Roleplay.Factories
             }
 
             Character.Wound = CharacterWound.Nenhum;
-            SetSyncedMetaData("ferido", 0);
+            SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, 0);
 
             if (!OnAdminDuty)
                 Invincible = false;
@@ -484,7 +485,7 @@ namespace Roleplay.Factories
             SetNametag();
             Emit("nametags:Config", true);
             ConfigurarChat();
-            SetSyncedMetaData("ferido", 0);
+            SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, 0);
             Invincible = false;
             Frozen = false;
             SetPosition(new Position(Character.PosX, Character.PosY, Character.PosZ), Character.Dimension, true);
@@ -597,7 +598,7 @@ namespace Roleplay.Factories
             {
                 Character.Wound = CharacterWound.GravementeFeridoInvencivel;
                 StopAnimation();
-                SetSyncedMetaData("ferido", (int)Character.Wound);
+                SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)Character.Wound);
                 SendMessage(MessageType.Error, "Você foi gravemente ferido. Você deverá ser socorrido em até 5 minutos ou você sofrerá um PK.");
 
                 CancellationTokenSourceSetarFerido = new CancellationTokenSource();
@@ -613,11 +614,11 @@ namespace Roleplay.Factories
             else
             {
                 StopAnimation();
-                SetSyncedMetaData("ferido", (int)Character.Wound);
+                SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)Character.Wound);
             }
         }
 
-        public void SetNametag() => SetSyncedMetaData("nametag",
+        public void SetNametag() => SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_NAMETAG,
             !SPECPosition.HasValue ? $"{(OnAdminDuty ? $"~q~{User?.Name}" : ICName)} [{SessionId}]" : string.Empty);
 
         public void ToggleGameControls(bool enabled) => Emit("Server:ToggleGameControls", enabled);
@@ -755,14 +756,14 @@ namespace Roleplay.Factories
                 CancellationTokenSourceTextAction?.Cancel();
                 CancellationTokenSourceTextAction = new CancellationTokenSource();
 
-                SetSyncedMetaData("TextAction", type == MessageCategory.Ame ? $"* {ICName} {message}" : $"* {message} (( {ICName} ))");
+                SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_TEXT_ACTION, type == MessageCategory.Ame ? $"* {ICName} {message}" : $"* {message} (( {ICName} ))");
 
                 Task.Delay(7000, CancellationTokenSourceTextAction.Token).ContinueWith(t =>
                 {
                     if (t.IsCanceled)
                         return;
 
-                    DeleteSyncedMetaData("TextAction");
+                    DeleteStreamSyncedMetaData(Constants.PLAYER_META_DATA_TEXT_ACTION);
                     CancellationTokenSourceTextAction = null;
                 });
             }
@@ -1050,8 +1051,8 @@ namespace Roleplay.Factories
 
                 if (!real)
                 {
-                    DeleteSyncedMetaData("nametag");
-                    DeleteSyncedMetaData("GameUnfocused");
+                    DeleteStreamSyncedMetaData(Constants.PLAYER_META_DATA_NAMETAG);
+                    DeleteStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED);
                     LimparChat();
                     ClearDrugEffect();
                     StopAnimation();
@@ -1097,9 +1098,9 @@ namespace Roleplay.Factories
         {
             var html = string.Empty;
 
-            if (HasSyncedMetaData("GameUnfocused"))
+            if (HasStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED))
             {
-                GetSyncedMetaData("GameUnfocused", out string dataStr);
+                GetStreamSyncedMetaData(Constants.PLAYER_META_DATA_GAME_UNFOCUSED, out string dataStr);
                 if (DateTime.TryParse(dataStr, out DateTime data))
                 {
                     var ts = DateTime.Now - data;
@@ -1638,14 +1639,14 @@ namespace Roleplay.Factories
             CancellationTokenSourceDamaged?.Cancel();
             CancellationTokenSourceDamaged = new CancellationTokenSource();
 
-            SetSyncedMetaData("Damaged", true);
+            SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_DAMAGED, true);
 
             Task.Delay(250, CancellationTokenSourceDamaged.Token).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     return;
 
-                SetSyncedMetaData("Damaged", false);
+                SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_DAMAGED, false);
                 CancellationTokenSourceDamaged = null;
             });
         }

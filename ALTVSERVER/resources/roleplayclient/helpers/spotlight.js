@@ -1,6 +1,7 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
 import { drawText2d } from '/helpers/text.js';
+import * as Constants from '/helpers/constants.js';
 
 const fov_max = 80.0;
 const fov_min = 10.0; // max zoom level (smaller fov is more zoom)
@@ -148,7 +149,7 @@ alt.everyTick(() => {
         if (vehicle != null) {
             const veh = alt.Vehicle.streamedIn.find(x => x.scriptID == vehicle);
             if (native.isSphereVisible(veh.pos.x, veh.pos.y, veh.pos.z, 0.0099999998))
-                drawText2d(`Modelo: ${veh.getSyncedMeta('modelo')}`, 0.5, 0.93, 0.55, 0, 255, 255, 255, 185);
+                drawText2d(`Modelo: ${veh.getStreamSyncedMeta(Constants.Constants.VEHICLE_META_DATA_MODEL)}`, 0.5, 0.93, 0.55, 0, 255, 255, 255, 185);
         }
 
         native.beginScaleformMovieMethod(scaleform, "SET_ALT_FOV_HEADING");
