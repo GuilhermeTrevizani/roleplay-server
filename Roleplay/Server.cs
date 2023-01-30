@@ -62,6 +62,9 @@ namespace Roleplay
             Global.CompanyAnnouncementDiscordChannel = config.Get("companyAnnouncementDiscordChannel").GetULong() ?? 0;
             Global.RolesStaffMessage = config.Get("rolesStaffMessage").GetList().Select(x => x.GetULong() ?? 0).ToList();
 
+            await using var context = new DatabaseContext();
+            await context.Database.MigrateAsync();
+
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             Global.Clothes1Male = JsonSerializer.Deserialize<List<ClotheAccessory>>(File.ReadAllText($"{Global.PATH_JSON_CLOTHES}clothes1male.json"),
                 jsonOptions);
@@ -191,7 +194,6 @@ namespace Roleplay
                 jsonOptions);
             Alt.Log($"Accessories7Female: {Global.Accessories7Female.Count}");
 
-            await using var context = new DatabaseContext();
             await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.HelpRequests)} SET {nameof(HelpRequest.AnswerDate)} = now() WHERE {nameof(HelpRequest.AnswerDate)} is null");
             Alt.Log("Cleaned Help Requests");
 
