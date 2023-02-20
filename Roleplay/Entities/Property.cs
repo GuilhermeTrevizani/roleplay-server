@@ -55,10 +55,10 @@ namespace Roleplay.Entities
         public DateTime? RobberyCooldown { get; set; }
 
         [JsonIgnore]
-        public ICollection<PropertyFurniture> Furnitures { get; set; }
+        public ICollection<PropertyFurniture> Furnitures { get; set; } = new List<PropertyFurniture>();
 
         [NotMapped, JsonIgnore]
-        public List<PropertyItem> Items { get; set; }
+        public List<PropertyItem> Items { get; set; } = new();
 
         [NotMapped, JsonIgnore]
         public Marker EntranceMarker { get; set; }
