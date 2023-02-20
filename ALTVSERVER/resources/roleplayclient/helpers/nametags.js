@@ -36,7 +36,7 @@ async function drawPlayerNametag(player) {
     if (player === alt.Player.local) 
         return;
 
-    let name = player.getStreamSyncedMetaData(Constants.PLAYER_META_DATA_NAMETAG);
+    let name = player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG);
     if (!name) 
         return;
 
@@ -47,8 +47,8 @@ async function drawPlayerNametag(player) {
     if (!native.hasEntityClearLosToEntity(alt.Player.local, player, 17))
         return;
 
-    name = `~${player.getStreamSyncedMetaData(Constants.PLAYER_META_DATA_DAMAGED) ? 'r' : 'w'}~${name}`;
-    const ferido = parseInt(player.getStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED));
+    name = `~${player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_DAMAGED) ? 'r' : 'w'}~${name}`;
+    const ferido = parseInt(player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED));
     if (ferido == 1 || ferido == 2)
         name = `(( Este jogador está gravemente ferido. ))\n${name}`;
     else if (ferido >= 3)
@@ -56,7 +56,7 @@ async function drawPlayerNametag(player) {
 
     if (player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_GAME_UNFOCUSED))
         name += `~r~*`;
-    else if (player.getStreamSyncedMetaData(Constants.PLAYER_META_DATA_CHATTING))
+    else if (player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_CHATTING))
         name += `~y~*`;
     else if (player.isTalking)
         name += `~b~*`;
@@ -78,7 +78,7 @@ async function drawPlayerNametag(player) {
         true
     );
     
-    const action = player.getStreamSyncedMetaData(Constants.PLAYER_META_DATA_TEXT_ACTION);
+    const action = player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_TEXT_ACTION);
     if (action) {
         pos.z += 0.15;
         alt.Utils.drawText3dThisFrame(
