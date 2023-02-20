@@ -22,7 +22,7 @@ Vue.component('tab-overlays', {
                     </div>
                 </div>
                 <div class="inputHolder">
-                    <input type="range" :min="opacityOverlays[i].min" :max="opacityOverlays[i].max" v-model.number="opacityOverlays[i].value" :step="opacityOverlays[i].increment" @input="e => handleChange(e, 'Value', i)" />
+                    <input type="range" :min="opacityOverlays[i].min" :max="opacityOverlays[i].max" v-model.number="data.info.OpacityOverlays[i].Value" :step="opacityOverlays[i].increment" @input="e => handleChange(e, 'Value', i)" />
                 </div>
                 <div class="labelContainer">
                     <div class="label">
@@ -33,7 +33,7 @@ Vue.component('tab-overlays', {
                     </div>
                 </div>
                 <div class="inputHolder">
-                    <input type="range" :min="0" :max="1" v-model.number="opacityOverlays[i].Opacity" :step="0.1" @input="e => handleChange(e, 'Opacity', i)" />
+                    <input type="range" :min="0" :max="1" v-model.number="data.info.OpacityOverlays[i].Opacity" :step="0.1" @input="e => handleChange(e, 'Opacity', i)" />
                 </div>
             </div>
         </div>
