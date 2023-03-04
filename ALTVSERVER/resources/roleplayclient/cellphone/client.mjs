@@ -98,7 +98,8 @@ function toggleView(show) {
 }
 
 export function updateCellphone() {
-	time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric"});
+	const date = new Date();
+	time = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
 	temp = alt.getSyncedMeta('Temperature');
 	weather = alt.getSyncedMeta('WeatherType');
 	updateData();
