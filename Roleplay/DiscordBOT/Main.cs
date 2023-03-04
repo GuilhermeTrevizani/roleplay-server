@@ -11,7 +11,7 @@ namespace Roleplay.DiscordBOT
 {
     public class Main
     {
-        public static async void MainAsync()
+        public static async Task MainAsync()
         {
             try
             {
@@ -23,6 +23,7 @@ namespace Roleplay.DiscordBOT
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
                 await Global.DiscordClient.LoginAsync(TokenType.Bot, Global.DiscordBotToken);
                 await Global.DiscordClient.StartAsync();
+                await Task.Delay(-1);
             }
             catch (Exception ex)
             {

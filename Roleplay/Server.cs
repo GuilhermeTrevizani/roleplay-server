@@ -330,7 +330,7 @@ namespace Roleplay
             MainTimer_Elapsed(null, null);
 
             if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken))
-                DiscordBOT.Main.MainAsync();
+                DiscordBOT.Main.MainAsync().GetAwaiter().GetResult();
 
             Alt.Log("Successfully loaded.");
         }
