@@ -184,14 +184,13 @@ namespace Roleplay.Commands.Faction
             var pos = player.Position;
             pos.Z -= player.IsInVehicle ? 0.45f : 0.95f;
 
-            player.RadarSpot = new Spot
+            player.RadarSpot = new()
             {
                 PosX = pos.X,
                 PosY = pos.Y,
                 PosZ = pos.Z,
+                Blip = Alt.CreateBlip(player, 4, pos)
             };
-
-            player.RadarSpot.Blip = Alt.CreateBlip(player, 4, pos);
             player.RadarSpot.Blip.Sprite = 225;
             player.RadarSpot.Blip.Name = "Radar";
             player.RadarSpot.Blip.Color = 59;
@@ -227,8 +226,8 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            player.RadarSpot?.ColShape?.Remove();
-            player.RadarSpot?.Blip?.Remove();
+            player.RadarSpot?.ColShape?.Destroy();
+            player.RadarSpot?.Blip?.Destroy();
             player.RadarSpot?.Marker?.Destroy();
             player.RadarSpot = null;
 

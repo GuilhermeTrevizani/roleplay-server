@@ -8,22 +8,22 @@
     ".NETCoreApp,Version=v7.0": {
       "Roleplay/1.0.0": {
         "dependencies": {
-          "AltV.Net": "13.0.19",
-          "AltV.Net.Async": "13.0.19",
-          "AltV.Net.EntitySync.ServerEvent": "13.0.19",
-          "Discord.Net.Commands": "3.9.0",
-          "Discord.Net.Core": "3.9.0",
-          "Discord.Net.WebSocket": "3.9.0",
-          "Microsoft.EntityFrameworkCore.Tools": "7.0.3",
+          "AltV.Net": "14.0.1",
+          "AltV.Net.Async": "14.0.1",
+          "AltV.Net.EntitySync.ServerEvent": "14.0.1",
+          "Discord.Net.Commands": "3.10.0",
+          "Discord.Net.Core": "3.10.0",
+          "Discord.Net.WebSocket": "3.10.0",
+          "Microsoft.EntityFrameworkCore.Tools": "7.0.4",
           "Pomelo.EntityFrameworkCore.MySql": "7.0.0"
         },
         "runtime": {
           "Roleplay.dll": {}
         }
       },
-      "AltV.Net/13.0.19": {
+      "AltV.Net/14.0.1": {
         "dependencies": {
-          "AltV.Net.Shared": "13.0.19"
+          "AltV.Net.Shared": "14.0.1"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.dll": {
@@ -32,9 +32,9 @@
           }
         }
       },
-      "AltV.Net.Async/13.0.19": {
+      "AltV.Net.Async/14.0.1": {
         "dependencies": {
-          "AltV.Net": "13.0.19",
+          "AltV.Net": "14.0.1",
           "System.Threading.Channels": "6.0.0"
         },
         "runtime": {
@@ -44,7 +44,7 @@
           }
         }
       },
-      "AltV.Net.CApi/13.0.19": {
+      "AltV.Net.CApi/14.0.1": {
         "runtime": {
           "lib/net6.0/AltV.Net.CApi.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -63,10 +63,10 @@
           }
         }
       },
-      "AltV.Net.EntitySync.ServerEvent/13.0.19": {
+      "AltV.Net.EntitySync.ServerEvent/14.0.1": {
         "dependencies": {
-          "AltV.Net": "13.0.19",
-          "AltV.Net.Async": "13.0.19",
+          "AltV.Net": "14.0.1",
+          "AltV.Net.Async": "14.0.1",
           "AltV.Net.EntitySync": "1.18.0",
           "System.Threading.Channels": "6.0.0"
         },
@@ -77,9 +77,9 @@
           }
         }
       },
-      "AltV.Net.Shared/13.0.19": {
+      "AltV.Net.Shared/14.0.1": {
         "dependencies": {
-          "AltV.Net.CApi": "13.0.19"
+          "AltV.Net.CApi": "14.0.1"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.Shared.dll": {
@@ -88,51 +88,51 @@
           }
         }
       },
-      "Discord.Net.Commands/3.9.0": {
+      "Discord.Net.Commands/3.10.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.9.0"
+          "Discord.Net.Core": "3.10.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Commands.dll": {
-            "assemblyVersion": "3.9.0.0",
-            "fileVersion": "3.9.0.0"
+            "assemblyVersion": "3.10.0.0",
+            "fileVersion": "3.10.0.0"
           }
         }
       },
-      "Discord.Net.Core/3.9.0": {
+      "Discord.Net.Core/3.10.0": {
         "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
+          "Newtonsoft.Json": "13.0.2",
           "System.Collections.Immutable": "5.0.0",
           "System.Interactive.Async": "5.0.0",
           "System.ValueTuple": "4.5.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Core.dll": {
-            "assemblyVersion": "3.9.0.0",
-            "fileVersion": "3.9.0.0"
+            "assemblyVersion": "3.10.0.0",
+            "fileVersion": "3.10.0.0"
           }
         }
       },
-      "Discord.Net.Rest/3.9.0": {
+      "Discord.Net.Rest/3.10.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.9.0"
+          "Discord.Net.Core": "3.10.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Rest.dll": {
-            "assemblyVersion": "3.9.0.0",
-            "fileVersion": "3.9.0.0"
+            "assemblyVersion": "3.10.0.0",
+            "fileVersion": "3.10.0.0"
           }
         }
       },
-      "Discord.Net.WebSocket/3.9.0": {
+      "Discord.Net.WebSocket/3.10.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.9.0",
-          "Discord.Net.Rest": "3.9.0"
+          "Discord.Net.Core": "3.10.0",
+          "Discord.Net.Rest": "3.10.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.WebSocket.dll": {
-            "assemblyVersion": "3.9.0.0",
-            "fileVersion": "3.9.0.0"
+            "assemblyVersion": "3.10.0.0",
+            "fileVersion": "3.10.0.0"
           }
         }
       },
@@ -144,59 +144,59 @@
           }
         }
       },
-      "Microsoft.EntityFrameworkCore/7.0.3": {
+      "Microsoft.EntityFrameworkCore/7.0.4": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "7.0.3",
-          "Microsoft.EntityFrameworkCore.Analyzers": "7.0.3",
+          "Microsoft.EntityFrameworkCore.Abstractions": "7.0.4",
+          "Microsoft.EntityFrameworkCore.Analyzers": "7.0.4",
           "Microsoft.Extensions.Caching.Memory": "7.0.0",
           "Microsoft.Extensions.DependencyInjection": "7.0.0",
           "Microsoft.Extensions.Logging": "7.0.0"
         },
         "runtime": {
           "lib/net6.0/Microsoft.EntityFrameworkCore.dll": {
-            "assemblyVersion": "7.0.3.0",
-            "fileVersion": "7.0.323.6302"
+            "assemblyVersion": "7.0.4.0",
+            "fileVersion": "7.0.423.11504"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Abstractions/7.0.3": {
+      "Microsoft.EntityFrameworkCore.Abstractions/7.0.4": {
         "runtime": {
           "lib/net6.0/Microsoft.EntityFrameworkCore.Abstractions.dll": {
-            "assemblyVersion": "7.0.3.0",
-            "fileVersion": "7.0.323.6302"
+            "assemblyVersion": "7.0.4.0",
+            "fileVersion": "7.0.423.11504"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Analyzers/7.0.3": {},
-      "Microsoft.EntityFrameworkCore.Design/7.0.3": {
+      "Microsoft.EntityFrameworkCore.Analyzers/7.0.4": {},
+      "Microsoft.EntityFrameworkCore.Design/7.0.4": {
         "dependencies": {
           "Humanizer.Core": "2.14.1",
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.3",
+          "Microsoft.EntityFrameworkCore.Relational": "7.0.4",
           "Microsoft.Extensions.DependencyModel": "7.0.0",
           "Mono.TextTemplating": "2.2.1"
         },
         "runtime": {
           "lib/net6.0/Microsoft.EntityFrameworkCore.Design.dll": {
-            "assemblyVersion": "7.0.3.0",
-            "fileVersion": "7.0.323.6302"
+            "assemblyVersion": "7.0.4.0",
+            "fileVersion": "7.0.423.11504"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Relational/7.0.3": {
+      "Microsoft.EntityFrameworkCore.Relational/7.0.4": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "7.0.3",
+          "Microsoft.EntityFrameworkCore": "7.0.4",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0"
         },
         "runtime": {
           "lib/net6.0/Microsoft.EntityFrameworkCore.Relational.dll": {
-            "assemblyVersion": "7.0.3.0",
-            "fileVersion": "7.0.323.6302"
+            "assemblyVersion": "7.0.4.0",
+            "fileVersion": "7.0.423.11504"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Tools/7.0.3": {
+      "Microsoft.EntityFrameworkCore.Tools/7.0.4": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Design": "7.0.3"
+          "Microsoft.EntityFrameworkCore.Design": "7.0.4"
         }
       },
       "Microsoft.Extensions.Caching.Abstractions/7.0.0": {
@@ -328,17 +328,17 @@
           }
         }
       },
-      "Newtonsoft.Json/13.0.1": {
+      "Newtonsoft.Json/13.0.2": {
         "runtime": {
-          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
             "assemblyVersion": "13.0.0.0",
-            "fileVersion": "13.0.1.25517"
+            "fileVersion": "13.0.2.27524"
           }
         }
       },
       "Pomelo.EntityFrameworkCore.MySql/7.0.0": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "7.0.3",
+          "Microsoft.EntityFrameworkCore.Relational": "7.0.4",
           "MySqlConnector": "2.2.5"
         },
         "runtime": {
@@ -392,26 +392,26 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AltV.Net/13.0.19": {
+    "AltV.Net/14.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-wXrG8leod/w3iNVifkTGWTUvMzlv9AnpjO8y2am3IMVPMFVXBhC0YgToQvlZYETomS+mVmkTGC8Z+vYhrolSGQ==",
-      "path": "altv.net/13.0.19",
-      "hashPath": "altv.net.13.0.19.nupkg.sha512"
+      "sha512": "sha512-vbiMEd5BR4VFiZEI9a8vZG6Qe0TOYdrHp5yf6y0bfHEzIM1NOUo5+6Ct6QeEGd0fVjpmXZoQhnq7N2Xn3qHkMA==",
+      "path": "altv.net/14.0.1",
+      "hashPath": "altv.net.14.0.1.nupkg.sha512"
     },
-    "AltV.Net.Async/13.0.19": {
+    "AltV.Net.Async/14.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pu4+s6R35/SRriMBCr3y/AKPYMZ07XeW7qcqLFBDdqY/iVN6WtF1BbJdR3Cb4rH/4G2wWSAcqylAIimO7gw1xA==",
-      "path": "altv.net.async/13.0.19",
-      "hashPath": "altv.net.async.13.0.19.nupkg.sha512"
+      "sha512": "sha512-c52kwoJJIeaFhIMbK9DOBWOY9cLIYUp6nS/aBrYNJtPrmjU15y8iZhqCRHsbnX1zzCMb+edN6/43FuTX7oTUnQ==",
+      "path": "altv.net.async/14.0.1",
+      "hashPath": "altv.net.async.14.0.1.nupkg.sha512"
     },
-    "AltV.Net.CApi/13.0.19": {
+    "AltV.Net.CApi/14.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-zt95CrjlA3WuX2+YB+77P7UVQBb3FtE+Vs3q+pvdVM40L9CzOzRPWZon9xV5J6yCQ83Yp2zTGB8I6SHAFrAfqg==",
-      "path": "altv.net.capi/13.0.19",
-      "hashPath": "altv.net.capi.13.0.19.nupkg.sha512"
+      "sha512": "sha512-ewb73wVC1BFn+A58cq1i1ksXSOnxj3oFD0/FM/+Ba8AHW1IugceJV1DA9/K4V74xB7k//T3vIiLTDeapTH85pw==",
+      "path": "altv.net.capi/14.0.1",
+      "hashPath": "altv.net.capi.14.0.1.nupkg.sha512"
     },
     "AltV.Net.EntitySync/1.18.0": {
       "type": "package",
@@ -420,47 +420,47 @@
       "path": "altv.net.entitysync/1.18.0",
       "hashPath": "altv.net.entitysync.1.18.0.nupkg.sha512"
     },
-    "AltV.Net.EntitySync.ServerEvent/13.0.19": {
+    "AltV.Net.EntitySync.ServerEvent/14.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LL0tlDOMkjrmUXy2eS7gxDqIxkOVqGCYTJnwa5aQLnYF8dwfdvEreG7NuVGPr4XUP+exZ7ko9Z/mVOuqi6+kGg==",
-      "path": "altv.net.entitysync.serverevent/13.0.19",
-      "hashPath": "altv.net.entitysync.serverevent.13.0.19.nupkg.sha512"
+      "sha512": "sha512-abHlvxO5WB7iItk+1GnbCQBKpkzghdPi1QzqbAloOoaBYOlKie1yne0efOWnXsT5v+jucFNHlv9eoFRB1hizbw==",
+      "path": "altv.net.entitysync.serverevent/14.0.1",
+      "hashPath": "altv.net.entitysync.serverevent.14.0.1.nupkg.sha512"
     },
-    "AltV.Net.Shared/13.0.19": {
+    "AltV.Net.Shared/14.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-H3iXroTvmPvO23CwLjH9C7eqTzQM/TJCgQ1O8bkyEWJLbio6mik/d44ZxXxIx6W8AY8CbuzY9JmujrHFAY9b0w==",
-      "path": "altv.net.shared/13.0.19",
-      "hashPath": "altv.net.shared.13.0.19.nupkg.sha512"
+      "sha512": "sha512-ChuQj+itiYytkb5dl6fqmC9Bvgizo2pdV9ydEuLMEAXTKYaQM6jjgaZGI5PhY7pfCh4jqupCyHB1wJG9qyj/9Q==",
+      "path": "altv.net.shared/14.0.1",
+      "hashPath": "altv.net.shared.14.0.1.nupkg.sha512"
     },
-    "Discord.Net.Commands/3.9.0": {
+    "Discord.Net.Commands/3.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Zbv2XQ4jPa2/b7TKR32OqGpAo/H7ps43fgVi57M/IBwnI6oYEOHjGAbnlPD5Rx/gbD/Gmj+n+Q+yWeUQnxfojg==",
-      "path": "discord.net.commands/3.9.0",
-      "hashPath": "discord.net.commands.3.9.0.nupkg.sha512"
+      "sha512": "sha512-/DpV2H+PkOtypV6csIdp6NSqhxuDnyS25gcteaDpbwceMwCxmaveTiycUmPxbqgjKADzNx4qszoxShwQGoXalg==",
+      "path": "discord.net.commands/3.10.0",
+      "hashPath": "discord.net.commands.3.10.0.nupkg.sha512"
     },
-    "Discord.Net.Core/3.9.0": {
+    "Discord.Net.Core/3.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pO1V1yGBM5pYYWuUbSIUM/C6jQVG8cNmZnVMZxXto1NJq16Ldgvg3KgiS9GMLMF1o/Q7EenIFI6jFaDvIBg6Mw==",
-      "path": "discord.net.core/3.9.0",
-      "hashPath": "discord.net.core.3.9.0.nupkg.sha512"
+      "sha512": "sha512-GnsLmSYDShws23rqzdf6aOwIG70cqYUHY7i2cFdj3YVz/c8OelsbLndnFvkg6yELcy7aD60NSHyYZ5oMsgDavA==",
+      "path": "discord.net.core/3.10.0",
+      "hashPath": "discord.net.core.3.10.0.nupkg.sha512"
     },
-    "Discord.Net.Rest/3.9.0": {
+    "Discord.Net.Rest/3.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Rde+/TUmcy/vZGuHJQ0nQioMEg8hcLBvjry40/khSYnVvHw22IPNYxLEftej/onKseyjbtb1F+u4JSfQwszBKQ==",
-      "path": "discord.net.rest/3.9.0",
-      "hashPath": "discord.net.rest.3.9.0.nupkg.sha512"
+      "sha512": "sha512-N2nlOCoZCTyQbDlwqDKcqknOgwAbeJgy2r9DAUNsNxcO763ru67WK3GxkA7V7QgZ80RU9rLB3fr9jvjJ14pUBA==",
+      "path": "discord.net.rest/3.10.0",
+      "hashPath": "discord.net.rest.3.10.0.nupkg.sha512"
     },
-    "Discord.Net.WebSocket/3.9.0": {
+    "Discord.Net.WebSocket/3.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-iw8umoLyG3DiYU33qYkQNPbfUGWYkPTE2Cs2HBnSAQBn92HI8rJZijKNpJjXLNurf1pHFKAQOToLHydHu9QtFQ==",
-      "path": "discord.net.websocket/3.9.0",
-      "hashPath": "discord.net.websocket.3.9.0.nupkg.sha512"
+      "sha512": "sha512-pA581o5JoAAFlintQEeDncIr99WHZOWzwnZWLuPiSW4BmFjG/oYf8F6C60Ob/5w1C1QB0k72NLgh8mEwnTCI5Q==",
+      "path": "discord.net.websocket/3.10.0",
+      "hashPath": "discord.net.websocket.3.10.0.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -469,47 +469,47 @@
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore/7.0.3": {
+    "Microsoft.EntityFrameworkCore/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6XUI2YGoaLMoP9KGaqWmmd4B2n5bpQbXrVRpH20Et3YjQ0Rn3Ia6HM/ANcSq9rBfjfUySgo9SwUZgQ4m4PF3LQ==",
-      "path": "microsoft.entityframeworkcore/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.7.0.3.nupkg.sha512"
+      "sha512": "sha512-eNcsY3rft5ERJJcen80Jyg57EScjWZmvhwmFLYXmEOTdVqHG+wQZiMOXnO1b5RH3u2qTQq+Tpci7KGfLAG5Gtg==",
+      "path": "microsoft.entityframeworkcore/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.7.0.4.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Abstractions/7.0.3": {
+    "Microsoft.EntityFrameworkCore.Abstractions/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0NaFBZykUlQHknddRuKY4v+MFZX/AW+v2V85dgj7abIlt+kL3GWa7QNH5S1084VLf1u+dq1SnhZsOvykc3Y0sA==",
-      "path": "microsoft.entityframeworkcore.abstractions/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.abstractions.7.0.3.nupkg.sha512"
+      "sha512": "sha512-6GbYvs4L5oFpYpMzwF05kdDgvX09UmMX7MpDtDlGI5ymijFwquwv+yvdijbtodOuu0yLUpc4n71x6eBdJ8v1xQ==",
+      "path": "microsoft.entityframeworkcore.abstractions/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.abstractions.7.0.4.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Analyzers/7.0.3": {
+    "Microsoft.EntityFrameworkCore.Analyzers/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-CLyRWFLwaOUZNPEia/aBMzFxZqm/ITKt3B+yUFtrg4Ys5VF3n2gvneuItC9IhpeOcjfdSgu/yUKf8y/IsNHs5A==",
-      "path": "microsoft.entityframeworkcore.analyzers/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.analyzers.7.0.3.nupkg.sha512"
+      "sha512": "sha512-YRD4bViuaEPEsaBIL52DzXGzLCt3jYoE3wztYEW1QZYDl89hQ+ca0nvBO2mnMHmCXpU/2wlErrUyDp4x5B/3mg==",
+      "path": "microsoft.entityframeworkcore.analyzers/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.analyzers.7.0.4.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Design/7.0.3": {
+    "Microsoft.EntityFrameworkCore.Design/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Nv0Y2Zh8d919qKq8Q1bvbWQbFeb4JQ7jCuakajSVtip5JIwt4hTIWetVIapJ2vOQDDZuAHCzkjimMOlHH5LVsQ==",
-      "path": "microsoft.entityframeworkcore.design/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.design.7.0.3.nupkg.sha512"
+      "sha512": "sha512-LI/ML3w17ap5IUmEKOPVnGJYi/XSDJW3Rf42utNF0e1tidmKtSkjwoTqIKLt2hE+jQJrlzeaqu5YiqdoFWVuZw==",
+      "path": "microsoft.entityframeworkcore.design/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.design.7.0.4.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Relational/7.0.3": {
+    "Microsoft.EntityFrameworkCore.Relational/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-RxNNjtTrxsMtdBtgoXGRSy8uCXaBHaVzIonTeo7+Ys+N0yEWwhf2E74cxneyunMi13Ezlld10ecCHlDubEU/Pw==",
-      "path": "microsoft.entityframeworkcore.relational/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.relational.7.0.3.nupkg.sha512"
+      "sha512": "sha512-L41+VonK6L0IurFHopoe5yY+m3MD26OMocKLPPR/XKxnazzZUcGPz0IGJpVnwpZyKVPfEIAnD5vmm60meYr1NA==",
+      "path": "microsoft.entityframeworkcore.relational/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.relational.7.0.4.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Tools/7.0.3": {
+    "Microsoft.EntityFrameworkCore.Tools/7.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-yHFlYPZS3Jx7JMCQnGKfJzv95rJWVcmcUn/OW5cbCyWgQk81JJpTZ9Q6kkvwquYjFRfvYHBGuXNIYhAJokOBTQ==",
-      "path": "microsoft.entityframeworkcore.tools/7.0.3",
-      "hashPath": "microsoft.entityframeworkcore.tools.7.0.3.nupkg.sha512"
+      "sha512": "sha512-58hDB+ENGisuSjJBl1RBHL9qzFJTukFSQFl/wCU8/3ApcOH/rPrRG4PWThiJTmfHRmh8H8HExdYbtkv7wa7BLg==",
+      "path": "microsoft.entityframeworkcore.tools/7.0.4",
+      "hashPath": "microsoft.entityframeworkcore.tools.7.0.4.nupkg.sha512"
     },
     "Microsoft.Extensions.Caching.Abstractions/7.0.0": {
       "type": "package",
@@ -595,12 +595,12 @@
       "path": "mysqlconnector/2.2.5",
       "hashPath": "mysqlconnector.2.2.5.nupkg.sha512"
     },
-    "Newtonsoft.Json/13.0.1": {
+    "Newtonsoft.Json/13.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
-      "path": "newtonsoft.json/13.0.1",
-      "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
+      "sha512": "sha512-R2pZ3B0UjeyHShm9vG+Tu0EBb2lC8b0dFzV9gVn50ofHXh9Smjk6kTn7A/FdAsC8B5cKib1OnGYOXxRBz5XQDg==",
+      "path": "newtonsoft.json/13.0.2",
+      "hashPath": "newtonsoft.json.13.0.2.nupkg.sha512"
     },
     "Pomelo.EntityFrameworkCore.MySql/7.0.0": {
       "type": "package",

@@ -41,7 +41,7 @@ namespace Roleplay.Entities
 
         public void RemoveIdentifier()
         {
-            BlipAlt?.Remove();
+            BlipAlt?.Destroy();
             BlipAlt = null;
         }
     }

@@ -757,7 +757,7 @@ namespace Roleplay.Scripts
             }
 
             player.Emit("Server:SoltarSacoLixo");
-            player.CollectingSpot.Blip.Remove();
+            player.CollectingSpot.Blip.Destroy();
             player.CollectingSpot.Marker.Destroy();
             player.CollectSpots.Remove(player.CollectingSpot);
             player.CollectingSpot = new Spot();

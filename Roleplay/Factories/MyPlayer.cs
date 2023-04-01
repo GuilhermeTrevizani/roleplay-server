@@ -1006,8 +1006,8 @@ namespace Roleplay.Factories
 
                 LoginSession = FactionDutySession = AdminDutySession = new();
 
-                RadarSpot?.ColShape?.Remove();
-                RadarSpot?.Blip?.Remove();
+                RadarSpot?.ColShape?.Destroy();
+                RadarSpot?.Blip?.Destroy();
                 RadarSpot?.Marker?.Destroy();
 
                 CancellationTokenSourceAcao?.Cancel();
@@ -1027,7 +1027,7 @@ namespace Roleplay.Factories
 
                 foreach (var collectSpot in CollectSpots)
                 {
-                    collectSpot.Blip.Remove();
+                    collectSpot.Blip.Destroy();
                     collectSpot.Marker.Destroy();
                 }
 

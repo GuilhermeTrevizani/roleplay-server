@@ -285,7 +285,7 @@ namespace Roleplay.Factories
             context.Vehicles.Update(Vehicle);
             await context.SaveChangesAsync();
 
-            Remove();
+            Destroy();
 
             if (player != null)
                 await player.GravarLog(LogType.EstacionarVeiculo, Vehicle.Id.ToString(), null);
@@ -313,7 +313,7 @@ namespace Roleplay.Factories
 
             Timer?.Stop();
             StopAlarm();
-            Remove();
+            Destroy();
 
             Vehicle.PosX = pos.X;
             Vehicle.PosY = pos.Y;
@@ -377,8 +377,7 @@ namespace Roleplay.Factories
             if (Vehicle.ProtectionLevel >= 2)
             {
                 var target = Global.Players.FirstOrDefault(x => x.Character.Id == Vehicle.CharacterId && x.Cellphone > 0 && !x.CellphoneItem.ModoAviao);
-                if (target != null)
-                    target.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme do seu {Vehicle.Model.ToUpper()} {Vehicle.Plate.ToUpper()} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
+                target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme do seu {Vehicle.Model.ToUpper()} {Vehicle.Plate.ToUpper()} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
             }
 
             if (Vehicle.ProtectionLevel >= 3)

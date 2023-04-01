@@ -35,7 +35,7 @@ namespace Roleplay.Commands.Job
             player.Character.Job = CharacterJob.None;
             foreach (var collectSpot in player.CollectSpots)
             {
-                collectSpot.Blip.Remove();
+                collectSpot.Blip.Destroy();
                 collectSpot.Marker.Destroy();
             }
             player.CollectSpots = new List<Spot>();
@@ -193,7 +193,7 @@ namespace Roleplay.Commands.Job
                         var pontosColetados = 20 - player.CollectSpots.Count;
                         foreach (var collectSpot in player.CollectSpots)
                         {
-                            collectSpot.Blip.Remove();
+                            collectSpot.Blip.Destroy();
                             collectSpot.Marker.Destroy(); 
                         }
                         player.CollectSpots = new List<Spot>();

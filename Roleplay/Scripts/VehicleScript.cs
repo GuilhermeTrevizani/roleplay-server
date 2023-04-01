@@ -26,7 +26,7 @@ namespace Roleplay.Scripts
             if (vehicle.Model == (uint)VehicleModel.Thruster)
             {
                 await Task.Delay(2000);
-                vehicle.Remove();
+                vehicle.Destroy();
             }
 
             if (vehicle.Vehicle.Id > 0)

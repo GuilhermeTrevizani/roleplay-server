@@ -78,7 +78,7 @@ namespace Roleplay.Entities
             Marker?.Destroy();
             Marker = null;
 
-            ColShape?.Remove();
+            ColShape?.Destroy();
             ColShape = null;
         }
 
@@ -116,7 +116,7 @@ namespace Roleplay.Entities
             }
             else
             {
-                Blip?.Remove();
+                Blip?.Destroy();
                 Blip = null;
             }
         }

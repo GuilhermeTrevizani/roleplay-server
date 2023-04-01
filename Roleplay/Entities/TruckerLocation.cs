@@ -59,7 +59,7 @@ namespace Roleplay.Entities
             Marker?.Destroy();
             Marker = null;
 
-            ColShape?.Remove();
+            ColShape?.Destroy();
             ColShape = null;
         }
     }

@@ -163,7 +163,7 @@ namespace Roleplay.Commands.Job
 
             foreach (var collectSpot in veh.CollectSpots)
             {
-                collectSpot.Blip.Remove();
+                collectSpot.Blip.Destroy();
                 collectSpot.Marker.Destroy();
             }
             veh.CollectSpots = new List<Spot>();
@@ -216,7 +216,7 @@ namespace Roleplay.Commands.Job
                 if (t.IsCanceled)
                     return;
 
-                spot.Blip.Remove();
+                spot.Blip.Destroy();
                 spot.Marker.Destroy();
                 veh.CollectSpots.Remove(spot);
 

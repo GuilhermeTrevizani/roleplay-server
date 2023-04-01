@@ -93,7 +93,7 @@ namespace Roleplay.Entities
             EntranceMarker?.Destroy();
             EntranceMarker = null;
 
-            EntranceColShape?.Remove();
+            EntranceColShape?.Destroy();
             EntranceColShape = null;
         }
 
@@ -129,8 +129,7 @@ namespace Roleplay.Entities
             if (ProtectionLevel >= 2)
             {
                 var target = Global.Players.FirstOrDefault(x => x.Character.Id == CharacterId && x.Cellphone > 0 && !x.CellphoneItem.ModoAviao);
-                if (target != null)
-                    target.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme da sua propriedade {Id} em {Address} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
+                target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme da sua propriedade {Id} em {Address} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
             }
 
             if (ProtectionLevel >= 3)
