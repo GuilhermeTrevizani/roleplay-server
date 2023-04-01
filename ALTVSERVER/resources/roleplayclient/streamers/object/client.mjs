@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 
-import { objStreamer } from "./object-streamer";
+import { objStreamer } from "./object-streamer.mjs";
 
 alt.onServer("entitySync:create", (entityId, entityType, position, currEntityData) => {
     if (entityType == 1) {

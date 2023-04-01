@@ -1,5 +1,5 @@
 import * as alt from 'alt-client';
-import { markerStreamer } from "./marker-streamer";
+import { markerStreamer } from "./marker-streamer.mjs";
 
 // when an object is streamed in
 alt.onServer("entitySync:create", (entityId, entityType, position, currEntityData) => {
