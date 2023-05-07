@@ -59,7 +59,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, $"Veículo {veiculo} não está spawnado.");

@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Elements.Entities;
-using AltV.Net.EntitySync.SpatialPartitions;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
@@ -33,20 +32,6 @@ namespace Roleplay
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.DefaultThreadCurrentUICulture =
                   CultureInfo.GetCultureInfo("pt-BR");
-
-            AltV.Net.EntitySync.AltEntitySync.Init(2, (syncrate) => 100, (threadId) => false,
-               (threadCount, repository) => new AltV.Net.EntitySync.ServerEvent.ServerEventNetworkLayer(threadCount, repository),
-               (entity, threadCount) => entity.Id % threadCount,
-               (entityId, entityType, threadCount) => entityId % threadCount,
-               (threadId) =>
-               {
-                   return threadId switch
-                   {
-                       1 => new LimitedGrid3(50_000, 50_000, 100, 10_000, 10_000, 300), // PROP
-                       _ => new LimitedGrid3(50_000, 50_000, 100, 10_000, 10_000, 64), // MARKER
-                   };
-               },
-               new AltV.Net.EntitySync.IdProvider());
 
             var config = Alt.GetServerConfig();
             Global.DbConnectionString = config.Get("dbConnectionString").GetString();

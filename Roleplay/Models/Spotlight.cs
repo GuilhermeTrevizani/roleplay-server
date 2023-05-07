@@ -4,7 +4,7 @@ namespace Roleplay.Models
 {
     public class Spotlight
     {
-        public int Id { get; set; }
+        public uint Id { get; set; }
 
         public Position Position { get; set; }
 

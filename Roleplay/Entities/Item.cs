@@ -1,9 +1,9 @@
-﻿using Roleplay.Factories;
+﻿using AltV.Net.Elements.Entities;
+using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Roleplay.Entities
@@ -40,22 +40,23 @@ namespace Roleplay.Entities
         public float RotY { get; set; }
 
         [NotMapped, JsonIgnore]
-        public Prop Object { get; set; }
+        public IObject Object { get; set; }
 
         [NotMapped, JsonIgnore]
         public AudioSpot AudioSpot { get; set; }
 
+        [Obsolete("TODO")]
         public void CreateObject(MyPlayer player)
         {
-            Object = PropStreamer.Create(
-                ObjectName,
-                new Vector3(PosX, PosY, PosZ),
-                new Vector3(RotR, RotP, RotY),
-                Dimension,
-                true,
-                frozen: true,
-                collision: false,
-                streamRange: 25);
+            //Object = PropStreamer.Create(
+            //    ObjectName,
+            //    new Vector3(PosX, PosY, PosZ),
+            //    new Vector3(RotR, RotP, RotY),
+            //    Dimension,
+            //    true,
+            //    frozen: true,
+            //    collision: false,
+            //    streamRange: 25);
 
             if (player != null)
                 UpdateGroundItems(player);

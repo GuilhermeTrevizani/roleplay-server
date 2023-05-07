@@ -1,13 +1,14 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using AltV.Net.Shared.Enums;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -29,7 +30,7 @@ namespace Roleplay
         public static string Encrypt(string text)
         {
             var encodedValue = Encoding.UTF8.GetBytes(text);
-            var encryptedPassword = SHA512.Create().ComputeHash(encodedValue);
+            var encryptedPassword = SHA512.HashData(encodedValue);
 
             var sb = new StringBuilder();
             foreach (var caracter in encryptedPassword)
@@ -484,10 +485,10 @@ namespace Roleplay
         {
             position.Z -= 0.95f;
 
-            MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                position,
-                new Vector3(1, 1, 1.5f),
-                color: Global.MainRgba);
+            _ = new Marker(Alt.Core, MarkerType.MarkerHalo, position, Global.MainRgba)
+            {
+                Scale = new Vector3(1, 1, 1.5f),
+            };
 
             var colShape = (MyColShape)Alt.CreateColShapeCylinder(position, 1, 1.5f);
             colShape.Description = description;
@@ -733,7 +734,7 @@ namespace Roleplay
                 return;
             }
 
-            if (veh.Vehicle.Fuel == 0)
+            if (veh.VehicleDB.Fuel == 0)
             {
                 player.SendMessage(Models.MessageType.Error, "Veículo não possui combustível.");
                 return;
@@ -757,11 +758,11 @@ namespace Roleplay
                 return;
             }
 
-            var vehiclePrice = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.Vehicle.Model.ToLower());
+            var vehiclePrice = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.VehicleDB.Model.ToLower());
 
             if (staff)
             {
-                if (!veh.Vehicle.FactionId.HasValue)
+                if (!veh.VehicleDB.FactionId.HasValue)
                 {
                     player.SendMessage(Models.MessageType.Error, "O veículo não pertence a uma facção.");
                     return;
@@ -822,10 +823,10 @@ namespace Roleplay
                 };
             }
 
-            var realMods = JsonSerializer.Deserialize<List<VehicleMod>>(veh.Vehicle.ModsJSON);
+            var realMods = JsonSerializer.Deserialize<List<VehicleMod>>(veh.VehicleDB.ModsJSON);
 
             var vehicleTuning = new VehicleTuning();
-            if (player.VehicleTuning?.VehicleId == veh.Vehicle.Id)
+            if (player.VehicleTuning?.VehicleId == veh.VehicleDB.Id)
             {
                 vehicleTuning = player.VehicleTuning;
             }
@@ -848,25 +849,25 @@ namespace Roleplay
                             Selected = realMods.FirstOrDefault(y => y.Type == (byte)x)?.Id ?? 0,
                         }).Where(x => x.ModsCount > 0 && (x.UnitaryValue > 0 || staff)).ToList(),
                     RepairValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "repair")?.Value ?? 0) / 100))),
-                    WheelType = veh.Vehicle.WheelType,
-                    WheelVariation = veh.Vehicle.WheelVariation,
-                    WheelColor = veh.Vehicle.WheelColor,
+                    WheelType = veh.VehicleDB.WheelType,
+                    WheelVariation = veh.VehicleDB.WheelVariation,
+                    WheelColor = veh.VehicleDB.WheelColor,
                     WheelValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "wheel")?.Value ?? 0) / 100))),
-                    Color1 = $"#{veh.Vehicle.Color1R:X2}{veh.Vehicle.Color1G:X2}{veh.Vehicle.Color1B:X2}",
-                    Color2 = $"#{veh.Vehicle.Color2R:X2}{veh.Vehicle.Color2G:X2}{veh.Vehicle.Color2B:X2}",
+                    Color1 = $"#{veh.VehicleDB.Color1R:X2}{veh.VehicleDB.Color1G:X2}{veh.VehicleDB.Color1B:X2}",
+                    Color2 = $"#{veh.VehicleDB.Color2R:X2}{veh.VehicleDB.Color2G:X2}{veh.VehicleDB.Color2B:X2}",
                     ColorValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "color")?.Value ?? 0) / 100))),
-                    NeonColor = $"#{veh.Vehicle.NeonColorR:X2}{veh.Vehicle.NeonColorG:X2}{veh.Vehicle.NeonColorB:X2}",
-                    NeonLeft = Convert.ToByte(veh.Vehicle.NeonLeft),
-                    NeonRight = Convert.ToByte(veh.Vehicle.NeonRight),
-                    NeonFront = Convert.ToByte(veh.Vehicle.NeonFront),
-                    NeonBack = Convert.ToByte(veh.Vehicle.NeonBack),
+                    NeonColor = $"#{veh.VehicleDB.NeonColorR:X2}{veh.VehicleDB.NeonColorG:X2}{veh.VehicleDB.NeonColorB:X2}",
+                    NeonLeft = Convert.ToByte(veh.VehicleDB.NeonLeft),
+                    NeonRight = Convert.ToByte(veh.VehicleDB.NeonRight),
+                    NeonFront = Convert.ToByte(veh.VehicleDB.NeonFront),
+                    NeonBack = Convert.ToByte(veh.VehicleDB.NeonBack),
                     NeonValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "neon")?.Value ?? 0) / 100))),
-                    HeadlightColor = veh.Vehicle.HeadlightColor,
-                    LightsMultiplier = veh.Vehicle.LightsMultiplier,
+                    HeadlightColor = veh.VehicleDB.HeadlightColor,
+                    LightsMultiplier = veh.VehicleDB.LightsMultiplier,
                     XenonColorValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "xenoncolor")?.Value ?? 0) / 100))),
-                    WindowTint = veh.Vehicle.WindowTint,
+                    WindowTint = veh.VehicleDB.WindowTint,
                     WindowTintValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "insulfilm")?.Value ?? 0) / 100))),
-                    TireSmokeColor = $"#{veh.Vehicle.TireSmokeColorR:X2}{veh.Vehicle.TireSmokeColorG:X2}{veh.Vehicle.TireSmokeColorB:X2}",
+                    TireSmokeColor = $"#{veh.VehicleDB.TireSmokeColorR:X2}{veh.VehicleDB.TireSmokeColorG:X2}{veh.VehicleDB.TireSmokeColorB:X2}",
                     TireSmokeColorValue = Convert.ToInt32(Math.Abs((vehiclePrice?.Value ?? 0) * ((Global.Prices.FirstOrDefault(x => x.Type == PriceType.Tuning && x.Name.ToLower() == "tiresmoke")?.Value ?? 0) / 100))),
                 };
 
@@ -895,7 +896,7 @@ namespace Roleplay
 
         public static async Task CMDVenderVeiculoConcessionaria(MyPlayer player, int id, bool confirm)
         {
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == id))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.SendMessage(Models.MessageType.Error, $"Veículo {id} está spawnado.");
                 return;

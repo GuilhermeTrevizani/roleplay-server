@@ -162,7 +162,6 @@ function shiftHistoryDown() {
 
 let audioSpots = [];
 alt.setInterval(() => {
-    const dimension = alt.getLocalMeta(Constants.PLAYER_META_DATA_DIMENSION);
     for (const audioSpot of audioSpots) {
         let position = audioSpot.position;
         if (audioSpot.vehicleId) {
@@ -172,7 +171,7 @@ alt.setInterval(() => {
         }
 
         const distance = alt.Player.local.pos.distanceTo(position);
-        webview.emit('Audio:UpdateVolume', audioSpot.id, distance, dimension);
+        webview.emit('Audio:UpdateVolume', audioSpot.id, distance, alt.Player.local.dimension);
     }
 }, 1000);
 

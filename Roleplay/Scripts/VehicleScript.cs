@@ -29,12 +29,12 @@ namespace Roleplay.Scripts
                 vehicle.Destroy();
             }
 
-            if (vehicle.Vehicle.Id > 0)
+            if (vehicle.VehicleDB.Id > 0)
             {
                 player.Emit("Spotlight:Toggle", false);
 
-                if (vehicle.Vehicle.Model.ToUpper() == VehicleModelMods.LSPDHELI.ToString().ToUpper()
-                    || vehicle.Vehicle.Model.ToUpper() == VehicleModel.Polmav.ToString().ToUpper())
+                if (vehicle.VehicleDB.Model.ToUpper() == VehicleModelMods.LSPDHELI.ToString().ToUpper()
+                    || vehicle.VehicleDB.Model.ToUpper() == VehicleModel.Polmav.ToString().ToUpper())
                 {
                     player.Emit("Helicam:Toggle", true);
                     var spotlight = Global.Spotlights.FirstOrDefault(x => x.Id == vehicle.Id && x.Player == player.SessionId);
@@ -45,7 +45,7 @@ namespace Roleplay.Scripts
                     }
                 }
 
-                if (seat == 1 && vehicle.Vehicle.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
+                if (seat == 1 && vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
                 {
                     await Task.Delay(2000);
                     await vehicle.Estacionar(player);
@@ -56,22 +56,22 @@ namespace Roleplay.Scripts
         [ScriptEvent(ScriptEventType.PlayerEnterVehicle)]
         public static void OnPlayerEnterVehicle(MyVehicle vehicle, MyPlayer player, byte seat)
         {
-            if (vehicle.Vehicle.Id == 0)
+            if (vehicle.VehicleDB.Id == 0)
                 return;
 
             if (seat == 1)
                 player.Emit("Spotlight:Toggle", vehicle.SpotlightActive);
 
             player.SetCanDoDriveBy(seat);
-            vehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_RADIO_ENABLED, !vehicle.Vehicle.FactionId.HasValue);
+            vehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_RADIO_ENABLED, !vehicle.VehicleDB.FactionId.HasValue);
 
             if (vehicle.EngineOn)
             {
-                if (vehicle.Vehicle.Fuel == 0)
+                if (vehicle.VehicleDB.Fuel == 0)
                 {
                     vehicle.EngineOn = false;
                 }
-                else if (vehicle.Vehicle.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
+                else if (vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
                 {
                     vehicle.EngineOn = false;
                     if (player.Seat == 1)
@@ -84,7 +84,7 @@ namespace Roleplay.Scripts
                     vehicle.EngineOn = true;
             }
 
-            if (vehicle.Vehicle.Job != CharacterJob.None && vehicle.NomeEncarregado == player.Character.Name && vehicle.DataExpiracaoAluguel.HasValue)
+            if (vehicle.VehicleDB.Job != CharacterJob.None && vehicle.NomeEncarregado == player.Character.Name && vehicle.DataExpiracaoAluguel.HasValue)
                 player.SendMessage(MessageType.Error, $"O aluguel do veículo irá expirar em {vehicle.DataExpiracaoAluguel}.");
         }
 
@@ -193,7 +193,7 @@ namespace Roleplay.Scripts
         {
             try
             {
-                if (Global.Vehicles.Any(x => x.Vehicle.Id == vehicleId))
+                if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
                 {
                     player.SendMessage(MessageType.Error, "Veículo já está spawnado.", notify: true);
                     return;
@@ -230,11 +230,11 @@ namespace Roleplay.Scripts
         [AsyncClientEvent(nameof(AbastecerVeiculo))]
         public async Task AbastecerVeiculo(MyPlayer player, int veiculo)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
 
-            var combustivelNecessario = veh.Vehicle.MaxFuel - veh.Vehicle.Fuel;
+            var combustivelNecessario = veh.VehicleDB.MaxFuel - veh.VehicleDB.Fuel;
             var valor = combustivelNecessario * Global.Parameter.FuelValue;
-            if (valor > player.Money && !veh.Vehicle.FactionId.HasValue)
+            if (valor > player.Money && !veh.VehicleDB.FactionId.HasValue)
             {
                 player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, valor));
                 return;
@@ -255,9 +255,9 @@ namespace Roleplay.Scripts
 
                 Task.Run(async () =>
                 {
-                    veh.Vehicle.Fuel = veh.Vehicle.MaxFuel;
+                    veh.VehicleDB.Fuel = veh.VehicleDB.MaxFuel;
                     veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
-                    if (!veh.Vehicle.FactionId.HasValue)
+                    if (!veh.VehicleDB.FactionId.HasValue)
                     {
                         await player.RemoveItem(new CharacterItem(ItemCategory.Money)
                         {
@@ -281,7 +281,7 @@ namespace Roleplay.Scripts
         {
             try
             {
-                if (Global.Vehicles.Any(x => x.Vehicle.Id == vehicleId))
+                if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
                 {
                     player.SendMessage(MessageType.Error, "Veículo já está spawnado.", notify: true);
                     return;
@@ -325,16 +325,16 @@ namespace Roleplay.Scripts
         [AsyncScriptEvent(ScriptEventType.VehicleDestroy)]
         public static async Task OnVehicleDestroy(MyVehicle vehicle)
         {
-            if (vehicle.Vehicle.Id == 0)
+            if (vehicle.VehicleDB.Id == 0)
                 return;
 
-            await Functions.WriteLog(LogType.DestruicaoVeiculo, $"{vehicle.Vehicle.Id} | {JsonSerializer.Serialize(vehicle.Damages)}");
+            await Functions.WriteLog(LogType.DestruicaoVeiculo, $"{vehicle.VehicleDB.Id} | {JsonSerializer.Serialize(vehicle.Damages)}");
         }
 
         [AsyncClientEvent(nameof(BuyVehicleUpgrade))]
         public static async Task BuyVehicleUpgrade(MyPlayer player, int vehicleId, string name)
         {
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == vehicleId))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {vehicleId} está spawnado.");
                 return;
@@ -439,7 +439,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            var vehicle = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == vehicleId);
+            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
             if (vehicle == null)
                 return;
 
@@ -464,7 +464,7 @@ namespace Roleplay.Scripts
         [ClientEvent(nameof(TurnOffXMR))]
         public static void TurnOffXMR(MyPlayer player, int vehicleId)
         {
-            var vehicle = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == vehicleId);
+            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
             if (vehicle == null)
                 return;
 
@@ -557,7 +557,7 @@ namespace Roleplay.Scripts
 
             async Task SetMods()
             {
-                var realMods = JsonSerializer.Deserialize<List<VehicleMod>>(veh.Vehicle.ModsJSON);
+                var realMods = JsonSerializer.Deserialize<List<VehicleMod>>(veh.VehicleDB.ModsJSON);
                 foreach (var mod in vehicleTuning.Mods.Where(x => x.Type < 249))
                 {
                     var realMod = realMods.FirstOrDefault(x => x.Type == mod.Type);
@@ -578,42 +578,42 @@ namespace Roleplay.Scripts
                 }
 
                 var drawingColor1 = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.Color1);
-                veh.Vehicle.Color1R = drawingColor1.R;
-                veh.Vehicle.Color1G = drawingColor1.G;
-                veh.Vehicle.Color1B = drawingColor1.B;
+                veh.VehicleDB.Color1R = drawingColor1.R;
+                veh.VehicleDB.Color1G = drawingColor1.G;
+                veh.VehicleDB.Color1B = drawingColor1.B;
 
                 var drawingColor2 = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.Color2);
-                veh.Vehicle.Color2R = drawingColor2.R;
-                veh.Vehicle.Color2G = drawingColor2.G;
-                veh.Vehicle.Color2B = drawingColor2.B;
+                veh.VehicleDB.Color2R = drawingColor2.R;
+                veh.VehicleDB.Color2G = drawingColor2.G;
+                veh.VehicleDB.Color2B = drawingColor2.B;
 
-                veh.Vehicle.WheelType = vehicleTuning.WheelType;
-                veh.Vehicle.WheelVariation = vehicleTuning.WheelVariation;
-                veh.Vehicle.WheelColor = vehicleTuning.WheelColor;
+                veh.VehicleDB.WheelType = vehicleTuning.WheelType;
+                veh.VehicleDB.WheelVariation = vehicleTuning.WheelVariation;
+                veh.VehicleDB.WheelColor = vehicleTuning.WheelColor;
 
                 var drawingNeonColor = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.NeonColor);
-                veh.Vehicle.NeonColorR = drawingNeonColor.R;
-                veh.Vehicle.NeonColorG = drawingNeonColor.G;
-                veh.Vehicle.NeonColorB = drawingNeonColor.B;
-                veh.Vehicle.NeonLeft = Convert.ToBoolean(vehicleTuning.NeonLeft);
-                veh.Vehicle.NeonRight = Convert.ToBoolean(vehicleTuning.NeonRight);
-                veh.Vehicle.NeonFront = Convert.ToBoolean(vehicleTuning.NeonFront);
-                veh.Vehicle.NeonBack = Convert.ToBoolean(vehicleTuning.NeonBack);
+                veh.VehicleDB.NeonColorR = drawingNeonColor.R;
+                veh.VehicleDB.NeonColorG = drawingNeonColor.G;
+                veh.VehicleDB.NeonColorB = drawingNeonColor.B;
+                veh.VehicleDB.NeonLeft = Convert.ToBoolean(vehicleTuning.NeonLeft);
+                veh.VehicleDB.NeonRight = Convert.ToBoolean(vehicleTuning.NeonRight);
+                veh.VehicleDB.NeonFront = Convert.ToBoolean(vehicleTuning.NeonFront);
+                veh.VehicleDB.NeonBack = Convert.ToBoolean(vehicleTuning.NeonBack);
 
-                veh.Vehicle.HeadlightColor = vehicleTuning.HeadlightColor;
-                veh.Vehicle.LightsMultiplier = vehicleTuning.LightsMultiplier;
+                veh.VehicleDB.HeadlightColor = vehicleTuning.HeadlightColor;
+                veh.VehicleDB.LightsMultiplier = vehicleTuning.LightsMultiplier;
 
-                veh.Vehicle.WindowTint = vehicleTuning.WindowTint;
+                veh.VehicleDB.WindowTint = vehicleTuning.WindowTint;
 
                 var drawingTireSmokeColor = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.TireSmokeColor);
-                veh.Vehicle.TireSmokeColorR = drawingTireSmokeColor.R;
-                veh.Vehicle.TireSmokeColorG = drawingTireSmokeColor.G;
-                veh.Vehicle.TireSmokeColorB = drawingTireSmokeColor.B;
+                veh.VehicleDB.TireSmokeColorR = drawingTireSmokeColor.R;
+                veh.VehicleDB.TireSmokeColorG = drawingTireSmokeColor.G;
+                veh.VehicleDB.TireSmokeColorB = drawingTireSmokeColor.B;
 
-                veh.Vehicle.ModsJSON = JsonSerializer.Serialize(realMods);
+                veh.VehicleDB.ModsJSON = JsonSerializer.Serialize(realMods);
 
                 await using var context = new DatabaseContext();
-                context.Vehicles.Update(veh.Vehicle);
+                context.Vehicles.Update(veh.VehicleDB);
                 await context.SaveChangesAsync();
 
                 if (vehicleTuning.Repair == 1)
@@ -625,8 +625,8 @@ namespace Roleplay.Scripts
                 if (vehicleTuning.Staff)
                 {
                     await SetMods();
-                    await player.GravarLog(LogType.Staff, $"Tunar Veículo | {veh.Vehicle.Id} | {vehicleTuningJSON}", null);
-                    player.SendMessage(MessageType.Success, $"Você aplicou as modificações no veículo {veh.Vehicle.Id}.");
+                    await player.GravarLog(LogType.Staff, $"Tunar Veículo | {veh.VehicleDB.Id} | {vehicleTuningJSON}", null);
+                    player.SendMessage(MessageType.Success, $"Você aplicou as modificações no veículo {veh.VehicleDB.Id}.");
                 }
                 else
                 {
@@ -636,7 +636,7 @@ namespace Roleplay.Scripts
                         if (target == null)
                             player.SendMessage(MessageType.Error, $"O jogador não está mais conectado.");
 
-                        vehicleTuning.VehicleId = veh.Vehicle.Id;
+                        vehicleTuning.VehicleId = veh.VehicleDB.Id;
                         vehicleTuning.TargetId = null;
                         vehicleTuning.Mods = new List<VehicleTuning.Mod>();
 
@@ -663,8 +663,8 @@ namespace Roleplay.Scripts
 
                         await SetMods();
                         await player.RemoveItem(new CharacterItem(ItemCategory.Money) { Quantity = totalValue });
-                        player.SendMessage(MessageType.Success, $"Você aplicou as modificações no veículo {veh.Vehicle.Id} por ${totalValue:N0}.");
-                        await player.GravarLog(LogType.TunarVeiculoMecanico, $"{veh.Vehicle.Id} | {vehicleTuningJSON}", null);
+                        player.SendMessage(MessageType.Success, $"Você aplicou as modificações no veículo {veh.VehicleDB.Id} por ${totalValue:N0}.");
+                        await player.GravarLog(LogType.TunarVeiculoMecanico, $"{veh.VehicleDB.Id} | {vehicleTuningJSON}", null);
                     }
                 }
             }

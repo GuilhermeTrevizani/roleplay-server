@@ -19,7 +19,7 @@ namespace Roleplay.Models
 
         public float Volume { get; set; } = 0.1f;
 
-        public int? VehicleId { get; set; }
+        public uint? VehicleId { get; set; }
 
         public bool Loop { get; set; }
 

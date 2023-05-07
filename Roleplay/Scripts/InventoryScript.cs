@@ -567,7 +567,7 @@ namespace Roleplay.Scripts
                 }
                 else
                 {
-                    var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == player.InventoryRightTargetId);
+                    var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == player.InventoryRightTargetId);
                     if (veh == null)
                         return;
 
@@ -615,10 +615,10 @@ namespace Roleplay.Scripts
                     :
                     item);
 
-                    await player.GravarLog(LogType.ArmazenarItemVeiculo, $"{veh.Vehicle.Id} | {JsonSerializer.Serialize(item)}", null);
+                    await player.GravarLog(LogType.ArmazenarItemVeiculo, $"{veh.VehicleDB.Id} | {JsonSerializer.Serialize(item)}", null);
 
                     player.SendMessageToNearbyPlayers($"armazena {quantity:N0}x {item.Name} no veículo.", MessageCategory.Ame, 5);
-                    player.Emit("Server:MostrarErro", $"Você armazenou {quantity:N0}x {item.Name} no veículo {veh.Vehicle.Id}.");
+                    player.Emit("Server:MostrarErro", $"Você armazenou {quantity:N0}x {item.Name} no veículo {veh.VehicleDB.Id}.");
 
                     veh.ShowInventory(player, true);
                 }
@@ -653,7 +653,7 @@ namespace Roleplay.Scripts
                 }
                 else
                 {
-                    var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == player.InventoryRightTargetId);
+                    var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == player.InventoryRightTargetId);
                     var item = veh.Itens.FirstOrDefault(x => x.Id == id);
                     if (item == null || item.Slot == slot)
                         return;
@@ -747,7 +747,7 @@ namespace Roleplay.Scripts
                 }
                 else if (player.InventoryShowType == InventoryShowType.Vehicle)
                 {
-                    var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == player.InventoryRightTargetId);
+                    var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == player.InventoryRightTargetId);
                     if (veh == null)
                         return;
 
@@ -795,9 +795,9 @@ namespace Roleplay.Scripts
                     }
 
                     player.SendMessageToNearbyPlayers($"pega {quantity:N0}x {item.Name} do veículo.", MessageCategory.Ame, 5);
-                    player.Emit("Server:MostrarErro", $"Você pegou {quantity:N0}x {item.Name} do veículo {veh.Vehicle.Id}.");
+                    player.Emit("Server:MostrarErro", $"Você pegou {quantity:N0}x {item.Name} do veículo {veh.VehicleDB.Id}.");
 
-                    await player.GravarLog(LogType.PegarItemVeiculo, $"{veh.Vehicle.Id} | {JsonSerializer.Serialize(item)}", null);
+                    await player.GravarLog(LogType.PegarItemVeiculo, $"{veh.VehicleDB.Id} | {JsonSerializer.Serialize(item)}", null);
 
                     veh.ShowInventory(player, true);
                 }

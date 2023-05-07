@@ -1,9 +1,10 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
+using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,7 +80,7 @@ namespace Roleplay.Commands.Job
                 return;
             }
 
-            if (!truckerLocation.AllowedVehicles.Contains(veh.Vehicle.Model.ToUpper()))
+            if (!truckerLocation.AllowedVehicles.Contains(veh.VehicleDB.Model.ToUpper()))
             {
                 player.SendMessage(MessageType.Error, "Você não está em um veículo permitido para esta rota.");
                 return;
@@ -111,11 +112,10 @@ namespace Roleplay.Commands.Job
                     spot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
                     spot.Blip.Display = 2;
 
-                    spot.Marker = MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                        new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f),
-                        new Vector3(5, 5, 5),
-                        Global.MainRgba,
-                        player: player.Id);
+                    spot.Marker = new Marker(Alt.Core, player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba)
+                    {
+                        Scale = new Vector3(5, 5, 5)
+                    };
 
                     veh.CollectSpots.Add(spot);
                 }

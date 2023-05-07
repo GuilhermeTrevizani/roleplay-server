@@ -1,8 +1,9 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
+using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -78,11 +79,11 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(EntrancePosX, EntrancePosY, EntrancePosZ - 0.95f);
 
-            EntranceMarker = MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                pos,
-                new Vector3(1, 1, 1.5f),
-                color: Global.MainRgba,
-                dimension: Dimension);
+            EntranceMarker = new Marker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            {
+                Scale = new Vector3(1, 1, 1.5f),
+                Dimension = Dimension,
+            };
 
             EntranceColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             EntranceColShape.Description = $"[PROPRIEDADE Nº {Id}] {{#FFFFFF}}{(!CharacterId.HasValue ? $"Use /comprar para comprar por ${Value:N0}." : string.Empty)}";

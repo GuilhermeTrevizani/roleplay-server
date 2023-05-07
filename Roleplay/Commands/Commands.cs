@@ -155,7 +155,7 @@ namespace Roleplay.Commands
                         break;
                     }
 
-                    var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+                    var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
                     if (veh == null)
                     {
                         player.SendMessage(MessageType.Error, "Veículo inválido.");
@@ -184,18 +184,18 @@ namespace Roleplay.Commands
                         Quantity = valorVeh
                     });
 
-                    veh.Vehicle.CharacterId = player.Character.Id;
-                    veh.Vehicle.Parked = false;
+                    veh.VehicleDB.CharacterId = player.Character.Id;
+                    veh.VehicleDB.Parked = false;
 
                     await using (var context = new DatabaseContext())
                     {
-                        context.Vehicles.Update(veh.Vehicle);
+                        context.Vehicles.Update(veh.VehicleDB);
                         await context.SaveChangesAsync();
                     }
 
-                    player.SendMessage(MessageType.Success, $"Você comprou o veículo {veh.Vehicle.Id} de {target.ICName} por ${valorVeh:N0}.");
-                    target.SendMessage(MessageType.Success, $"Você vendeu o veículo {veh.Vehicle.Id} para {player.ICName} por ${valorVeh:N0}.");
-                    await target.GravarLog(LogType.Venda, $"/vvenderpara {veh.Vehicle.Id} {valorVeh}", player);
+                    player.SendMessage(MessageType.Success, $"Você comprou o veículo {veh.VehicleDB.Id} de {target.ICName} por ${valorVeh:N0}.");
+                    target.SendMessage(MessageType.Success, $"Você vendeu o veículo {veh.VehicleDB.Id} para {player.ICName} por ${valorVeh:N0}.");
+                    await target.GravarLog(LogType.Venda, $"/vvenderpara {veh.VehicleDB.Id} {valorVeh}", player);
                     break;
                 case InviteType.LocalizacaoCelular:
                     if (!float.TryParse(convite.Value[0], out float posX) || !float.TryParse(convite.Value[1], out float posY))
@@ -1140,7 +1140,7 @@ namespace Roleplay.Commands
 
             player.SendMessage(MessageType.Success, $"Você colocou {target.ICName} dentro do veículo.");
             target.SendMessage(MessageType.Success, $"{player.ICName} colocou você dentro do veículo.");
-            await player.GravarLog(LogType.ColocarVeiculo, veh.Vehicle.Id.ToString(), target);
+            await player.GravarLog(LogType.ColocarVeiculo, veh.VehicleDB.Id.ToString(), target);
         }
 
         [Command("retirar", "/retirar (ID ou nome)")]
@@ -1168,7 +1168,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var vehId = veh.Vehicle.Id;
+            var vehId = veh.VehicleDB.Id;
             var pos = player.Position;
             pos.Y += 1.5f;
             target.SetPosition(pos, target.Dimension, false);

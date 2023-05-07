@@ -1,14 +1,13 @@
 ﻿using AltV.Net;
 using AltV.Net.Elements.Entities;
-using System;
 
 namespace Roleplay.Factories
 {
     public class MyColShapeFactory : IBaseObjectFactory<IColShape>
     {
-        public IColShape Create(ICore server, IntPtr playerPointer)
+        public IColShape Create(ICore core, nint baseObjectPointer, uint id)
         {
-            return new MyColShape(server, playerPointer);
+            return new MyColShape(core, baseObjectPointer, id);
         }
     }
 }

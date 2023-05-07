@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
@@ -20,7 +19,7 @@ namespace Roleplay.Factories
 {
     public class MyPlayer : AsyncPlayer
     {
-        public MyPlayer(ICore server, IntPtr nativePointer, ushort id) : base(server, nativePointer, id)
+        public MyPlayer(ICore server, nint nativePointer, uint id) : base(server, nativePointer, id)
         {
         }
 
@@ -380,7 +379,6 @@ namespace Roleplay.Factories
         public void SetPosition(Position position, int dimension, bool spawn)
         {
             Dimension = dimension;
-            this.SetLocalMetaData(Constants.PLAYER_META_DATA_DIMENSION, Dimension);
             if (spawn)
                 Spawn(position, 0);
             else

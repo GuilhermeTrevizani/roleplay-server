@@ -27,14 +27,14 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.CharacterId != player.Character.Id)
+            if (veh.VehicleDB.CharacterId != player.Character.Id)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
                 return;
             }
 
             var valor = Global.Parameter.VehicleParkValue;
-            if (!veh.Vehicle.Parked
+            if (!veh.VehicleDB.Parked
                 || Global.Properties.Any(x => x.CharacterId == player.Character.Id
                     && player.Vehicle.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)) <= 25))
                 valor = 0;
@@ -45,16 +45,16 @@ namespace Roleplay.Commands
                 return;
             }
 
-            veh.Vehicle.PosX = player.Vehicle.Position.X;
-            veh.Vehicle.PosY = player.Vehicle.Position.Y;
-            veh.Vehicle.PosZ = player.Vehicle.Position.Z;
-            veh.Vehicle.RotR = player.Vehicle.Rotation.Roll;
-            veh.Vehicle.RotP = player.Vehicle.Rotation.Pitch;
-            veh.Vehicle.RotY = player.Vehicle.Rotation.Yaw;
-            veh.Vehicle.Parked = true;
+            veh.VehicleDB.PosX = player.Vehicle.Position.X;
+            veh.VehicleDB.PosY = player.Vehicle.Position.Y;
+            veh.VehicleDB.PosZ = player.Vehicle.Position.Z;
+            veh.VehicleDB.RotR = player.Vehicle.Rotation.Roll;
+            veh.VehicleDB.RotP = player.Vehicle.Rotation.Pitch;
+            veh.VehicleDB.RotY = player.Vehicle.Rotation.Yaw;
+            veh.VehicleDB.Parked = true;
 
             await using var context = new DatabaseContext();
-            context.Vehicles.Update(veh.Vehicle);
+            context.Vehicles.Update(veh.VehicleDB);
             await context.SaveChangesAsync();
 
             if (valor > 0)
@@ -80,12 +80,12 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.CharacterId == player.Character.Id
-                || player.Items.Any(x => x.Category == ItemCategory.VehicleKey && x.Type == veh.Vehicle.LockNumber))
+            if (veh.VehicleDB.CharacterId == player.Character.Id
+                || player.Items.Any(x => x.Category == ItemCategory.VehicleKey && x.Type == veh.VehicleDB.LockNumber))
             {
-                if (player.Vehicle.Position.Distance(new Position(veh.Vehicle.PosX, veh.Vehicle.PosY, veh.Vehicle.PosZ)) > Global.RP_DISTANCE)
+                if (player.Vehicle.Position.Distance(new Position(veh.VehicleDB.PosX, veh.VehicleDB.PosY, veh.VehicleDB.PosZ)) > Global.RP_DISTANCE)
                 {
-                    player.Emit("Server:SetWaypoint", veh.Vehicle.PosX, veh.Vehicle.PosY);
+                    player.Emit("Server:SetWaypoint", veh.VehicleDB.PosX, veh.VehicleDB.PosY);
                     player.SendMessage(MessageType.Error, "Você não está próximo de sua vaga.");
                     return;
                 }
@@ -95,7 +95,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.FactionId == player.Character.FactionId && veh.Vehicle.FactionId.HasValue)
+            if (veh.VehicleDB.FactionId == player.Character.FactionId && veh.VehicleDB.FactionId.HasValue)
             {
                 if (!Global.Spots.Any(x => x.Type == SpotType.SpawnVeiculosFaccao
                     && player.Vehicle.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE))
@@ -118,7 +118,7 @@ namespace Roleplay.Commands
                     return;
                 }
 
-                veh.Vehicle.Fuel = veh.Vehicle.MaxFuel;
+                veh.VehicleDB.Fuel = veh.VehicleDB.MaxFuel;
                 await veh.Estacionar(player);
                 player.SendMessage(MessageType.Success, $"Você estacionou o veículo.", notify: true);
                 return;
@@ -137,10 +137,10 @@ namespace Roleplay.Commands
                     x.Id,
                     Model = x.Model.ToUpper(),
                     x.Plate,
-                    Spawn = Global.Vehicles.Any(y => y.Vehicle.Id == x.Id) ? $"<span class='label' style='background-color:{Global.SUCCESS_COLOR}'>SIM</span>" : $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>NÃO</span>",
+                    Spawn = Global.Vehicles.Any(y => y.VehicleDB.Id == x.Id) ? $"<span class='label' style='background-color:{Global.SUCCESS_COLOR}'>SIM</span>" : $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>NÃO</span>",
                     Seized = x.SeizedValue > 0 ? $"<span class='label' style='background-color:{Global.SUCCESS_COLOR}'>SIM (${x.SeizedValue:N0})</span>" : $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>NÃO</span>",
                     Dismantled = x.DismantledValue > 0 ? $"<span class='label' style='background-color:{Global.SUCCESS_COLOR}'>SIM (${x.DismantledValue:N0})</span>" : $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>NÃO</span>",
-                }).OrderByDescending(x => Convert.ToInt32(Global.Vehicles.Any(y => y.Vehicle.Id == x.Id))).ToList();
+                }).OrderByDescending(x => Convert.ToInt32(Global.Vehicles.Any(y => y.VehicleDB.Id == x.Id))).ToList();
             if (veiculos.Count == 0)
             {
                 player.SendMessage(MessageType.Error, "Você não possui veículos.");
@@ -154,7 +154,7 @@ namespace Roleplay.Commands
         public static void CMD_vvender(MyPlayer player, string idNome, int valor)
         {
             var prox = Global.Vehicles
-                .Where(x => x.Vehicle.CharacterId == player.Character.Id
+                .Where(x => x.VehicleDB.CharacterId == player.Character.Id
                     && player.Position.Distance(x.Position) <= Global.RP_DISTANCE
                     && x.Dimension == player.Dimension)
                 .MinBy(x => player.Position.Distance(x.Position));
@@ -181,7 +181,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var restricao = Functions.CheckVIPVehicle(prox.Vehicle.Model);
+            var restricao = Functions.CheckVIPVehicle(prox.VehicleDB.Model);
             if (restricao.Item2 != UserVIP.None && (restricao.Item2 > target.User.VIP || (target.User.VIPValidDate ?? DateTime.MinValue) < DateTime.Now))
             {
                 player.SendMessage(MessageType.Error, $"O veículo é restrito para VIP {restricao.Item2}.");
@@ -192,13 +192,13 @@ namespace Roleplay.Commands
             {
                 Type = InviteType.VendaVeiculo,
                 SenderCharacterId = player.Character.Id,
-                Value = new string[] { prox.Vehicle.Id.ToString(), valor.ToString() },
+                Value = new string[] { prox.VehicleDB.Id.ToString(), valor.ToString() },
             };
             target.Invites.RemoveAll(x => x.Type == InviteType.VendaVeiculo);
             target.Invites.Add(convite);
 
-            player.SendMessage(MessageType.Success, $"Você ofereceu seu veículo {prox.Vehicle.Id} para {target.ICName} por ${valor:N0}.");
-            target.SendMessage(MessageType.Success, $"{player.ICName} ofereceu para você o veículo {prox.Vehicle.Id} por ${valor:N0}. (/ac {(int)convite.Type} para aceitar ou /rc {(int)convite.Type} para recusar)");
+            player.SendMessage(MessageType.Success, $"Você ofereceu seu veículo {prox.VehicleDB.Id} para {target.ICName} por ${valor:N0}.");
+            target.SendMessage(MessageType.Success, $"{player.ICName} ofereceu para você o veículo {prox.VehicleDB.Id} por ${valor:N0}. (/ac {(int)convite.Type} para aceitar ou /rc {(int)convite.Type} para recusar)");
         }
 
         [Command("vliberar", "/vliberar (código do veículo)")]
@@ -211,7 +211,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == codigo))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == codigo))
             {
                 player.SendMessage(MessageType.Error, "Veículo está spawnado.");
                 return;
@@ -309,7 +309,7 @@ namespace Roleplay.Commands
                 && player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)));
 
-            if (veh == null || !(veh?.TemArmazenamento ?? false) || veh?.Vehicle?.Job != CharacterJob.None)
+            if (veh == null || !(veh?.TemArmazenamento ?? false) || veh?.VehicleDB?.Job != CharacterJob.None)
             {
                 player.SendMessage(MessageType.Error, "Você não está próximo de um veículo que possui armazenamento.");
                 return;
@@ -343,7 +343,7 @@ namespace Roleplay.Commands
                     return;
                 }
 
-                if (veh.Vehicle.FactionId.HasValue && veh.Vehicle.FactionId != player.Character.FactionId)
+                if (veh.VehicleDB.FactionId.HasValue && veh.VehicleDB.FactionId != player.Character.FactionId)
                 {
                     player.SendMessage(MessageType.Error, Global.VEHICLE_ACCESS_ERROR_MESSAGE);
                     return;
@@ -378,13 +378,13 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.Fuel == veh.Vehicle.MaxFuel)
+            if (veh.VehicleDB.Fuel == veh.VehicleDB.MaxFuel)
             {
                 player.SendMessage(MessageType.Error, "Veículo está com tanque cheio.");
                 return;
             }
 
-            player.Emit("Server:Abastecer", veh.Vehicle.Id);
+            player.Emit("Server:Abastecer", veh.VehicleDB.Id);
         }
 
         [Command("vplaca", "/vplaca (código do veículo) (placa)")]
@@ -402,7 +402,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == codigo))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == codigo))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {codigo} está spawnado.");
                 return;
@@ -470,7 +470,7 @@ namespace Roleplay.Commands
             MyVehicle veh = null;
             if (player.IsInVehicle)
             {
-                veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.Vehicle.Job == player.Character.Job && !x.DataExpiracaoAluguel.HasValue);
+                veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.VehicleDB.Job == player.Character.Job && !x.DataExpiracaoAluguel.HasValue);
                 if (veh == null)
                 {
                     player.SendMessage(MessageType.Error, "Você não está dentro de um veículo disponível para aluguel.");
@@ -481,7 +481,7 @@ namespace Roleplay.Commands
             {
                 await using var context = new DatabaseContext();
                 var veiculos = await context.Vehicles.Where(x => x.Job == player.Character.Job && !x.Sold).ToListAsync();
-                var veiculo = veiculos.FirstOrDefault(x => !Global.Vehicles.Any(y => y.Vehicle.Id == x.Id));
+                var veiculo = veiculos.FirstOrDefault(x => !Global.Vehicles.Any(y => y.VehicleDB.Id == x.Id));
                 if (veiculo == null)
                 {
                     player.SendMessage(MessageType.Error, "Não há nenhum veículo disponível para aluguel.");
@@ -513,7 +513,7 @@ namespace Roleplay.Commands
         [Command("danos", "/danos (veículo)")]
         public static void CMD_danos(MyPlayer player, int veiculo)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, $"Nenhum veículo encontrado com o código {veiculo}.");
@@ -548,7 +548,7 @@ namespace Roleplay.Commands
             </table>
             </div>";
 
-            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Danos do veículo {veh.Vehicle.Model.ToUpper()} [{veh.Vehicle.Id}] ({veh.Vehicle.Plate})", html));
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Danos do veículo {veh.VehicleDB.Model.ToUpper()} [{veh.VehicleDB.Id}] ({veh.VehicleDB.Plate})", html));
         }
 
         [Command("velmax", "/velmax (velocidade)")]
@@ -686,7 +686,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.CharacterId != player.Character.Id)
+            if (veh.VehicleDB.CharacterId != player.Character.Id)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
                 return;
@@ -699,8 +699,8 @@ namespace Roleplay.Commands
             }
 
             await using var context = new DatabaseContext();
-            veh.Vehicle.LockNumber = await context.Vehicles.MaxAsync(x => x.LockNumber) + 1;
-            context.Vehicles.Update(veh.Vehicle);
+            veh.VehicleDB.LockNumber = await context.Vehicles.MaxAsync(x => x.LockNumber) + 1;
+            context.Vehicles.Update(veh.VehicleDB);
             await context.SaveChangesAsync();
 
             await player.RemoveItem(new CharacterItem(ItemCategory.Money)
@@ -708,7 +708,7 @@ namespace Roleplay.Commands
                 Quantity = Global.Parameter.LockValue
             });
 
-            player.SendMessage(MessageType.Success, $"Você trocou a fechadura do veículo {veh.Vehicle.Id} por ${Global.Parameter.LockValue:N0}.");
+            player.SendMessage(MessageType.Success, $"Você trocou a fechadura do veículo {veh.VehicleDB.Id} por ${Global.Parameter.LockValue:N0}.");
         }
 
         [Command("vchave")]
@@ -720,7 +720,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.CharacterId != player.Character.Id)
+            if (veh.VehicleDB.CharacterId != player.Character.Id)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
                 return;
@@ -732,7 +732,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.VehicleKey, veh.Vehicle.LockNumber));
+            var res = await player.GiveItem(new CharacterItem(ItemCategory.VehicleKey, veh.VehicleDB.LockNumber));
             if (!string.IsNullOrWhiteSpace(res))
             {
                 player.SendMessage(MessageType.Error, res);
@@ -744,7 +744,7 @@ namespace Roleplay.Commands
                 Quantity = Global.Parameter.KeyValue
             });
 
-            player.SendMessage(MessageType.Success, $"Você criou uma cópia da chave para o veículo {veh.Vehicle.Id} por ${Global.Parameter.KeyValue:N0}.");
+            player.SendMessage(MessageType.Success, $"Você criou uma cópia da chave para o veículo {veh.VehicleDB.Id} por ${Global.Parameter.KeyValue:N0}.");
         }
 
         [Command("usargalao")]
@@ -768,7 +768,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (veh.Vehicle.Fuel == veh.Vehicle.MaxFuel)
+            if (veh.VehicleDB.Fuel == veh.VehicleDB.MaxFuel)
             {
                 player.SendMessage(MessageType.Error, "Veículo está com tanque cheio.");
                 return;
@@ -791,11 +791,11 @@ namespace Roleplay.Commands
 
             var extra = JsonSerializer.Deserialize<WeaponItem>(galaoCombustivel.Extra);
             var combustivel = Convert.ToInt32(Math.Ceiling(extra.Ammo / 50f));
-            var combustivelNecessario = veh.Vehicle.MaxFuel - veh.Vehicle.Fuel;
+            var combustivelNecessario = veh.VehicleDB.MaxFuel - veh.VehicleDB.Fuel;
             if (combustivelNecessario > combustivel)
                 combustivelNecessario = combustivel;
 
-            veh.Vehicle.Fuel += combustivelNecessario;
+            veh.VehicleDB.Fuel += combustivelNecessario;
             veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
 
             combustivel -= combustivelNecessario;
@@ -839,7 +839,7 @@ namespace Roleplay.Commands
         [Command("vupgrade", "/vupgrade (código do veículo)")]
         public static async Task CMD_vupgrade(MyPlayer player, int vehicleId)
         {
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == vehicleId))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {vehicleId} está spawnado.");
                 return;
@@ -894,14 +894,14 @@ namespace Roleplay.Commands
         [Command("vrastrear", "/vrastrear (código do veículo)")]
         public static async Task CMD_vrastrear(MyPlayer player, int vehicleId)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == vehicleId);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, $"Veículo {vehicleId} não está spawnado.");
                 return;
             }
 
-            if (veh.Vehicle.ProtectionLevel < 1)
+            if (veh.VehicleDB.ProtectionLevel < 1)
             {
                 player.SendMessage(MessageType.Error, $"Veículo {vehicleId} não possui rastreador.");
                 return;
@@ -938,13 +938,13 @@ namespace Roleplay.Commands
                 return;
             }
 
-            if (!veh.Vehicle.XMR)
+            if (!veh.VehicleDB.XMR)
             {
                 player.SendMessage(MessageType.Error, "O veículo não possui XMR.");
                 return;
             }
 
-            player.Emit("XMR", veh.Vehicle.Id, veh.AudioSpot?.Source ?? string.Empty, veh.AudioSpot?.Volume ?? 0.1f);
+            player.Emit("XMR", veh.VehicleDB.Id, veh.AudioSpot?.Source ?? string.Empty, veh.AudioSpot?.Volume ?? 0.1f);
         }
 
         [Command("quebrartrava")]
@@ -966,7 +966,7 @@ namespace Roleplay.Commands
                 player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= 5
                 && x.Dimension == player.Dimension
                 && x.LockState == VehicleLockState.Locked
-                && x.Vehicle.CharacterId.HasValue)
+                && x.VehicleDB.CharacterId.HasValue)
                 .MinBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)));
 
             if (veh == null)
@@ -991,7 +991,7 @@ namespace Roleplay.Commands
                     veh.LockState = VehicleLockState.Unlocked;
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("quebra a trava do veículo.", MessageCategory.Ame, 5);
-                    await player.GravarLog(LogType.QuebrarTrava, veh.Vehicle.Id.ToString(), null);
+                    await player.GravarLog(LogType.QuebrarTrava, veh.VehicleDB.Id.ToString(), null);
                     player.CancellationTokenSourceAcao = null;
                 });
             });
@@ -1026,7 +1026,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var vehiclePrice = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.Vehicle.Model.ToLower());
+            var vehiclePrice = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.VehicleDB.Model.ToLower());
             if (vehiclePrice == null)
             {
                 player.SendMessage(MessageType.Error, "Preço do veículo não foi encontrado.");
@@ -1059,7 +1059,7 @@ namespace Roleplay.Commands
                     player.SendMessage(MessageType.Success, $"Você consertou o veículo e pagou ${value:N0}.");
                     player.ToggleGameControls(true);
 
-                    await player.GravarLog(LogType.RepararVeiculoJogador, veh.Vehicle.Id.ToString(), null);
+                    await player.GravarLog(LogType.RepararVeiculoJogador, veh.VehicleDB.Id.ToString(), null);
                     player.CancellationTokenSourceAcao = null;
                 });
             });
@@ -1086,12 +1086,12 @@ namespace Roleplay.Commands
 
                 Task.Run(async () =>
                 {
-                    if (veh.Vehicle.ProtectionLevel < 2)
+                    if (veh.VehicleDB.ProtectionLevel < 2)
                         veh.StopAlarm();
                     veh.EngineOn = true;
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("faz uma ligação direta no veículo.", MessageCategory.Ame, 5);
-                    await player.GravarLog(LogType.LigacaoDireta, veh.Vehicle.Id.ToString(), null);
+                    await player.GravarLog(LogType.LigacaoDireta, veh.VehicleDB.Id.ToString(), null);
                     player.CancellationTokenSourceAcao = null;
                 });
             });
@@ -1111,8 +1111,8 @@ namespace Roleplay.Commands
                 && x.Dimension == player.Dimension
                 && x.LockState == VehicleLockState.Unlocked
                 && x.EngineOn
-                && x.Vehicle.CharacterId != player.Character.Id
-                && x.Vehicle.CharacterId.HasValue)
+                && x.VehicleDB.CharacterId != player.Character.Id
+                && x.VehicleDB.CharacterId.HasValue)
                 .MinBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)));
 
             if (veh == null)
@@ -1121,7 +1121,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            var preco = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.Vehicle.Model.ToLower());
+            var preco = Global.Prices.FirstOrDefault(x => x.Vehicle && x.Name.ToLower() == veh.VehicleDB.Model.ToLower());
             if (preco == null)
             {
                 player.SendMessage(MessageType.Error, "Preço não encontrado.");
@@ -1148,14 +1148,14 @@ namespace Roleplay.Commands
                         return;
                     }
 
-                    veh.Vehicle.DismantledValue = value;
+                    veh.VehicleDB.DismantledValue = value;
                     await veh.Estacionar(null);
 
                     player.User.CooldownDismantle = DateTime.Now.AddHours(Global.Parameter.CooldownDismantleHours);
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("desmancha o veículo.", MessageCategory.Ame, 5);
                     player.SendMessage(MessageType.Success, $"Você desmanchou o veículo e recebeu ${value:N0}.");
-                    await player.GravarLog(LogType.Desmanche, $"{veh.Vehicle.Id} {value}", null);
+                    await player.GravarLog(LogType.Desmanche, $"{veh.VehicleDB.Id} {value}", null);
                     player.CancellationTokenSourceAcao = null;
                 });
             });
@@ -1165,7 +1165,7 @@ namespace Roleplay.Commands
         public static void CMD_rebocar(MyPlayer player, int id)
         {
             if (player.Vehicle is not MyVehicle veh || 
-                veh ?.Vehicle?.Model?.ToUpper() != VehicleModel.Flatbed.ToString().ToUpper() && veh.Driver != player)
+                veh ?.VehicleDB?.Model?.ToUpper() != VehicleModel.Flatbed.ToString().ToUpper() && veh.Driver != player)
             {
                 player.SendMessage(MessageType.Error, "Você não dirigindo um FLATBED.");
                 return;
@@ -1177,7 +1177,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            attachedVehicle = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == id
+            attachedVehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id
                 && x != player.Vehicle 
                 && x.Position.Distance(player.Vehicle.Position) <= 10);
             if (attachedVehicle == null)
@@ -1212,7 +1212,7 @@ namespace Roleplay.Commands
             await attachedVehicle.AttachToEntityAsync(veh, 0, 0, new Position(0, -45f, -0.5f), new Rotation(0, 0, 0), true, false);
             await Task.Delay(1000);
             await attachedVehicle.DetachAsync();
-            attachedVehicle.DeleteSyncedMetaData("Attached");
+            attachedVehicle.DeleteSyncedMetaData(Constants.VEHICLE_META_DATA_ATTACHED);
 
             player.SendMessage(MessageType.Success, "Você soltou o veículo.");
         }

@@ -2,7 +2,6 @@
 {
     public class Constants
     {
-        public const string PLAYER_META_DATA_DIMENSION = "DIMENSION";
         public const string PLAYER_META_DATA_INJURED = "INJURED";
         public const string PLAYER_META_DATA_GAME_UNFOCUSED = "GAME_UNFOCUSED";
         public const string PLAYER_META_DATA_DAMAGED = "DAMAGED";

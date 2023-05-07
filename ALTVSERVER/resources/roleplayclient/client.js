@@ -11,8 +11,6 @@ import * as vehtags from '/helpers/vehtags.js';
 import * as clothes from '/clothes/editor.js';
 import Fingerpointing from '/helpers/fingerpointing.js';
 import * as spotlight from '/helpers/spotlight.js';
-import * as markerStreamer from '/streamers/marker/client.mjs';
-import * as objectStreamer from '/streamers/object/client.mjs';
 import { updateCellphone, isCellphoneOpened } from '/cellphone/client.mjs';
 import * as bankSystem from '/bank/client.mjs';
 import * as staffSystem from '/staff/client.mjs';
@@ -193,6 +191,7 @@ alt.setStat('stealth_ability', 100);
 alt.setConfigFlag('DISABLE_AUTO_WEAPON_SWAP', true);
 alt.setConfigFlag('DISABLE_PED_PROP_KNOCK_OFF', true);
 alt.setConfigFlag('DISABLE_IDLE_CAMERA', true);
+alt.setConfigFlag('DISABLE_VEHICLE_ENGINE_SHUTDOWN_ON_LEAVE', true);
 alt.setMsPerGameMinute(60000);
 alt.setMinimapIsRectangle(true);
 
@@ -255,8 +254,8 @@ alt.everyTick(() => {
     native.disableControlAction(0, 23, true); // INPUT_ENTER
     native.disableControlAction(0, 37, true); // INPUT_SELECT_WEAPON
 
-    native.setPedConfigFlag(player, 429, true); // PED_FLAG_DISABLE_STARTING_VEH_ENGINE
-    native.setPedConfigFlag(player, 241, true); // PED_FLAG_DISABLE_STOPPING_VEH_ENGINE
+    //native.setPedConfigFlag(player, 429, true); // PED_FLAG_DISABLE_STARTING_VEH_ENGINE - TESTAR SEM ISSO PQ TEM FLAG AGORA
+    //native.setPedConfigFlag(player, 241, true); // PED_FLAG_DISABLE_STOPPING_VEH_ENGINE - TESTAR SEM ISSO PQ TEM FLAG AGORA
     native.setPedConfigFlag(player, 184, true); // PED_FLAG_DISABLE_SHUFFLING_TO_DRIVER_SEAT
 
     native.setPedSuffersCriticalHits(player, false);

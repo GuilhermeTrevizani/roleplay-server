@@ -414,7 +414,7 @@ namespace Roleplay.Scripts
                     oldCharacter = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
                     if (string.IsNullOrWhiteSpace(oldCharacter.RejectionReason))
                     {
-                        if (Global.Vehicles.Any(x => x.Vehicle.CharacterId == oldCharacter.Id))
+                        if (Global.Vehicles.Any(x => x.VehicleDB.CharacterId == oldCharacter.Id))
                         {
                             player.Emit("Server:MostrarErro", "Não é possível prosseguir pois você possui veículos spawnados.");
                             return;

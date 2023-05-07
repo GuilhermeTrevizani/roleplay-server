@@ -182,14 +182,14 @@ namespace Roleplay.Entities
             else
                 veh = (MyVehicle)Alt.CreateVehicle(Model, new Position(PosX, PosY, PosZ), new Rotation(RotR, RotP, RotY));
 
-            veh.Vehicle = this;
+            veh.VehicleDB = this;
             veh.ManualEngineControl = true;
-            veh.NumberplateText = veh.Vehicle.Plate;
+            veh.NumberplateText = veh.VehicleDB.Plate;
             veh.LockState = VehicleLockState.Locked;
-            veh.Livery = veh.Vehicle.Livery;
-            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_ID, veh.Vehicle.Id);
-            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_PLATE, veh.Vehicle.Plate);
-            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_MODEL, veh.Vehicle.Model.ToUpper());
+            veh.Livery = veh.VehicleDB.Livery;
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_ID, veh.VehicleDB.Id);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_PLATE, veh.VehicleDB.Plate);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_MODEL, veh.VehicleDB.Model.ToUpper());
 
             if (veh.TemTanqueCombustivel)
                 veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
@@ -205,12 +205,12 @@ namespace Roleplay.Entities
 
                 if (player != null)
                 {
-                    veh.EngineHealth = veh.Vehicle.EngineHealth;
-                    veh.BodyHealth = veh.Vehicle.BodyHealth;
-                    veh.BodyAdditionalHealth = veh.Vehicle.BodyAdditionalHealth;
-                    veh.PetrolTankHealth = veh.Vehicle.PetrolTankHealth;
+                    veh.EngineHealth = veh.VehicleDB.EngineHealth;
+                    veh.BodyHealth = veh.VehicleDB.BodyHealth;
+                    veh.BodyAdditionalHealth = veh.VehicleDB.BodyAdditionalHealth;
+                    veh.PetrolTankHealth = veh.VehicleDB.PetrolTankHealth;
 
-                    var dano = JsonSerializer.Deserialize<MyVehicle.Dano>(veh.Vehicle.StructureDamagesJSON);
+                    var dano = JsonSerializer.Deserialize<MyVehicle.Dano>(veh.VehicleDB.StructureDamagesJSON);
                     if (dano?.WindowsDamaged?.Count > 0)
                     {
                         foreach (var x in dano.Bumpers)
@@ -251,12 +251,12 @@ namespace Roleplay.Entities
                 }
             }
 
-            veh.Timer = new System.Timers.Timer(60000);
+            veh.Timer = new System.Timers.Timer(TimeSpan.FromMinutes(1));
             veh.Timer.Elapsed += (o, e) =>
             {
                 try
                 {
-                    Alt.Log($"Vehicle Timer {veh.Vehicle.Id}");
+                    Alt.Log($"Vehicle Timer {veh.VehicleDB.Id}");
                     if (veh.DataExpiracaoAluguel.HasValue)
                     {
                         if (veh.DataExpiracaoAluguel.Value < DateTime.Now)
@@ -269,17 +269,17 @@ namespace Roleplay.Entities
                         }
                     }
 
-                    if (veh.EngineOn && veh.Vehicle.Fuel > 0 && veh.TemTanqueCombustivel)
+                    if (veh.EngineOn && veh.VehicleDB.Fuel > 0 && veh.TemTanqueCombustivel)
                     {
-                        veh.Vehicle.Fuel--;
+                        veh.VehicleDB.Fuel--;
                         veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
-                        if (veh.Vehicle.Fuel == 0)
+                        if (veh.VehicleDB.Fuel == 0)
                             veh.EngineOn = false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    ex.Source = veh.Vehicle.Id.ToString();
+                    ex.Source = veh.VehicleDB.Id.ToString();
                     Functions.GetException(ex);
                 }
             };

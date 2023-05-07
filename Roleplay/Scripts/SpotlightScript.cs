@@ -81,8 +81,8 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            if (veh.Vehicle.Model.ToUpper() != VehicleModel.Polmav.ToString().ToUpper() 
-                && veh.Vehicle.Model.ToUpper() != VehicleModelMods.LSPDHELI.ToString().ToUpper())
+            if (veh.VehicleDB.Model.ToUpper() != VehicleModel.Polmav.ToString().ToUpper() 
+                && veh.VehicleDB.Model.ToUpper() != VehicleModelMods.LSPDHELI.ToString().ToUpper())
             {
                 player.SendMessage(MessageType.Error, "Você não está em um helicóptero policial.");
                 return;

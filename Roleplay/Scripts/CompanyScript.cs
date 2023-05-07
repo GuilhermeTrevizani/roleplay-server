@@ -198,8 +198,7 @@ namespace Roleplay.Scripts
             await context.SaveChangesAsync();
 
             var target = Global.Players.FirstOrDefault(x => x.Character.Id == characterId);
-            if (target != null)
-                target.SendMessage(MessageType.Success, $"{player.User.Name} alterou suas informações na empresa {company.Name}.");
+            target?.SendMessage(MessageType.Success, $"{player.User.Name} alterou suas informações na empresa {company.Name}.");
 
             player.EmitStaffShowMessage($"Você alterou as informações do personagem {characterId} na empresa.", true);
             await player.GravarLog(LogType.Faction, $"Salvar Funcionário Empresa {companyId} {characterId} {flagsJSON}", target);
@@ -237,8 +236,7 @@ namespace Roleplay.Scripts
             company.Characters.Remove(companyCharacterTarget);
 
             var target = Global.Players.FirstOrDefault(x => x.Character.Id == characterId);
-            if (target != null)
-                target.SendMessage(MessageType.Success, $"{player.User.Name} expulsou você da empresa {company.Name}.");
+            target?.SendMessage(MessageType.Success, $"{player.User.Name} expulsou você da empresa {company.Name}.");
 
             player.EmitStaffShowMessage($"Você expulsou o personagem {characterId} da empresa.", true);
             await player.GravarLog(LogType.Empresa, $"Expulsar Empresa {companyId} {characterId}", target);

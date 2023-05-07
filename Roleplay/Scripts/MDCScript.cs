@@ -66,7 +66,7 @@ namespace Roleplay.Scripts
         [ClientEvent(nameof(MDCRastrearVeiculo))]
         public void MDCRastrearVeiculo(MyPlayer player, int codigo)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == codigo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, "O veículo não foi encontrado.", notify: true);
@@ -215,8 +215,7 @@ namespace Roleplay.Scripts
             player.SendMessage(MessageType.Success, $"Você multou {nome} por ${valor:N0}. Motivo: {motivo}", notify: true);
 
             var target = Global.Players.FirstOrDefault(x => x.Character.Id == codigo && x.Cellphone > 0 && !x.CellphoneItem.ModoAviao);
-            if (target != null)
-                target.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CELLPHONE_MAIN_COLOR);
+            target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CELLPHONE_MAIN_COLOR);
 
             var html = await Functions.GetSearchPersonHTML(nome);
             foreach (var x in Global.Players.Where(x => x.Character.FactionId == player.Character.FactionId))

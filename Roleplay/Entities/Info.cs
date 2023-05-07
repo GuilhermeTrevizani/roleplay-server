@@ -1,7 +1,8 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
+using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
-using Roleplay.Streamer;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
@@ -43,12 +44,11 @@ namespace Roleplay.Entities
         {
             RemoveIdentifier();
 
-            Marker = MarkerStreamer.Create(MarkerTypes.MarkerTypeQuestionMark,
-                new Vector3(PosX, PosY, PosZ),
-                new Vector3(0.2f, 0.2f, 0.2f),
-                new Rgba(227, 170, 36, 75),
-                dimension: Dimension,
-                faceCamera: true);
+            Marker = new Marker(Alt.Core, MarkerType.MarkerHalo, new Vector3(PosX, PosY, PosZ), new Rgba(227, 170, 36, 75))
+            {
+                Scale = new Vector3(0.2f, 0.2f, 0.2f),
+                Dimension = Dimension,
+            };
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(Marker.Position, 1, 1.5f);
             ColShape.Description = $"[INFO] {{#FFFFFF}}{Message}";

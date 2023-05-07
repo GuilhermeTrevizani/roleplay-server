@@ -1,6 +1,7 @@
 ﻿using AltV.Net;
+using AltV.Net.Elements.Entities;
+using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
-using Roleplay.Streamer;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
@@ -45,10 +46,10 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(PosX, PosY, PosZ - 0.95f);
 
-            Marker = MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                pos,
-                new Vector3(1, 1, 1.5f),
-                color: Global.MainRgba);
+            Marker = new Marker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            {
+                Scale = new Vector3(1, 1, 1.5f),
+            };
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             ColShape.Description = $"[{Name}] {{#FFFFFF}}Use /carregarcaixas ou /cancelarcaixas.";

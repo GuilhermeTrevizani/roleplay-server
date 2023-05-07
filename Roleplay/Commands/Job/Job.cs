@@ -1,10 +1,11 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -174,11 +175,10 @@ namespace Roleplay.Commands.Job
                             x.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
                             x.Blip.Display = 2;
 
-                            x.Marker = MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                                new Position(x.PosX, x.PosY, x.PosZ - 0.95f),
-                                new Vector3(1, 1, 1),
-                                Global.MainRgba,
-                                player: player.Id);
+                            x.Marker = new Marker(Alt.Core, player, MarkerType.MarkerHalo, new Position(x.PosX, x.PosY, x.PosZ - 0.95f), Global.MainRgba)
+                            {
+                                Scale = new Vector3(1, 1, 1)
+                            };
 
                             player.CollectSpots.Add(x);
                         }

@@ -1,7 +1,8 @@
-﻿using Roleplay.Streamer;
+﻿using AltV.Net;
+using AltV.Net.Elements.Entities;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Roleplay.Entities
@@ -36,18 +37,20 @@ namespace Roleplay.Entities
         public string ModelName { get => Global.Furnitures.FirstOrDefault(x => x.Model.ToLower() == Model.ToLower())?.Name ?? string.Empty; }
 
         [NotMapped, JsonIgnore]
-        public Prop Object { get; set; }
+        public IObject Object { get; set; }
 
+        [Obsolete("TODO")]
         public void CreateObject()
         {
-            Object = PropStreamer.Create(
-                Model,
-                new Vector3(PosX, PosY, PosZ),
-                new Vector3(RotR, RotP, RotY),
-                Interior ? PropertyId : 0,
-                true,
-                frozen: true,
-                collision: true);
+            //Alt.CreateObject
+            //Object = PropStreamer.Create(
+            //    Model,
+            //    new Vector3(PosX, PosY, PosZ),
+            //    new Vector3(RotR, RotP, RotY),
+            //    Interior ? PropertyId : 0,
+            //    true,
+            //    frozen: true,
+            //    collision: true);
         }
 
         public void DeleteObject()

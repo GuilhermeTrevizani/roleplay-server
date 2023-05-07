@@ -88,7 +88,7 @@ namespace Roleplay.Commands.Faction
 
             await using var context = new DatabaseContext();
             var veiculos = (await context.Vehicles.Where(x => x.FactionId == player.Character.FactionId && !x.Sold).ToListAsync())
-                .OrderBy(x => Convert.ToInt32(Global.Vehicles.Any(y => y.Vehicle.Id == x.Id)))
+                .OrderBy(x => Convert.ToInt32(Global.Vehicles.Any(y => y.VehicleDB.Id == x.Id)))
                 .ThenBy(x => x.Model)
                 .ThenBy(x => x.Plate)
                 .Select(x => new
@@ -98,7 +98,7 @@ namespace Roleplay.Commands.Faction
                     Name = Alt.GetVehicleModelInfo(x.Model).Title,
                     x.LiveryName,
                     x.Plate,
-                    InChargeCharacterName = Global.Vehicles.FirstOrDefault(y => y.Vehicle.Id == x.Id)?.NomeEncarregado ?? "N/A",
+                    InChargeCharacterName = Global.Vehicles.FirstOrDefault(y => y.VehicleDB.Id == x.Id)?.NomeEncarregado ?? "N/A",
                 }).ToList();
 
             if (veiculos.Count == 0)
@@ -141,7 +141,7 @@ namespace Roleplay.Commands.Faction
 
             if (!Global.Spots.Any(x => x.Type == SpotType.MDC
                 && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE)
-                && !(Global.Vehicles.FirstOrDefault(x => x == player.Vehicle)?.Vehicle?.FactionId == player.Character.FactionId
+                && !(Global.Vehicles.FirstOrDefault(x => x == player.Vehicle)?.VehicleDB?.FactionId == player.Character.FactionId
                     && (player.Seat == 1 || player.Seat == 2)))
             {
                 player.SendMessage(Models.MessageType.Error, "Você não está em ponto de MDC ou em um veículo da sua facção nos bancos dianteiros.");
@@ -215,7 +215,7 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.Driver == player && x.Vehicle.FactionId == player.Character.FactionId);
+            var veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.Driver == player && x.VehicleDB.FactionId == player.Character.FactionId);
             if (veh == null)
             {
                 player.SendMessage(Models.MessageType.Error, "Você não está dirigindo um veículo que pertence a sua facção.");
@@ -242,8 +242,8 @@ namespace Roleplay.Commands.Faction
                 {
                     veh = await veh.Reparar();
                     player.ToggleGameControls(true);
-                    player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} reparou o veículo {veh.Vehicle.Model.ToUpper()} {veh.Vehicle.Plate}.");
-                    await player.GravarLog(LogType.RepararVeiculoFaccao, veh.Vehicle.Id.ToString(), null);
+                    player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} reparou o veículo {veh.VehicleDB.Model.ToUpper()} {veh.VehicleDB.Plate}.");
+                    await player.GravarLog(LogType.RepararVeiculoFaccao, veh.VehicleDB.Id.ToString(), null);
                     player.CancellationTokenSourceAcao = null;
                 });
             });
@@ -285,7 +285,7 @@ namespace Roleplay.Commands.Faction
             }
 
             var veh = (MyVehicle)player.Vehicle;
-            var modelo = veh?.Vehicle?.Model?.ToUpper();
+            var modelo = veh?.VehicleDB?.Model?.ToUpper();
             if ((player.Seat != 3 && player.Seat != 4) 
                 || (modelo != VehicleModel.Polmav.ToString().ToUpper() 
                     && modelo != VehicleModelMods.LSPDHELI.ToString().ToUpper())
@@ -392,6 +392,7 @@ namespace Roleplay.Commands.Faction
         }
 
         [Command("rb")]
+        [Obsolete("TODO")]
         public static async Task CMD_rb(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -400,22 +401,24 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            var barrier = Streamer.Prop.PropList.Where(x => x.CharacterId.HasValue
-                && x.Dimension == player.Dimension
-                && player.Position.Distance(x.Position) <= Global.RP_DISTANCE)
-                .MinBy(x=> player.Position.Distance(x.Position));
-            if (barrier == null)
-            {
-                player.SendMessage(Models.MessageType.Error, "Você não está próximo de nenhuma barreira criada por você.");
-                return;
-            }
+            //var barrier = Streamer.Prop.PropList.Where(x => 
+            //    x.CharacterId == player.Character.Id
+            //    && x.Dimension == player.Dimension
+            //    && player.Position.Distance(x.Position) <= Global.RP_DISTANCE)
+            //    .MinBy(x=> player.Position.Distance(x.Position));
+            //if (barrier == null)
+            //{
+            //    player.SendMessage(Models.MessageType.Error, "Você não está próximo de nenhuma barreira criada por você.");
+            //    return;
+            //}
 
-            barrier.Destroy();
-            player.SendMessageToNearbyPlayers($"retira a barreira do chão.", MessageCategory.Ame, 5);
-            await player.GravarLog(LogType.Faction, $"/rb | X: {barrier.Position.X} Y: {barrier.Position.Y} Z: {barrier.Position.Z}", null);
+            //barrier.Destroy();
+            //player.SendMessageToNearbyPlayers($"retira a barreira do chão.", MessageCategory.Ame, 5);
+            //await player.GravarLog(LogType.Faction, $"/rb | X: {barrier.Position.X} Y: {barrier.Position.Y} Z: {barrier.Position.Z}", null);
         }
 
         [Command("rball")]
+        [Obsolete("TODO")]
         public static async Task CMD_rball(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -430,21 +433,22 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            var barriers = Streamer.Prop.PropList.Where(x => x.FactionId == player.Faction.Id).ToList();
-            if (!barriers.Any())
-            {
-                player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas pela facção.");
-                return;
-            }
+            //var barriers = Streamer.Prop.PropList.Where(x => x.FactionId == player.Faction.Id).ToList();
+            //if (!barriers.Any())
+            //{
+            //    player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas pela facção.");
+            //    return;
+            //}
 
-            foreach(var barrier in barriers)
-                barrier.Destroy();
+            //foreach(var barrier in barriers)
+            //    barrier.Destroy();
 
             player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as barreiras da facção.");
             await player.GravarLog(LogType.Faction, $"/rball", null);
         }
 
         [Command("rballme")]
+        [Obsolete("TODO")]
         public static async Task CMD_rballme(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -453,15 +457,15 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            var barriers = Streamer.Prop.PropList.Where(x => x.CharacterId == player.Character.Id).ToList();
-            if (!barriers.Any())
-            {
-                player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas por você.");
-                return;
-            }
+            //var barriers = Streamer.Prop.PropList.Where(x => x.CharacterId == player.Character.Id).ToList();
+            //if (!barriers.Any())
+            //{
+            //    player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas por você.");
+            //    return;
+            //}
 
-            foreach (var barrier in barriers)
-                barrier.Destroy();
+            //foreach (var barrier in barriers)
+            //    barrier.Destroy();
 
             player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as suas barreiras.");
             await player.GravarLog(LogType.Faction, $"/rballme", null);

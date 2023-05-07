@@ -2152,7 +2152,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            if (id > 0 && Global.Vehicles.Any(x => x.Vehicle.Id == id))
+            if (id > 0 && Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.EmitStaffShowMessage($"Veículo {id} está spawnado.");
                 return;
@@ -2270,7 +2270,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            if (Global.Vehicles.Any(x => x.Vehicle.Id == id))
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.EmitStaffShowMessage($"Veículo {id} está spawnado.");
                 return;

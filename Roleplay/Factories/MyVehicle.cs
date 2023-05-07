@@ -2,7 +2,6 @@
 using AltV.Net.Async;
 using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Roleplay.Entities;
 using Roleplay.Models;
@@ -21,7 +20,7 @@ namespace Roleplay.Factories
         {
         }
 
-        public MyVehicle(ICore server, IntPtr nativePointer, ushort id) : base(server, nativePointer, id)
+        public MyVehicle(ICore server, IntPtr nativePointer, uint id) : base(server, nativePointer, id)
         {
         }
 
@@ -106,7 +105,7 @@ namespace Roleplay.Factories
             public float Distance { get; set; }
         }
 
-        public Entities.Vehicle Vehicle { get; set; } = new();
+        public Entities.Vehicle VehicleDB { get; set; } = new();
 
         /// <summary>
         /// Nome do personagem que usou o /fspawn ou /valugar
@@ -130,7 +129,7 @@ namespace Roleplay.Factories
             get
             {
                 var combustivel = "COMBUSTÍVEL: ";
-                var porcentagem = Convert.ToInt32(Convert.ToDecimal(Vehicle.Fuel) / Convert.ToDecimal(Vehicle.MaxFuel) * 100);
+                var porcentagem = Convert.ToInt32(Convert.ToDecimal(VehicleDB.Fuel) / Convert.ToDecimal(VehicleDB.MaxFuel) * 100);
                 if (porcentagem > 50)
                     combustivel += "~g~";
                 else if (porcentagem > 20)
@@ -145,9 +144,9 @@ namespace Roleplay.Factories
 
         public bool TemTanqueCombustivel
         {
-            get => !(Vehicle.Model.ToUpper() == VehicleModel.Polmav.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModelMods.LSPDHELI.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
+            get => !(VehicleDB.Model.ToUpper() == VehicleModel.Polmav.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModelMods.LSPDHELI.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
                 || new List<VehicleModelType> { VehicleModelType.BOAT, VehicleModelType.BMX, VehicleModelType.PLANE, VehicleModelType.HELI, VehicleModelType.TRAILER, VehicleModelType.TRAIN }.Contains(Info.Type));
         }
 
@@ -157,43 +156,43 @@ namespace Roleplay.Factories
 
         public bool TemJanelas
         {
-            get => !(Vehicle.Model.ToUpper() == VehicleModel.Policeb.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModelMods.POLTHRUST.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModelMods.LSPDB.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Wastlndr.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Raptor.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Veto.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Veto2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Banshee2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Voltic2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Airtug.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Caddy.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Caddy2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Caddy3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Forklift.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Mower.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Tractor.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Bifta.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer4.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer5.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Bodhi2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune4.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune5.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Outlaw.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Trophytruck.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Vagrant.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Verus.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Winky.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Faction.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Faction2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Faction3.ToString().ToUpper()
+            get => !(VehicleDB.Model.ToUpper() == VehicleModel.Policeb.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModelMods.POLTHRUST.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModelMods.LSPDB.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Wastlndr.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Raptor.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Veto.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Veto2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Banshee2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Voltic2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Airtug.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Caddy.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Caddy2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Caddy3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Forklift.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Mower.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Tractor.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Bifta.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer4.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer5.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Bodhi2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune4.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune5.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Outlaw.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Trophytruck.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Vagrant.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Verus.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Winky.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Faction.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Faction2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Faction3.ToString().ToUpper()
                 || new List<VehicleModelType> { VehicleModelType.BOAT, VehicleModelType.BMX, VehicleModelType.BIKE }.Contains(Info.Type));
         }
 
@@ -201,36 +200,36 @@ namespace Roleplay.Factories
 
         public bool TemArmazenamento
         {
-            get => !(Vehicle.Model.ToUpper() == VehicleModel.Policeb.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModelMods.POLTHRUST.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModelMods.LSPDB.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Wastlndr.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Raptor.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Veto.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Veto2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Banshee2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Voltic2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Tractor.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Tractor2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Tractor3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Bifta.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer4.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Blazer5.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Bodhi2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune2.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune3.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune4.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Dune5.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Outlaw.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Trophytruck.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Vagrant.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Verus.ToString().ToUpper()
-                || Vehicle.Model.ToUpper() == VehicleModel.Winky.ToString().ToUpper()
+            get => !(VehicleDB.Model.ToUpper() == VehicleModel.Policeb.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModelMods.POLTHRUST.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModelMods.LSPDB.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Predator.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Wastlndr.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Raptor.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Veto.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Veto2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Banshee2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Voltic2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Tractor.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Tractor2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Tractor3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Bifta.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer4.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Blazer5.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Bodhi2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune2.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune3.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune4.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Dune5.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Outlaw.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Trophytruck.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Vagrant.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Verus.ToString().ToUpper()
+                || VehicleDB.Model.ToUpper() == VehicleModel.Winky.ToString().ToUpper()
                 || new List<VehicleModelType> { VehicleModelType.BOAT, VehicleModelType.BMX, VehicleModelType.BIKE }.Contains(Info.Type));
         }
 
@@ -251,20 +250,20 @@ namespace Roleplay.Factories
             Timer?.Stop();
             StopAlarm();
 
-            if (Vehicle.Job == CharacterJob.None)
+            if (VehicleDB.Job == CharacterJob.None)
             {
-                Vehicle.EngineHealth = EngineHealth;
-                Vehicle.BodyHealth = BodyHealth;
-                Vehicle.BodyAdditionalHealth = BodyAdditionalHealth;
-                Vehicle.PetrolTankHealth = PetrolTankHealth;
+                VehicleDB.EngineHealth = EngineHealth;
+                VehicleDB.BodyHealth = BodyHealth;
+                VehicleDB.BodyAdditionalHealth = BodyAdditionalHealth;
+                VehicleDB.PetrolTankHealth = PetrolTankHealth;
 
                 var dano = new Dano();
 
-                foreach (byte x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
-                    dano.Bumpers.Add(new Dano.Bumper((VehicleBumper)x, (VehicleBumperDamage)GetBumperDamageLevel(x)));
+                foreach (var x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
+                    dano.Bumpers.Add(new Dano.Bumper(x, (VehicleBumperDamage)GetBumperDamageLevel((byte)x)));
 
-                foreach (byte x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
-                    dano.Parts.Add(new Dano.Part((VehiclePart)x, (VehiclePartDamage)GetPartDamageLevel(x), GetPartBulletHoles(x)));
+                foreach (var x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
+                    dano.Parts.Add(new Dano.Part(x, (VehiclePartDamage)GetPartDamageLevel((byte)x), GetPartBulletHoles((byte)x)));
 
                 for (byte i = 0; i <= 20; i++)
                 {
@@ -277,26 +276,26 @@ namespace Roleplay.Factories
                 for (byte i = 0; i < WheelsCount; i++)
                     dano.Wheels.Add(new Dano.Wheel(i, GetWheelHealth(i), IsWheelDetached(i), IsWheelBurst(i), DoesWheelHasTire(i)));
 
-                Vehicle.StructureDamagesJSON = JsonSerializer.Serialize(dano);
-                Vehicle.DamagesJSON = JsonSerializer.Serialize(Damages);
+                VehicleDB.StructureDamagesJSON = JsonSerializer.Serialize(dano);
+                VehicleDB.DamagesJSON = JsonSerializer.Serialize(Damages);
             }
 
             await using var context = new DatabaseContext();
-            context.Vehicles.Update(Vehicle);
+            context.Vehicles.Update(VehicleDB);
             await context.SaveChangesAsync();
 
             Destroy();
 
             if (player != null)
-                await player.GravarLog(LogType.EstacionarVeiculo, Vehicle.Id.ToString(), null);
+                await player.GravarLog(LogType.EstacionarVeiculo, VehicleDB.Id.ToString(), null);
 
             return true;
         }
 
         public async Task<MyVehicle> Reparar()
         {
-            var vehPos = new Vector3(Vehicle.PosX, Vehicle.PosY, Vehicle.PosZ);
-            var vehRot = new Vector3(Vehicle.RotR, Vehicle.RotP, Vehicle.RotY);
+            var vehPos = new Vector3(VehicleDB.PosX, VehicleDB.PosY, VehicleDB.PosZ);
+            var vehRot = new Vector3(VehicleDB.RotR, VehicleDB.RotP, VehicleDB.RotY);
 
             var pos = Position;
             var rot = Rotation;
@@ -315,24 +314,24 @@ namespace Roleplay.Factories
             StopAlarm();
             Destroy();
 
-            Vehicle.PosX = pos.X;
-            Vehicle.PosY = pos.Y;
-            Vehicle.PosZ = pos.Z;
+            VehicleDB.PosX = pos.X;
+            VehicleDB.PosY = pos.Y;
+            VehicleDB.PosZ = pos.Z;
 
-            Vehicle.RotR = rot.Roll;
-            Vehicle.RotP = rot.Pitch;
-            Vehicle.RotY = rot.Yaw;
+            VehicleDB.RotR = rot.Roll;
+            VehicleDB.RotP = rot.Pitch;
+            VehicleDB.RotY = rot.Yaw;
 
-            var veh = await Vehicle.Spawnar(null);
+            var veh = await VehicleDB.Spawnar(null);
             veh.LockState = lockState;
             veh.EngineOn = engineOn;
-            veh.Vehicle.PosX = vehPos.X;
-            veh.Vehicle.PosY = vehPos.Y;
-            veh.Vehicle.PosZ = vehPos.Z;
+            veh.VehicleDB.PosX = vehPos.X;
+            veh.VehicleDB.PosY = vehPos.Y;
+            veh.VehicleDB.PosZ = vehPos.Z;
 
-            veh.Vehicle.RotR = vehRot.X;
-            veh.Vehicle.RotP = vehRot.Y;
-            veh.Vehicle.RotY = vehRot.Z;
+            veh.VehicleDB.RotR = vehRot.X;
+            veh.VehicleDB.RotP = vehRot.Y;
+            veh.VehicleDB.RotY = vehRot.Z;
 
             foreach (var occupant in occupants)
                 occupant.Player.SetIntoVehicle(veh, occupant.Seat);
@@ -346,7 +345,7 @@ namespace Roleplay.Factories
         public void ShowInventory(MyPlayer player, bool update)
         {
             player.ShowInventory(player, InventoryShowType.Vehicle,
-                $"{Vehicle.Model.ToUpper()} ({Vehicle.Plate.ToUpper()}) [{Vehicle.Id}]",
+                $"{VehicleDB.Model.ToUpper()} ({VehicleDB.Plate.ToUpper()}) [{VehicleDB.Id}]",
                 JsonSerializer.Serialize(
                     Itens.Select(x => new
                     {
@@ -358,29 +357,29 @@ namespace Roleplay.Factories
                         Extra = Functions.GetItemExtra(x),
                         Weight = (x.Quantity * x.Weight).ToString("N2"),
                     })
-            ), update, Vehicle.Id);
+            ), update, VehicleDB.Id);
         }
 
         public bool CanAccess(MyPlayer player)
         {
-            return Vehicle.CharacterId == player.Character.Id
-                || (Vehicle.FactionId.HasValue && Vehicle.FactionId == player.Character.FactionId)
+            return VehicleDB.CharacterId == player.Character.Id
+                || (VehicleDB.FactionId.HasValue && VehicleDB.FactionId == player.Character.FactionId)
                 || (!string.IsNullOrWhiteSpace(NomeEncarregado) && NomeEncarregado == player.Character.Name)
-                || player.Items.Any(x => x.Category == ItemCategory.VehicleKey && x.Type == Vehicle.LockNumber);
+                || player.Items.Any(x => x.Category == ItemCategory.VehicleKey && x.Type == VehicleDB.LockNumber);
         }
 
         public async Task ActivateProtection(MyPlayer player)
         {
-            if (Vehicle.ProtectionLevel >= 1)
+            if (VehicleDB.ProtectionLevel >= 1)
                 StartAlarm();
 
-            if (Vehicle.ProtectionLevel >= 2)
+            if (VehicleDB.ProtectionLevel >= 2)
             {
-                var target = Global.Players.FirstOrDefault(x => x.Character.Id == Vehicle.CharacterId && x.Cellphone > 0 && !x.CellphoneItem.ModoAviao);
-                target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme do seu {Vehicle.Model.ToUpper()} {Vehicle.Plate.ToUpper()} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
+                var target = Global.Players.FirstOrDefault(x => x.Character.Id == VehicleDB.CharacterId && x.Cellphone > 0 && !x.CellphoneItem.ModoAviao);
+                target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: O alarme do seu {VehicleDB.Model.ToUpper()} {VehicleDB.Plate.ToUpper()} foi acionado.", Global.CELLPHONE_MAIN_COLOR);
             }
 
-            if (Vehicle.ProtectionLevel >= 3)
+            if (VehicleDB.ProtectionLevel >= 3)
             {
                 var emergencyCall = new EmergencyCall
                 {
@@ -388,7 +387,7 @@ namespace Roleplay.Factories
                     Number = Global.EMERGENCY_NUMBER,
                     PosX = Position.X,
                     PosY = Position.Y,
-                    Message = $"O alarme do veículo {Vehicle.Model.ToUpper()} {Vehicle.Plate.ToUpper()} foi acionado.",
+                    Message = $"O alarme do veículo {VehicleDB.Model.ToUpper()} {VehicleDB.Plate.ToUpper()} foi acionado.",
                 };
 
                 player.AreaNameType = 1;
@@ -431,21 +430,21 @@ namespace Roleplay.Factories
             {
                 ModKit = 1;
 
-                PrimaryColorRgb = new Rgba(Vehicle.Color1R, Vehicle.Color1G, Vehicle.Color1B, 255);
-                SecondaryColorRgb = new Rgba(Vehicle.Color2R, Vehicle.Color2G, Vehicle.Color2B, 255);
-                SetWheels(Vehicle.WheelType, Vehicle.WheelVariation);
-                WheelColor = Vehicle.WheelColor;
-                NeonColor = new Rgba(Vehicle.NeonColorR, Vehicle.NeonColorG, Vehicle.NeonColorB, 255);
-                SetNeonActive(Vehicle.NeonLeft, Vehicle.NeonRight, Vehicle.NeonFront, Vehicle.NeonBack);
+                PrimaryColorRgb = new Rgba(VehicleDB.Color1R, VehicleDB.Color1G, VehicleDB.Color1B, 255);
+                SecondaryColorRgb = new Rgba(VehicleDB.Color2R, VehicleDB.Color2G, VehicleDB.Color2B, 255);
+                SetWheels(VehicleDB.WheelType, VehicleDB.WheelVariation);
+                WheelColor = VehicleDB.WheelColor;
+                NeonColor = new Rgba(VehicleDB.NeonColorR, VehicleDB.NeonColorG, VehicleDB.NeonColorB, 255);
+                SetNeonActive(VehicleDB.NeonLeft, VehicleDB.NeonRight, VehicleDB.NeonFront, VehicleDB.NeonBack);
 
-                var mods = JsonSerializer.Deserialize<List<VehicleMod>>(Vehicle.ModsJSON);
+                var mods = JsonSerializer.Deserialize<List<VehicleMod>>(VehicleDB.ModsJSON);
                 foreach (var mod in mods)
                     SetMod(mod.Type, mod.Id);
 
-                HeadlightColor = Vehicle.HeadlightColor;
-                LightsMultiplier = Vehicle.LightsMultiplier;
-                WindowTint = Vehicle.WindowTint;
-                TireSmokeColor = new Rgba(Vehicle.TireSmokeColorR, Vehicle.TireSmokeColorG, Vehicle.TireSmokeColorB, 255);
+                HeadlightColor = VehicleDB.HeadlightColor;
+                LightsMultiplier = VehicleDB.LightsMultiplier;
+                WindowTint = VehicleDB.WindowTint;
+                TireSmokeColor = new Rgba(VehicleDB.TireSmokeColorR, VehicleDB.TireSmokeColorG, VehicleDB.TireSmokeColorB, 255);
             }
         }
     }

@@ -148,7 +148,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == codigo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
@@ -176,7 +176,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == codigo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
@@ -383,7 +383,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, "Veículo não está spawnado.");
@@ -423,7 +423,7 @@ namespace Roleplay.Commands.Staff
         [Command("adanos", "/adanos (veículo)")]
         public static void CMD_adanos(MyPlayer player, int veiculo)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, $"Nenhum veículo encontrado com o código {veiculo}.");
@@ -460,7 +460,7 @@ namespace Roleplay.Commands.Staff
             </table>
             </div>";
 
-            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Danos do veículo {veh.Vehicle.Model.ToUpper()} [{veh.Vehicle.Id}] ({veh.Vehicle.Plate})", html));
+            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"Danos do veículo {veh.VehicleDB.Model.ToUpper()} [{veh.VehicleDB.Id}] ({veh.VehicleDB.Plate})", html));
         }
 
         [Command("checarveh", "/checarveh (código)")]
@@ -472,7 +472,7 @@ namespace Roleplay.Commands.Staff
                 return;
             }
 
-            var veh = Global.Vehicles.FirstOrDefault(x => x.Vehicle.Id == codigo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == codigo);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, $"Veículo {codigo} não está spawnado.");
@@ -480,21 +480,21 @@ namespace Roleplay.Commands.Staff
             }
 
             var dono = string.Empty;
-            if (veh.Vehicle.FactionId.HasValue)
+            if (veh.VehicleDB.FactionId.HasValue)
             {
-                dono = $"{Global.Factions.FirstOrDefault(x => x.Id == veh.Vehicle.FactionId).Name} [{veh.Vehicle.FactionId}]";
+                dono = $"{Global.Factions.FirstOrDefault(x => x.Id == veh.VehicleDB.FactionId).Name} [{veh.VehicleDB.FactionId}]";
             }
-            else if (veh.Vehicle.CharacterId.HasValue)
+            else if (veh.VehicleDB.CharacterId.HasValue)
             {
                 await using var context = new DatabaseContext();
-                dono = $"{(await context.Characters.FirstOrDefaultAsync(x => x.Id == veh.Vehicle.CharacterId)).Name} [{veh.Vehicle.CharacterId}]";
+                dono = $"{(await context.Characters.FirstOrDefaultAsync(x => x.Id == veh.VehicleDB.CharacterId)).Name} [{veh.VehicleDB.CharacterId}]";
             }
-            else if (veh.Vehicle.Job != CharacterJob.None)
+            else if (veh.VehicleDB.Job != CharacterJob.None)
             {
-                dono = $"{Functions.GetEnumDisplay(veh.Vehicle.Job)} ({veh.NomeEncarregado}){{#FFFFFF}} | Término Aluguel: {{{Global.MAIN_COLOR}}}{veh.DataExpiracaoAluguel}";
+                dono = $"{Functions.GetEnumDisplay(veh.VehicleDB.Job)} ({veh.NomeEncarregado}){{#FFFFFF}} | Término Aluguel: {{{Global.MAIN_COLOR}}}{veh.DataExpiracaoAluguel}";
             }
 
-            player.SendMessage(MessageType.None, $"Veículo: {{{Global.MAIN_COLOR}}}{codigo}{{#FFFFFF}} | Modelo: {{{Global.MAIN_COLOR}}}{veh.Vehicle.Model}{{#FFFFFF}} | Proprietário: {{{Global.MAIN_COLOR}}}{dono}");
+            player.SendMessage(MessageType.None, $"Veículo: {{{Global.MAIN_COLOR}}}{codigo}{{#FFFFFF}} | Modelo: {{{Global.MAIN_COLOR}}}{veh.VehicleDB.Model}{{#FFFFFF}} | Proprietário: {{{Global.MAIN_COLOR}}}{dono}");
         }
 
         [Command("acp")]
@@ -603,7 +603,7 @@ namespace Roleplay.Commands.Staff
             {
                 if (player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= distanceVer)
                 {
-                    player.SendMessage(MessageType.None, $"Veículo {x.Vehicle.Id} | Modelo: {x.Vehicle.Model.ToUpper()}");
+                    player.SendMessage(MessageType.None, $"Veículo {x.VehicleDB.Id} | Modelo: {x.VehicleDB.Model.ToUpper()}");
                     isTemAlgoProximo = true;
                 }
             }

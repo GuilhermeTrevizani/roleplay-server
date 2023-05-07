@@ -1,10 +1,11 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
+using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -142,7 +143,7 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            if (veh.Vehicle.FactionId.HasValue || veh.Vehicle.Job > 0)
+            if (veh.VehicleDB.FactionId.HasValue || veh.VehicleDB.Job > 0)
             {
                 player.SendMessage(MessageType.Error, "Veículo pertence a uma facção ou um emprego.");
                 return;
@@ -151,7 +152,7 @@ namespace Roleplay.Commands.Faction
             await using var context = new DatabaseContext();
             await context.SeizedVehicles.AddAsync(new SeizedVehicle
             {
-                VehicleId = veh.Vehicle.Id,
+                VehicleId = veh.VehicleDB.Id,
                 Reason = motivo,
                 PoliceOfficerCharacterId = player.Character.Id,
                 Value = valor,
@@ -159,11 +160,11 @@ namespace Roleplay.Commands.Faction
             });
             await context.SaveChangesAsync();
 
-            veh.Vehicle.SeizedValue = valor;
+            veh.VehicleDB.SeizedValue = valor;
 
             await veh.Estacionar(player);
 
-            player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} apreendeu o veículo de placa {veh.Vehicle.Plate.ToUpper()} por ${valor:N0}.");
+            player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} apreendeu o veículo de placa {veh.VehicleDB.Plate.ToUpper()} por ${valor:N0}.");
         }
 
         [Command("radar", "/radar (velocidade)")]
@@ -198,11 +199,10 @@ namespace Roleplay.Commands.Faction
             player.RadarSpot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
             player.RadarSpot.Blip.Display = 2;
 
-            player.RadarSpot.Marker = MarkerStreamer.Create(MarkerTypes.MarkerTypeHorizontalCircleSkinny,
-                pos,
-                new Vector3(10, 10, 10),
-                Global.MainRgba,
-                player: player.Id);
+            player.RadarSpot.Marker = new Marker(Alt.Core, player, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            {
+                Scale = new Vector3(10, 10, 10)
+            };
 
             player.RadarSpot.ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 10, 3);
             player.RadarSpot.ColShape.PoliceOfficerCharacterId = player.Character.Id;
@@ -253,12 +253,12 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            if (veh.Vehicle.Model.ToUpper() != VehicleModel.Police.ToString().ToUpper()
-                && veh.Vehicle.Model.ToUpper() != VehicleModel.Police2.ToString().ToUpper()
-                && veh.Vehicle.Model.ToUpper() != VehicleModel.Police3.ToString().ToUpper()
-                && veh.Vehicle.Model.ToUpper() != VehicleModel.Police4.ToString().ToUpper()
-                && veh.Vehicle.Model.ToUpper() != VehicleModelMods.PSCOUT.ToString().ToUpper()
-                && veh.Vehicle.Model.ToUpper() != VehicleModelMods.POLICE42.ToString().ToUpper())
+            if (veh.VehicleDB.Model.ToUpper() != VehicleModel.Police.ToString().ToUpper()
+                && veh.VehicleDB.Model.ToUpper() != VehicleModel.Police2.ToString().ToUpper()
+                && veh.VehicleDB.Model.ToUpper() != VehicleModel.Police3.ToString().ToUpper()
+                && veh.VehicleDB.Model.ToUpper() != VehicleModel.Police4.ToString().ToUpper()
+                && veh.VehicleDB.Model.ToUpper() != VehicleModelMods.PSCOUT.ToString().ToUpper()
+                && veh.VehicleDB.Model.ToUpper() != VehicleModelMods.POLICE42.ToString().ToUpper())
             {
                 player.SendMessage(MessageType.Error, "Você não está em um veículo policial com holofote.");
                 return;

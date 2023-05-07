@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using Roleplay.Streamer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -359,6 +358,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(ConfirmDropBarrier))]
+        [Obsolete("TODO")]
         public static async Task ConfirmDropBarrier(MyPlayer player, Vector3 position, Vector3 rotation)
         {
             if (position.X == 0 || position.Y == 0 || position.Z == 0)
@@ -367,14 +367,14 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            PropStreamer.Create(player.DropFurniture.Model,
-                position,
-                rotation,
-                player.Dimension,
-                true,
-                true,
-                characterId: player.Character.Id,
-                factionId: player.Faction.Id);
+            //PropStreamer.Create(player.DropFurniture.Model,
+            //    position,
+            //    rotation,
+            //    player.Dimension,
+            //    true,
+            //    true,
+            //    characterId: player.Character.Id,
+            //    factionId: player.Faction.Id);
 
             await player.GravarLog(LogType.Faction, $"/br {JsonSerializer.Serialize(player.DropFurniture)}", null);
             player.SendMessageToNearbyPlayers($"dropa uma barreira no chão.", MessageCategory.Ame, 5);

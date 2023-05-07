@@ -1,12 +1,11 @@
 ﻿using AltV.Net;
 using AltV.Net.Async.Elements.Entities;
-using System;
 
 namespace Roleplay.Factories
 {
     public class MyColShape : AsyncColShape
     {
-        public MyColShape(ICore server, IntPtr nativePointer) : base(server, nativePointer)
+        public MyColShape(ICore server, nint nativePointer, uint id) : base(server, nativePointer, id)
         {
         }
 
