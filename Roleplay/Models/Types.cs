@@ -90,113 +90,107 @@ namespace Roleplay.Models
         [Display(Name = "Anúncio Governamental")]
         AnuncioGov = 14,
 
-        [Display(Name = "Falha Login")]
-        LoginFalha = 15,
-
-        [Display(Name = "Falha Esqueci Minha Senha")]
-        EsqueciMinhaSenhaFalha = 16,
-
         [Display(Name = "Entregar Item")]
-        EntregarItem = 17,
+        EntregarItem = 15,
 
         [Display(Name = "Dropar Item")]
-        DroparItem = 18,
+        DroparItem = 16,
 
         [Display(Name = "Pegar Item Chão")]
-        PegarItemChao = 19,
+        PegarItemChao = 17,
 
         [Display(Name = "Roubar Item")]
-        RoubarItem = 20,
+        RoubarItem = 18,
 
         [Display(Name = "Descartar Item")]
-        DescartarItem = 21,
+        DescartarItem = 19,
 
         [Display(Name = "Dar Item")]
-        DarItem = 22,
+        DarItem = 20,
 
         [Display(Name = "Armazenar Item Propriedade")]
-        ArmazenarItemPropriedade = 23,
+        ArmazenarItemPropriedade = 21,
 
         [Display(Name = "Pegar Item Propriedade")]
-        PegarItemPropriedade = 24,
+        PegarItemPropriedade = 22,
 
         [Display(Name = "Armazenar Item Veículo")]
-        ArmazenarItemVeiculo = 25,
+        ArmazenarItemVeiculo = 23,
 
         [Display(Name = "Pegar Item Veículo")]
-        PegarItemVeiculo = 26,
+        PegarItemVeiculo = 24,
 
         [Display(Name = "Reparar Veículo Facção")]
-        RepararVeiculoFaccao = 27,
+        RepararVeiculoFaccao = 25,
 
         [Display(Name = "Reparar Veículo Jogador")]
-        RepararVeiculoJogador = 28,
+        RepararVeiculoJogador = 26,
 
         [Display(Name = "Spawnar Veículo")]
-        SpawnarVeiculo = 29,
+        SpawnarVeiculo = 27,
 
         [Display(Name = "Estacionar Veículo")]
-        EstacionarVeiculo = 30,
+        EstacionarVeiculo = 28,
 
         [Display(Name = "Me Curar")]
-        MeCurar = 31,
+        MeCurar = 29,
 
         [Display(Name = "Mensagens Privadas")]
-        MensagensPrivadas = 32,
+        MensagensPrivadas = 30,
 
         [Display(Name = "Máscara")]
-        Mascara = 33,
+        Mascara = 31,
 
         [Display(Name = "Destruição de Veículo")]
-        DestruicaoVeiculo = 34,
+        DestruicaoVeiculo = 32,
 
-        Hack = 35,
+        Hack = 33,
 
-        Droga = 36,
+        Droga = 34,
 
         [Display(Name = "Quebrar Trava")]
-        QuebrarTrava = 37,
+        QuebrarTrava = 35,
 
         [Display(Name = "Ligação Direta")]
-        LigacaoDireta = 38,
+        LigacaoDireta = 36,
 
-        Desmanche = 39,
+        Desmanche = 37,
 
-        Arrombar = 40,
+        Arrombar = 38,
 
         [Display(Name = "Roubar Propriedade")]
-        RoubarPropriedade = 41,
+        RoubarPropriedade = 39,
 
         [Display(Name = "Roubar Armazenamento")]
-        RoubarArmazenamento = 42,
+        RoubarArmazenamento = 40,
 
         [Display(Name = "Visualizar Vendas Boca de Fumo")]
-        VisualizarVendasBocaFumo = 43,
+        VisualizarVendasBocaFumo = 41,
         
         [Display(Name = "Editar Mobília Propriedade")]
-        EditPropertyFurniture = 44,
+        EditPropertyFurniture = 42,
 
         [Display(Name = "Chat OOC Global")]
-        GlobalOOCChat = 45,
+        GlobalOOCChat = 43,
 
         [Display(Name = "Chat Staff")]
-        StaffChat = 46,
+        StaffChat = 44,
 
         [Display(Name = "Colocar no Veículo")]
-        ColocarVeiculo = 47,
+        ColocarVeiculo = 45,
 
         [Display(Name = "Retirar do Veículo")]
-        RetirarVeiculo = 48,
+        RetirarVeiculo = 46,
 
-        Empresa = 49,
+        Empresa = 47,
 
         [Display(Name = "Anúncio Empresa")]
-        AnuncioEmpresa = 50,
+        AnuncioEmpresa = 48,
 
         [Display(Name = "Tunar Veículo Mecânico")]
-        TunarVeiculoMecanico = 51,
+        TunarVeiculoMecanico = 49,
 
-        Emprego = 52,
+        Emprego = 50,
     }
 
     public enum InviteType

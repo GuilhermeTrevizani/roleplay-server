@@ -573,54 +573,23 @@ function disableHud() {
     player.setMeta('f7', false);
 }
 
-let loginUser;
-alt.onServer('Server:Login', (user) => {
-    loginUser = user;
-    serverLogin();
+disableHud();
+setView(new alt.WebView('http://resource/login/login.html'));
+view.on('requestDiscordToken', () => {
+    requestDiscordToken();
 });
+toggleView(true);
 
-function serverLogin() {
-    disableHud();
-
-    if (view) 
-        view.destroy();
-    else 
-        toggleView(true);
-
-    setView(new alt.WebView('http://resource/login/login.html'));
-    view.on('load', () => {
-        view.emit('showHTML', loginUser);
-    });
-    view.on('entrarUsuario', (usuario, senha) => {
-        alt.emitServer('EntrarUsuario', usuario, senha);
-    });
-    view.on('esqueciMinhaSenha', () => {
-        view.destroy();
-        setView(new alt.WebView('http://resource/login/esqueciminhasenha.html'));  
-        view.on('voltarLogin', serverLogin);
-        view.on('confirmar', (email) => {
-            alt.emitServer('EnviarEmailTokenRedefinirSenha', email);
-        });
-        view.focus();
-    });
-    view.on('registrarUsuario', () => {
-        alt.emitServer('ExibirPerguntas');
-    });
-    view.focus();
+async function requestDiscordToken() {
+    try {
+        const token = await alt.Discord.requestOAuth2Token(Constants.DISCORD_APP_ID);
+        alt.emitServer('ValidateDiscordToken', token);
+    } catch (ex) {
+        view.emit('mostrarErro', ex);
+    }
 }
 
-alt.onServer('Server:RedefinirSenha', (email, codigo) => {
-    view.destroy();
-    setView(new alt.WebView('http://resource/login/redefinirsenha.html'));  
-    view.on('load', () => {
-        view.emit('showHTML', email);
-    });
-    view.on('voltarLogin', serverLogin);
-    view.on('confirmar', (token) => {
-        alt.emitServer('RedefinirSenha', codigo, token);
-    });
-    view.focus();
-});
+requestDiscordToken();
 
 alt.onServer('Server:ExibirPerguntas', (perguntas) => {
     view.destroy();
@@ -628,45 +597,8 @@ alt.onServer('Server:ExibirPerguntas', (perguntas) => {
     view.on('load', () => {
         view.emit('showHTML', perguntas);
     });
-    view.on('voltarLogin', serverLogin);
     view.on('confirmar', () => {
-        view.destroy();
-        setView(new alt.WebView('http://resource/login/registro.html'));  
-        view.on('voltarLogin', serverLogin);
-        view.on('registrarUsuario', (usuario, email, senha, senha2) => {
-            alt.emitServer('RegistrarUsuario', usuario, email, senha, senha2);
-        });
-        view.focus();
-    });
-    view.focus();
-});
-
-alt.onServer('Server:ConfirmacaoEmail', (nome, email) => {
-    if (view != null)
-        view.destroy();
-    setView(new alt.WebView('http://resource/login/confirmacaoemail.html'));
-    view.on('load', () => {
-        view.emit('showHTML', nome, email);
-    });
-    view.on('enviarEmail', (email) => {
-        alt.emitServer('EnviarEmailConfirmacao', email);
-    });
-    view.on('validarToken', (token) => {
-        alt.emitServer('ValidarTokenConfirmacao', token);
-    });
-    view.focus();
-});
-
-alt.onServer('Server:ConfirmacaoDiscord', (nome, token) => {
-    if (view != null) 
-        view.destroy();
-
-    setView(new alt.WebView('http://resource/login/confirmacaodiscord.html'));
-    view.on('load', () => {
-        view.emit('showHTML', nome, token);
-    });
-    view.on('verificarConfirmacao', () => {
-        alt.emitServer('VerificarConfirmacaoDiscord');
+        alt.emitServer('ListarPersonagens');
     });
     view.focus();
 });
@@ -692,28 +624,6 @@ alt.onServer('Server:ListarPersonagens', (nome, personagens, slots, alerta) => {
     });
     view.on('atualizar', () => {
         alt.emitServer('ListarPersonagens');
-    });
-    view.on('alterarEmail', () => {
-        view.destroy();
-        setView(new alt.WebView('http://resource/login/alteraremail.html'));
-        view.on('voltar', () => {
-            alt.emitServer('ListarPersonagens');
-        });
-        view.on('alterar', (email) => {
-            alt.emitServer('AlterarEmail', email);
-        });
-        view.focus();
-    });
-    view.on('alterarSenha', () => {
-        view.destroy();
-        setView(new alt.WebView('http://resource/login/alterarsenha.html'));
-        view.on('voltar', () => {
-            alt.emitServer('ListarPersonagens');
-        });
-        view.on('alterar', (senhaAntiga, novaSenha, novaSenha2) => {
-            alt.emitServer('AlterarSenha', senhaAntiga, novaSenha, novaSenha2);
-        });
-        view.focus();
     });
     view.on('punicoesAdministrativas', () => {
         alt.emitServer('PunicoesAdministrativas');

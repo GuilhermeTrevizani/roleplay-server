@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -199,7 +200,7 @@ namespace Roleplay.Commands.Faction
             player.RadarSpot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
             player.RadarSpot.Blip.Display = 2;
 
-            player.RadarSpot.Marker = new Marker(Alt.Core, player, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            player.RadarSpot.Marker = new AsyncMarker(Alt.Core, player, MarkerType.MarkerHalo, pos, Global.MainRgba)
             {
                 Scale = new Vector3(10, 10, 10)
             };

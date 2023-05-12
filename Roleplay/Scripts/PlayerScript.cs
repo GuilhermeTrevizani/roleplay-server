@@ -19,26 +19,14 @@ namespace Roleplay.Scripts
 {
     public class PlayerScript : IScript
     {
-        [AsyncScriptEvent(ScriptEventType.PlayerConnect)]
-        public static async Task OnPlayerConnect(MyPlayer player, string reason)
+        [ScriptEvent(ScriptEventType.PlayerConnect)]
+        public static void OnPlayerConnect(MyPlayer player, string reason)
         {
             try
             {
                 player.SessionId = Convert.ToInt16(Enumerable.Range(0, 1000).FirstOrDefault(i => !Global.Players.Any(x => x.SessionId == i)));
                 player.Dimension = player.SessionId;
-
-                var hardwareIdHash = player?.HardwareIdHash ?? 0; ;
-                var hardwareIdExHash = player?.HardwareIdExHash ?? 0;
-
-                await using var context = new DatabaseContext();
-
-                var user = (await context.Users.FirstOrDefaultAsync(x =>
-                    (x.RegisterHardwareIdHash == hardwareIdHash && x.RegisterHardwareIdExHash == hardwareIdExHash)
-                    ||
-                    (x.LastAccessHardwareIdHash == hardwareIdHash && x.LastAccessHardwareIdExHash == hardwareIdExHash)))?.Name ?? string.Empty;
-
-                player.Emit("Server:Login", user);
-                Alt.Log($"OnPlayerConnect | {player.Id} | {player.Name} | {player.Ip} | {user}");
+                Alt.Log($"OnPlayerConnect | {player.Id} | {player.Name} | {player.Ip}");
             }
             catch (Exception ex)
             {

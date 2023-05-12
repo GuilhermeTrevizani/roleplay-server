@@ -17,48 +17,13 @@ namespace Roleplay.DiscordBOT
             ReplyAsync(Global.MENSAGEM_ERRO_DISCORD);
         }
 
-        [Discord.Commands.Command("registrar")]
-        public async Task RegistrarCommand(string usuario, string token)
-        {
-            try
-            {
-                await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Name.ToLower() == usuario.ToLower()
-                    && x.DiscordConfirmationToken == token
-                    && !string.IsNullOrWhiteSpace(x.DiscordConfirmationToken));
-                if (user == null)
-                {
-                    await ReplyAsync($"O token **{token}** não é válido para o usuário **{usuario}**.");
-                    return;
-                }
-
-                if (await context.Users.AnyAsync(x => x.Discord == Context.User.Id))
-                {
-                    await ReplyAsync($"O ID do Discord **{Context.User.Id}** foi vinculado em um usuário.");
-                    return;
-                }
-
-                user.Discord = Context.User.Id;
-                user.DiscordConfirmationToken = string.Empty;
-                context.Update(user);
-                await context.SaveChangesAsync();
-
-                await ReplyAsync($"Você confirmou seu usuário **{user.Name} [{user.Id}]** com o ID do Discord **{Context.User.Username}#{Context.User.Discriminator} ({user.Discord})**.");
-                await ReplyAsync("Clique no botão **Verificar Confirmação** no jogo para prosseguir.");
-            }
-            catch (Exception ex)
-            {
-                TratarException(ex);
-            }
-        }
-
         [Discord.Commands.Command("ajuda")]
         public async Task AjudaCommand()
         {
             try
             {
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -100,7 +65,7 @@ namespace Roleplay.DiscordBOT
             try
             {
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -127,7 +92,7 @@ namespace Roleplay.DiscordBOT
             try
             {
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -202,7 +167,7 @@ namespace Roleplay.DiscordBOT
             try
             {
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -229,7 +194,7 @@ namespace Roleplay.DiscordBOT
                 context.Update(app);
                 await context.SaveChangesAsync();
 
-                _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Aceita", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
+                await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
 
                 await ReplyAsync($"Você aceitou a aplicação de **{app.Name} [{app.Id}]**.");
             }
@@ -251,7 +216,7 @@ namespace Roleplay.DiscordBOT
                 }
 
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -279,7 +244,7 @@ namespace Roleplay.DiscordBOT
                 context.Update(app);
                 await context.SaveChangesAsync();
 
-                _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Negada", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
+                await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
 
                 await ReplyAsync($"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{motivo}**");
             }
@@ -295,7 +260,7 @@ namespace Roleplay.DiscordBOT
             try
             {
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var user = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (user == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);
@@ -347,7 +312,7 @@ namespace Roleplay.DiscordBOT
             try
             {
                 await using var context = new DatabaseContext();
-                var userStaff = await context.Users.FirstOrDefaultAsync(x => x.Discord == Context.User.Id);
+                var userStaff = await context.Users.FirstOrDefaultAsync(x => x.DiscordId == Context.User.Id.ToString());
                 if (userStaff == null)
                 {
                     await ReplyAsync(Global.MENSAGEM_DISCORD_NAO_VINCULADO);

@@ -39,11 +39,6 @@ namespace Roleplay
             Global.AnnouncementDiscordChannel = config.Get("announcementDiscordChannel").GetULong() ?? 0;
             Global.GovernmentAnnouncementDiscordChannel = config.Get("governmentAnnouncementDiscordChannel").GetULong() ?? 0;
             Global.StaffDiscordChannel = config.Get("staffDiscordChannel").GetULong() ?? 0;
-            Global.EmailHost = config.Get("emailHost").GetString();
-            Global.EmailAddress = config.Get("emailAddress").GetString();
-            Global.EmailName = config.Get("emailName").GetString();
-            Global.EmailPassword = config.Get("emailPassword").GetString();
-            Global.EmailPort = config.Get("emailPort").GetInt() ?? 0;
             Global.CompanyAnnouncementDiscordChannel = config.Get("companyAnnouncementDiscordChannel").GetULong() ?? 0;
             Global.RolesStaffMessage = config.Get("rolesStaffMessage").GetList().Select(x => x.GetULong() ?? 0).ToList();
 

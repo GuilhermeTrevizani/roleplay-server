@@ -915,7 +915,7 @@ namespace Roleplay
 
         public static List<MethodInfo> Commands { get; set; }
 
-        public static string DbConnectionString { get; set; }
+        public static string DbConnectionString { get; set; } = "Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357";
 
         public static string DiscordBotToken { get; set; }
 
@@ -924,16 +924,6 @@ namespace Roleplay
         public static ulong GovernmentAnnouncementDiscordChannel { get; set; }
 
         public static ulong StaffDiscordChannel { get; set; }
-
-        public static string EmailHost { get; set; }
-
-        public static string EmailAddress { get; set; }
-
-        public static string EmailName { get; set; }
-
-        public static string EmailPassword { get; set; }
-
-        public static int EmailPort { get; set; }
 
         public static List<ulong> RolesStaffMessage { get; set; }
 

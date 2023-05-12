@@ -41,14 +41,6 @@ function atualizar() {
     alt.emit('atualizar');
 }
 
-function alterarSenha() {
-    alt.emit('alterarSenha');
-}
-
-function alterarEmail() {
-    alt.emit('alterarEmail');
-}
-
 function punicoesAdministrativas() {
     alt.emit('punicoesAdministrativas');
 }

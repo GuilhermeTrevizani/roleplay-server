@@ -1,6 +1,7 @@
 ﻿using Roleplay.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Roleplay.Entities
@@ -9,11 +10,14 @@ namespace Roleplay.Entities
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string DiscordId { get; set; }
 
-        public string Email { get; set; }
+        public string DiscordUsername { get; set; }
 
-        public string Password { get; set; }
+        public string DiscordDiscriminator { get; set; }
+
+        [NotMapped]
+        public string Name => $"{DiscordUsername}#{DiscordDiscriminator}";
 
         public string RegisterIp { get; set; }
 
@@ -41,8 +45,6 @@ namespace Roleplay.Entities
 
         public bool TimeStampToggle { get; set; } = true;
 
-        public string EmailConfirmationToken { get; set; }
-
         public UserVIP VIP { get; set; } = UserVIP.None;
 
         public DateTime? VIPValidDate { get; set; }
@@ -59,8 +61,6 @@ namespace Roleplay.Entities
 
         public bool AnnouncementToggle { get; set; }
 
-        public ulong Discord { get; set; }
-
         public bool VehicleTagToggle { get; set; }
 
         public int ChatFontType { get; set; }
@@ -68,10 +68,6 @@ namespace Roleplay.Entities
         public int ChatLines { get; set; } = 10;
 
         public int ChatFontSize { get; set; } = 14;
-
-        public string DiscordConfirmationToken { get; set; }
-
-        public string ResetPasswordToken { get; set; } = string.Empty;
 
         public string StaffFlagsJSON { get; set; } = "[]";
 
@@ -91,5 +87,7 @@ namespace Roleplay.Entities
         public DateTime? CooldownDismantle { get; set; }
 
         public DateTime? PropertyRobberyCooldown { get; set; }
+
+        public bool AnsweredQuestions { get; set; }
     }
 }

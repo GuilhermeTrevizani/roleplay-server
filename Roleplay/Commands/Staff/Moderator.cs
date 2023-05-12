@@ -749,7 +749,7 @@ namespace Roleplay.Commands.Staff
             context.Update(app);
             await context.SaveChangesAsync();
 
-            _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Aceita", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
+            await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
 
             player.SendMessage(MessageType.Success, $"Você aceitou a aplicação de **{app.Name} [{app.Id}]**.");
         }
@@ -779,7 +779,7 @@ namespace Roleplay.Commands.Staff
             context.Update(app);
             await context.SaveChangesAsync();
 
-            _ = Functions.SendEmail(app.User.Email, $"Aplicação de {app.Name} Negada", $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
+            await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
 
             player.SendMessage(MessageType.Success, $"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{motivo}**");
         }

@@ -6,11 +6,6 @@ dbConnectionString = 'Server=localhost;Database=bdsegundavidaroleplay;Uid=root;P
 debug = true
 description = 'Primeiro servidor luso-brasileiro de roleplay baseado em texto no GTA V.'
 discordBotToken = ''
-emailAddress = 'naoresponda@segundavida.com.br'
-emailHost = ''
-emailName = 'Segunda Vida Roleplay'
-emailPassword = 'aDGi^O&deHoG'
-emailPort = 587
 gamemode = 'Roleplay'
 governmentAnnouncementDiscordChannel = 938605270991511552
 host = '0.0.0.0'

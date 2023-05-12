@@ -10,6 +10,8 @@ using Roleplay.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -17,48 +19,60 @@ namespace Roleplay.Scripts
 {
     public class LoginScript : IScript
     {
-        [AsyncClientEvent(nameof(EntrarUsuario))]
-        public static async Task EntrarUsuario(MyPlayer player, string usuario, string senha)
+        [AsyncClientEvent(nameof(ValidateDiscordToken))]
+        public static async Task ValidateDiscordToken(MyPlayer player, string token)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(senha))
-                {
-                    player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
-                    return;
-                }
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var senhaCriptografada = Functions.Encrypt(senha);
+                var res = await httpClient.GetFromJsonAsync<DiscordResponse>("https://discordapp.com/api/users/@me");
+
                 await using var context = new DatabaseContext();
-                var user = await context.Users.FirstOrDefaultAsync(x => x.Name.ToLower() == usuario.ToLower() && x.Password == senhaCriptografada);
+                var user = context.Users.FirstOrDefault(x => x.DiscordId == res.Id);
                 if (user == null)
                 {
-                    await player.GravarLog(LogType.LoginFalha, $"Usuário: {usuario}", null);
-                    player.Emit("Server:MostrarErro", "Usuário ou senha inválidos.");
-                    return;
+                    user = new User
+                    {
+                        DiscordId = res.Id,
+                        DiscordUsername = res.Username,
+                        DiscordDiscriminator = res.Discriminator,
+                        RegisterIp = player.RealIp,
+                        LastAccessIp = player.RealIp,
+                        RegisterHardwareIdHash = player.HardwareIdHash,
+                        RegisterHardwareIdExHash = player.HardwareIdExHash,
+                        LastAccessHardwareIdHash = player.HardwareIdHash,
+                        LastAccessHardwareIdExHash = player.HardwareIdExHash,
+                        Staff = context.Users.Any() ? UserStaff.None : UserStaff.Manager,
+                    };
+                    await context.Users.AddAsync(user);
+                    await context.SaveChangesAsync();
                 }
-
-                var banishment = await context.Banishments.Where(x => x.UserId == user.Id).Include(x => x.StaffUser).FirstOrDefaultAsync();
-                if (banishment != null)
+                else
                 {
-                    if (banishment.ExpirationDate.HasValue && DateTime.Now > banishment.ExpirationDate)
+                    var banishment = await context.Banishments.Where(x => x.UserId == user.Id).Include(x => x.StaffUser).FirstOrDefaultAsync();
+                    if (banishment != null)
                     {
-                        context.Banishments.Remove(banishment);
-                        await context.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        var strBan = !banishment.ExpirationDate.HasValue ? " permanentemente." : $". Seu banimento expira em: {banishment.ExpirationDate?.ToString()}";
+                        if (banishment.ExpirationDate.HasValue && DateTime.Now > banishment.ExpirationDate)
+                        {
+                            context.Banishments.Remove(banishment);
+                            await context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            var strBan = !banishment.ExpirationDate.HasValue ? " permanentemente." : $". Seu banimento expira em: {banishment.ExpirationDate?.ToString()}";
 
-                        player.Emit("Server:BaseHTML", Functions.GetBaseHTML("Banimento", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser.Name}</strong>"));
+                            player.Emit("Server:BaseHTML", Functions.GetBaseHTML("Banimento", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser.Name}</strong>"));
+                            return;
+                        }
+                    }
+
+                    if (Global.Players.Any(x => x.User.Id == user.Id))
+                    {
+                        player.Emit("Server:MostrarErro", "Usuário já está logado.");
                         return;
                     }
-                }
-
-                if (Global.Players.Any(x => x.User.Id == user.Id))
-                {
-                    player.Emit("Server:MostrarErro", "Usuário já está logado.");
-                    return;
                 }
 
                 player.User = user;
@@ -68,49 +82,31 @@ namespace Roleplay.Scripts
                 player.User.LastAccessHardwareIdExHash = player.HardwareIdExHash;
                 context.Users.Update(player.User);
                 await context.SaveChangesAsync();
-
                 player.StaffFlags = JsonSerializer.Deserialize<List<StaffFlag>>(player.User.StaffFlagsJSON);
 
-                await VerificarRegistro(player);
+                if (player.User.AnsweredQuestions)
+                {
+                    await ListarPersonagens(player);
+                }
+                else
+                {
+                    var perguntas = Global.Questions.OrderBy(x => Guid.NewGuid()).Take(10).ToList();
+                    var respostas = Global.QuestionsAnswers.OrderBy(x => Guid.NewGuid()).ToList();
+                    player.Emit("Server:ExibirPerguntas",
+                        JsonSerializer.Serialize(perguntas.Select(x => new
+                        {
+                            x.Id,
+                            x.Name,
+                            x.CorrectQuestionAnswerId,
+                            Answers = respostas.Where(y => y.QuestionId == x.Id)
+                        })));
+                }
             }
             catch (Exception ex)
             {
-                Functions.GetException(ex);
+                player.Emit("Server:MostarErro", ex.Message);
+                Alt.LogError(ex.Message);
             }
-        }
-
-        private static async Task VerificarRegistro(MyPlayer player)
-        {
-            if (!string.IsNullOrWhiteSpace(player.User.EmailConfirmationToken))
-            {
-                player.Emit("Server:ConfirmacaoEmail", player.User.Name, player.User.Email);
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(Global.DiscordBotToken) && !string.IsNullOrWhiteSpace(player.User.DiscordConfirmationToken))
-            {
-                player.Emit("Server:ConfirmacaoDiscord", player.User.Name, player.User.DiscordConfirmationToken);
-                return;
-            }
-
-            await ListarPersonagens(player);
-        }
-
-        [AsyncClientEvent(nameof(VerificarConfirmacaoDiscord))]
-        public static async Task VerificarConfirmacaoDiscord(MyPlayer player)
-        {
-            using var context = new DatabaseContext();
-            var usuario = await context.Users.FirstOrDefaultAsync(x => x.Id == player.User.Id);
-            player.User.Discord = usuario.Discord;
-            player.User.DiscordConfirmationToken = usuario.DiscordConfirmationToken;
-
-            if (string.IsNullOrWhiteSpace(player.User.DiscordConfirmationToken))
-            {
-                await ListarPersonagens(player);
-                return;
-            }
-
-            player.Emit("Server:MostrarErro", "Você ainda não vinculou nenhuma conta do Discord.");
         }
 
         [AsyncClientEvent(nameof(ListarPersonagens))]
@@ -134,6 +130,10 @@ namespace Roleplay.Scripts
             }
 
             await using var context = new DatabaseContext();
+            player.User.AnsweredQuestions = true;
+            context.Users.Update(player.User);
+            await context.SaveChangesAsync();
+
             player.Emit("Server:ListarPersonagens", player.User.Name,
                 JsonSerializer.Serialize((await context.Characters
                     .Where(x => x.UserId == player.User.Id
@@ -294,80 +294,6 @@ namespace Roleplay.Scripts
             }
         }
 
-        [AsyncClientEvent(nameof(RegistrarUsuario))]
-        public async Task RegistrarUsuario(MyPlayer player, string usuario, string email, string senha, string senha2)
-        {
-            if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(senha) || string.IsNullOrWhiteSpace(senha2))
-            {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
-                return;
-            }
-
-            if (usuario.Contains(' '))
-            {
-                player.Emit("Server:MostrarErro", "Usuário não pode ter espaços.");
-                return;
-            }
-
-            if (usuario.Length > 25)
-            {
-                player.Emit("Server:MostrarErro", "Usuário não pode ter mais que 25 caracteres.");
-                return;
-            }
-
-            if (email.Length > 100)
-            {
-                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
-                return;
-            }
-
-            if (senha != senha2)
-            {
-                player.Emit("Server:MostrarErro", "Senhas não são iguais.");
-                return;
-            }
-
-            if (!Functions.CheckEmail(email))
-            {
-                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
-                return;
-            }
-
-            await using var context = new DatabaseContext();
-            if (await context.Users.AnyAsync(x => x.Name.ToLower() == usuario.ToLower()))
-            {
-                player.Emit("Server:MostrarErro", $"Usuário {usuario} já existe.");
-                return;
-            }
-
-            if (await context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower()))
-            {
-                player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
-                return;
-            }
-
-            var user = new User()
-            {
-                Name = usuario,
-                Email = email,
-                Password = Functions.Encrypt(senha),
-                RegisterIp = player.RealIp,
-                LastAccessIp = player.RealIp,
-                RegisterHardwareIdHash = player.HardwareIdHash,
-                RegisterHardwareIdExHash = player.HardwareIdExHash,
-                LastAccessHardwareIdHash = player.HardwareIdHash,
-                LastAccessHardwareIdExHash = player.HardwareIdExHash,
-                EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.EmailHost) ? string.Empty : Functions.GenerateRandomString(6),
-                DiscordConfirmationToken = Functions.GenerateRandomString(6),
-            };
-            await context.Users.AddAsync(user);
-            await context.SaveChangesAsync();
-
-            _ = Functions.SendEmail(user.Email, "Confirmação de E-mail", $"Seu token de confirmação é <strong>{user.EmailConfirmationToken}</strong>.");
-
-            await EntrarUsuario(player, usuario, senha);
-        }
-
         [AsyncClientEvent(nameof(CriarPersonagem))]
         public async Task CriarPersonagem(MyPlayer player, int id, string nome, string sobrenome, string sexo, string dataNascimento, string historia)
         {
@@ -492,68 +418,6 @@ namespace Roleplay.Scripts
             }
         }
 
-        [AsyncClientEvent(nameof(EnviarEmailConfirmacao))]
-        public async Task EnviarEmailConfirmacao(MyPlayer player, string email)
-        {
-            if (email.Length > 100)
-            {
-                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
-                return;
-            }
-
-            if (!Functions.CheckEmail(email))
-            {
-                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
-                return;
-            }
-
-            await using var context = new DatabaseContext();
-            if (await context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower() && x.Id != player.User.Id))
-            {
-                player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
-                return;
-            }
-
-            player.User.Email = email;
-            context.Users.Update(player.User);
-            await context.SaveChangesAsync();
-
-            await Functions.SendEmail(email, "Confirmação de E-mail", $"Seu token de confirmação é <strong>{player.User.EmailConfirmationToken}</strong>.");
-            player.Emit("Server:MostrarSucesso", "E-mail com o token de confirmação enviado.");
-        }
-
-        [AsyncClientEvent(nameof(ValidarTokenConfirmacao))]
-        public async Task ValidarTokenConfirmacao(MyPlayer player, string token)
-        {
-            if (player.User.EmailConfirmationToken != token)
-            {
-                player.Emit("Server:MostrarErro", "Token de confirmação incorreto.");
-                return;
-            }
-
-            using var context = new DatabaseContext();
-            player.User.EmailConfirmationToken = string.Empty;
-            context.Users.Update(player.User);
-            await context.SaveChangesAsync();
-
-            await VerificarRegistro(player);
-        }
-
-        [ClientEvent(nameof(ExibirPerguntas))]
-        public void ExibirPerguntas(MyPlayer player)
-        {
-            var perguntas = Global.Questions.OrderBy(x => Guid.NewGuid()).Take(10).ToList();
-            var respostas = Global.QuestionsAnswers.OrderBy(x => Guid.NewGuid()).ToList();
-            player.Emit("Server:ExibirPerguntas",
-                JsonSerializer.Serialize(perguntas.Select(x => new
-                {
-                    x.Id,
-                    x.Name,
-                    x.CorrectQuestionAnswerId,
-                    Answers = respostas.Where(y => y.QuestionId == x.Id)
-                })));
-        }
-
         [AsyncClientEvent(nameof(DeletarPersonagem))]
         public async Task DeletarPersonagem(MyPlayer player, int codigo)
         {
@@ -588,113 +452,6 @@ namespace Roleplay.Scripts
                     Staffer = x.StaffUser.Name,
                     x.Reason,
                 })));
-        }
-
-        [AsyncClientEvent(nameof(AlterarEmail))]
-        public async Task AlterarEmail(MyPlayer player, string email)
-        {
-            if (email.Length > 100)
-            {
-                player.Emit("Server:MostrarErro", "E-mail não pode ter mais que 100 caracteres.");
-                return;
-            }
-
-            if (!Functions.CheckEmail(email))
-            {
-                player.Emit("Server:MostrarErro", "E-mail não está um formato válido.");
-                return;
-            }
-
-            using var context = new DatabaseContext();
-            if (await context.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower()))
-            {
-                player.Emit("Server:MostrarErro", $"E-mail {email} já está sendo utilizado.");
-                return;
-            }
-
-            player.User.EmailConfirmationToken = string.IsNullOrWhiteSpace(Global.EmailHost) ? string.Empty : Functions.GenerateRandomString(6);
-            player.User.Email = email;
-            context.Users.Update(player.User);
-            await context.SaveChangesAsync();
-
-            await Functions.SendEmail(email, "Confirmação de E-mail", $"Você alterou seu e-mail. Seu token de confirmação é<strong>{player.User.EmailConfirmationToken}</strong>.");
-
-            if (!string.IsNullOrWhiteSpace(Global.EmailHost))
-            {
-                await VerificarRegistro(player);
-                return;
-            }
-
-            player.Emit("Server:MostrarErro", "Você alterou seu e-mail.");
-        }
-
-        [AsyncClientEvent(nameof(AlterarSenha))]
-        public async Task AlterarSenha(MyPlayer player, string senhaAntiga, string novaSenha, string novaSenha2)
-        {
-            if (string.IsNullOrWhiteSpace(senhaAntiga) || string.IsNullOrWhiteSpace(novaSenha) || string.IsNullOrWhiteSpace(novaSenha2))
-            {
-                player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
-                return;
-            }
-
-            if (novaSenha != novaSenha2)
-            {
-                player.Emit("Server:MostrarErro", "Novas senhas não são iguais.");
-                return;
-            }
-
-            if (Functions.Encrypt(senhaAntiga) != player.User.Password)
-            {
-                player.Emit("Server:MostrarErro", "Sua senha atual não confere.");
-                return;
-            }
-
-            using var context = new DatabaseContext();
-            player.User.Password = Functions.Encrypt(novaSenha);
-            context.Users.Update(player.User);
-            await context.SaveChangesAsync();
-
-            player.Emit("Server:MostrarSucesso", "Sua senha foi alterada.");
-        }
-
-        [AsyncClientEvent(nameof(EnviarEmailTokenRedefinirSenha))]
-        public async Task EnviarEmailTokenRedefinirSenha(MyPlayer player, string email)
-        {
-            await using var context = new DatabaseContext();
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
-            if (user != null)
-            {
-                user.ResetPasswordToken = Functions.GenerateRandomString(6);
-                context.Users.Update(user);
-                await context.SaveChangesAsync();
-
-                _ = Functions.SendEmail(email, "Recuperação da Senha", $"Seu token para redefinir a senha é <strong>{user.ResetPasswordToken}</strong>.");
-            }
-            else
-            {
-                await player.GravarLog(LogType.EsqueciMinhaSenhaFalha, $"E-mail: {email}", null);
-            }
-
-            player.Emit("Server:RedefinirSenha", email, user?.Id ?? 0);
-        }
-
-        [AsyncClientEvent(nameof(RedefinirSenha))]
-        public async Task RedefinirSenha(MyPlayer player, int codigo, string token)
-        {
-            using var context = new DatabaseContext();
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == codigo && x.ResetPasswordToken == token);
-            if (user != null)
-            {
-                var senha = Functions.GenerateRandomString(10);
-                user.ResetPasswordToken = string.Empty;
-                user.Password = Functions.Encrypt(senha);
-                context.Users.Update(user);
-                await context.SaveChangesAsync();
-
-                _ = Functions.SendEmail(user.Email, "Recuperação da Senha", $"Sua nova senha é <strong>{senha}</strong>.");
-            }
-
-            player.Emit("Server:MostrarSucesso", "Caso o e-mail e o token correspondam, um e-mail será enviado contendo sua nova senha. Verifique também sua caixa de lixo eletrônico.");
         }
     }
 }

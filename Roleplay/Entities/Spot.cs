@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
@@ -28,7 +29,7 @@ namespace Roleplay.Entities
         public float AuxiliarPosZ { get; set; }
 
         [NotMapped, JsonIgnore]
-        public Marker Marker { get; set; }
+        public IMarker Marker { get; set; }
 
         [NotMapped, JsonIgnore]
         public MyColShape ColShape { get; set; }
@@ -119,7 +120,7 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(PosX, PosY, PosZ - 0.95f);
 
-            Marker = new Marker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            Marker = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
             {
                 Scale = new Vector3(1, 1, 1.5f),
             };

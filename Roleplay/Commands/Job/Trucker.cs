@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Shared.Enums;
@@ -112,7 +113,7 @@ namespace Roleplay.Commands.Job
                     spot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
                     spot.Blip.Display = 2;
 
-                    spot.Marker = new Marker(Alt.Core, player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba)
+                    spot.Marker = new AsyncMarker(Alt.Core, player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba)
                     {
                         Scale = new Vector3(5, 5, 5)
                     };

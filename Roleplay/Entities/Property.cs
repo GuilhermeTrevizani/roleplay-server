@@ -1,4 +1,5 @@
 ﻿using AltV.Net;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Shared.Enums;
@@ -62,7 +63,7 @@ namespace Roleplay.Entities
         public List<PropertyItem> Items { get; set; } = new();
 
         [NotMapped, JsonIgnore]
-        public Marker EntranceMarker { get; set; }
+        public IMarker EntranceMarker { get; set; }
 
         [NotMapped, JsonIgnore]
         public MyColShape EntranceColShape { get; set; }
@@ -79,7 +80,7 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(EntrancePosX, EntrancePosY, EntrancePosZ - 0.95f);
 
-            EntranceMarker = new Marker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
+            EntranceMarker = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
             {
                 Scale = new Vector3(1, 1, 1.5f),
                 Dimension = Dimension,

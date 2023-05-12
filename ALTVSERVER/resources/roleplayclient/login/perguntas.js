@@ -47,10 +47,6 @@ function copiar() {
     document.execCommand("copy");
 }
 
-function voltarLogin() {
-    alt.emit("voltarLogin");
-}
-
 function mostrarErro(erro, limpar = true) {
     $('#btn-confirmar').LoadingOverlay('hide');
     $.alert(erro);

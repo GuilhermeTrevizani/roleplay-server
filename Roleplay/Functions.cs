@@ -1,6 +1,6 @@
 ﻿using AltV.Net;
+using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using AltV.Net.Shared.Enums;
 using Discord;
@@ -13,11 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -27,18 +23,6 @@ namespace Roleplay
 {
     public static class Functions
     {
-        public static string Encrypt(string text)
-        {
-            var encodedValue = Encoding.UTF8.GetBytes(text);
-            var encryptedPassword = SHA512.HashData(encodedValue);
-
-            var sb = new StringBuilder();
-            foreach (var caracter in encryptedPassword)
-                sb.Append(caracter.ToString("X2"));
-
-            return sb.ToString();
-        }
-
         public static Position GetExitPositionByInterior(PropertyInterior propertyInterior)
         {
             return propertyInterior switch
@@ -286,63 +270,7 @@ namespace Roleplay
             };
         }
 
-        public static bool CheckEmail(string email)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(email))
-                    return false;
-
-                var m = new MailAddress(email);
-                return true;
-            }
-            catch (FormatException)
-            {
-                return false;
-            }
-        }
-
-        public static async Task SendEmail(string email, string subject, string body)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(Global.EmailHost))
-                    return;
-
-                var msg = new MailMessage
-                {
-                    IsBodyHtml = true,
-                    From = new MailAddress(Global.EmailAddress, Global.EmailName),
-                    Subject = subject,
-                    Body = body,
-                    BodyEncoding = Encoding.UTF8,
-                };
-                msg.To.Add(email);
-
-                var clienteSmtp = new SmtpClient(Global.EmailHost)
-                {
-                    UseDefaultCredentials = false,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    Credentials = new NetworkCredential(Global.EmailAddress, Global.EmailPassword),
-                    Port = Global.EmailPort,
-                };
-
-                await clienteSmtp.SendMailAsync(msg);
-            }
-            catch (Exception ex)
-            {
-                GetException(ex);
-            }
-        }
-
         public static void GetException(Exception ex) => Alt.LogError($"{ex.InnerException?.Message ?? ex.Message} - {ex.Source} - {ex.StackTrace}");
-
-        public static string GenerateRandomString(int length)
-        {
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
-        }
 
         public static string GetBaseHTML(string title, string body)
         {
@@ -485,7 +413,7 @@ namespace Roleplay
         {
             position.Z -= 0.95f;
 
-            _ = new Marker(Alt.Core, MarkerType.MarkerHalo, position, Global.MainRgba)
+            _ = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, position, Global.MainRgba)
             {
                 Scale = new Vector3(1, 1, 1.5f),
             };
@@ -538,6 +466,18 @@ namespace Roleplay
 
                 player.SendMessage(Models.MessageType.None, $"[S:{slotPlayer} C:{channel}] {message}", slotPlayer == 1 ? "#FFFF9B" : "#9e8d66");
             }
+        }
+
+        public static async Task SendDiscordMessage(string discordId, string text)
+        {
+            if (Global.DiscordClient == null)
+                return;
+
+            var user = Global.DiscordClient.GetUser(Convert.ToUInt64(discordId));
+            if (user == null)
+                return;
+
+            await user.SendMessageAsync(text);
         }
 
         #region Items
