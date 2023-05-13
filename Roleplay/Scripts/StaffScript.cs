@@ -2628,7 +2628,7 @@ namespace Roleplay.Scripts
             context.CrackDens.Remove(crackDen);
             context.CrackDensItems.RemoveRange(Global.CrackDensItems.Where(x => x.CrackDenId == id));
             await context.SaveChangesAsync();
-            await context.Database.ExecuteSqlRawAsync($"DELETE FROM {nameof(context.CrackDensSells)} WHERE {nameof(CrackDenSell.CrackDenId)} = {id}");
+            await context.CrackDensSells.Where(x => x.CrackDenId == id).ExecuteDeleteAsync();
             Global.CrackDens.Remove(crackDen);
             Global.CrackDensItems.RemoveAll(x => x.CrackDenId == crackDen.Id);
             crackDen.RemoveIdentifier();

@@ -33,6 +33,7 @@ namespace Roleplay.Scripts
                 var user = context.Users.FirstOrDefault(x => x.DiscordId == res.Id);
                 if (user == null)
                 {
+                    var anyUser = context.Users.Any();
                     user = new User
                     {
                         DiscordId = res.Id,
@@ -44,7 +45,8 @@ namespace Roleplay.Scripts
                         RegisterHardwareIdExHash = player.HardwareIdExHash,
                         LastAccessHardwareIdHash = player.HardwareIdHash,
                         LastAccessHardwareIdExHash = player.HardwareIdExHash,
-                        Staff = context.Users.Any() ? UserStaff.None : UserStaff.Manager,
+                        Staff = anyUser ? UserStaff.None : UserStaff.Manager,
+                        StaffFlagsJSON = anyUser ? "[]" : JsonSerializer.Serialize(Enum.GetValues<StaffFlag>()),
                     };
                     await context.Users.AddAsync(user);
                     await context.SaveChangesAsync();
@@ -392,9 +394,9 @@ namespace Roleplay.Scripts
                 {
                     await player.GravarLog(LogType.NameChange, $"{oldCharacter.Name} [{oldCharacter.Id}] > {personagem.Name} [{personagem.Id}]", null);
 
-                    await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.Properties)} SET {nameof(Property.CharacterId)} = {personagem.Id} WHERE {nameof(Property.CharacterId)} = {oldCharacter.Id}");
-                    await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.Vehicles)} SET {nameof(Entities.Vehicle.CharacterId)} = {personagem.Id} WHERE {nameof(Entities.Vehicle.CharacterId)} = {oldCharacter.Id}");
-                    await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.CharactersItems)} SET {nameof(CharacterItem.CharacterId)} = {personagem.Id} WHERE {nameof(CharacterItem.CharacterId)} = {oldCharacter.Id}");
+                    await context.Properties.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
+                    await context.Vehicles.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
+                    await context.CharactersItems.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
 
                     foreach (var x in Global.Properties.Where(x => x.CharacterId == oldCharacter.Id))
                         x.CharacterId = personagem.Id;

@@ -254,8 +254,8 @@ alt.everyTick(() => {
     native.disableControlAction(0, 23, true); // INPUT_ENTER
     native.disableControlAction(0, 37, true); // INPUT_SELECT_WEAPON
 
-    //native.setPedConfigFlag(player, 429, true); // PED_FLAG_DISABLE_STARTING_VEH_ENGINE - TESTAR SEM ISSO PQ TEM FLAG AGORA
-    //native.setPedConfigFlag(player, 241, true); // PED_FLAG_DISABLE_STOPPING_VEH_ENGINE - TESTAR SEM ISSO PQ TEM FLAG AGORA
+    native.setPedConfigFlag(player, 429, true); // PED_FLAG_DISABLE_STARTING_VEH_ENGINE
+    native.setPedConfigFlag(player, 241, true); // PED_FLAG_DISABLE_STOPPING_VEH_ENGINE
     native.setPedConfigFlag(player, 184, true); // PED_FLAG_DISABLE_SHUFFLING_TO_DRIVER_SEAT
 
     native.setPedSuffersCriticalHits(player, false);

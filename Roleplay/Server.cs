@@ -174,7 +174,7 @@ namespace Roleplay
                 jsonOptions);
             Alt.Log($"Accessories7Female: {Global.Accessories7Female.Count}");
 
-            await context.Database.ExecuteSqlRawAsync($"UPDATE {nameof(context.HelpRequests)} SET {nameof(HelpRequest.AnswerDate)} = now() WHERE {nameof(HelpRequest.AnswerDate)} is null");
+            await context.HelpRequests.Where(x => !x.AnswerDate.HasValue).ExecuteUpdateAsync(x => x.SetProperty(y => y.AnswerDate, DateTime.Now));
             Alt.Log("Cleaned Help Requests");
 
             Global.Parameter = await context.Parameters.FirstOrDefaultAsync();

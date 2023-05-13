@@ -521,7 +521,6 @@ namespace Roleplay.Commands.Staff
                 (await context.Users.Where(x => x.Staff != UserStaff.None)
                     .Include(x => x.Characters)
                     .OrderByDescending(x => x.Staff)
-                    .ThenBy(x => x.Name)
                     .ToListAsync())
                     .Select(x => new
                     {
