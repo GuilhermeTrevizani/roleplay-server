@@ -16,10 +16,6 @@ namespace Roleplay.Factories
 {
     public class MyVehicle : AsyncVehicle
     {
-        public MyVehicle(ICore server, uint model, Position position, Rotation rotation) : base(server, model, position, rotation)
-        {
-        }
-
         public MyVehicle(ICore server, IntPtr nativePointer, uint id) : base(server, nativePointer, id)
         {
         }

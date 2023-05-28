@@ -1,5 +1,4 @@
 ﻿using AltV.Net;
-using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Shared.Enums;
@@ -45,11 +44,9 @@ namespace Roleplay.Entities
         {
             RemoveIdentifier();
 
-            Marker = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, new Vector3(PosX, PosY, PosZ), new Rgba(227, 170, 36, 75))
-            {
-                Scale = new Vector3(0.2f, 0.2f, 0.2f),
-                Dimension = Dimension,
-            };
+            Marker = Alt.CreateMarker(MarkerType.MarkerHalo, new Vector3(PosX, PosY, PosZ), new Rgba(227, 170, 36, 75));
+            Marker.Scale = new Vector3(0.2f, 0.2f, 0.2f);
+            Marker.Dimension = Dimension;
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(Marker.Position, 1, 1.5f);
             ColShape.Description = $"[INFO] {{#FFFFFF}}{Message}";

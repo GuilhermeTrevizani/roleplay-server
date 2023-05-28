@@ -26,6 +26,8 @@ namespace Roleplay
 
         public override IBaseObjectFactory<IColShape> GetColShapeFactory() => new MyColShapeFactory();
 
+        public override IEntityFactory<INetworkObject> GetNetworkObjectFactory() => new MyObjectFactory();
+
         Timer MainTimer { get; set; }
 
         public override async void OnStart()
@@ -256,7 +258,7 @@ namespace Roleplay
             Alt.Log($"EmergencyCalls: {Global.EmergencyCalls.Count}");
 
             Global.Items = (await context.Items.ToListAsync()).Select(x => new Item(x)).ToList();
-            Global.Items.ForEach(x => x.CreateObject(null));
+            Global.Items.ForEach(x => x.CreateObject());
             Alt.Log($"Items: {Global.Items.Count}");
 
             Global.Doors = await context.Doors.ToListAsync();

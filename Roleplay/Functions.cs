@@ -1,5 +1,4 @@
 ﻿using AltV.Net;
-using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Enums;
 using AltV.Net.Shared.Enums;
@@ -413,10 +412,8 @@ namespace Roleplay
         {
             position.Z -= 0.95f;
 
-            _ = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, position, Global.MainRgba)
-            {
-                Scale = new Vector3(1, 1, 1.5f),
-            };
+            var marker = Alt.CreateMarker(MarkerType.MarkerHalo, position, Global.MainRgba);
+            marker.Scale = new Vector3(1, 1, 1.5f);
 
             var colShape = (MyColShape)Alt.CreateColShapeCylinder(position, 1, 1.5f);
             colShape.Description = description;

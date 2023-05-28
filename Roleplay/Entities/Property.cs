@@ -1,5 +1,4 @@
 ﻿using AltV.Net;
-using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Shared.Enums;
@@ -80,11 +79,9 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(EntrancePosX, EntrancePosY, EntrancePosZ - 0.95f);
 
-            EntranceMarker = new AsyncMarker(Alt.Core, MarkerType.MarkerHalo, pos, Global.MainRgba)
-            {
-                Scale = new Vector3(1, 1, 1.5f),
-                Dimension = Dimension,
-            };
+            EntranceMarker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
+            EntranceMarker.Scale = new Vector3(1, 1, 1.5f);
+            EntranceMarker.Dimension = Dimension;
 
             EntranceColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             EntranceColShape.Description = $"[PROPRIEDADE Nº {Id}] {{#FFFFFF}}{(!CharacterId.HasValue ? $"Use /comprar para comprar por ${Value:N0}." : string.Empty)}";
@@ -207,7 +204,7 @@ namespace Roleplay.Entities
                         <td>X: {furniture.PosX} | Y: {furniture.PosY} | Z: {furniture.PosZ}</td>
                         <td>R: {furniture.RotR} | P: {furniture.RotP} | Y: {furniture.RotY}</td>
                         <td>{player.Position.Distance(new Position(furniture.PosX, furniture.PosY, furniture.PosZ))}</td>
-                        <td class='text-center'>{(furniture.Interior? "SIM": "NÃO")}</td>
+                        <td class='text-center'>{(furniture.Interior ? "SIM" : "NÃO")}</td>
                         <td class='text-center'>
                             <button onclick='edit(this, {furniture.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
                             <button onclick='remove(this, {furniture.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>

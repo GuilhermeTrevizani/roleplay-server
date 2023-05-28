@@ -928,5 +928,8 @@ namespace Roleplay
         public static List<ulong> RolesStaffMessage { get; set; }
 
         public static ulong CompanyAnnouncementDiscordChannel { get; set; }
+
+        [Obsolete("TODO")]
+        public static IEnumerable<MyObject> Objects =>new List<MyObject>(); //{ get => Alt.GetAllNetworkObjects().Cast<MyObject>(); }
     }
 }

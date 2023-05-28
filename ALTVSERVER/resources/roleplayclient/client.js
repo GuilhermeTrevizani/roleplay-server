@@ -585,7 +585,7 @@ async function requestDiscordToken() {
         const token = await alt.Discord.requestOAuth2Token(Constants.DISCORD_APP_ID);
         alt.emitServer('ValidateDiscordToken', token);
     } catch (ex) {
-        view.emit('mostrarErro', ex);
+        view.emit('mostrarErro', ex.message);
     }
 }
 
@@ -809,23 +809,10 @@ alt.onServer('Server:SpawnarVeiculos', (titulo, veiculos) => {
     toggleView(true);
 });
 
-let objetoEmMaos = null;
-alt.onServer('Server:PegarSacoLixo', () => {
-    objetoEmMaos?.destroy();
-
-    objetoEmMaos = new alt.Object('ng_proc_binbag_01a', player.pos, alt.Vector3.zero, false, true);
-    objetoEmMaos.attachToEntity(player, native.getPedBoneIndex(player, 0xdead), new alt.Vector3(0.0, -0.1, -0.4), alt.Vector3.zero, false, false, false);
-});
-
-alt.onServer('Server:VerificarSoltarSacoLixo', (veh) => {
-    const bone = native.getEntityBoneIndexByName(veh.scriptID, 'platelight');
-    const pos = native.getWorldPositionOfEntityBone(veh.scriptID, bone);
+alt.onServer('Server:VerificarSoltarSacoLixo', (vehicle) => {
+    const bone = native.getEntityBoneIndexByName(vehicle, 'platelight');
+    const pos = native.getWorldPositionOfEntityBone(vehicle, bone);
     alt.emitServer('SoltarSacoLixo', pos.x, pos.y, pos.z);
-});
-
-alt.onServer('Server:SoltarSacoLixo', () => {
-    objetoEmMaos?.destroy();
-    objetoEmMaos = null;
 });
 
 alt.onServer('Server:AbrirPainelControleUsuario', (htmlComandos, htmlMinhasInformacoes, htmlConfiguracoes) => {

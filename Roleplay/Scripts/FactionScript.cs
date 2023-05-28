@@ -358,7 +358,6 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(ConfirmDropBarrier))]
-        [Obsolete("TODO")]
         public static async Task ConfirmDropBarrier(MyPlayer player, Vector3 position, Vector3 rotation)
         {
             if (position.X == 0 || position.Y == 0 || position.Z == 0)
@@ -367,14 +366,12 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            //PropStreamer.Create(player.DropFurniture.Model,
-            //    position,
-            //    rotation,
-            //    player.Dimension,
-            //    true,
-            //    true,
-            //    characterId: player.Character.Id,
-            //    factionId: player.Faction.Id);
+            var barrier = (MyObject)Alt.CreateNetworkObject(player.DropFurniture.Model, position, rotation);
+            barrier.Dimension = player.Dimension;
+            barrier.Frozen = true;
+            barrier.Collision = true;
+            barrier.CharacterId = player.Character.Id;
+            barrier.FactionId = player.Faction.Id;
 
             await player.GravarLog(LogType.Faction, $"/br {JsonSerializer.Serialize(player.DropFurniture)}", null);
             player.SendMessageToNearbyPlayers($"dropa uma barreira no chão.", MessageCategory.Ame, 5);

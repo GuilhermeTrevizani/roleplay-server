@@ -392,7 +392,6 @@ namespace Roleplay.Commands.Faction
         }
 
         [Command("rb")]
-        [Obsolete("TODO")]
         public static async Task CMD_rb(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -401,24 +400,23 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            //var barrier = Streamer.Prop.PropList.Where(x => 
-            //    x.CharacterId == player.Character.Id
-            //    && x.Dimension == player.Dimension
-            //    && player.Position.Distance(x.Position) <= Global.RP_DISTANCE)
-            //    .MinBy(x=> player.Position.Distance(x.Position));
-            //if (barrier == null)
-            //{
-            //    player.SendMessage(Models.MessageType.Error, "Você não está próximo de nenhuma barreira criada por você.");
-            //    return;
-            //}
+            var barrier = Global.Objects.Where(x =>
+                x.CharacterId == player.Character.Id
+                && x.Dimension == player.Dimension
+                && player.Position.Distance(x.Position) <= Global.RP_DISTANCE)
+                .MinBy(x => player.Position.Distance(x.Position));
+            if (barrier == null)
+            {
+                player.SendMessage(Models.MessageType.Error, "Você não está próximo de nenhuma barreira criada por você.");
+                return;
+            }
 
-            //barrier.Destroy();
-            //player.SendMessageToNearbyPlayers($"retira a barreira do chão.", MessageCategory.Ame, 5);
-            //await player.GravarLog(LogType.Faction, $"/rb | X: {barrier.Position.X} Y: {barrier.Position.Y} Z: {barrier.Position.Z}", null);
+            barrier.Destroy();
+            player.SendMessageToNearbyPlayers($"retira a barreira do chão.", MessageCategory.Ame, 5);
+            await player.GravarLog(LogType.Faction, $"/rb | X: {barrier.Position.X} Y: {barrier.Position.Y} Z: {barrier.Position.Z}", null);
         }
 
         [Command("rball")]
-        [Obsolete("TODO")]
         public static async Task CMD_rball(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -433,22 +431,21 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            //var barriers = Streamer.Prop.PropList.Where(x => x.FactionId == player.Faction.Id).ToList();
-            //if (!barriers.Any())
-            //{
-            //    player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas pela facção.");
-            //    return;
-            //}
+            var barriers = Global.Objects.Where(x => x.FactionId == player.Faction.Id).ToList();
+            if (!barriers.Any())
+            {
+                player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas pela facção.");
+                return;
+            }
 
-            //foreach(var barrier in barriers)
-            //    barrier.Destroy();
+            foreach (var barrier in barriers)
+                barrier.Destroy();
 
             player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as barreiras da facção.");
             await player.GravarLog(LogType.Faction, $"/rball", null);
         }
 
         [Command("rballme")]
-        [Obsolete("TODO")]
         public static async Task CMD_rballme(MyPlayer player)
         {
             if (!(player.Faction?.Government ?? false) || !player.OnDuty)
@@ -457,15 +454,15 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            //var barriers = Streamer.Prop.PropList.Where(x => x.CharacterId == player.Character.Id).ToList();
-            //if (!barriers.Any())
-            //{
-            //    player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas por você.");
-            //    return;
-            //}
+            var barriers = Global.Objects.Where(x => x.CharacterId == player.Character.Id).ToList();
+            if (!barriers.Any())
+            {
+                player.SendMessage(Models.MessageType.Error, "Não há barreiras criadas por você.");
+                return;
+            }
 
-            //foreach (var barrier in barriers)
-            //    barrier.Destroy();
+            foreach (var barrier in barriers)
+                barrier.Destroy();
 
             player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as suas barreiras.");
             await player.GravarLog(LogType.Faction, $"/rballme", null);

@@ -314,7 +314,7 @@ namespace Roleplay.Scripts
                     player.DropItem);
 
                 Global.Items.Add(item);
-                item.CreateObject(player);
+                item.CreateObject();
 
                 player.DropItem = null;
                 player.DropItemQuantity = 0;
@@ -844,7 +844,7 @@ namespace Roleplay.Scripts
                     item.Quantity -= quantity;
                     if (item.Quantity == 0)
                     {
-                        item.DeleteObject(player);
+                        item.DeleteObject();
                         context.Items.Remove(item);
                     }
                     else

@@ -252,6 +252,8 @@ namespace Roleplay.Factories
 
         public string AreaNameJSON { get; set; }
 
+        public MyObject GarbageBagObject { get; set; }
+
         public string ObterNomeContato(uint number)
         {
             if (number == Global.EMERGENCY_NUMBER)

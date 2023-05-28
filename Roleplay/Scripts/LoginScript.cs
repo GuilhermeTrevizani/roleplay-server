@@ -106,7 +106,7 @@ namespace Roleplay.Scripts
             }
             catch (Exception ex)
             {
-                player.Emit("Server:MostarErro", ex.Message);
+                player.Emit("Server:MostrarErro", ex.Message);
                 Alt.LogError(ex.Message);
             }
         }

@@ -1,7 +1,5 @@
 ﻿using AltV.Net;
-using AltV.Net.Async.Elements.Entities;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
@@ -200,10 +198,8 @@ namespace Roleplay.Commands.Faction
             player.RadarSpot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
             player.RadarSpot.Blip.Display = 2;
 
-            player.RadarSpot.Marker = new AsyncMarker(Alt.Core, player, MarkerType.MarkerHalo, pos, Global.MainRgba)
-            {
-                Scale = new Vector3(10, 10, 10)
-            };
+            player.RadarSpot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, pos, Global.MainRgba);
+            player.RadarSpot.Marker.Scale = new Vector3(10, 10, 10);
 
             player.RadarSpot.ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 10, 3);
             player.RadarSpot.ColShape.PoliceOfficerCharacterId = player.Character.Id;

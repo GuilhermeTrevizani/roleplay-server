@@ -1,8 +1,8 @@
 ﻿using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -41,40 +41,38 @@ namespace Roleplay.Entities
         public float RotY { get; set; }
 
         [NotMapped, JsonIgnore]
-        public IObject Object { get; set; }
+        public MyObject Object { get; set; }
 
         [NotMapped, JsonIgnore]
         public AudioSpot AudioSpot { get; set; }
 
-        [Obsolete("TODO")]
-        public void CreateObject(MyPlayer player)
+        public void CreateObject()
         {
-            //Object = PropStreamer.Create(
-            //    ObjectName,
-            //    new Vector3(PosX, PosY, PosZ),
-            //    new Vector3(RotR, RotP, RotY),
-            //    Dimension,
-            //    true,
-            //    frozen: true,
-            //    collision: false,
-            //    streamRange: 25);
+            Object = (MyObject) Alt.CreateNetworkObject(
+                ObjectName,
+                new Position(PosX, PosY, PosZ),
+                new Rotation(RotR, RotP, RotY));
 
-            if (player != null)
-                UpdateGroundItems(player);
+            Object.Frozen = true;
+            Object.Collision = false;
+            Object.Dimension = Dimension;
+
+            UpdateGroundItems();
         }
 
-        public void DeleteObject(MyPlayer player)
+        public void DeleteObject()
         {
             Global.Items.Remove(this);
             Object.Destroy();
             AudioSpot?.RemoveAllClients();
-            UpdateGroundItems(player);
+            UpdateGroundItems();
         }
 
-        private static void UpdateGroundItems(MyPlayer player)
+        private void UpdateGroundItems()
         {
-            foreach (var x in Global.Players.Where(x => player.Position.Distance(x.Position) <= Global.RP_DISTANCE && x.Dimension == player.Dimension))
-                x.ShowInventory(x, update: true);
+            var position = new Position(PosX, PosY, PosZ);
+            foreach (var player in Global.Players.Where(x => position.Distance(x.Position) <= Global.RP_DISTANCE && x.Dimension == Dimension))
+                player.ShowInventory(player, update: true);
         }
     }
 }
