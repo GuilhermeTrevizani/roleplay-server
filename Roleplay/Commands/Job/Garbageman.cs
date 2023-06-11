@@ -35,7 +35,7 @@ namespace Roleplay.Commands.Job
             }
 
             player.GarbageBagObject = (MyObject)Alt.CreateNetworkObject("ng_proc_binbag_01a", player.Position, Rotation.Zero);
-            player.GarbageBagObject.AttachToEntity(player, "", "SKEL_R_Hand", new Position(0, -0.1f, -0.4f), Rotation.Zero, false, false);
+            player.GarbageBagObject.AttachToEntity(player, "SKEL_R_Hand", "", new Position(0, -0.1f, -0.4f), Rotation.Zero, false, false);
             player.CollectingSpot = ponto;
             player.SendMessageToNearbyPlayers($"pega um saco de lixo.", MessageCategory.Ame, 5);
         }

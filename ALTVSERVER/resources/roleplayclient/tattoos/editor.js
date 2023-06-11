@@ -35,7 +35,6 @@ function handleEdit(_sexo, _personalization, _estudio = false) {
     view.on('character:Everything', handleEverything);
     view.focus();
 
-    native.freezeEntityPosition(alt.Player.local, true);
     toggleView(true, false);
     native.setEntityHeading(alt.Player.local, 169.24);
     createPedEditCamera(false);
@@ -45,7 +44,6 @@ function handleEdit(_sexo, _personalization, _estudio = false) {
 
 function handleClose() {
     closeView();
-    native.freezeEntityPosition(alt.Player.local, false);
     destroyPedEditCamera();
 }
 

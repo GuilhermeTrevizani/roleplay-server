@@ -370,10 +370,16 @@ namespace Roleplay.Factories
             }
         }
 
-        public void PlayAnimation(string dic, string name, int flag, int duration = -1, bool freeze = false) => Emit("animation:Play", dic, name, flag, duration, freeze);
+        public void PlayAnimation(string dic, string name, int flag, int duration = -1, bool freeze = false)
+        {
+            // How to "Freeze" animation?
+            //PlayAnimation(dic, name, 1, -1, duration, flag, 1, false, false, false);
+            Emit("animation:Play", dic, name, flag, duration, freeze);
+        }
 
         public void StopAnimation()
         {
+            //ClearTasks();
             Emit("animation:Clear");
             VehicleAnimation = false;
         }
@@ -1063,7 +1069,7 @@ namespace Roleplay.Factories
                     Invites = new();
                     CellphoneItem = new();
                     OnDuty = Masked = Cuffed = OnAdminDuty = VehicleAnimation = false;
-                    AguardandoTipoServico = 0;
+                    AguardandoTipoServico = CharacterJob.None;
                     Cellphone = 0;
                     IPLs = new();
                     Ferimentos = new();

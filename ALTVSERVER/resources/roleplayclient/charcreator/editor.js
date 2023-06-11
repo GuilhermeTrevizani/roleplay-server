@@ -30,7 +30,6 @@ async function handleEdit(_sexo, _oldData, _barbearia) {
     view.focus();
     toggleView(true, false);
 
-    native.freezeEntityPosition(alt.Player.local, true);
     if (!barbearia) 
         native.setEntityHeading(alt.Player.local, 169.24);
     createPedEditCamera();
@@ -40,7 +39,6 @@ async function handleEdit(_sexo, _oldData, _barbearia) {
 
 function closeEditor() {
     closeView();
-    native.freezeEntityPosition(alt.Player.local, false);
     destroyPedEditCamera();
 }
 

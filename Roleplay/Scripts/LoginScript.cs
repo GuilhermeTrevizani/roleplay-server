@@ -277,13 +277,16 @@ namespace Roleplay.Scripts
 
                 player.SetDateTime(DateTime.Now.AddHours(2));
                 player.Emit("SyncWeather", Global.WeatherInfo.WeatherType.ToString().ToUpper());
-                player.Invincible = true;
-                player.Frozen = true;
 
                 if (player.Character.PersonalizationStep != CharacterPersonalizationStep.Ready)
-                    player.SetPosition(new Position(402.84396f, -996.9758f, -99.01465f), player.SessionId, true);
+                {
+                    player.SetPosition(new Position(402.83078f, -996.9758f, -99.01465f), player.SessionId, true);
+                    player.Invincible = true;
+                }
                 else
+                {
                     await player.Spawnar();
+                }
 
                 player.Emit("Server:SelecionarPersonagem",
                     (int)player.Character.PersonalizationStep,

@@ -41,7 +41,6 @@ function handleEdit(_sexo, _tipo = 0, _tipoFaccao = 0) {
     });
     view.focus();
 
-    native.freezeEntityPosition(alt.Player.local, true);
     toggleView(true, false);
     if (_tipo == 0)
         native.setEntityHeading(alt.Player.local, 169.24);
@@ -52,7 +51,6 @@ function handleEdit(_sexo, _tipo = 0, _tipoFaccao = 0) {
 
 function handleClose() {
     closeView();
-    native.freezeEntityPosition(alt.Player.local, false);
     destroyPedEditCamera();
 }
 

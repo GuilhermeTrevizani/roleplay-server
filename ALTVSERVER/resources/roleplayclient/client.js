@@ -215,7 +215,7 @@ alt.setInterval(() => {
     playersCount = alt.Player.all.length;
 
     updateCellphone();
-    
+
     const animationDic = player.getMeta('animation_dic');
     if (animationDic != '' && animationDic !== undefined) {
         const animationName = player.getMeta('animation_name');
@@ -250,7 +250,7 @@ alt.everyTick(() => {
     native.hideHudComponentThisFrame(8);
     native.hideHudComponentThisFrame(9);
 
-    native.blockWeaponWheelThisFrame();
+    native.hudSuppressWeaponWheelResultsThisFrame();
     native.disableControlAction(0, 23, true); // INPUT_ENTER
     native.disableControlAction(0, 37, true); // INPUT_SELECT_WEAPON
 
@@ -380,7 +380,8 @@ const functionsKeyDown = {
         native.displayRadar(!f7);
     },
     66() { // B
-        if (!player.getSyncedMeta('animation')) {
+        const animationDic = player.getMeta('animation_dic');
+        if (animationDic == '' || animationDic === undefined) {
             if (pointing.active) 
                 pointing.stop();
             else if (!player.vehicle)
@@ -660,21 +661,17 @@ function criarPersonagem(codigo = 0, nome = '', sobrenome = '', sexo = '', dataN
 }
 
 alt.onServer('Server:SelecionarPersonagem', (personalizationStep, sex, personalizationJSON) => {
-    if (view != null) 
-        view.destroy();
-
+    view?.destroy();
     setView(null);
     toggleView(false);
 
     native.destroyAllCams(true);
     native.renderScriptCams(false, false, 0, false, false, 0);
-    native.clearPedTasks(player);
     
     const personalization = JSON.parse(personalizationJSON);
     syncDecorations(personalization);
 
     if (personalizationStep == 4) {
-        native.freezeEntityPosition(player, false);
         activateChat(true);
         native.displayHud(true);
         native.displayRadar(true);

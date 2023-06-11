@@ -100,7 +100,6 @@ function clearDropObject() {
     if (dropObject)
         dropObject.destroy();
     dropObject = null;
-    native.freezeEntityPosition(player, false);
 }
 
 function dropObjectKeyDown(key) {
@@ -175,8 +174,6 @@ alt.onServer('DropObject', (model, type) => {
     alt.on('keydown', dropObjectKeyDown);
 
     getRightCoordsZ(player.pos.x, player.pos.y, player.pos.z).then((minPos) => {
-        native.freezeEntityPosition(player, true);
-    
         setView(new alt.WebView('http://resource/inventory/dropitem.html', true));
 
         dropObjectMinZ = minPos.z;
