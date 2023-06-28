@@ -1,13 +1,16 @@
 ﻿using ExcelDataReader;
 using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Testador
 {
@@ -42,8 +45,18 @@ namespace Testador
         };
 
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            try
+            {
+                await UpdateServer();
+            }
+            catch (Exception ex)
+            {
+                var a = ex;
+            }
+
+            return;
             var con = new MySqlConnection("Server=localhost;Database=bdbackup;Uid=root;Password=159357");
             con.Open();
             var cmd = new MySqlCommand("SELECT Email from Usuarios where Codigo >= 272", con);
@@ -264,6 +277,48 @@ stickybomb|80000";
                 sb.Append(caracter.ToString("X2"));
 
             return sb.ToString();
+        }
+
+        static async Task DownloadFile(string uri, string fileName)
+        {
+            var client = new HttpClient();
+            var response = await client.GetAsync(uri);
+            using var fs = new FileStream(fileName, FileMode.OpenOrCreate);
+            await response.Content.CopyToAsync(fs);
+        }
+
+        static async Task UpdateServer()
+        {
+            // pegar dos json e com base nele tem os nomes dos arquivos com a pasta base, assim vamos saber onde atualizar
+
+            // https://cdn.alt-mp.com/server/dev/x64_win32/update.json
+            // https://cdn.alt-mp.com/data/dev/update.json
+            // https://cdn.alt-mp.com/coreclr-module/dev/x64_win32/update.json
+            // https://cdn.alt-mp.com/js-module/dev/x64_win32/update.json
+
+            var branch = "dev"; // release | rc | dev
+            var path = @"C:\Projects\GuilhermeTrevizani\roleplay-server\ALTVSERVER";
+
+            var files = new Dictionary<string, string>
+            {
+                { $"https://cdn.alt-mp.com/server/{branch}/x64_win32/altv-server.exe", Path.Combine(path, @"altv-server.exe") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/vehmodels.bin", Path.Combine(path, @"data\vehmodels.bin") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/vehmods.bin", Path.Combine(path, @"data\vehmods.bin") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/clothes.bin", Path.Combine(path, @"data\clothes.bin") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/pedmodels.bin", Path.Combine(path, @"data\pedmodels.bin") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/rpfdata.bin", Path.Combine(path, @"data\rpfdata.bin") },
+                { $"https://cdn.alt-mp.com/data/{branch}/data/weaponmodels.bin", Path.Combine(path, @"data\weaponmodels.bin") },
+                { $"https://cdn.alt-mp.com/coreclr-module/{branch}/x64_win32/AltV.Net.Host.dll", Path.Combine(path, @"AltV.Net.Host.dll") },
+                { $"https://cdn.alt-mp.com/coreclr-module/{branch}/x64_win32/modules/csharp-module.dll", Path.Combine(path, @"modules\csharp-module.dll") },
+                { $"https://cdn.alt-mp.com/js-module/{branch}/x64_win32/modules/js-module/libnode.dll", Path.Combine(path, @"modules\js-module\libnode.dll") },
+                { $"https://cdn.alt-mp.com/js-module/{branch}/x64_win32/modules/js-module/js-module.dll", Path.Combine(path, @"modules\js-module\js-module.dll") },
+            };
+
+            var tasks = new List<Task>();
+            foreach (var file in files)
+                tasks.Add(DownloadFile(file.Key, file.Value));
+
+            await Task.WhenAll(tasks);
         }
     }
 }

@@ -14,10 +14,10 @@ namespace Roleplay.Entities
 
         public string DiscordUsername { get; set; }
 
-        public string DiscordDiscriminator { get; set; }
+        public string DiscordDisplayName { get; set; }
 
         [NotMapped]
-        public string Name => $"{DiscordUsername}#{DiscordDiscriminator}";
+        public string Name => string.IsNullOrWhiteSpace(DiscordDisplayName) ? DiscordUsername : DiscordDisplayName;
 
         public string RegisterIp { get; set; }
 

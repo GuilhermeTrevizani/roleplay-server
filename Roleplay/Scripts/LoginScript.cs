@@ -28,6 +28,7 @@ namespace Roleplay.Scripts
                 httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
                 var res = await httpClient.GetFromJsonAsync<DiscordResponse>("https://discordapp.com/api/users/@me");
+                res.Username = res.Discriminator == "0" ? res.Username : $"{res.Username}#{res.Discriminator}";
 
                 await using var context = new DatabaseContext();
                 var user = context.Users.FirstOrDefault(x => x.DiscordId == res.Id);
@@ -38,7 +39,7 @@ namespace Roleplay.Scripts
                     {
                         DiscordId = res.Id,
                         DiscordUsername = res.Username,
-                        DiscordDiscriminator = res.Discriminator,
+                        DiscordDisplayName = res.Global_Name,
                         RegisterIp = player.RealIp,
                         LastAccessIp = player.RealIp,
                         RegisterHardwareIdHash = player.HardwareIdHash,
@@ -82,6 +83,8 @@ namespace Roleplay.Scripts
                 player.User.LastAccessIp = player.RealIp;
                 player.User.LastAccessHardwareIdHash = player.HardwareIdHash;
                 player.User.LastAccessHardwareIdExHash = player.HardwareIdExHash;
+                player.User.DiscordUsername = res.Username;
+                player.User.DiscordDisplayName = res.Global_Name;
                 context.Users.Update(player.User);
                 await context.SaveChangesAsync();
                 player.StaffFlags = JsonSerializer.Deserialize<List<StaffFlag>>(player.User.StaffFlagsJSON);

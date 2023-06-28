@@ -1382,11 +1382,12 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(UpdateWeaponAmmo))]
-        public static async Task UpdateWeaponAmmo(MyPlayer player, uint weapon, int ammo)
+        public static async Task UpdateWeaponAmmo(MyPlayer player, uint weapon)
         {
             try
             {
                 var weap = (WeaponModel)weapon;
+                var ammo = player.GetWeaponAmmo(weapon);
 
                 var item = player.Items.FirstOrDefault(x => x.Slot < 0 && x.Category == ItemCategory.Weapon && x.Type == weapon);
                 if (item == null)
@@ -1411,13 +1412,6 @@ namespace Roleplay.Scripts
                 }
 
                 var extra = JsonSerializer.Deserialize<WeaponItem>(item.Extra);
-
-                if (ammo > extra.Ammo)
-                {
-                    _ = player.GravarLog(LogType.Hack, $"{JsonSerializer.Serialize(item)} | {ammo}", null);
-                    return;
-                }
-
                 extra.Ammo = ammo;
                 item.Extra = JsonSerializer.Serialize(extra);
             }

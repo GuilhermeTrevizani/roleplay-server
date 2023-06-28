@@ -94,7 +94,7 @@ namespace Roleplay.Scripts
                     if (oldSlot < 0 && slot > 0)
                     {
                         if (player.CurrentWeapon == item.Type)
-                            player.RemoveAllWeapons();
+                            player.RemoveAllWeapons(true);
                     }
                 }
                 else if (item.Category == ItemCategory.WalkieTalkie)
@@ -869,7 +869,7 @@ namespace Roleplay.Scripts
         {
             try
             {
-                player.RemoveAllWeapons();
+                player.RemoveAllWeapons(true);
 
                 if (slot == 0)
                     return;

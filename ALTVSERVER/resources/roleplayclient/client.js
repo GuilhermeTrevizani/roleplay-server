@@ -994,5 +994,5 @@ alt.on('windowFocusChange', (isFocused) => {
 });
 
 alt.on('playerWeaponShoot', (weaponHash, totalAmmo, ammoInClip) => {
-    alt.emitServer('UpdateWeaponAmmo', weaponHash, totalAmmo);
+    alt.emitServer('UpdateWeaponAmmo', weaponHash);
 });

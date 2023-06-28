@@ -8,11 +8,11 @@
     ".NETCoreApp,Version=v7.0": {
       "Roleplay/1.0.0": {
         "dependencies": {
-          "AltV.Net": "15.0.93-dev",
-          "AltV.Net.Async": "15.0.93-dev",
-          "Discord.Net.Commands": "3.10.0",
-          "Discord.Net.Core": "3.10.0",
-          "Discord.Net.WebSocket": "3.10.0",
+          "AltV.Net": "15.0.104-dev",
+          "AltV.Net.Async": "15.0.104-dev",
+          "Discord.Net.Commands": "3.11.0",
+          "Discord.Net.Core": "3.11.0",
+          "Discord.Net.WebSocket": "3.11.0",
           "Microsoft.EntityFrameworkCore.Tools": "7.0.5",
           "Pomelo.EntityFrameworkCore.MySql": "7.0.0"
         },
@@ -20,9 +20,9 @@
           "Roleplay.dll": {}
         }
       },
-      "AltV.Net/15.0.93-dev": {
+      "AltV.Net/15.0.104-dev": {
         "dependencies": {
-          "AltV.Net.Shared": "15.0.93-dev"
+          "AltV.Net.Shared": "15.0.104-dev"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.dll": {
@@ -31,9 +31,9 @@
           }
         }
       },
-      "AltV.Net.Async/15.0.93-dev": {
+      "AltV.Net.Async/15.0.104-dev": {
         "dependencies": {
-          "AltV.Net": "15.0.93-dev",
+          "AltV.Net": "15.0.104-dev",
           "System.Threading.Channels": "6.0.0"
         },
         "runtime": {
@@ -43,7 +43,7 @@
           }
         }
       },
-      "AltV.Net.CApi/15.0.93-dev": {
+      "AltV.Net.CApi/15.0.104-dev": {
         "runtime": {
           "lib/net6.0/AltV.Net.CApi.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -51,9 +51,9 @@
           }
         }
       },
-      "AltV.Net.Shared/15.0.93-dev": {
+      "AltV.Net.Shared/15.0.104-dev": {
         "dependencies": {
-          "AltV.Net.CApi": "15.0.93-dev"
+          "AltV.Net.CApi": "15.0.104-dev"
         },
         "runtime": {
           "lib/net6.0/AltV.Net.Shared.dll": {
@@ -62,18 +62,18 @@
           }
         }
       },
-      "Discord.Net.Commands/3.10.0": {
+      "Discord.Net.Commands/3.11.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.10.0"
+          "Discord.Net.Core": "3.11.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Commands.dll": {
-            "assemblyVersion": "3.10.0.0",
-            "fileVersion": "3.10.0.0"
+            "assemblyVersion": "3.11.0.0",
+            "fileVersion": "3.11.0.0"
           }
         }
       },
-      "Discord.Net.Core/3.10.0": {
+      "Discord.Net.Core/3.11.0": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.2",
           "System.Collections.Immutable": "5.0.0",
@@ -82,31 +82,31 @@
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Core.dll": {
-            "assemblyVersion": "3.10.0.0",
-            "fileVersion": "3.10.0.0"
+            "assemblyVersion": "3.11.0.0",
+            "fileVersion": "3.11.0.0"
           }
         }
       },
-      "Discord.Net.Rest/3.10.0": {
+      "Discord.Net.Rest/3.11.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.10.0"
+          "Discord.Net.Core": "3.11.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.Rest.dll": {
-            "assemblyVersion": "3.10.0.0",
-            "fileVersion": "3.10.0.0"
+            "assemblyVersion": "3.11.0.0",
+            "fileVersion": "3.11.0.0"
           }
         }
       },
-      "Discord.Net.WebSocket/3.10.0": {
+      "Discord.Net.WebSocket/3.11.0": {
         "dependencies": {
-          "Discord.Net.Core": "3.10.0",
-          "Discord.Net.Rest": "3.10.0"
+          "Discord.Net.Core": "3.11.0",
+          "Discord.Net.Rest": "3.11.0"
         },
         "runtime": {
           "lib/net6.0/Discord.Net.WebSocket.dll": {
-            "assemblyVersion": "3.10.0.0",
-            "fileVersion": "3.10.0.0"
+            "assemblyVersion": "3.11.0.0",
+            "fileVersion": "3.11.0.0"
           }
         }
       },
@@ -366,61 +366,61 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AltV.Net/15.0.93-dev": {
+    "AltV.Net/15.0.104-dev": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-aDd2z1ShPzHuMsYWXTz30E1+SprNZkvtN6B+KQms4OEZPd5i9v+UhyVPaRQ9a0TSLNcRUXwC3grf00g5LVBqnQ==",
-      "path": "altv.net/15.0.93-dev",
-      "hashPath": "altv.net.15.0.93-dev.nupkg.sha512"
+      "sha512": "sha512-Df6DUQXZSr8zxyj3dkchNzp51/26HO5QJ9wA2VwhAtTM/x1apim+KXBFQJvtVISEy8Gd6gYFEEMZaoV+515Klw==",
+      "path": "altv.net/15.0.104-dev",
+      "hashPath": "altv.net.15.0.104-dev.nupkg.sha512"
     },
-    "AltV.Net.Async/15.0.93-dev": {
+    "AltV.Net.Async/15.0.104-dev": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OsPYnQ2hM9r2G6vDfo9cg5fwzDB9pELx9V+41/CH4uyCbVrtuxfO7lsa0/fKnORs7LnQH0NNK1Xq7L7IRFp0ug==",
-      "path": "altv.net.async/15.0.93-dev",
-      "hashPath": "altv.net.async.15.0.93-dev.nupkg.sha512"
+      "sha512": "sha512-oL22kkLBFQMWhVagBBtz21OSgTfW1PY5XfKFpPGj0ycYUTPa5QA7eSCxWN+4zOPCrzDCSe2IIMY1M3X70Tw8PQ==",
+      "path": "altv.net.async/15.0.104-dev",
+      "hashPath": "altv.net.async.15.0.104-dev.nupkg.sha512"
     },
-    "AltV.Net.CApi/15.0.93-dev": {
+    "AltV.Net.CApi/15.0.104-dev": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-XcwjSmN37i4tnZ6fQ/2ojlJH+XTSLxFQO2GW1LD/SNuogAVfPgDaH+bmg87hZO2ltoow65wiy4wS5dXeen+bAA==",
-      "path": "altv.net.capi/15.0.93-dev",
-      "hashPath": "altv.net.capi.15.0.93-dev.nupkg.sha512"
+      "sha512": "sha512-JTknVaiV+Ixu4ovgXKEXdbigQQ/FyVb2jyECnooOnwj6Zv5pVholAtWHpZoF8mrxuCOud8Usxr2wcjfAZBMS2Q==",
+      "path": "altv.net.capi/15.0.104-dev",
+      "hashPath": "altv.net.capi.15.0.104-dev.nupkg.sha512"
     },
-    "AltV.Net.Shared/15.0.93-dev": {
+    "AltV.Net.Shared/15.0.104-dev": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-hyon2mJsVGTKP8lm5AychhQYsiR+xO+HgUxxRzIe167pZHdbrByqtsofp1VehpuTjIRkVxnkITT5+P2AaHLqyQ==",
-      "path": "altv.net.shared/15.0.93-dev",
-      "hashPath": "altv.net.shared.15.0.93-dev.nupkg.sha512"
+      "sha512": "sha512-UZJfTys3OAS1RXoYnse0DCCoaF9om8jZGr2q1RuxDEpyV6VQ1HlkzTZZ384b1wc+1hUBzS9hwPBRCqsNG+NCFw==",
+      "path": "altv.net.shared/15.0.104-dev",
+      "hashPath": "altv.net.shared.15.0.104-dev.nupkg.sha512"
     },
-    "Discord.Net.Commands/3.10.0": {
+    "Discord.Net.Commands/3.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-/DpV2H+PkOtypV6csIdp6NSqhxuDnyS25gcteaDpbwceMwCxmaveTiycUmPxbqgjKADzNx4qszoxShwQGoXalg==",
-      "path": "discord.net.commands/3.10.0",
-      "hashPath": "discord.net.commands.3.10.0.nupkg.sha512"
+      "sha512": "sha512-G++xp6rVOphx6jX8m8TCVfiwQi6AsXlWW+lNXfKE3j5VhSKYbytRXOs0faUCrTa+tsfOGI6OCoe8XHMjEDwPoA==",
+      "path": "discord.net.commands/3.11.0",
+      "hashPath": "discord.net.commands.3.11.0.nupkg.sha512"
     },
-    "Discord.Net.Core/3.10.0": {
+    "Discord.Net.Core/3.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-GnsLmSYDShws23rqzdf6aOwIG70cqYUHY7i2cFdj3YVz/c8OelsbLndnFvkg6yELcy7aD60NSHyYZ5oMsgDavA==",
-      "path": "discord.net.core/3.10.0",
-      "hashPath": "discord.net.core.3.10.0.nupkg.sha512"
+      "sha512": "sha512-jVwzXlIs/tHFufukhych0/GGOntXOYr2hDJyJTYprvJBMGtGZG2N8GZDt923wW/08M96DX7SesDwOdItvT7VzQ==",
+      "path": "discord.net.core/3.11.0",
+      "hashPath": "discord.net.core.3.11.0.nupkg.sha512"
     },
-    "Discord.Net.Rest/3.10.0": {
+    "Discord.Net.Rest/3.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-N2nlOCoZCTyQbDlwqDKcqknOgwAbeJgy2r9DAUNsNxcO763ru67WK3GxkA7V7QgZ80RU9rLB3fr9jvjJ14pUBA==",
-      "path": "discord.net.rest/3.10.0",
-      "hashPath": "discord.net.rest.3.10.0.nupkg.sha512"
+      "sha512": "sha512-mq/pE+j1dISgD0740rFKIdrONa6R0Rn+gw6qjq9baJRH8eezVr7zRJOW0QMy/X+iSnh+hxJWW9eErCGWuShXNg==",
+      "path": "discord.net.rest/3.11.0",
+      "hashPath": "discord.net.rest.3.11.0.nupkg.sha512"
     },
-    "Discord.Net.WebSocket/3.10.0": {
+    "Discord.Net.WebSocket/3.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pA581o5JoAAFlintQEeDncIr99WHZOWzwnZWLuPiSW4BmFjG/oYf8F6C60Ob/5w1C1QB0k72NLgh8mEwnTCI5Q==",
-      "path": "discord.net.websocket/3.10.0",
-      "hashPath": "discord.net.websocket.3.10.0.nupkg.sha512"
+      "sha512": "sha512-85vyo2bMThjgQgu1Fr4NCi7TNXrWEn3MlRF9zt1qcAFlMNy8UE6qpa1KmERD0Z05G8UB+l8/UQ4TmH1mWN/cqQ==",
+      "path": "discord.net.websocket/3.11.0",
+      "hashPath": "discord.net.websocket.3.11.0.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
