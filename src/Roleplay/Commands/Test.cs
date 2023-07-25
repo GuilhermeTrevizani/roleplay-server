@@ -71,7 +71,7 @@ namespace Roleplay.Commands
 
             var msg = $"/x3 {collection} {overlay}";
             player.SendMessage(MessageType.None, msg);
-            player.Emit("AddPedDecorationFromHashes", collection, overlay);
+            player.AddDecoration(Alt.Hash(collection), Alt.Hash(overlay));
             Alt.Log(msg);
         }
 

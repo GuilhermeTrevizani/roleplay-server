@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mail;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -267,18 +266,7 @@ stickybomb|80000";
             var a = ret;
         }
         */
-        public static string Criptografar(string texto)
-        {
-            var encodedValue = Encoding.UTF8.GetBytes(texto);
-            var encryptedPassword = SHA512.Create().ComputeHash(encodedValue);
-
-            var sb = new StringBuilder();
-            foreach (var caracter in encryptedPassword)
-                sb.Append(caracter.ToString("X2"));
-
-            return sb.ToString();
-        }
-
+       
         static async Task DownloadFile(string uri, string fileName)
         {
             var client = new HttpClient();

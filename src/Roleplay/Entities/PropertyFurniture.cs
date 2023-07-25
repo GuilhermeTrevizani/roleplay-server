@@ -41,7 +41,7 @@ namespace Roleplay.Entities
 
         public void CreateObject()
         {
-            Object = (MyObject)Alt.CreateNetworkObject(
+            Object = (MyObject)Alt.CreateObject(
                 Model,
                 new Position(PosX, PosY, PosZ),
                 new Rotation(RotR, RotP, RotY));

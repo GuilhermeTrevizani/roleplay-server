@@ -3,9 +3,9 @@ using AltV.Net.Elements.Entities;
 
 namespace Roleplay.Factories
 {
-    public class MyObjectFactory : IEntityFactory<INetworkObject>
+    public class MyObjectFactory : IEntityFactory<IObject>
     {
-        public INetworkObject Create(ICore core, nint baseObjectPointer, uint id)
+        public IObject Create(ICore core, nint baseObjectPointer, uint id)
         {
             return new MyObject(core, baseObjectPointer, id);
         }

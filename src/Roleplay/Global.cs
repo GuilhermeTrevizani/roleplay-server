@@ -930,6 +930,6 @@ namespace Roleplay
         public static ulong CompanyAnnouncementDiscordChannel { get; set; }
 
         [Obsolete("TODO")]
-        public static IEnumerable<MyObject> Objects => new List<MyObject>(); //{ get => Alt.GetAllNetworkObjects().Cast<MyObject>(); }
+        public static IEnumerable<MyObject> Objects => new List<MyObject>(); //{ get => Alt.GetAllObjects().Cast<MyObject>(); }
     }
 }

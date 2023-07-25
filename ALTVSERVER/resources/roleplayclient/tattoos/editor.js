@@ -1,7 +1,7 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
 import { createPedEditCamera, destroyPedEditCamera, setFov, setZPos } from '/helpers/camera.js';
-import { view, setView, toggleView, closeView, syncDecorations } from '/helpers/cursor.js';
+import { view, setView, toggleView, closeView } from '/helpers/cursor.js';
 import { activateChat } from '/chat/index.mjs';
 
 let sexo = 0;
@@ -58,24 +58,33 @@ function handleCancel() {
 function handleSync(tattoo) {
     syncDecorations(personalization, false);
 
-    native.addPedDecorationFromHashes(
-        alt.Player.local, 
-        alt.hash(tattoo.Collection), 
-        alt.hash(tattoo.Overlay)
-    );
+    addDecoration(tattoo.Collection, tattoo.Overlay);
 }
 
 function handleEverything(tattoos) {
     syncDecorations(personalization);
 
     tattoos.forEach(x => {
-        native.addPedDecorationFromHashes(
-            alt.Player.local, 
-            alt.hash(x.Collection), 
-            alt.hash(x.Overlay)
-        );
+        addDecoration(x.Collection, x.Overlay);
     });
 }
+
+function addDecoration(collection, overlay) {
+    alt.emitServer('AddDecoration', collection, overlay);
+}
+
+function syncDecorations(personalization, setTattoos = true) {
+    alt.emitServer('ClearDecorations');
+
+    if (personalization.HairOverlay && personalization.HairCollection)
+        addDecoration(personalization.HairCollection, personalization.HairOverlay);
+    
+    if (setTattoos)
+        personalization.Tattoos.forEach(x => {
+            addDecoration(x.Collection, x.Overlay);
+        });
+}
+
 
 alt.onServer('Character:ShowMessage', (message) => {
     view.emit('character:ShowMessage', message);

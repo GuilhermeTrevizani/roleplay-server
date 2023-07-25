@@ -26,7 +26,7 @@ namespace Roleplay
 
         public override IBaseObjectFactory<IColShape> GetColShapeFactory() => new MyColShapeFactory();
 
-        public override IEntityFactory<INetworkObject> GetNetworkObjectFactory() => new MyObjectFactory();
+        public override IEntityFactory<IObject> GetObjectFactory() => new MyObjectFactory();
 
         Timer MainTimer { get; set; }
 

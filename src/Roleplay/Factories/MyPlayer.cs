@@ -379,7 +379,7 @@ namespace Roleplay.Factories
 
         public void StopAnimation()
         {
-            //ClearTasks();
+            ClearTasks();
             Emit("animation:Clear");
             VehicleAnimation = false;
         }
@@ -1405,6 +1405,15 @@ namespace Roleplay.Factories
             }
 
             SetEyeColor(personalizacaoDados.Eyes);
+
+            ClearDecorations();
+
+            if (!string.IsNullOrWhiteSpace(personalizacaoDados.HairOverlay)
+                && !string.IsNullOrWhiteSpace(personalizacaoDados.HairCollection))
+                AddDecoration(Alt.Hash(personalizacaoDados.HairCollection), Alt.Hash(personalizacaoDados.HairOverlay));
+
+            foreach(var tattoo in personalizacaoDados.Tattoos)
+                AddDecoration(Alt.Hash(tattoo.Collection), Alt.Hash(tattoo.Overlay));
         }
 
         private void SetCloth(ItemCategory tipoCategoriaItem, byte component, ushort defaultDrawable)
@@ -1822,8 +1831,6 @@ namespace Roleplay.Factories
                 Character.ThresoldDeath = 0;
             }
         }
-
-        public void PlayScenario(string scenario) => Emit("PlayScenario", scenario);
 
         public void ShowConfirm(string title, string message, string clientEvent)
         {

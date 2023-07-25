@@ -1630,11 +1630,8 @@ namespace Roleplay.Scripts
                 });
                 player.SendMessage(MessageType.Success, $"Você pagou ${Global.Parameter.TattooValue:N0} no estúdio de tatuagens.");
             }
-            else
-            {
-                player.SetarPersonalizacao(player.Personalization);
-            }
 
+            player.SetarPersonalizacao(player.Personalization);
             player.Emit("Character:CloseTattoos");
             player.Emit("Server:SelecionarPersonagem",
                 (int)player.Character.PersonalizationStep,
@@ -1860,6 +1857,18 @@ namespace Roleplay.Scripts
             {
                 Functions.GetException(ex);
             }
+        }
+
+        [ClientEvent(nameof(ClearDecorations))]
+        public void ClearDecorations(MyPlayer player)
+        {
+            player.ClearDecorations();
+        }
+
+        [ClientEvent(nameof(AddDecoration))]
+        public void AddDecoration(MyPlayer player, string collection, string overlay)
+        {
+            player.AddDecoration(Alt.Hash(collection), Alt.Hash(overlay));
         }
     }
 }

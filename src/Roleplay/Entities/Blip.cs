@@ -1,6 +1,8 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
+using Roleplay.Factories;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -30,7 +32,7 @@ namespace Roleplay.Entities
         {
             RemoveIdentifier();
 
-            BlipAlt = Alt.CreateBlip(4, new Position(PosX, PosY, PosZ));
+            BlipAlt = Alt.CreateBlip(true, 4, new Position(PosX, PosY, PosZ), Array.Empty<MyPlayer>());
             BlipAlt.Sprite = Type;
             BlipAlt.Name = Name;
             BlipAlt.Color = Color;

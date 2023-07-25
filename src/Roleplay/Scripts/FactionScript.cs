@@ -366,7 +366,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            var barrier = (MyObject)Alt.CreateNetworkObject(player.DropFurniture.Model, position, rotation);
+            var barrier = (MyObject)Alt.CreateObject(player.DropFurniture.Model, position, rotation);
             barrier.Dimension = player.Dimension;
             barrier.Frozen = true;
             barrier.Collision = true;

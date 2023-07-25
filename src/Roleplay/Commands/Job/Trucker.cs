@@ -103,7 +103,7 @@ namespace Roleplay.Commands.Job
                         PosZ = delivery.PosZ,
                     };
 
-                    spot.Blip = Alt.CreateBlip(player, 4, new Position(spot.PosX, spot.PosY, spot.PosZ));
+                    spot.Blip = Alt.CreateBlip(false, 4, new Position(spot.PosX, spot.PosY, spot.PosZ), new MyPlayer[] { player });
                     spot.Blip.Sprite = 1;
                     spot.Blip.Name = "Ponto de Entrega";
                     spot.Blip.Color = 2;

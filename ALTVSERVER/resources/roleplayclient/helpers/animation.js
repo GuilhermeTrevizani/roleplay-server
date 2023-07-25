@@ -6,15 +6,11 @@ const player = alt.Player.local;
 
 alt.onServer('animation:Clear', clearAnimation);
 function clearAnimation() {
-    player.setMeta('animation_dic', '');
-    player.setMeta('animation_name', '');
-    player.setMeta('animation_duration', 0);
-    player.setMeta('animation_flag', 0);
-    player.setMeta('animation_freeze', false);
-
-    native.clearPedTasks(player);
-    if (!player.vehicle)
-        native.clearPedSecondaryTask(player);
+    player.deleteMeta('animation_dic');
+    player.deleteMeta('animation_name');
+    player.deleteMeta('animation_duration');
+    player.deleteMeta('animation_flag');
+    player.deleteMeta('animation_freeze');
 }
 
 function checkAnimation(dict, name) {

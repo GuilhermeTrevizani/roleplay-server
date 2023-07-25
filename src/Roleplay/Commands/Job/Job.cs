@@ -166,7 +166,7 @@ namespace Roleplay.Commands.Job
                                 PosZ = ponto.PosZ,
                             };
 
-                            x.Blip = Alt.CreateBlip(player, 4, new Position(x.PosX, x.PosY, x.PosZ));
+                            x.Blip = Alt.CreateBlip(false, 4, new Position(x.PosX, x.PosY, x.PosZ), new MyPlayer[] { player });
                             x.Blip.Sprite = 1;
                             x.Blip.Name = "Ponto de Coleta";
                             x.Blip.Color = 2;

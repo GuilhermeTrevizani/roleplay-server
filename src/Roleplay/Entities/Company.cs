@@ -105,7 +105,7 @@ namespace Roleplay.Entities
 
             if (Open)
             {
-                Blip = Alt.CreateBlip(4, new Position(PosX, PosY, PosZ));
+                Blip = Alt.CreateBlip(true, 4, new Position(PosX, PosY, PosZ), Array.Empty<MyPlayer>());
                 Blip.Sprite = BlipType;
                 Blip.Name = Name;
                 Blip.Color = BlipColor;

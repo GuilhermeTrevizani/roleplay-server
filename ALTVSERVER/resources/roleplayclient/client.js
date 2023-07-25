@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { view, setView, toggleView, closeView, getAddress, syncDecorations, getRightCoordsZ } from '/helpers/cursor.js';
+import { view, setView, toggleView, closeView, getAddress, getRightCoordsZ } from '/helpers/cursor.js';
 import { activateChat } from '/chat/index.mjs';
 import { playAnimation } from '/helpers/animation.js';
 import { drawText2d } from '/helpers/text.js';
@@ -216,8 +216,8 @@ alt.setInterval(() => {
 
     updateCellphone();
 
-    const animationDic = player.getMeta('animation_dic');
-    if (animationDic != '' && animationDic !== undefined) {
+    if (player.hasMeta('animation_dic')) {
+        const animationDic = player.getMeta('animation_dic');
         const animationName = player.getMeta('animation_name');
         if (!native.isEntityPlayingAnim(player, animationDic, animationName, 3)) {
             if (player.getMeta('animation_freeze'))
@@ -316,8 +316,7 @@ alt.everyTick(() => {
                 native.disableControlAction(0, 24, true);
         }
 
-        const animationDic = player.getMeta('animation_dic');
-        if (animationDic != '' && animationDic !== undefined) {
+        if (player.hasMeta('animation_dic')) {
             native.disableControlAction(0, 22, true); // Space Bar
             native.disableControlAction(0, 24, true);
             native.disableControlAction(0, 25, true);
@@ -380,8 +379,7 @@ const functionsKeyDown = {
         native.displayRadar(!f7);
     },
     66() { // B
-        const animationDic = player.getMeta('animation_dic');
-        if (animationDic == '' || animationDic === undefined) {
+        if (player.hasMeta('animation_dic')) {
             if (pointing.active) 
                 pointing.stop();
             else if (!player.vehicle)
@@ -669,7 +667,6 @@ alt.onServer('Server:SelecionarPersonagem', (personalizationStep, sex, personali
     native.renderScriptCams(false, false, 0, false, false, 0);
     
     const personalization = JSON.parse(personalizationJSON);
-    syncDecorations(personalization);
 
     if (personalizationStep == 4) {
         activateChat(true);
@@ -762,7 +759,6 @@ alt.onServer('SpectatePlayer', (target) => {
     intervalSpec = alt.setInterval(() => { 
         if (target.scriptID != 0) {
             alt.clearInterval(intervalSpec);
-            native.attachEntityToEntity(player.scriptID, target.scriptID, 0, 0.0, 0.0, 5.0, 0.0, 0.0, 0.0, true, false, false, false, 0, false);
             const cam = native.createCamWithParams('DEFAULT_SCRIPTED_CAMERA', target.pos.x, target.pos.y, target.pos.z, 0, 0, 0, 60, true, 0);
             native.setCamActive(cam, true);
             native.renderScriptCams(true, false, 0, true, false, 0);
@@ -862,10 +858,6 @@ alt.onServer('RegistrarImagemDMV', (valor) => {
     });
 });
 
-alt.onServer('PlayScenario', (scenarioName) => {
-    native.taskStartScenarioInPlace(player, scenarioName, 0, true);
-});
-
 let oldWeather = 'CLEAR';
 let intervalWeather;
 alt.onServer('SyncWeather', (weather) => {
@@ -893,14 +885,6 @@ alt.onServer('SyncWeather', (weather) => {
         native.useSnowWheelVfxWhenUnsheltered(false);
         native.useSnowFootVfxWhenUnsheltered(false);
     }
-});
-
-alt.onServer('AddPedDecorationFromHashes', (collection, overlay) => {
-    native.addPedDecorationFromHashes(
-        player, 
-        alt.hash(collection), 
-        alt.hash(overlay)
-    );
 });
 
 alt.onServer('SetDrugEffect', (drug) => {

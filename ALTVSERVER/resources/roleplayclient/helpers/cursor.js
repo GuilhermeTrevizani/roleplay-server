@@ -55,26 +55,6 @@ export function getAddress(pos) {
     return [zoneName , streetName];
 }
 
-export function syncDecorations(personalization, setTattoos = true) {
-    native.clearPedDecorations(alt.Player.local);
-
-    if (personalization.HairOverlay && personalization.HairCollection)
-        native.addPedDecorationFromHashes(
-            alt.Player.local, 
-            alt.hash(personalization.HairCollection), 
-            alt.hash(personalization.HairOverlay)
-        );
-    
-    if (setTattoos)
-        personalization.Tattoos.forEach(x => {
-            native.addPedDecorationFromHashes(
-                alt.Player.local, 
-                alt.hash(x.Collection), 
-                alt.hash(x.Overlay)
-            );
-        });
-}
-
 export function getRightCoordsZ(x, y, z, tries = 0) {
     return new Promise(resolve => {
         if (tries == 0) 

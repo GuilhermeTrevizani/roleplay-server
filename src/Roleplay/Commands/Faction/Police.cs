@@ -189,7 +189,7 @@ namespace Roleplay.Commands.Faction
                 PosX = pos.X,
                 PosY = pos.Y,
                 PosZ = pos.Z,
-                Blip = Alt.CreateBlip(player, 4, pos)
+                Blip = Alt.CreateBlip(false, 4, pos, new MyPlayer[] { player }),
             };
             player.RadarSpot.Blip.Sprite = 225;
             player.RadarSpot.Blip.Name = "Radar";
@@ -234,9 +234,6 @@ namespace Roleplay.Commands.Faction
         [Command("spotlight", Aliases = new string[] { "holofote" })]
         public static void CMD_spotlight(MyPlayer player)
         {
-            player.SendMessage(MessageType.Error, "Este comando está inativo.");
-            return;
-
             if (player.Faction?.Type != FactionType.Police || !player.OnDuty)
             {
                 player.SendMessage(MessageType.Error, "Você não está em uma facção policial ou não está em serviço.");

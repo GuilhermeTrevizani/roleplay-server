@@ -26,7 +26,7 @@ export async function enterVehicleAsDriver() {
             lastDistance = distance;
         }
     });
-	
+
     if (vehicle == undefined) 
         return;
 

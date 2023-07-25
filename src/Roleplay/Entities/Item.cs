@@ -1,6 +1,5 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -48,7 +47,7 @@ namespace Roleplay.Entities
 
         public void CreateObject()
         {
-            Object = (MyObject) Alt.CreateNetworkObject(
+            Object = (MyObject) Alt.CreateObject(
                 ObjectName,
                 new Position(PosX, PosY, PosZ),
                 new Rotation(RotR, RotP, RotY));

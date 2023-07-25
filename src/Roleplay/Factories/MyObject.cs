@@ -3,7 +3,7 @@ using AltV.Net.Async.Elements.Entities;
 
 namespace Roleplay.Factories
 {
-    public class MyObject : AsyncNetworkObject
+    public class MyObject : AsyncObject
     {
         public MyObject(ICore core, nint nativePointer, uint id) : base(core, nativePointer, id)
         {

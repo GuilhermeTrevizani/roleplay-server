@@ -308,6 +308,7 @@ namespace Roleplay.Commands.Staff
             player.Visible = false;
             player.SetNametag();
             player.SetPosition(new Position(target.Position.X, target.Position.Y, target.Position.Z), target.Dimension, true);
+            player.AttachToEntity(target, 0, 0, new Position(0, 0, 5), Rotation.Zero, false, false);
             player.Emit("SpectatePlayer", target);
             await player.GravarLog(LogType.Staff, "/spec", target);
         }
