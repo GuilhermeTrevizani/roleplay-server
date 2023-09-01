@@ -944,7 +944,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("XMR", veh.VehicleDB.Id, veh.AudioSpot?.Source ?? string.Empty, veh.AudioSpot?.Volume ?? 0.1f);
+            player.Emit("XMR", veh.VehicleDB.Id, veh.AudioSpot?.Source ?? string.Empty, veh.AudioSpot?.Volume ?? 1);
         }
 
         [Command("quebrartrava")]

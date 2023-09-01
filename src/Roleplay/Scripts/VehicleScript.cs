@@ -445,7 +445,6 @@ namespace Roleplay.Scripts
 
             vehicle.AudioSpot ??= new AudioSpot
             {
-                MaxRange = 10,
                 Dimension = vehicle.Dimension,
                 VehicleId = vehicle.Id,
             };

@@ -398,10 +398,9 @@ namespace Roleplay.Factories
             {
                 AlarmAudioSpot = new AudioSpot
                 {
-                    MaxRange = 20,
                     Dimension = Dimension,
                     VehicleId = Id,
-                    Source = "https://play.segundavida.com.br/caralarm.mp3",
+                    Source = Global.URL_AUDIO_VEHICLE_ALARM,
                     Loop = true,
                 };
                 AlarmAudioSpot.SetupAllClients();

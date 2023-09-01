@@ -157,9 +157,8 @@ namespace Roleplay.Entities
                 ExteriorAlarmAudioSpot = new AudioSpot
                 {
                     Position = new Vector3(EntrancePosX, EntrancePosY, EntrancePosZ),
-                    MaxRange = 40,
                     Dimension = Dimension,
-                    Source = "https://play.segundavida.com.br/housealarm.mp3",
+                    Source = Global.URL_AUDIO_PROPERTY_ALARM,
                     Loop = true,
                 };
                 ExteriorAlarmAudioSpot.SetupAllClients();
@@ -170,9 +169,8 @@ namespace Roleplay.Entities
                 InteriorAlarmAudioSpot = new AudioSpot
                 {
                     Position = new Vector3(ExitPosX, ExitPosY, ExitPosZ),
-                    MaxRange = 40,
                     Dimension = Dimension,
-                    Source = "https://play.segundavida.com.br/housealarm.mp3",
+                    Source = Global.URL_AUDIO_PROPERTY_ALARM,
                     Loop = true,
                 };
                 InteriorAlarmAudioSpot.SetupAllClients();

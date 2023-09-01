@@ -287,9 +287,7 @@ namespace Roleplay.Commands
             }
 
             player.SendMessage(MessageType.Success, $"Você recusou o convite para {strPlayer}.");
-
-            if (target != null)
-                target.SendMessage(MessageType.Success, $"{player.ICName} recusou seu convite para {strTarget}.");
+            target?.SendMessage(MessageType.Success, $"{player.ICName} recusou seu convite para {strTarget}.");
 
             player.Invites.RemoveAll(x => x.Type == (InviteType)tipo);
         }
@@ -1073,7 +1071,7 @@ namespace Roleplay.Commands
                 return;
             }
 
-            player.Emit("Boombox", item.Id, item.AudioSpot?.Source ?? string.Empty, item.AudioSpot?.Volume ?? 0.1f);
+            player.Emit("Boombox", item.Id, item.AudioSpot?.Source ?? string.Empty, item.AudioSpot?.Volume ?? 1);
         }
 
         [Command("mic", "/mic (mensagem)", GreedyArg = true)]

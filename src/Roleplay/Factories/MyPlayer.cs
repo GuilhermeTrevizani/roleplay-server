@@ -1412,7 +1412,7 @@ namespace Roleplay.Factories
                 && !string.IsNullOrWhiteSpace(personalizacaoDados.HairCollection))
                 AddDecoration(Alt.Hash(personalizacaoDados.HairCollection), Alt.Hash(personalizacaoDados.HairOverlay));
 
-            foreach(var tattoo in personalizacaoDados.Tattoos)
+            foreach (var tattoo in personalizacaoDados.Tattoos)
                 AddDecoration(Alt.Hash(tattoo.Collection), Alt.Hash(tattoo.Overlay));
         }
 

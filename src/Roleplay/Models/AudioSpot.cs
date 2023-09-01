@@ -13,26 +13,22 @@ namespace Roleplay.Models
 
         public string Source { get; set; }
 
-        public uint MaxRange { get; set; }
-
         public int Dimension { get; set; }
 
-        public float Volume { get; set; } = 0.1f;
+        public float Volume { get; set; } = 1;
 
         public uint? VehicleId { get; set; }
 
         public bool Loop { get; set; }
 
-        public bool FixVolume { get; set; }
-
         public void Setup(MyPlayer player)
         {
-            player.Emit("Audio:Setup", Id, Position, Source, MaxRange, Dimension, Volume, VehicleId, Loop, FixVolume);
+            player.Emit("Audio:Setup", Id, Position, Source, Dimension, Volume, VehicleId, Loop);
         }
 
         public void SetupAllClients()
         {
-            Alt.EmitAllClients("Audio:Setup", Id, Position, Source, MaxRange, Dimension, Volume, VehicleId, Loop, FixVolume);
+            Alt.EmitAllClients("Audio:Setup", Id, Position, Source, Dimension, Volume, VehicleId, Loop);
 
             if (!Global.AudioSpots.Contains(this))
                 Global.AudioSpots.Add(this);

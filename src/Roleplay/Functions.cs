@@ -509,9 +509,6 @@ namespace Roleplay
             if (item.Category == ItemCategory.Cellphone)
                 return $"Número: <strong>{item.Type}</strong>";
 
-            if (item.Category == ItemCategory.Boombox)
-                return $"Alcance: <strong>{item.Type} metros</strong>";
-
             return string.Empty;
         }
 

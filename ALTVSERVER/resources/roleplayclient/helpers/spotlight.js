@@ -25,7 +25,7 @@ let player = alt.Player.local;
 let spotlightTick;
 
 alt.on('keyup', (key) => {
-    if (key == 113 && player.vehicle) // F2
+    if (key == 114 && player.vehicle) // F3
         alt.emitServer('HelicamToggle');
 });
 

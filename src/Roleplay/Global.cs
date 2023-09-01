@@ -72,7 +72,9 @@ namespace Roleplay
 
         public const string ROBBED_PROPERTY_ERROR_MESSAGE = "A propriedade foi roubada. Use /pliberar.";
 
-        public const uint BOOMBOX_DEFAULT_DISTANCE = 20;
+        public const string URL_AUDIO_PROPERTY_ALARM = "https://play.segundavida.com.br/housealarm.mp3";
+
+        public const string URL_AUDIO_VEHICLE_ALARM = "https://play.segundavida.com.br/caralarm.mp3";
 
         public static Rgba MainRgba { get; } = new Rgba(174, 106, 178, 75);
 
@@ -930,6 +932,6 @@ namespace Roleplay
         public static ulong CompanyAnnouncementDiscordChannel { get; set; }
 
         [Obsolete("TODO")]
-        public static IEnumerable<MyObject> Objects => new List<MyObject>(); //{ get => Alt.GetAllObjects().Cast<MyObject>(); }
+        public static IEnumerable<MyObject> Objects => new List<MyObject>(); // Alt.GetAllObjects().Cast<MyObject>();
     }
 }

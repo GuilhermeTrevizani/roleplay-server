@@ -19,6 +19,7 @@ import * as tattoos from '/tattoos/editor.js';
 import * as inventorySystem from '/inventory/client.mjs';
 import * as tuningSystem from '/tuning/client.mjs';
 import * as Constants from '/helpers/constants.js';
+import * as audioSystem from '/helpers/audio.js';
 
 const WeaponModel = {
     AntiqueCavalryDagger: 2460120199,
@@ -386,7 +387,7 @@ const functionsKeyDown = {
                 pointing.start();
         }
     },
-    112() { // F1
+    113() { // F1
         alt.emitServer('AbrirPainelControleUsuario');
     },
     73() { // I
@@ -403,9 +404,6 @@ const functionsKeyDown = {
     },
     74() { // J
         toggleCruise();
-    },
-    114() { // F3
-        alt.log('F3');
     },
     115() { // F4
         alt.log('F4');

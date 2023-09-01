@@ -1,6 +1,5 @@
 import * as alt from 'alt-client'
 import { showCursor, toggleView } from '/helpers/cursor.js';
-import * as Constants from '/helpers/constants.js';
 
 let chatActive = false;
 let inputActive = false;
@@ -159,46 +158,3 @@ function shiftHistoryUp() {
 function shiftHistoryDown() {
     webview.emit('chat:shiftHistoryDown');
 }
-
-let audioSpots = [];
-alt.setInterval(() => {
-    for (const audioSpot of audioSpots) {
-        let position = audioSpot.position;
-        if (audioSpot.vehicleId) {
-            const veh = alt.Vehicle.getByID(audioSpot.vehicleId);
-            if (veh?.valid)
-                position = veh.pos;
-        }
-
-        const distance = alt.Player.local.pos.distanceTo(position);
-        webview.emit('Audio:UpdateVolume', audioSpot.id, distance, alt.Player.local.dimension);
-    }
-}, 1000);
-
-alt.onServer('Audio:Setup', (id, position, source, maxRange, dimension, volume, vehicleId, loop, fixVolume) => {
-    const x = audioSpots.findIndex(x => x.id === id);
-    if (x === -1) {
-        audioSpots.push({id, position, source, maxRange, dimension, volume, vehicleId, loop, fixVolume });
-    } else {
-        audioSpots[x].position = position;  
-        audioSpots[x].source = source;
-        audioSpots[x].maxRange = maxRange;
-        audioSpots[x].dimension = dimension;
-        audioSpots[x].volume = volume;
-        audioSpots[x].vehicleId = vehicleId;
-        audioSpots[x].loop = loop;
-        audioSpots[x].fixVolume = fixVolume;
-    }
-
-    webview.emit('Audio:Setup', id, source, maxRange, dimension, volume, loop, fixVolume);
-});
-
-alt.onServer('Audio:Remove', (id) => {
-    const x = audioSpots.findIndex(x => x.id === id);
-    if (x === -1) 
-        return;
-
-    audioSpots.splice(x, 1);
-
-    webview.emit('Audio:Remove', id);
-});

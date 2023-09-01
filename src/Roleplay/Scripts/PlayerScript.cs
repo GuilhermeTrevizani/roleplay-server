@@ -550,7 +550,7 @@ namespace Roleplay.Scripts
                     strMensagem = $"Você comprou uma bola de baseball.";
                     break;
                 case "Boombox":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Boombox, Global.BOOMBOX_DEFAULT_DISTANCE));
+                    res = await player.GiveItem(new CharacterItem(ItemCategory.Boombox));
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -774,7 +774,7 @@ namespace Roleplay.Scripts
         {
             var listaComandos = new List<Comando>()
             {
-                new Comando("Teclas", "F1", "Painel de Controle do Usuário"),
+                new Comando("Teclas", "F2", "Painel de Controle do Usuário"),
                 new Comando("Teclas", "F7", "Habilita/desabilita a HUD"),
                 new Comando("Teclas", "B", "Aponta/para de apontar o dedo estando fora de um veículo"),
                 new Comando("Teclas", "T", "Abrir caixa de texto para digitação no chat"),
@@ -968,7 +968,7 @@ namespace Roleplay.Scripts
                 if (player.Faction.Type == FactionType.Police)
                     listaComandos.AddRange(new List<Comando>()
                     {
-                        new Comando("Teclas", "F2", "Ativa/desativa a câmera do helicóptero"),
+                        new Comando("Teclas", "F3", "Ativa/desativa a câmera do helicóptero"),
                         new Comando("Teclas", "Botão Esquerdo do Mouse", "Ativa/desativa a luz do helicóptero enquanto a câmera estiver ativa"),
                         new Comando("Teclas", "Botão Direito do Mouse", "Altera o modo da visão do helicóptero enquanto a câmera estiver ativa"),
                         new Comando("Facção", "/prender", "Prende um personagem"),
@@ -1656,9 +1656,7 @@ namespace Roleplay.Scripts
             item.AudioSpot ??= new AudioSpot
             {
                 Position = new Vector3(item.PosX, item.PosY, item.PosZ),
-                MaxRange = item.Type,
                 Dimension = item.Dimension,
-                FixVolume = item.Type > Global.BOOMBOX_DEFAULT_DISTANCE,
             };
 
             if (item.AudioSpot.Source != url)

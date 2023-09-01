@@ -40,8 +40,8 @@ namespace Roleplay.Commands
             }
 
             var msg = $"/x1 {component} {drawable} {texture} 0 {Alt.Hash(dlc)}";
-            player.SendMessage(MessageType.None, msg);
-            player.SetDlcClothes(component, Convert.ToUInt16(drawable), texture, 0, Alt.Hash(dlc));
+            var success = player.SetDlcClothes(component, Convert.ToUInt16(drawable), texture, 0, Alt.Hash(dlc));
+            player.SendMessage(success ? MessageType.Success : MessageType.Error, msg);
             Alt.Log(msg);
         }
 
@@ -55,8 +55,8 @@ namespace Roleplay.Commands
             }
 
             var msg = $"/x2 {component} {drawable} {texture} 0 {Alt.Hash(dlc)}";
-            player.SendMessage(MessageType.None, msg);
-            player.SetDlcProps(component, Convert.ToUInt16(drawable), texture, Alt.Hash(dlc));
+            var success = player.SetDlcProps(component, Convert.ToUInt16(drawable), texture, Alt.Hash(dlc));
+            player.SendMessage(success ? MessageType.Success : MessageType.Error, msg);
             Alt.Log(msg);
         }
 
@@ -70,8 +70,8 @@ namespace Roleplay.Commands
             }
 
             var msg = $"/x3 {collection} {overlay}";
-            player.SendMessage(MessageType.None, msg);
             player.AddDecoration(Alt.Hash(collection), Alt.Hash(overlay));
+            player.SendMessage(MessageType.None, msg);
             Alt.Log(msg);
         }
 
