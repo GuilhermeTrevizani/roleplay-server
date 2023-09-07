@@ -1,6 +1,6 @@
 announce = false
 announcementDiscordChannel = 938605204427919360
-cdnUrl = 'https://play.segundavida.com.br/'
+cdnUrl = 'play.segundavida.com.br/'
 companyAnnouncementDiscordChannel = 968258071732310144
 dbConnectionString = 'Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357'
 debug = true
@@ -8,7 +8,6 @@ description = 'Primeiro servidor luso-brasileiro de roleplay baseado em texto no
 discordBotToken = ''
 gamemode = 'Roleplay'
 governmentAnnouncementDiscordChannel = 938605270991511552
-host = '0.0.0.0'
 language = 'pt'
 modules = [ 'csharp-module', 'js-module' ]
 name = 'Segunda Vida Roleplay'

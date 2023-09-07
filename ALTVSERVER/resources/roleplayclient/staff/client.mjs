@@ -249,6 +249,9 @@ alt.onServer('StaffProperties', (update, propertiesHtml, interiorsJson) => {
     view.on('remove', (id) => {
         alt.emitServer('StaffPropertyRemove', id);
     });
+    view.on('getPosition', () => {
+        view.emit('setPosition', alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z, alt.Player.local.dimension);
+    });
     view.focus();
     toggleView(true);
 });

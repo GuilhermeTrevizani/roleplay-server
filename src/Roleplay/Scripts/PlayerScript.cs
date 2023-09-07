@@ -279,7 +279,7 @@ namespace Roleplay.Scripts
                 || (x.GetCustomAttribute<CommandAttribute>().Aliases?.Any(y => y.ToLower() == cmd) ?? false));
                 if (method == null)
                 {
-                    player.SendMessage(MessageType.None, $"O comando {{{Global.MAIN_COLOR}}}{message}{{#FFFFFF}} não existe. Pressione {{{Global.MAIN_COLOR}}}F1{{#FFFFFF}} para visualizar os comandos disponíveis.");
+                    player.SendMessage(MessageType.None, $"O comando {{{Global.MAIN_COLOR}}}{message}{{#FFFFFF}} não existe. Pressione {{{Global.MAIN_COLOR}}}F2{{#FFFFFF}} para visualizar os comandos disponíveis.");
                     return;
                 }
 

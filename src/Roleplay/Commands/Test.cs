@@ -2,6 +2,7 @@
 using Roleplay.Factories;
 using Roleplay.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Roleplay.Commands
@@ -17,7 +18,10 @@ namespace Roleplay.Commands
                 return;
             }
 
-            await Global.DiscordClient.SetGameAsync("olá marilene");
+            var property = Global.Properties.FirstOrDefault();
+            property.StartAlarm();
+
+            //await Global.DiscordClient.SetGameAsync("olá marilene");
 
             //Alt.CreateColShapeRectangle()
 
@@ -28,6 +32,20 @@ namespace Roleplay.Commands
                 //await Task.Delay(2000); // 2 seg
                 //player.PlayAnimation("cellphone@", "cellphone_call_listen_base", (int)(AnimationFlags.StopOnLastFrame | AnimationFlags.AllowPlayerControl | AnimationFlags.OnlyAnimateUpperBody)); //em ligação
             */
+        }
+
+        [Command("y")]
+        public static async Task CMD_y(MyPlayer player)
+        {
+            if (!Alt.IsDebug)
+            {
+                player.SendMessage(MessageType.Error, "O servidor não está em modo desenvolvimento.");
+                return;
+            }
+
+            var property = Global.Properties.FirstOrDefault();
+            property.StopAlarm();
+            player.SendMessage(MessageType.Success, "/y");
         }
 
         [Command("x1", "/x1 (dlc) (component) (drawable) (texture)")]

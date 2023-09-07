@@ -339,4 +339,4 @@ ASALocalRun/
 healthchecksdb
 *.resource
 ALTVServer/resources/roleplay/*
-ALTVSERVER/settings.json
+ALTVSERVER/.server-crashes-cache

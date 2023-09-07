@@ -72,9 +72,9 @@ namespace Roleplay
 
         public const string ROBBED_PROPERTY_ERROR_MESSAGE = "A propriedade foi roubada. Use /pliberar.";
 
-        public const string URL_AUDIO_PROPERTY_ALARM = "https://play.segundavida.com.br/housealarm.mp3";
+        public const string URL_AUDIO_PROPERTY_ALARM = "https://trevizani.com.br/propertyalarm.mp3";
 
-        public const string URL_AUDIO_VEHICLE_ALARM = "https://play.segundavida.com.br/caralarm.mp3";
+        public const string URL_AUDIO_VEHICLE_ALARM = "https://trevizani.com.br/vehiclealarm.mp3";
 
         public static Rgba MainRgba { get; } = new Rgba(174, 106, 178, 75);
 
