@@ -8,15 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Numerics;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace Roleplay
 {
@@ -2248,7 +2243,7 @@ namespace Roleplay
             };
 
             player.TimerCelularElapsedCount = 0;
-            player.TimerCelular = new Timer(8000);
+            player.TimerCelular = new System.Timers.Timer(8000);
             player.TimerCelular.Elapsed += player.TimerCelular_Elapsed;
             player.TimerCelular.Start();
             player.SendMessage(Models.MessageType.None, $"[CELULAR] Você está ligando para {player.ObterNomeContato(cellphone)}.", Global.CELLPHONE_SECONDARY_COLOR);
