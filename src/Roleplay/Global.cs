@@ -5,9 +5,6 @@ using Discord.WebSocket;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Roleplay
@@ -931,7 +928,6 @@ namespace Roleplay
 
         public static ulong CompanyAnnouncementDiscordChannel { get; set; }
 
-        [Obsolete("TODO")]
-        public static IEnumerable<MyObject> Objects => new List<MyObject>(); // Alt.GetAllObjects().Cast<MyObject>();
+        public static IEnumerable<MyObject> Objects => Alt.GetAllNetworkObjects().Cast<MyObject>();
     }
 }

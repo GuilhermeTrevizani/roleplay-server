@@ -288,8 +288,13 @@ stickybomb|80000";
             // https://cdn.alt-mp.com/coreclr-module/dev/x64_win32/update.json
             // https://cdn.alt-mp.com/js-module/dev/x64_win32/update.json
 
+            Console.WriteLine("Press V to update Voice Roleplay, any other key to update Text Roleplay");
+            var option = Console.ReadKey(true);
+
             var branch = "dev"; // release | rc | dev
-            var path = @"C:\Projects\GuilhermeTrevizani\roleplay-server\ALTVSERVER";
+            var path = option.Key == ConsoleKey.V ? @"C:\Projects\GuilhermeTrevizani\roleplay-voice-server\ALTVSERVER" : @"C:\Projects\GuilhermeTrevizani\roleplay-server\ALTVSERVER";
+
+            Console.WriteLine("Downloading...");
 
             var directories = new List<string>
             {

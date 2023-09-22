@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roleplay", "src\Roleplay\Roleplay.csproj", "{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrevizaniTextRoleplay.Server", "src\Roleplay\TrevizaniTextRoleplay.Server.csproj", "{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testador", "src\Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
 EndProject

@@ -3,9 +3,9 @@
 
 
 "@altv/types-client@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-2.9.1.tgz#07107437aca3eb414bdffbc97309642dc558e4a6"
-  integrity sha512-c8bX/eZdzIX+oDkkLbf8RDTSxoHWIT8uaNHPsDGuUxv+jcJwfuHSWAqcPlYWiRmA89fudIGCzryfQzX7FchZPw==
+  version "2.9.7"
+  resolved "https://registry.yarnpkg.com/@altv/types-client/-/types-client-2.9.7.tgz#9082db1af8dbd7f04bc5f33e8ad67adcf6d9afba"
+  integrity sha512-VCuo56pzGLJedu6oiesAoKtFc7O5ZhAHH7W/WOX1dGU+PXWIM0B6OYbYuIOr6AOLwTCVTv+QpUrKgkN+38WCyA==
 
 "@altv/types-natives@^1.5.4":
   version "1.5.4"

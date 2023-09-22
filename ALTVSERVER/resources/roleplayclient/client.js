@@ -387,7 +387,7 @@ const functionsKeyDown = {
         pointing.start();
     }
   },
-  113() { // F1
+  113() { // F2
     alt.emitServer('AbrirPainelControleUsuario');
   },
   73() { // I

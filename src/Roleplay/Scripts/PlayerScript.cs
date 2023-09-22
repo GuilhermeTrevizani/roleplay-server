@@ -7,13 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Scripts
 {
@@ -59,7 +55,7 @@ namespace Roleplay.Scripts
         }
 
         [ScriptEvent(ScriptEventType.WeaponDamage)]
-        public static bool OnWeaponDamage(MyPlayer player, IEntity target, uint weapon, ushort damage, Position shotOffset, BodyPart bodyPart)
+        public static WeaponDamageResponse OnWeaponDamage(MyPlayer player, IEntity target, uint weapon, ushort damage, Position shotOffset, BodyPart bodyPart)
         {
             var hasDamage = true;
             try

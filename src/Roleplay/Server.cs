@@ -332,7 +332,8 @@ namespace Roleplay
                     await using var context = new DatabaseContext();
                     var properties = (await context.Properties
                         .Where(x => x.CharacterId.HasValue)
-                        .Include(x => x.Character).ThenInclude(x => x.User)
+                        .Include(x => x.Character)
+                            .ThenInclude(x => x.User)
                         .ToListAsync())
                         .Where(x => (DateTime.Now - x.Character.LastAccessDate).TotalDays
                             > (x.Character.User.VIP switch
