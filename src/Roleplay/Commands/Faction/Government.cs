@@ -6,11 +6,8 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
 using System.Drawing;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Faction
 {
@@ -286,8 +283,8 @@ namespace Roleplay.Commands.Faction
 
             var veh = (MyVehicle)player.Vehicle;
             var modelo = veh?.VehicleDB?.Model?.ToUpper();
-            if ((player.Seat != 3 && player.Seat != 4) 
-                || (modelo != VehicleModel.Polmav.ToString().ToUpper() 
+            if ((player.Seat != 3 && player.Seat != 4)
+                || (modelo != VehicleModel.Polmav.ToString().ToUpper()
                     && modelo != VehicleModelMods.LSPDHELI.ToString().ToUpper())
             )
             {

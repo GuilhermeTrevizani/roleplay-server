@@ -1,19 +1,14 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
-using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Job
 {
-    public class Job 
+    public class Job
     {
         [Command("sairemprego")]
         public static async Task CMD_sairemprego(MyPlayer player)
@@ -134,6 +129,7 @@ namespace Roleplay.Commands.Job
                 target.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.MECHANIC_NUMBER)}: Nosso mecânico {player.Character.Name} está atendendo sua chamada. Celular: {player.Cellphone}.", Global.CELLPHONE_MAIN_COLOR);
         }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         [Command("duty", Aliases = new string[] { "trabalho" })]
         public async static void CMD_duty(MyPlayer player)
         {
@@ -174,8 +170,8 @@ namespace Roleplay.Commands.Job
                             x.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
                             x.Blip.Display = 2;
 
-                            x.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(x.PosX, x.PosY, x.PosZ - 0.95f), Global.MainRgba);
-                            x.Marker.Scale = new Vector3(1, 1, 1);
+                            //x.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(x.PosX, x.PosY, x.PosZ - 0.95f), Global.MainRgba);
+                            //x.Marker.Scale = new Vector3(1, 1, 1);
 
                             player.CollectSpots.Add(x);
                         }
@@ -191,7 +187,7 @@ namespace Roleplay.Commands.Job
                         foreach (var collectSpot in player.CollectSpots)
                         {
                             collectSpot.Blip.Destroy();
-                            collectSpot.Marker.Destroy(); 
+                            collectSpot.Marker.Destroy();
                         }
                         player.CollectSpots = new List<Spot>();
 

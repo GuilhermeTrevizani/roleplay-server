@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
-using AltV.Net.Shared.Enums;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
@@ -403,12 +401,13 @@ namespace Roleplay
             return new Tuple<string, UserVIP>(display, vip);
         }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public static void CreateMarkerColShape(string description, Position position)
         {
             position.Z -= 0.95f;
 
-            var marker = Alt.CreateMarker(MarkerType.MarkerHalo, position, Global.MainRgba);
-            marker.Scale = new Vector3(1, 1, 1.5f);
+            //var marker = Alt.CreateMarker(MarkerType.MarkerHalo, position, Global.MainRgba);
+            //marker.Scale = new Vector3(1, 1, 1.5f);
 
             var colShape = (MyColShape)Alt.CreateColShapeCylinder(position, 1, 1.5f);
             colShape.Description = description;

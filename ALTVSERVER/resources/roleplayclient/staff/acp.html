@@ -1,210 +1,216 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../resources/css/nifty.min.css" rel="stylesheet">
-    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
-    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
-    <link href="../resources/css/select2.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../resources/css/nifty.min.css" rel="stylesheet">
+  <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+  <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+  <link href="../resources/css/select2.min.css" rel="stylesheet">
 </head>
+
 <body style="background-color:transparent;text-align:center;">
-    <div class="panel panel-bordered panel-primary" style="width:95%;text-align: left;display: inline-block;margin-top:3%;">
-        <div class="panel-heading">
-            <div class="panel-control">
-                <button class="btn btn-default" onclick="closeView();">
-                    Fechar
-                </button>
-            </div>
-            <h3 class="panel-title">Painel de Controle Administrativo</h3>
-        </div>
-        <div class="panel-body">
-            <div class="tab-base tab-stacked-left">
-                <ul class="nav nav-tabs" style="width:20vw">
-                    <li id="li-banimentosativos" class="active">
-                        <a data-toggle="tab" href="#tab-banimentosativos">Banimentos Ativos</a>
-                    </li>
-                    <li id="li-sos">
-                        <a data-toggle="tab" href="#tab-sos">Pedidos de Ajuda Ativos</a>
-                    </li>
-                    <li id="li-logs">
-                        <a data-toggle="tab" href="#tab-logs">Logs</a>
-                    </li>
-                    <li id="li-pesquisarusuario">
-                        <a data-toggle="tab" href="#tab-pesquisarusuario">Pesquisar Usuário</a>
-                    </li>
-                    <li id="li-pesquisarpersonagem">
-                        <a data-toggle="tab" href="#tab-pesquisarpersonagem">Pesquisar Personagem</a>
-                    </li>
-                    <li id="li-staff">
-                        <a data-toggle="tab" href="#tab-staff">Staff</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div id="tab-banimentosativos" class="tab-pane fade active in">
-                        <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
-                            <table class='table table-bordered table-striped'>
-                                <thead>
-                                    <tr class='bg-dark'>
-                                        <th>ID</th>
-                                        <th>Personagem</th>
-                                        <th>Usuário</th>
-                                        <th>Data</th>
-                                        <th>Expiração</th>
-                                        <th>Staffer</th>
-                                        <th>Motivo</th>
-                                        <th class="text-center">Opções</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-bans"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="tab-sos" class="tab-pane fade">
-                        <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
-                            <table class='table table-bordered table-striped'>
-                                <thead>
-                                    <tr class='bg-dark'>
-                                        <th>ID</th>
-                                        <th>Data</th>
-                                        <th>Personagem</th>
-                                        <th>Usuário</th>
-                                        <th>Mensagem</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-sos">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="tab-logs" class="tab-pane fade">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Data Inicial</label>
-                                    <input id="input-logDataInicial" type="text" class="form-control" spellcheck="false">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Data Final</label>
-                                    <input id="input-logDataFinal" type="text" class="form-control" spellcheck="false">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Tipo</label>
-                                    <select id="select-logTipo" class="form-control" spellcheck="false"></select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Personagem Origem</label>
-                                    <input id="input-logPersonagemOrigem" type="number" class="form-control" spellcheck="false">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Personagem Destino</label>
-                                    <input id="input-logPersonagemDestino" type="number" class="form-control" spellcheck="false">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label>Descrição</label>
-                                    <input id="input-logDescricao" type="text" class="form-control" spellcheck="false">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-offset-10 col-md-2">
-                                <button id="btn-logPesquisar" class="btn btn-dark btn-block" type="button">Pesquisar</button>
-                            </div>
-                        </div>
-                        <hr/>
-                        <div class='table-responsive' style='max-height:40vh;max-width:85vw;overflow-y:auto;overflow-x:auto;'>
-                            <table class='table table-bordered table-striped'>
-                                <thead>
-                                    <tr class="bg-dark">
-                                        <th rowspan="2" style="vertical-align: middle;">Tipo</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Data</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Descrição</th>
-                                        <th colspan="4" class="text-center">Origem</th>
-                                        <th colspan="4" class="text-center">Destino</th>
-                                    </tr>
-                                    <tr class="bg-dark">
-                                        <th>Personagem</th>
-                                        <th>IP</th>
-                                        <th>HardwareIdHash</th>
-                                        <th>HardwareIdExHash</th>
-                                        <th>Personagem</th>
-                                        <th>IP</th>
-                                        <th>HardwareIdHash</th>
-                                        <th>HardwareIdExHash</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-logs">
-                                    <tr>
-                                        <td colspan="13" class="text-center">
-                                            Preencha os filtros acima e clique em Pesquisar.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div id="tab-pesquisarusuario" class="tab-pane fade">
-                        <div class="input-group mar-btm">
-                            <input id="input-pesquisarusuario" type="text" placeholder="Pesquise pelo código ou nome do usuário" class="form-control" autofocus spellcheck="false">
-                            <span class="input-group-btn">
-                                <button id="btn-pesquisarusuario" class="btn btn-dark" type="button">Pesquisar</button>
-                            </span>
-                        </div>
-                        <div id="div-pesquisarusuario" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
-                        </div>
-                    </div>
-                    <div id="tab-pesquisarpersonagem" class="tab-pane fade">
-                        <div class="input-group mar-btm">
-                            <input id="input-pesquisarpersonagem" type="text" placeholder="Pesquise pelo código ou nome do personagem" class="form-control" autofocus spellcheck="false">
-                            <span class="input-group-btn">
-                                <button id="btn-pesquisarpersonagem" class="btn btn-dark" type="button">Pesquisar</button>
-                            </span>
-                        </div>
-                        <div id="div-pesquisarpersonagem" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
-                        </div>
-                    </div>
-                    <div id="tab-staff" class="tab-pane fade">
-                        <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
-                            <table class='table table-bordered table-striped'>
-                                <thead>
-                                    <tr class='bg-dark'>
-                                        <th>Staff</th>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Pedidos de Ajuda Atendidos</th>
-                                        <th>Aplicações Avaliadas</th>
-                                        <th>Tempo Serviço Administrativo (minutos)</th>
-                                        <th>Tempo Conectado (minutos)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbody-staff">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="panel panel-bordered panel-primary"
+    style="width:95%;text-align: left;display: inline-block;margin-top:3%;">
+    <div class="panel-heading">
+      <div class="panel-control">
+        <button class="btn btn-default" onclick="closeView();">
+          Fechar
+        </button>
+      </div>
+      <h3 class="panel-title">Painel de Controle Administrativo</h3>
     </div>
-    <script src="../resources/js/jquery.min.js"></script>
-    <script src="../resources/js/bootstrap.min.js"></script>
-    <script src="../resources/js/nifty.min.js"></script>
-    <script src="../resources/js/loadingoverlay.min.js"></script>
-    <script src="../resources/js/jquery-confirm.js"></script>
-    <script src="../resources/js/jquery.mask.min.js"></script>
-    <script src="../resources/js/select2.min.js"></script>
-    <script src="acp.js" defer></script>
+    <div class="panel-body">
+      <div class="tab-base tab-stacked-left">
+        <ul class="nav nav-tabs" style="width:20vw">
+          <li id="li-banimentosativos" class="active">
+            <a data-toggle="tab" href="#tab-banimentosativos">Banimentos Ativos</a>
+          </li>
+          <li id="li-sos">
+            <a data-toggle="tab" href="#tab-sos">Pedidos de Ajuda Ativos</a>
+          </li>
+          <li id="li-logs">
+            <a data-toggle="tab" href="#tab-logs">Logs</a>
+          </li>
+          <li id="li-pesquisarusuario">
+            <a data-toggle="tab" href="#tab-pesquisarusuario">Pesquisar Usuário</a>
+          </li>
+          <li id="li-pesquisarpersonagem">
+            <a data-toggle="tab" href="#tab-pesquisarpersonagem">Pesquisar Personagem</a>
+          </li>
+          <li id="li-staff">
+            <a data-toggle="tab" href="#tab-staff">Staff</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="tab-banimentosativos" class="tab-pane fade active in">
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+              <table class='table table-bordered table-striped'>
+                <thead>
+                  <tr class='bg-dark'>
+                    <th>ID</th>
+                    <th>Personagem</th>
+                    <th>Usuário</th>
+                    <th>Data</th>
+                    <th>Expiração</th>
+                    <th>Staffer</th>
+                    <th>Motivo</th>
+                    <th class="text-center">Opções</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-bans"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="tab-sos" class="tab-pane fade">
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+              <table class='table table-bordered table-striped'>
+                <thead>
+                  <tr class='bg-dark'>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Personagem</th>
+                    <th>Usuário</th>
+                    <th>Mensagem</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-sos">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="tab-logs" class="tab-pane fade">
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Data Inicial</label>
+                  <input id="input-logDataInicial" type="text" class="form-control" spellcheck="false">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Data Final</label>
+                  <input id="input-logDataFinal" type="text" class="form-control" spellcheck="false">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Tipo</label>
+                  <select id="select-logTipo" class="form-control" spellcheck="false"></select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Personagem Origem</label>
+                  <input id="input-logPersonagemOrigem" type="number" class="form-control" spellcheck="false">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Personagem Destino</label>
+                  <input id="input-logPersonagemDestino" type="number" class="form-control" spellcheck="false">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Descrição</label>
+                  <input id="input-logDescricao" type="text" class="form-control" spellcheck="false">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-offset-10 col-md-2">
+                <button id="btn-logPesquisar" class="btn btn-dark btn-block" type="button">Pesquisar</button>
+              </div>
+            </div>
+            <hr />
+            <div class='table-responsive' style='max-height:40vh;max-width:85vw;overflow-y:auto;overflow-x:auto;'>
+              <table class='table table-bordered table-striped'>
+                <thead>
+                  <tr class="bg-dark">
+                    <th rowspan="2" style="vertical-align: middle;">Tipo</th>
+                    <th rowspan="2" style="vertical-align: middle;">Data</th>
+                    <th rowspan="2" style="vertical-align: middle;">Descrição</th>
+                    <th colspan="4" class="text-center">Origem</th>
+                    <th colspan="4" class="text-center">Destino</th>
+                  </tr>
+                  <tr class="bg-dark">
+                    <th>Personagem</th>
+                    <th>IP</th>
+                    <th>HardwareIdHash</th>
+                    <th>HardwareIdExHash</th>
+                    <th>Personagem</th>
+                    <th>IP</th>
+                    <th>HardwareIdHash</th>
+                    <th>HardwareIdExHash</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-logs">
+                  <tr>
+                    <td colspan="13" class="text-center">
+                      Preencha os filtros acima e clique em Pesquisar.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div id="tab-pesquisarusuario" class="tab-pane fade">
+            <div class="input-group mar-btm">
+              <input id="input-pesquisarusuario" type="text" placeholder="Pesquise pelo código ou nome do usuário"
+                class="form-control" autofocus spellcheck="false">
+              <span class="input-group-btn">
+                <button id="btn-pesquisarusuario" class="btn btn-dark" type="button">Pesquisar</button>
+              </span>
+            </div>
+            <div id="div-pesquisarusuario" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+            </div>
+          </div>
+          <div id="tab-pesquisarpersonagem" class="tab-pane fade">
+            <div class="input-group mar-btm">
+              <input id="input-pesquisarpersonagem" type="text" placeholder="Pesquise pelo código ou nome do personagem"
+                class="form-control" autofocus spellcheck="false">
+              <span class="input-group-btn">
+                <button id="btn-pesquisarpersonagem" class="btn btn-dark" type="button">Pesquisar</button>
+              </span>
+            </div>
+            <div id="div-pesquisarpersonagem" style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+            </div>
+          </div>
+          <div id="tab-staff" class="tab-pane fade">
+            <div class='table-responsive' style='max-height:50vh;overflow-y:auto;overflow-x:auto;'>
+              <table class='table table-bordered table-striped'>
+                <thead>
+                  <tr class='bg-dark'>
+                    <th>Staff</th>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Pedidos de Ajuda Atendidos</th>
+                    <th>Aplicações Avaliadas</th>
+                    <th>Tempo Serviço Administrativo (minutos)</th>
+                    <th>Tempo Conectado (minutos)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-staff">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../resources/js/jquery.min.js"></script>
+  <script src="../resources/js/bootstrap.min.js"></script>
+  <script src="../resources/js/nifty.min.js"></script>
+  <script src="../resources/js/loadingoverlay.min.js"></script>
+  <script src="../resources/js/jquery-confirm.js"></script>
+  <script src="../resources/js/jquery.mask.min.js"></script>
+  <script src="../resources/js/select2.min.js"></script>
+  <script src="acp.js" defer></script>
 </body>
+
 </html>

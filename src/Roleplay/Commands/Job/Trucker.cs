@@ -1,14 +1,9 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
-using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Job
 {
@@ -45,6 +40,7 @@ namespace Roleplay.Commands.Job
             player.Emit("TruckerLocations", html);
         }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         [Command("carregarcaixas")]
         public static async Task CMD_carregarcaixas(MyPlayer player)
         {
@@ -111,8 +107,8 @@ namespace Roleplay.Commands.Job
                     spot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
                     spot.Blip.Display = 2;
 
-                    spot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba);
-                    spot.Marker.Scale = new Vector3(5, 5, 5);
+                    //spot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba);
+                    //spot.Marker.Scale = new Vector3(5, 5, 5);
 
                     veh.CollectSpots.Add(spot);
                 }

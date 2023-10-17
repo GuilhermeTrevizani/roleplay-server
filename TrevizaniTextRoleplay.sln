@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrevizaniTextRoleplay.Server", "src\Roleplay\TrevizaniTextRoleplay.Server.csproj", "{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testador", "src\Testador\Testador.csproj", "{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{549516F9-1232-42BA-A38A-FA0B0D18DC1E}"
 EndProject
 Global
@@ -19,17 +17,12 @@ Global
 		{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3C6EDB2B-A15E-4838-A9B1-4BDC0FF968EA} = {549516F9-1232-42BA-A38A-FA0B0D18DC1E}
-		{69E8755E-96DF-4F9A-B7D1-4245F3C705A9} = {549516F9-1232-42BA-A38A-FA0B0D18DC1E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB803A41-9CC3-43D6-9194-E29DCEF649C0}

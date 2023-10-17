@@ -1,9 +1,7 @@
 ﻿using AltV.Net.Data;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Faction
 {
@@ -113,7 +111,7 @@ namespace Roleplay.Commands.Faction
                 return;
             }
 
-            var factionArmory = Global.FactionsArmories.FirstOrDefault(x => 
+            var factionArmory = Global.FactionsArmories.FirstOrDefault(x =>
                 player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE
                 && x.FactionId == player.Character.FactionId
                 && x.Dimension == player.Dimension);

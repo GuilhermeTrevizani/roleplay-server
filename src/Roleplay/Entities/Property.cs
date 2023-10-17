@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
 using Roleplay.Models;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -69,15 +68,16 @@ namespace Roleplay.Entities
         [NotMapped, JsonIgnore]
         public AudioSpot InteriorAlarmAudioSpot { get; set; }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public void CreateIdentifier()
         {
             RemoveIdentifier();
 
             var pos = new Vector3(EntrancePosX, EntrancePosY, EntrancePosZ - 0.95f);
 
-            EntranceMarker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
-            EntranceMarker.Scale = new Vector3(1, 1, 1.5f);
-            EntranceMarker.Dimension = Dimension;
+            //EntranceMarker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
+            //EntranceMarker.Scale = new Vector3(1, 1, 1.5f);
+            //EntranceMarker.Dimension = Dimension;
 
             EntranceColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             EntranceColShape.Description = $"[PROPRIEDADE Nº {Id}] {{#FFFFFF}}{(!CharacterId.HasValue ? $"Use /comprar para comprar por ${Value:N0}." : string.Empty)}";

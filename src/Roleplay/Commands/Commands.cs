@@ -5,11 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -230,7 +226,7 @@ namespace Roleplay.Commands
                     break;
                 case InviteType.Mechanic:
                     player.VehicleTuning = JsonSerializer.Deserialize<VehicleTuning>(convite.Value.FirstOrDefault());
-                    
+
                     player.SendMessage(MessageType.Success, $"Você aceitou o convite para receber o catálogo de modificações veiculares.");
                     target.SendMessage(MessageType.Success, $"{player.Character.Name} aceitou seu convite para receber o catálogo de modificações veiculares.");
                     break;

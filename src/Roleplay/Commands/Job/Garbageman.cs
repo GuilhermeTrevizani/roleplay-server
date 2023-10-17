@@ -3,7 +3,6 @@ using AltV.Net.Data;
 using AltV.Net.Enums;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System.Linq;
 
 namespace Roleplay.Commands.Job
 {

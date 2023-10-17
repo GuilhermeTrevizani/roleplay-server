@@ -5,11 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands
 {
@@ -1164,8 +1160,8 @@ namespace Roleplay.Commands
         [Command("rebocar", "/rebocar (id)")]
         public static void CMD_rebocar(MyPlayer player, int id)
         {
-            if (player.Vehicle is not MyVehicle veh || 
-                veh ?.VehicleDB?.Model?.ToUpper() != VehicleModel.Flatbed.ToString().ToUpper() && veh.Driver != player)
+            if (player.Vehicle is not MyVehicle veh ||
+                veh?.VehicleDB?.Model?.ToUpper() != VehicleModel.Flatbed.ToString().ToUpper() && veh.Driver != player)
             {
                 player.SendMessage(MessageType.Error, "Você não dirigindo um FLATBED.");
                 return;
@@ -1178,7 +1174,7 @@ namespace Roleplay.Commands
             }
 
             attachedVehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id
-                && x != player.Vehicle 
+                && x != player.Vehicle
                 && x.Position.Distance(player.Vehicle.Position) <= 10);
             if (attachedVehicle == null)
             {

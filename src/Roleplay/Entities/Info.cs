@@ -1,11 +1,7 @@
 ﻿using AltV.Net;
-using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Roleplay.Entities
@@ -40,13 +36,14 @@ namespace Roleplay.Entities
         [JsonIgnore, NotMapped]
         public MyColShape ColShape { get; set; }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public void CreateIdentifier()
         {
             RemoveIdentifier();
 
-            Marker = Alt.CreateMarker(MarkerType.MarkerHalo, new Vector3(PosX, PosY, PosZ), new Rgba(227, 170, 36, 75));
-            Marker.Scale = new Vector3(0.2f, 0.2f, 0.2f);
-            Marker.Dimension = Dimension;
+            //Marker = Alt.CreateMarker(MarkerType.MarkerHalo, new Vector3(PosX, PosY, PosZ), new Rgba(227, 170, 36, 75));
+            //Marker.Scale = new Vector3(0.2f, 0.2f, 0.2f);
+            //Marker.Dimension = Dimension;
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(Marker.Position, 1, 1.5f);
             ColShape.Description = $"[INFO] {{#FFFFFF}}{Message}";

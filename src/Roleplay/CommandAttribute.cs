@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Roleplay
+﻿namespace Roleplay
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class CommandAttribute : Attribute
@@ -15,6 +13,6 @@ namespace Roleplay
         }
 
         public string[] Aliases { get; set; }
-        public bool GreedyArg { get; set; }   
+        public bool GreedyArg { get; set; }
     }
 }

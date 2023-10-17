@@ -44,7 +44,7 @@ namespace Roleplay
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionAnswer> QuestionsAnswers { get; set; }
         public DbSet<SeizedVehicle> SeizedVehicles { get; set; }
-        public DbSet<Session> Sessions { get; set; }   
+        public DbSet<Session> Sessions { get; set; }
         public DbSet<Spot> Spots { get; set; }
         public DbSet<TruckerLocation> TruckerLocations { get; set; }
         public DbSet<TruckerLocationDelivery> TruckerLocationsDeliveries { get; set; }

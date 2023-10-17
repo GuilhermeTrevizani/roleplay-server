@@ -2,7 +2,6 @@
 using AltV.Net.Enums;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System.Linq;
 using System.Numerics;
 
 namespace Roleplay.Scripts
@@ -10,7 +9,7 @@ namespace Roleplay.Scripts
     public class SpotlightScript : IScript
     {
         [ClientEvent(nameof(SpotlightAdd))]
-        public static void SpotlightAdd(MyPlayer player, Vector3 position, Vector3 direction, 
+        public static void SpotlightAdd(MyPlayer player, Vector3 position, Vector3 direction,
             float distance, float brightness, float hardness, float radius, float falloff,
             bool helicoptero)
         {
@@ -81,7 +80,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            if (veh.VehicleDB.Model.ToUpper() != VehicleModel.Polmav.ToString().ToUpper() 
+            if (veh.VehicleDB.Model.ToUpper() != VehicleModel.Polmav.ToString().ToUpper()
                 && veh.VehicleDB.Model.ToUpper() != VehicleModelMods.LSPDHELI.ToString().ToUpper())
             {
                 player.SendMessage(MessageType.Error, "Você não está em um helicóptero policial.");

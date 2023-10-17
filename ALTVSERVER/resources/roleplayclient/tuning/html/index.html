@@ -1,248 +1,263 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />        
-        <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
-    </head>
-    <body>
-        <div id="app">
-            <div class="editor2">
-                <div class="options">
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Reparo
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.Repair }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.Repair"  @input="e => handleChangeRepair()"/>
-                        </div>
-                    </div>
 
-                    <div v-for="(name, i) in data.Tuning.CurrentMods" :key="i" class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                {{ data.Tuning.CurrentMods[i].Name }}
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.CurrentMods[i].Selected }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="data.Tuning.CurrentMods[i].ModsCount" v-model="data.Tuning.CurrentMods[i].Selected" :step="1" @input="e => handleChangeMod(i)"/>
-                        </div>
-                    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
+</head>
 
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor Primária
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.Color1 }}
-                            </div>
-                        </div>
-                        <input type="color" v-model="data.Tuning.Color1" @input="e => handleChangeColor()"/> <br/> <br/>
-                        
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor Secundária
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.Color2 }}
-                            </div>
-                        </div>
-                        <input type="color" v-model="data.Tuning.Color2" @input="e => handleChangeColor()"/>
-                    </div>
-
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Tipo da Roda
-                            </div>
-                            <div class="value">
-                                {{ data.WheelTypes[data.Tuning.WheelType]?.Name }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="data.WheelTypes.length - 1" :step="1" v-model="data.Tuning.WheelType" @input="e => handleChangeWheelType()"/>
-                        </div>
-
-                        <div class="labelContainer">
-                            <div class="label">
-                                Variação da Roda
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.WheelVariation }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="data.WheelTypes[data.Tuning.WheelType]?.MaxVariations ?? 0" :step="1" v-model="data.Tuning.WheelVariation" @input="e => handleChangeWheel()"/>
-                        </div>
-
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor da Roda
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.WheelColor }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="161" :step="1" v-model="data.Tuning.WheelColor" @input="e => handleChangeWheel()"/>
-                        </div>
-                    </div>
-
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor do Neon
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.NeonColor }}
-                            </div>
-                        </div>
-                        <input type="color" v-model="data.Tuning.NeonColor" @input="e => handleChangeNeon()"/> <br/> <br/>
-                        
-                        <div class="labelContainer">
-                            <div class="label">
-                                Neon Esquerda
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.NeonLeft }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonLeft" @input="e => handleChangeNeon()"/>
-                        </div>
-
-                        <div class="labelContainer">
-                            <div class="label">
-                                Neon Direta
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.NeonRight }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonRight" @input="e => handleChangeNeon()"/>
-                        </div>
-
-                        <div class="labelContainer">
-                            <div class="label">
-                                Neon Frente
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.NeonFront }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonFront" @input="e => handleChangeNeon()"/>
-                        </div>
-
-                        <div class="labelContainer">
-                            <div class="label">
-                                Neon Atrás
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.NeonBack }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonBack" @input="e => handleChangeNeon()"/>
-                        </div>
-                    </div>
-
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor do Xenon
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.HeadlightColor }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="13" :step="1" v-model="data.Tuning.HeadlightColor" @input="e => handleChangeXenonColor()"/>
-                        </div>
-                        
-                        <div class="labelContainer">
-                            <div class="label">
-                                Intensidade do Xenon
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.LightsMultiplier }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="20" :step="1" v-model="data.Tuning.LightsMultiplier" @input="e => handleChangeXenonColor()"/>
-                        </div>
-                    </div>
-
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Insulfim
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.WindowTint }}
-                            </div>
-                        </div>
-                        <div class="inputHolder">
-                            <input type="range" :min="0" :max="5" :step="1" v-model="data.Tuning.WindowTint" @input="e => handleChangeWindowTint()"/>
-                        </div>
-                    </div>
-
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Cor Fumaça Pneus
-                            </div>
-                            <div class="value">
-                                {{ data.Tuning.TireSmokeColor }}
-                            </div>
-                        </div>
-                        <input type="color" v-model="data.Tuning.TireSmokeColor" @input="e => handleChangeTireSmokeColor()"/>
-                    </div>
-                </div>
-                <div class="commands">Use F3 para permitir movimentar a câmera.</div>
-                <div class="stuyk">https://github.com/stuyk</div>
+<body>
+  <div id="app">
+    <div class="editor2">
+      <div class="options">
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Reparo
             </div>
-            <template v-if="data.Message != ''">
-                <div class="message">
-                    <p>{{ data.Message }}</p>
-                    <div class="navigation-bottom">
-                        <button @click="closeMessage" class="danger">OK</button>
-                    </div>
-                </div>
-            </template>
-            <div class="editor3">
-                <p>Itens Selecionados {{ !data.Tuning.Staff && !data.Tuning.TargetId ? `($${this.getTotal()})` : '' }}</p>
-                <div class="options">
-                    <div v-for="(name, i) in data.Tuning.Mods" :key="i" class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                {{ data.Tuning.Mods[i].Name }} {{ data.Tuning.Mods[i].Type < 250 ? data.Tuning.Mods[i].Selected : '' }}
-                                <button class="danger" style="padding:5px;" @click="removeItem(i)">Remover</button>
-                            </div>
-                        </div>
-                        <template v-if="!data.Tuning.Staff && !data.Tuning.TargetId">
-                            <span style="font-size: 10px;"> Valor: ${{ data.Tuning.Mods[i].Value.toLocaleString('pt-BR') }}</span>
-                        </template>
-                    </div>
-                </div>
-                <div class="navigation">
-                    <button @click="cancel" class="danger">Cancelar</button>
-                    <button @click="confirm">Confirmar</button>
-                </div>
+            <div class="value">
+              {{ data.Tuning.Repair }}
             </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.Repair"
+              @input="e => handleChangeRepair()" />
+          </div>
         </div>
-        <script src="../../resources/js/vue.min.js"></script>
-        <script src="../../resources/js/less.min.js"></script>
-        <script src="./app.js" type="text/javascript"></script>
+
+        <div v-for="(name, i) in data.Tuning.CurrentMods" :key="i" class="option">
+          <div class="labelContainer">
+            <div class="label">
+              {{ data.Tuning.CurrentMods[i].Name }}
+            </div>
+            <div class="value">
+              {{ data.Tuning.CurrentMods[i].Selected }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="data.Tuning.CurrentMods[i].ModsCount"
+              v-model="data.Tuning.CurrentMods[i].Selected" :step="1" @input="e => handleChangeMod(i)" />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Cor Primária
+            </div>
+            <div class="value">
+              {{ data.Tuning.Color1 }}
+            </div>
+          </div>
+          <input type="color" v-model="data.Tuning.Color1" @input="e => handleChangeColor()" /> <br /> <br />
+
+          <div class="labelContainer">
+            <div class="label">
+              Cor Secundária
+            </div>
+            <div class="value">
+              {{ data.Tuning.Color2 }}
+            </div>
+          </div>
+          <input type="color" v-model="data.Tuning.Color2" @input="e => handleChangeColor()" />
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Tipo da Roda
+            </div>
+            <div class="value">
+              {{ data.WheelTypes[data.Tuning.WheelType]?.Name }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="data.WheelTypes.length - 1" :step="1" v-model="data.Tuning.WheelType"
+              @input="e => handleChangeWheelType()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Variação da Roda
+            </div>
+            <div class="value">
+              {{ data.Tuning.WheelVariation }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="data.WheelTypes[data.Tuning.WheelType]?.MaxVariations ?? 0" :step="1"
+              v-model="data.Tuning.WheelVariation" @input="e => handleChangeWheel()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Cor da Roda
+            </div>
+            <div class="value">
+              {{ data.Tuning.WheelColor }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="161" :step="1" v-model="data.Tuning.WheelColor"
+              @input="e => handleChangeWheel()" />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Cor do Neon
+            </div>
+            <div class="value">
+              {{ data.Tuning.NeonColor }}
+            </div>
+          </div>
+          <input type="color" v-model="data.Tuning.NeonColor" @input="e => handleChangeNeon()" /> <br /> <br />
+
+          <div class="labelContainer">
+            <div class="label">
+              Neon Esquerda
+            </div>
+            <div class="value">
+              {{ data.Tuning.NeonLeft }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonLeft"
+              @input="e => handleChangeNeon()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Neon Direta
+            </div>
+            <div class="value">
+              {{ data.Tuning.NeonRight }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonRight"
+              @input="e => handleChangeNeon()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Neon Frente
+            </div>
+            <div class="value">
+              {{ data.Tuning.NeonFront }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonFront"
+              @input="e => handleChangeNeon()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Neon Atrás
+            </div>
+            <div class="value">
+              {{ data.Tuning.NeonBack }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="1" :step="1" v-model="data.Tuning.NeonBack"
+              @input="e => handleChangeNeon()" />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Cor do Xenon
+            </div>
+            <div class="value">
+              {{ data.Tuning.HeadlightColor }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="13" :step="1" v-model="data.Tuning.HeadlightColor"
+              @input="e => handleChangeXenonColor()" />
+          </div>
+
+          <div class="labelContainer">
+            <div class="label">
+              Intensidade do Xenon
+            </div>
+            <div class="value">
+              {{ data.Tuning.LightsMultiplier }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="20" :step="1" v-model="data.Tuning.LightsMultiplier"
+              @input="e => handleChangeXenonColor()" />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Insulfim
+            </div>
+            <div class="value">
+              {{ data.Tuning.WindowTint }}
+            </div>
+          </div>
+          <div class="inputHolder">
+            <input type="range" :min="0" :max="5" :step="1" v-model="data.Tuning.WindowTint"
+              @input="e => handleChangeWindowTint()" />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Cor Fumaça Pneus
+            </div>
+            <div class="value">
+              {{ data.Tuning.TireSmokeColor }}
+            </div>
+          </div>
+          <input type="color" v-model="data.Tuning.TireSmokeColor" @input="e => handleChangeTireSmokeColor()" />
+        </div>
+      </div>
+      <div class="commands">Use F3 para permitir movimentar a câmera.</div>
+      <div class="stuyk">https://github.com/stuyk</div>
+    </div>
+    <template v-if="data.Message != ''">
+      <div class="message">
+        <p>{{ data.Message }}</p>
+        <div class="navigation-bottom">
+          <button @click="closeMessage" class="danger">OK</button>
+        </div>
+      </div>
+    </template>
+    <div class="editor3">
+      <p>Itens Selecionados {{ !data.Tuning.Staff && !data.Tuning.TargetId ? `($${this.getTotal()})` : '' }}</p>
+      <div class="options">
+        <div v-for="(name, i) in data.Tuning.Mods" :key="i" class="option">
+          <div class="labelContainer">
+            <div class="label">
+              {{ data.Tuning.Mods[i].Name }} {{ data.Tuning.Mods[i].Type < 250 ? data.Tuning.Mods[i].Selected : '' }}
+                <button class="danger" style="padding:5px;" @click="removeItem(i)">Remover</button>
+            </div>
+          </div>
+          <template v-if="!data.Tuning.Staff && !data.Tuning.TargetId">
+            <span style="font-size: 10px;"> Valor: ${{ data.Tuning.Mods[i].Value.toLocaleString('pt-BR') }}</span>
+          </template>
+        </div>
+      </div>
+      <div class="navigation">
+        <button @click="cancel" class="danger">Cancelar</button>
+        <button @click="confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../resources/js/vue.min.js"></script>
+  <script src="../../resources/js/less.min.js"></script>
+  <script src="./app.js" type="text/javascript"></script>
 </body>
+
 </html>

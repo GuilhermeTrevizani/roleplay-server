@@ -2,12 +2,10 @@
 using AltV.Net.Elements.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Linq;
 
 namespace Roleplay.Scripts
 {
-    public class ColShapeScript :IScript
+    public class ColShapeScript : IScript
     {
         [ScriptEvent(ScriptEventType.ColShape)]
         public static async void OnColShape(MyColShape colShape, IEntity targetEntity, bool state)

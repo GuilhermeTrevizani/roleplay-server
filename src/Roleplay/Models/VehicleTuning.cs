@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Roleplay.Models
+﻿namespace Roleplay.Models
 {
     public class VehicleTuning
     {

@@ -1,5 +1,4 @@
 ﻿using AltV.Net.Enums;
-using System.Collections.Generic;
 
 namespace Roleplay.Models
 {

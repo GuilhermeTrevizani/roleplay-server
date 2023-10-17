@@ -2,8 +2,6 @@
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Staff
 {
@@ -80,7 +78,7 @@ namespace Roleplay.Commands.Staff
 
             foreach (var x in Global.Players)
                 x.SendMessage(MessageType.None, $"(( [{Global.SERVER_INITIALS}] {{{player.StaffColor}}}{player.User.Name}{{#FFFFFF}}: {mensagem} ))");
-            
+
             await player.GravarLog(LogType.GlobalOOCChat, mensagem, null);
         }
 

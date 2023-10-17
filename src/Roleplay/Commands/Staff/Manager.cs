@@ -1,9 +1,6 @@
 ﻿using AltV.Net;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Staff
 {

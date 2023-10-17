@@ -1,6 +1,5 @@
 ﻿using AltV.Net;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
@@ -28,15 +27,16 @@ namespace Roleplay.Entities
         [NotMapped, JsonIgnore]
         public MyColShape ColShape { get; set; }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public void CreateIdentifier()
         {
             RemoveIdentifier();
 
             var pos = new Vector3(PosX, PosY, PosZ - 0.95f);
 
-            Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
-            Marker.Scale = new Vector3(1, 1, 1.5f);
-            Marker.Dimension = Dimension;
+            //Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
+            //Marker.Scale = new Vector3(1, 1, 1.5f);
+            //Marker.Dimension = Dimension;
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             ColShape.Dimension = Dimension;

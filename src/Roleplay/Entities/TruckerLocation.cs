@@ -1,8 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Shared.Enums;
 using Roleplay.Factories;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
 using System.Text.Json;
@@ -39,6 +37,7 @@ namespace Roleplay.Entities
         [NotMapped, JsonIgnore]
         public List<string> AllowedVehicles { get; set; }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public void CreateIdentifier()
         {
             AllowedVehicles = JsonSerializer.Deserialize<List<string>>(AllowedVehiclesJSON);
@@ -46,8 +45,8 @@ namespace Roleplay.Entities
 
             var pos = new Vector3(PosX, PosY, PosZ - 0.95f);
 
-            Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
-            Marker.Scale = new Vector3(1, 1, 1.5f);
+            //Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
+            //Marker.Scale = new Vector3(1, 1, 1.5f);
 
             ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 1.5f);
             ColShape.Description = $"[{Name}] {{#FFFFFF}}Use /carregarcaixas ou /cancelarcaixas.";

@@ -166,7 +166,7 @@ namespace Roleplay.Models
 
         [Display(Name = "Visualizar Vendas Boca de Fumo")]
         VisualizarVendasBocaFumo = 41,
-        
+
         [Display(Name = "Editar Mobília Propriedade")]
         EditPropertyFurniture = 42,
 

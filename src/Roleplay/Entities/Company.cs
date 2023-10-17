@@ -1,19 +1,14 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
-using AltV.Net.Shared.Enums;
 using Discord;
 using Discord.WebSocket;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Roleplay.Entities
 {
@@ -56,6 +51,7 @@ namespace Roleplay.Entities
         [NotMapped, JsonIgnore]
         public IBlip Blip { get; set; }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         public void CreateIdentifier()
         {
             RemoveIdentifier();
@@ -64,8 +60,8 @@ namespace Roleplay.Entities
             {
                 var pos = new Position(PosX, PosY, PosZ - 0.95f);
 
-                Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
-                Marker.Scale = new Vector3(1, 1, 1.5f);
+                //Marker = Alt.CreateMarker(MarkerType.MarkerHalo, pos, Global.MainRgba);
+                //Marker.Scale = new Vector3(1, 1, 1.5f);
 
                 ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 1, 3);
                 ColShape.Description = $"[{Name}] {{#FFFFFF}}Use /alugarempresa para alugar por ${WeekRentValue:N0} semanalmente.";

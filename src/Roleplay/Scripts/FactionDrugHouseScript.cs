@@ -3,9 +3,6 @@ using AltV.Net.Async;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Roleplay.Scripts
 {

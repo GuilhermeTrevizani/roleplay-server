@@ -1,15 +1,11 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
-using AltV.Net.Shared.Enums;
 using Roleplay.Entities;
 using Roleplay.Factories;
 using Roleplay.Models;
-using System;
-using System.Linq;
 using System.Numerics;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Roleplay.Commands.Faction
 {
@@ -166,6 +162,7 @@ namespace Roleplay.Commands.Faction
             player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} apreendeu o veículo de placa {veh.VehicleDB.Plate.ToUpper()} por ${valor:N0}.");
         }
 
+        [Obsolete("TODO: Rollback commentary when alt:V implements")]
         [Command("radar", "/radar (velocidade)")]
         public static void CMD_radar(MyPlayer player, int velocidade)
         {
@@ -198,8 +195,8 @@ namespace Roleplay.Commands.Faction
             player.RadarSpot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
             player.RadarSpot.Blip.Display = 2;
 
-            player.RadarSpot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, pos, Global.MainRgba);
-            player.RadarSpot.Marker.Scale = new Vector3(10, 10, 10);
+            //player.RadarSpot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, pos, Global.MainRgba);
+            //player.RadarSpot.Marker.Scale = new Vector3(10, 10, 10);
 
             player.RadarSpot.ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 10, 3);
             player.RadarSpot.ColShape.PoliceOfficerCharacterId = player.Character.Id;

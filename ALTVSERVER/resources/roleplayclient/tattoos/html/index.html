@@ -1,77 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
-    </head>
-    <body>
-        <div id="app">
-            <div class="editor2">
-                <div class="options">
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Zona
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="arrowLeft" @click="decrementParameter('zoneId', 0, data.zones.length - 1, 1)">&#8249;</button>
-                            <span> {{ data.zones[data.zoneId].label }}</span>
-                            <button class="arrowRight" @click="incrementParameter('zoneId', 0, data.zones.length - 1, 1)">&#8250;</button>
-                        </div>
-                    </div>
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Tatuagem
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="arrowLeft" @click="decrementParameter('tattooId', 0, data.tattoos.length - 1, 1)">&#8249;</button>
-                            <span> {{ data.tattooId }}</span>
-                            <button class="arrowRight" @click="incrementParameter('tattooId', 0, data.tattoos.length - 1, 1)">&#8250;</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="navigation-bottom">
-                    <button @click="adicionar">Adicionar</button>
-                    <button @click="verCompleto" class="danger">Ver Completo</button>
-                </div>
-                <div class="commands">Controles: W, A, S, D, Botão Direito e Scroll</div>
-                <div class="stuyk">https://github.com/stuyk</div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
+</head>
+
+<body>
+  <div id="app">
+    <div class="editor2">
+      <div class="options">
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Zona
             </div>
-            <template v-if="data.message != ''">
-                <div class="message">
-                    <p>{{ data.message }}</p>
-                    <div class="navigation-bottom">
-                        <button @click="closeMessage" class="danger">OK</button>
-                    </div>
-                </div>
-            </template>
-            <div class="editor3">
-                <p>Itens Selecionados</p>
-                <div class="options">
-                    <div v-for="(name, i) in data.itensCarrinho" :key="i" class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                {{ data.itensCarrinho[i].Name }}
-                                <button class="danger" style="padding:5px;" @click="removerItem(i)">Remover</button>
-                            </div>
-                        </div>
-                        <span style="font-size: 10px;"> Collection: {{ data.itensCarrinho[i].Collection }}</span> <br/>
-                        <span style="font-size: 10px;"> Overlay: {{ data.itensCarrinho[i].Overlay }}</span>
-                    </div>
-                </div>
-                <div class="navigation">
-                    <button @click="cancel" class="danger">Cancelar</button>
-                    <button @click="confirm">Confirmar</button>
-                </div>
-            </div>
+          </div>
+          <div class="controls">
+            <button class="arrowLeft"
+              @click="decrementParameter('zoneId', 0, data.zones.length - 1, 1)">&#8249;</button>
+            <span> {{ data.zones[data.zoneId].label }}</span>
+            <button class="arrowRight"
+              @click="incrementParameter('zoneId', 0, data.zones.length - 1, 1)">&#8250;</button>
+          </div>
         </div>
-        <script src="../../resources/js/vue.min.js"></script>
-        <script src="../../resources/js/less.min.js"></script>
-        <script src="./tattoos.js" type="text/javascript"></script>
-        <script src="./app.js" type="text/javascript"></script>
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Tatuagem
+            </div>
+          </div>
+          <div class="controls">
+            <button class="arrowLeft"
+              @click="decrementParameter('tattooId', 0, data.tattoos.length - 1, 1)">&#8249;</button>
+            <span> {{ data.tattooId }}</span>
+            <button class="arrowRight"
+              @click="incrementParameter('tattooId', 0, data.tattoos.length - 1, 1)">&#8250;</button>
+          </div>
+        </div>
+      </div>
+      <div class="navigation-bottom">
+        <button @click="adicionar">Adicionar</button>
+        <button @click="verCompleto" class="danger">Ver Completo</button>
+      </div>
+      <div class="commands">Controles: W, A, S, D, Botão Direito e Scroll</div>
+      <div class="stuyk">https://github.com/stuyk</div>
+    </div>
+    <template v-if="data.message != ''">
+      <div class="message">
+        <p>{{ data.message }}</p>
+        <div class="navigation-bottom">
+          <button @click="closeMessage" class="danger">OK</button>
+        </div>
+      </div>
+    </template>
+    <div class="editor3">
+      <p>Itens Selecionados</p>
+      <div class="options">
+        <div v-for="(name, i) in data.itensCarrinho" :key="i" class="option">
+          <div class="labelContainer">
+            <div class="label">
+              {{ data.itensCarrinho[i].Name }}
+              <button class="danger" style="padding:5px;" @click="removerItem(i)">Remover</button>
+            </div>
+          </div>
+          <span style="font-size: 10px;"> Collection: {{ data.itensCarrinho[i].Collection }}</span> <br />
+          <span style="font-size: 10px;"> Overlay: {{ data.itensCarrinho[i].Overlay }}</span>
+        </div>
+      </div>
+      <div class="navigation">
+        <button @click="cancel" class="danger">Cancelar</button>
+        <button @click="confirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <script src="../../resources/js/vue.min.js"></script>
+  <script src="../../resources/js/less.min.js"></script>
+  <script src="./tattoos.js" type="text/javascript"></script>
+  <script src="./app.js" type="text/javascript"></script>
 </body>
+
 </html>

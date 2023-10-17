@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Roleplay.Models
+﻿namespace Roleplay.Models
 {
     public class CellphoneItem
     {
@@ -31,15 +28,15 @@ namespace Roleplay.Models
     {
         public uint Numero { get; set; }
 
-        public DateTime DataInicio { get; set;} = DateTime.Now;
+        public DateTime DataInicio { get; set; } = DateTime.Now;
 
-        public DateTime DataTermino { get; set;}
+        public DateTime DataTermino { get; set; }
 
         public CellphoneCallType Tipo { get; set; } = CellphoneCallType.Perdida;
 
         public bool Origem { get; set; } = true;
     }
-    
+
     public class CellphoneItemMessage
     {
         public uint Numero { get; set; }

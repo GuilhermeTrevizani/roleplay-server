@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Roleplay.Models
+﻿namespace Roleplay.Models
 {
     public class Invite
     {
