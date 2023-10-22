@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Roleplay": {
-      "commandName": "Executable",
-      "executablePath": "..\\ALTVSERVER\\altv-server.exe",
-      "workingDirectory": "..\\ALTVSERVER"
-    }
-  }
-}

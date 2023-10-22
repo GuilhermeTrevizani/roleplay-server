@@ -338,5 +338,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 *.resource
-ALTVServer/resources/roleplay/*
-ALTVSERVER/settings.json
+ALTVSERVER/resources/server/
+ALTVSERVER/.server-crashes-cache

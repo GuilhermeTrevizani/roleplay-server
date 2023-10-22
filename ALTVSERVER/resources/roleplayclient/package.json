@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@altv/types-client": "^2.3.7",
-    "@altv/types-natives": "^1.4.5",
-    "@altv/types-shared": "^1.3.1"
-  }
-}
