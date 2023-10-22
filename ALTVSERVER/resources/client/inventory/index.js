@@ -46,7 +46,7 @@ var contextMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('giveItem', Number($(target).data('id')), parseInt(quantity), parseInt(player));
+                            alt.emit('giveItem', $(target).data('id'), parseInt(quantity), parseInt(player));
                         }
                     },
                     cancel: { 
@@ -70,7 +70,7 @@ var contextMenuItems = [
         fn: (target) => { 
             const itemQuantity = $(target).data('quantity');
             if (itemQuantity == 1) {
-                alt.emit('dropItem', Number($(target).data('id')), parseInt(itemQuantity));
+                alt.emit('dropItem', $(target).data('id'), parseInt(itemQuantity));
                 return;
             }
 
@@ -95,7 +95,7 @@ var contextMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('dropItem', Number($(target).data('id')), parseInt(quantity));
+                            alt.emit('dropItem', $(target).data('id'), parseInt(quantity));
                         }
                     },
                     cancel: { 
@@ -119,7 +119,7 @@ var contextMenuItems = [
         fn: (target) => { 
             const itemQuantity = $(target).data('quantity');
             if (itemQuantity == 1) {
-                alt.emit('discardItem', Number($(target).data('id')), parseInt(itemQuantity));
+                alt.emit('discardItem', $(target).data('id'), parseInt(itemQuantity));
                 return;
             }
 
@@ -144,7 +144,7 @@ var contextMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('discardItem', Number($(target).data('id')), parseInt(quantity));
+                            alt.emit('discardItem', $(target).data('id'), parseInt(quantity));
                         }
                     },
                     cancel: { 
@@ -168,7 +168,7 @@ var contextMenuItems = [
         fn: (target) => { 
             const itemQuantity = $(target).data('quantity');
             if (itemQuantity == 1) {
-                alt.emit('storeItem', Number($(target).data('id')), parseInt(itemQuantity));
+                alt.emit('storeItem', $(target).data('id'), parseInt(itemQuantity));
                 return;
             }
 
@@ -193,7 +193,7 @@ var contextMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('storeItem', Number($(target).data('id')), parseInt(quantity));
+                            alt.emit('storeItem', $(target).data('id'), parseInt(quantity));
                         }
                     },
                     cancel: { 
@@ -220,7 +220,7 @@ var contextRightMenuItems = [
         fn: (target) => { 
             const itemQuantity = $(target).data('quantity');
             if (itemQuantity == 1) {
-                alt.emit('getItem', Number($(target).data('id')), parseInt(itemQuantity));
+                alt.emit('getItem', $(target).data('id'), parseInt(itemQuantity));
                 return;
             }
 
@@ -245,7 +245,7 @@ var contextRightMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('getItem', Number($(target).data('id')), parseInt(quantity));
+                            alt.emit('getItem', $(target).data('id'), parseInt(quantity));
                         }
                     },
                     cancel: { 
@@ -272,7 +272,7 @@ var contextRobberyMenuItems = [
         fn: (target) => { 
             const itemQuantity = $(target).data('quantity');
             if (itemQuantity == 1) {
-                alt.emit('robItem', Number($(target).data('id')), parseInt(itemQuantity));
+                alt.emit('robItem', $(target).data('id'), parseInt(itemQuantity));
                 return;
             }
 
@@ -297,7 +297,7 @@ var contextRobberyMenuItems = [
                                 return false;
                             }
         
-                            alt.emit('robItem', Number($(target).data('id')), parseInt(quantity));
+                            alt.emit('robItem', $(target).data('id'), parseInt(quantity));
                         }
                     },
                     cancel: { 

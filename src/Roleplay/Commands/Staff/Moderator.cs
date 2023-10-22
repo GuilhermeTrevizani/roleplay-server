@@ -200,7 +200,7 @@ namespace Roleplay.Commands.Staff
             {
                 player.AdminDutySession.FinalDate = DateTime.Now;
                 context.Sessions.Update(player.AdminDutySession);
-                player.AdminDutySession = new();
+                player.AdminDutySession = null;
             }
             else
             {

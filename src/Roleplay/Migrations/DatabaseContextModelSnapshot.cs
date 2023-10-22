@@ -3,11 +3,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Roleplay;
 
 #nullable disable
 
-namespace Roleplay.Migrations
+namespace TrevizaniTextRoleplay.Server.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     partial class DatabaseContextModelSnapshot : ModelSnapshot
@@ -16,32 +17,36 @@ namespace Roleplay.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "7.0.12")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Roleplay.Entities.Animation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Dictionary")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Display")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Duration")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Flag")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<bool>("Vehicle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -52,25 +57,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("StaffUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -87,25 +94,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<byte>("Color")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
-                    b.Property<ushort>("Type")
-                        .HasColumnType("smallint unsigned");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -116,163 +125,165 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AnnouncementLastUseDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<ushort>("Armor")
-                        .HasColumnType("smallint unsigned");
+                    b.Property<int>("Armor")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Badge")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Bank")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("BirthdayDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("CKAvaliation")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("ConnectedTime")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeathDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DeathReason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("DriverLicenseValidDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DrugEndDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DrugItemCategory")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int?>("EvaluatingStaffUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("EvaluatorStaffUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ExtraPayment")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("FactionFlagsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("FactionRankId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<ushort>("Health")
-                        .HasColumnType("smallint unsigned");
+                    b.Property<int>("Health")
+                        .HasColumnType("integer");
 
                     b.Property<string>("History")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("IPLsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Image")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("JailFinalDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("Job")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("LastAccessDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<ulong>("LastAccessHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("LastAccessHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("LastAccessHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("LastAccessHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("LastAccessIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
-                    b.Property<ulong>("Mask")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("Mask")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<uint>("Model")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Model")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("NameChangeStatus")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("PersonalizationJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("PersonalizationStep")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int?>("PoliceOfficerBlockedDriverLicenseCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<DateTime>("RegisterDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<ulong>("RegisterHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("RegisterHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("RegisterHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("RegisterHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("RegisterIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("RejectionReason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Savings")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Sex")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("ThresoldDeath")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime?>("ThresoldDeathEndDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Wound")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("WoundsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -291,27 +302,27 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.CharacterItem", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<byte>("Category")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Extra")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<short>("Slot")
                         .HasColumnType("smallint");
 
-                    b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Type")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -322,37 +333,39 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<byte>("BlipColor")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<ushort>("BlipType")
-                        .HasColumnType("smallint unsigned");
+                    b.Property<int>("BlipType")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Color")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("RentPaymentDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("WeekRentValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -363,16 +376,18 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("FlagsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -387,22 +402,24 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PoliceOfficerCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -417,24 +434,24 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.ConfiscationItem", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<byte>("Category")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("ConfiscationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Extra")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Type")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -447,34 +464,36 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CooldownDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("CooldownHours")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CooldownQuantityLimit")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("OnlinePoliceOfficers")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -485,16 +504,18 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CrackDenId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("ItemCategory")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -505,25 +526,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CrackDenId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("ItemCategory")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -536,31 +559,33 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<long>("Hash")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Locked")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -571,28 +596,30 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Location")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Message")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
-                    b.Property<uint>("Number")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Number")
+                        .HasColumnType("bigint");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -603,22 +630,24 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ChatColor")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Color")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Slots")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -629,22 +658,24 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -655,25 +686,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Ammo")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ComponentsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("FactionArmoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("TintIndex")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<uint>("Weapon")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Weapon")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -684,22 +717,24 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -710,16 +745,18 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("FactionDrugHouseId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("ItemCategory")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -730,19 +767,21 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Position")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Salary")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -753,28 +792,30 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("FinalDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("InitialDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Plate")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -787,13 +828,15 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("FactionUnitId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -806,24 +849,24 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.FinancialTransaction", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -834,28 +877,30 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("PaymentDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("PoliceOfficerCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -870,19 +915,21 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Category")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Model")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -893,22 +940,24 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("AnswerDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Message")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("StaffUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -919,31 +968,33 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Message")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -954,42 +1005,42 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.Item", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<byte>("Category")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Extra")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("RotP")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotR")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
-                    b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Type")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -1000,25 +1051,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PoliceOfficerCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1033,42 +1086,42 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.Log", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("OriginCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<ulong>("OriginHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("OriginHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("OriginHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("OriginHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("OriginIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("TargetCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<ulong>("TargetHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("TargetHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("TargetHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("TargetHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("TargetIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -1083,82 +1136,84 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AnnouncementValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("BarberValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Blackout")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("ClothesValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CooldownDismantleHours")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CooldownPropertyRobberyPropertyHours")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CooldownPropertyRobberyRobberHours")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("DriverLicenseBuyValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("DriverLicenseRenewValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("EndTimeCrackDen")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("ExtraPaymentGarbagemanValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("FirefightersBlockHeal")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("FuelValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("HospitalValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("IPLsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("InactivePropertiesDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("InitialTimeCrackDen")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<int>("KeyValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("LockValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("MaxCharactersOnline")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Paycheck")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PoliceOfficersPropertyRobbery")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PropertyRobberyConnectedTime")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("TattooValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("VehicleParkValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1199,16 +1254,18 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<float>("Value")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -1219,55 +1276,57 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Dimension")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("EntrancePosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("EntrancePosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("EntrancePosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("ExitPosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("ExitPosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("ExitPosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<byte>("Interior")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<uint>("LockNumber")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("LockNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("Locked")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<byte>("ProtectionLevel")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime?>("RobberyCooldown")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("RobberyValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1280,34 +1339,36 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Interior")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Model")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("PropertyId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("RotP")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotR")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -1318,27 +1379,27 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.PropertyItem", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<byte>("Category")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("Extra")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("PropertyId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Slot")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Type")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -1349,25 +1410,27 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Duration")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("StaffUserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -1382,13 +1445,15 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CorrectQuestionAnswerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -1399,13 +1464,15 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1416,31 +1483,33 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("PaymentDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("PoliceOfficerCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("VehicleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1449,21 +1518,21 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.Session", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("FinalDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("InitialDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -1474,28 +1543,30 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<float>("AuxiliarPosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("AuxiliarPosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("AuxiliarPosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<byte>("Type")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -1506,31 +1577,33 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AllowedVehiclesJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("DeliveryValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("LoadWaitTime")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("UnloadWaitTime")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1541,19 +1614,21 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("TruckerLocationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1564,109 +1639,111 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("AnnouncementToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("AnsweredQuestions")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("CharacterApplicationsQuantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ChatFontSize")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ChatFontType")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ChatLines")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("CooldownDismantle")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DiscordDisplayName")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("DiscordId")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("DiscordUsername")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<bool>("FactionChatToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("FactionToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("ForumNameChanges")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("HelpRequestsAnswersQuantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("LastAccessDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<ulong>("LastAccessHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("LastAccessHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("LastAccessHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("LastAccessHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("LastAccessIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("NameChanges")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("PMToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("PlateChanges")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("PropertyRobberyCooldown")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("RegisterDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<ulong>("RegisterHardwareIdExHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("RegisterHardwareIdExHash")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("RegisterHardwareIdHash")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("RegisterHardwareIdHash")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("RegisterIp")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Staff")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("StaffChatToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("StaffDutyTime")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("StaffFlagsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<bool>("TimeStampToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<byte>("VIP")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime?>("VIPValidDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("VehicleTagToggle")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -1677,157 +1754,159 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<uint>("BodyAdditionalHealth")
-                        .HasColumnType("int unsigned");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<uint>("BodyHealth")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("BodyAdditionalHealth")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BodyHealth")
+                        .HasColumnType("bigint");
 
                     b.Property<int?>("CharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Color1B")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Color1G")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Color1R")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Color2B")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Color2G")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Color2R")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("DamagesJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("DismantledValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("EngineHealth")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("FactionGift")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("FactionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Fuel")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("HeadlightColor")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Job")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<float>("LightsMultiplier")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<byte>("Livery")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<uint>("LockNumber")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("LockNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Model")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("ModsJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<bool>("NeonBack")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<byte>("NeonColorB")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("NeonColorG")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("NeonColorR")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<bool>("NeonFront")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("NeonLeft")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("NeonRight")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Parked")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("PetrolTankHealth")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Plate")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<float>("PosX")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("PosZ")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<byte>("ProtectionLevel")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<float>("RotP")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotR")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("RotY")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<int>("SeizedValue")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Sold")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("StructureDamagesJSON")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<byte>("TireSmokeColorB")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("TireSmokeColorG")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("TireSmokeColorR")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("WheelColor")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("WheelType")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("WheelVariation")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("WindowTint")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<bool>("XMR")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -1840,27 +1919,27 @@ namespace Roleplay.Migrations
 
             modelBuilder.Entity("Roleplay.Entities.VehicleItem", b =>
                 {
-                    b.Property<ulong>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint unsigned");
+                        .HasColumnType("uuid");
 
                     b.Property<byte>("Category")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("Extra")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<byte>("Slot")
-                        .HasColumnType("tinyint unsigned");
+                        .HasColumnType("smallint");
 
-                    b.Property<uint>("Type")
-                        .HasColumnType("int unsigned");
+                    b.Property<long>("Type")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("VehicleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1871,28 +1950,30 @@ namespace Roleplay.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("PoliceOfficerCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("PoliceOfficerDeletedCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("WantedCharacterId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("WantedVehicleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

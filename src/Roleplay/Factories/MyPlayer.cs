@@ -215,11 +215,11 @@ namespace Roleplay.Factories
 
         public CharacterJob AguardandoTipoServico { get; set; }
 
-        public Session LoginSession { get; set; } = new();
+        public Session LoginSession { get; set; }
 
-        public Session FactionDutySession { get; set; } = new();
+        public Session FactionDutySession { get; set; }
 
-        public Session AdminDutySession { get; set; } = new();
+        public Session AdminDutySession { get; set; }
 
         public List<StaffFlag> StaffFlags { get; set; } = new();
 
@@ -367,7 +367,7 @@ namespace Roleplay.Factories
 
         public void PlayAnimation(string dic, string name, int flag, int duration = -1, bool freeze = false)
         {
-            // How to "Freeze" animation?
+            // How to "Freeze/Lock" animation?
             //PlayAnimation(dic, name, 1, -1, duration, flag, 1, false, false, false);
             Emit("animation:Play", dic, name, flag, duration, freeze);
         }
@@ -991,21 +991,21 @@ namespace Roleplay.Factories
                 context.Sessions.Update(LoginSession);
                 await context.SaveChangesAsync();
 
-                if (FactionDutySession.Id > 0)
+                if (FactionDutySession != null)
                 {
                     FactionDutySession.FinalDate = DateTime.Now;
                     context.Sessions.Update(FactionDutySession);
                     await context.SaveChangesAsync();
                 }
 
-                if (AdminDutySession.Id > 0)
+                if (AdminDutySession != null)
                 {
                     AdminDutySession.FinalDate = DateTime.Now;
                     context.Sessions.Update(AdminDutySession);
                     await context.SaveChangesAsync();
                 }
 
-                LoginSession = FactionDutySession = AdminDutySession = new();
+                LoginSession = FactionDutySession = AdminDutySession = null;
 
                 RadarSpot?.ColShape?.Destroy();
                 RadarSpot?.Blip?.Destroy();

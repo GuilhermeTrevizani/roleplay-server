@@ -14,11 +14,11 @@ namespace Roleplay.Scripts
         public static void ShowInventory(MyPlayer player) => player.ShowInventory(player);
 
         [AsyncClientEvent(nameof(MoveItem))]
-        public static async Task MoveItem(MyPlayer player, ulong id, short slot)
+        public static async Task MoveItem(MyPlayer player, string id, short slot)
         {
             try
             {
-                var item = player.Items.FirstOrDefault(x => x.Id == id);
+                var item = player.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null || item.Slot == slot || slot == 0)
                     return;
 
@@ -125,7 +125,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(GiveItem))]
-        public static async Task GiveItem(MyPlayer player, ulong id, int quantity, int targetId)
+        public static async Task GiveItem(MyPlayer player, string id, int quantity, int targetId)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace Roleplay.Scripts
                     return;
                 }
 
-                var item = player.Items.FirstOrDefault(x => x.Id == id);
+                var item = player.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null)
                     return;
 
@@ -207,7 +207,7 @@ namespace Roleplay.Scripts
         }
 
         [ClientEvent(nameof(DropItem))]
-        public static void DropItem(MyPlayer player, ulong id, int quantity)
+        public static void DropItem(MyPlayer player, string id, int quantity)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace Roleplay.Scripts
                     return;
                 }
 
-                var item = player.Items.FirstOrDefault(x => x.Id == id);
+                var item = player.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null)
                     return;
 
@@ -326,7 +326,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(RobItem))]
-        public static async Task RobItem(MyPlayer player, ulong id, int quantity)
+        public static async Task RobItem(MyPlayer player, string id, int quantity)
         {
             try
             {
@@ -357,7 +357,7 @@ namespace Roleplay.Scripts
                     }
                 }
 
-                var item = target.Items.FirstOrDefault(x => x.Id == id);
+                var item = target.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null)
                     return;
 
@@ -420,7 +420,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(DiscardItem))]
-        public static async Task DiscardItem(MyPlayer player, ulong id, int quantity)
+        public static async Task DiscardItem(MyPlayer player, string id, int quantity)
         {
             try
             {
@@ -430,7 +430,7 @@ namespace Roleplay.Scripts
                     return;
                 }
 
-                var item = player.Items.FirstOrDefault(x => x.Id == id);
+                var item = player.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null)
                     return;
 
@@ -479,7 +479,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(StoreItem))]
-        public static async Task StoreItem(MyPlayer player, ulong id, int quantity)
+        public static async Task StoreItem(MyPlayer player, string id, int quantity)
         {
             try
             {
@@ -489,7 +489,7 @@ namespace Roleplay.Scripts
                     return;
                 }
 
-                var item = player.Items.FirstOrDefault(x => x.Id == id);
+                var item = player.Items.FirstOrDefault(x => x.Id == new Guid(id));
                 if (item == null)
                     return;
 
@@ -627,7 +627,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(MoveRightItem))]
-        public static async Task MoveRightItem(MyPlayer player, ulong id, short slot)
+        public static async Task MoveRightItem(MyPlayer player, string id, short slot)
         {
             try
             {
@@ -636,7 +636,7 @@ namespace Roleplay.Scripts
                 if (player.InventoryShowType == InventoryShowType.Property)
                 {
                     var prop = Global.Properties.FirstOrDefault(x => x.Id == player.InventoryRightTargetId);
-                    var item = prop.Items.FirstOrDefault(x => x.Id == id);
+                    var item = prop.Items.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null || item.Slot == slot)
                         return;
 
@@ -651,7 +651,7 @@ namespace Roleplay.Scripts
                 else
                 {
                     var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == player.InventoryRightTargetId);
-                    var item = veh.Itens.FirstOrDefault(x => x.Id == id);
+                    var item = veh.Itens.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null || item.Slot == slot)
                         return;
 
@@ -671,7 +671,7 @@ namespace Roleplay.Scripts
         }
 
         [AsyncClientEvent(nameof(GetItem))]
-        public static async Task GetItem(MyPlayer player, ulong id, int quantity)
+        public static async Task GetItem(MyPlayer player, string id, int quantity)
         {
             try
             {
@@ -692,7 +692,7 @@ namespace Roleplay.Scripts
                     if (prop == null)
                         return;
 
-                    var item = prop.Items.FirstOrDefault(x => x.Id == id);
+                    var item = prop.Items.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null)
                         return;
 
@@ -748,7 +748,7 @@ namespace Roleplay.Scripts
                     if (veh == null)
                         return;
 
-                    var item = veh.Itens.FirstOrDefault(x => x.Id == id);
+                    var item = veh.Itens.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null)
                         return;
 
@@ -800,7 +800,7 @@ namespace Roleplay.Scripts
                 }
                 else
                 {
-                    var item = Global.Items.FirstOrDefault(x => x.Id == id);
+                    var item = Global.Items.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null)
                     {
                         player.Emit("Server:MostrarErro", "Você não está próximo deste item.");

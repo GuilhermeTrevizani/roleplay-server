@@ -26,7 +26,7 @@ namespace Roleplay.Entities
             Init();
         }
 
-        public ulong Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public ItemCategory Category { get; set; }
 

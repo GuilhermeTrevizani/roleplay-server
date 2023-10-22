@@ -2,7 +2,7 @@ announce = false
 announcementDiscordChannel = 938605204427919360
 cdnUrl = 'play.segundavida.com.br/'
 companyAnnouncementDiscordChannel = 968258071732310144
-dbConnectionString = 'Server=localhost;Database=bdsegundavidaroleplay;Uid=root;Password=159357'
+dbConnectionString = 'Host=localhost;Port=5432;Database=segundavidaroleplay;User ID=postgres;Password=159357;Pooling=true;'
 debug = true
 description = 'Primeiro servidor luso-brasileiro de roleplay baseado em texto no GTA V.'
 discordBotToken = ''
@@ -28,8 +28,8 @@ resources = [
     'bcat',
     'vvpi',
     'body',
-    'roleplayclient',
-    'roleplay'
+    'client',
+    'server'
 ]
 rolesStaffMessage = [ 938597977474367488, 938597975721148416 ]
 staffDiscordChannel = 938607853630025856

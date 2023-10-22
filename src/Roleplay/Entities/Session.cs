@@ -1,11 +1,10 @@
 ﻿using Roleplay.Models;
-using System;
 
 namespace Roleplay.Entities
 {
     public class Session
     {
-        public ulong Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public int CharacterId { get; set; }
 

@@ -211,7 +211,7 @@ namespace Roleplay.Commands.Job
                 {
                     player.FactionDutySession.FinalDate = DateTime.Now;
                     context.Sessions.Update(player.FactionDutySession);
-                    player.FactionDutySession = new();
+                    player.FactionDutySession = null;
                 }
                 else
                 {

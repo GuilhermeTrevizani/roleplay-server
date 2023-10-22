@@ -43,7 +43,7 @@ namespace Roleplay
 
         public const int QUANTIDADE_SLOTS_INVENTARIO = 30;
 
-        public const string PATH_JSON_CLOTHES = "resources/roleplayclient/resources/json/";
+        public const string PATH_JSON_CLOTHES = "resources/client/resources/json/";
 
         public const int EMERGENCY_NUMBER = 911;
 

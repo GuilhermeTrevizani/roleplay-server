@@ -55,7 +55,8 @@ namespace Roleplay
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(Global.DbConnectionString, ServerVersion.AutoDetect(Global.DbConnectionString))
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            optionsBuilder.UseNpgsql(Global.DbConnectionString)
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);

@@ -1,12 +1,11 @@
 ﻿using Roleplay.Models;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Roleplay.Entities
 {
     public class Log
     {
-        public ulong Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public DateTime Date { get; set; } = DateTime.Now;
 

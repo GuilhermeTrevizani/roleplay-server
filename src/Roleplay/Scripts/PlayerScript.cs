@@ -1636,7 +1636,7 @@ namespace Roleplay.Scripts
         }
 
         [ClientEvent(nameof(ConfirmBoombox))]
-        public static void ConfirmBoombox(MyPlayer player, ulong itemId, string url, float volume)
+        public static void ConfirmBoombox(MyPlayer player, string itemId, string url, float volume)
         {
             if (!(Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
@@ -1645,7 +1645,7 @@ namespace Roleplay.Scripts
                 return;
             }
 
-            var item = Global.Items.FirstOrDefault(x => x.Id == itemId);
+            var item = Global.Items.FirstOrDefault(x => x.Id == new Guid(itemId));
             if (item == null)
                 return;
 
@@ -1667,9 +1667,9 @@ namespace Roleplay.Scripts
         }
 
         [ClientEvent(nameof(TurnOffBoombox))]
-        public static void TurnOffBoombox(MyPlayer player, ulong itemId)
+        public static void TurnOffBoombox(MyPlayer player, string itemId)
         {
-            var item = Global.Items.FirstOrDefault(x => x.Id == itemId);
+            var item = Global.Items.FirstOrDefault(x => x.Id == new Guid(itemId));
             if (item == null)
                 return;
 
