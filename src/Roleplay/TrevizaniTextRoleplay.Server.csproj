@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <ImplicitUsings>true</ImplicitUsings>
         <Nullable>disable</Nullable>
@@ -23,16 +23,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AltV.Net" Version="15.0.2" />
-        <PackageReference Include="AltV.Net.Async" Version="15.0.2" />
-        <PackageReference Include="Discord.Net.Commands" Version="3.12.0" />
-        <PackageReference Include="Discord.Net.Core" Version="3.12.0" />
-        <PackageReference Include="Discord.Net.WebSocket" Version="3.12.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12">
+        <PackageReference Include="AltV.Net" Version="15.0.5" />
+        <PackageReference Include="AltV.Net.Async" Version="15.0.5" />
+        <PackageReference Include="Discord.Net.Commands" Version="3.13.0" />
+        <PackageReference Include="Discord.Net.Core" Version="3.13.0" />
+        <PackageReference Include="Discord.Net.WebSocket" Version="3.13.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     </ItemGroup>
 
 </Project>
