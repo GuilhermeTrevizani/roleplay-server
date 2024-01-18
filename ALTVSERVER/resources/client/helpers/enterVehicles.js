@@ -36,7 +36,7 @@ export async function enterVehicleAsDriver() {
   if (!native.hasEntityClearLosToEntity(player, vehicle, 17))
     return;
 
-  native.taskEnterVehicle(player, vehicle, timeout, -1, 2, 1, null);
+  native.taskEnterVehicle(player, vehicle, timeout, -1, 2, 1, null, 0);
 }
 
 export async function enterVehicleAsPassenger() {
@@ -69,7 +69,7 @@ export async function enterVehicleAsPassenger() {
 
   if (native.isThisModelABike(vehicle.model)) {
     if (native.isVehicleSeatFree(vehicle, 0, false))
-      native.taskEnterVehicle(player, vehicle, timeout, 0, 1, 1, null);
+      native.taskEnterVehicle(player, vehicle, timeout, 0, 1, 1, null, 0);
     return;
   }
 
@@ -314,5 +314,5 @@ export async function enterVehicleAsPassenger() {
   if (closestFreeSeatNumber === -1)
     return;
 
-  native.taskEnterVehicle(player, vehicle, timeout, closestFreeSeatNumber, 2, 1, null);
+  native.taskEnterVehicle(player, vehicle, timeout, closestFreeSeatNumber, 2, 1, null, 0);
 }

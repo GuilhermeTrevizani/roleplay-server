@@ -23,12 +23,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AltV.Net" Version="15.0.6" />
-        <PackageReference Include="AltV.Net.Async" Version="15.0.6" />
+        <PackageReference Include="AltV.Net" Version="16.0.0" />
+        <PackageReference Include="AltV.Net.Async" Version="16.0.0" />
         <PackageReference Include="Discord.Net.Commands" Version="3.13.0" />
         <PackageReference Include="Discord.Net.Core" Version="3.13.0" />
         <PackageReference Include="Discord.Net.WebSocket" Version="3.13.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
