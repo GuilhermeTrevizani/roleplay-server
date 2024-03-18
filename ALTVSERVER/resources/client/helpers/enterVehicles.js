@@ -15,19 +15,9 @@ export async function enterVehicleAsDriver() {
   if (player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED) != 0)
     return;
 
-  let vehicle;
-  let lastDistance = 7;
-  const vehicles = [...alt.Vehicle.streamedIn];
-  vehicles.forEach(veh => {
-    var vehiclePosition = veh.pos;
-    var distance = player.pos.distanceTo(vehiclePosition);
-    if (distance < lastDistance) {
-      vehicle = veh;
-      lastDistance = distance;
-    }
-  });
-
-  if (vehicle == undefined)
+  const vehicle = alt.Utils.getClosestVehicle({ range: 7 });
+  console.log(vehicle);
+  if (!vehicle)
     return;
 
   if (!native.isVehicleSeatFree(vehicle, -1, false))
@@ -49,19 +39,8 @@ export async function enterVehicleAsPassenger() {
   if (player.getStreamSyncedMeta(Constants.PLAYER_META_DATA_INJURED) != 0)
     return;
 
-  let vehicle;
-  let lastDistance = 7;
-  const vehicles = [...alt.Vehicle.streamedIn];
-  vehicles.forEach(veh => {
-    var vehiclePosition = veh.pos;
-    var distance = player.pos.distanceTo(vehiclePosition);
-    if (distance < lastDistance) {
-      vehicle = veh;
-      lastDistance = distance;
-    }
-  });
-
-  if (vehicle == undefined)
+  const vehicle = alt.Utils.getClosestVehicle({ range: 7 });
+  if (!vehicle)
     return;
 
   if (!native.hasEntityClearLosToEntity(player, vehicle, 17))
@@ -125,9 +104,6 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`1 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   // Side by Side vehicles
   calculatedDistance = seatFrontPassengerPosition === null ? null : playerPos.distanceTo(seatFrontPassengerPosition);
   seatIndex = seatFrontPassenger === -1 ? seatIndex : seatIndex + 1;
@@ -136,9 +112,6 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`2 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriverPosition === null ? null : playerPos.distanceTo(seatRearDriverPosition);
   seatIndex = seatRearDriver === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
@@ -146,18 +119,12 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`3 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearPassengerPosition === null ? null : playerPos.distanceTo(seatRearPassengerPosition);
   seatIndex = seatRearPassenger === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`4 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   // Force inner seats before outer grab holds if shift not pressed
   calculatedDistance = seatRearDriver1Position === null ? null : playerPos.distanceTo(seatRearDriver1Position);
@@ -169,9 +136,6 @@ export async function enterVehicleAsPassenger() {
     }
   }
 
-  if (alt.debug)
-    alt.log(`5 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   // Force inner seats before outer grab holds if shift not pressed
   calculatedDistance = seatRearPassenger1Position === null ? null : playerPos.distanceTo(seatRearPassenger1Position);
   seatIndex = seatRearPassenger1 === -1 ? seatIndex : seatIndex + 1; // 4
@@ -181,9 +145,6 @@ export async function enterVehicleAsPassenger() {
       closestFreeSeatNumber = seatIndex;
     }
   }
-
-  if (alt.debug)
-    alt.log(`6 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   // Force inner seats before outer grab holds if shift not pressed
   calculatedDistance = seatRearDriver2Position === null ? null : playerPos.distanceTo(seatRearDriver2Position);
@@ -195,9 +156,6 @@ export async function enterVehicleAsPassenger() {
     }
   }
 
-  if (alt.debug)
-    alt.log(`7 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   // Force inner seats before outer grab holds if shift not pressed
   calculatedDistance = seatRearPassenger2Position === null ? null : playerPos.distanceTo(seatRearPassenger2Position);
   seatIndex = seatRearPassenger2 === -1 ? seatIndex : seatIndex + 1; // 6
@@ -208,18 +166,12 @@ export async function enterVehicleAsPassenger() {
     }
   }
 
-  if (alt.debug)
-    alt.log(`8 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriver3Position === null ? null : playerPos.distanceTo(seatRearDriver3Position);
   seatIndex = seatRearDriver3 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`9 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   calculatedDistance = seatRearPassenger3Position === null ? null : playerPos.distanceTo(seatRearPassenger3Position);
   seatIndex = seatRearPassenger3 === -1 ? seatIndex : seatIndex + 1;
@@ -228,18 +180,12 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`10 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriver4Position === null ? null : playerPos.distanceTo(seatRearDriver4Position);
   seatIndex = seatRearDriver4 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`11 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   calculatedDistance = seatRearPassenger4Position === null ? null : playerPos.distanceTo(seatRearPassenger4Position);
   seatIndex = seatRearPassenger4 === -1 ? seatIndex : seatIndex + 1;
@@ -248,18 +194,12 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`12 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriver5Position === null ? null : playerPos.distanceTo(seatRearDriver5Position);
   seatIndex = seatRearDriver5 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`13 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   calculatedDistance = seatRearPassenger5Position === null ? null : playerPos.distanceTo(seatRearPassenger5Position);
   seatIndex = seatRearPassenger5 === -1 ? seatIndex : seatIndex + 1;
@@ -268,18 +208,12 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`14 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriver6Position === null ? null : playerPos.distanceTo(seatRearDriver6Position);
   seatIndex = seatRearDriver6 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`15 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   calculatedDistance = seatRearPassenger6Position === null ? null : playerPos.distanceTo(seatRearPassenger6Position);
   seatIndex = seatRearPassenger6 === -1 ? seatIndex : seatIndex + 1;
@@ -288,9 +222,6 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`16 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearDriver7Position === null ? null : playerPos.distanceTo(seatRearDriver7Position);
   seatIndex = seatRearDriver7 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
@@ -298,18 +229,12 @@ export async function enterVehicleAsPassenger() {
     closestFreeSeatNumber = seatIndex;
   }
 
-  if (alt.debug)
-    alt.log(`17 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
-
   calculatedDistance = seatRearPassenger7Position === null ? null : playerPos.distanceTo(seatRearPassenger7Position);
   seatIndex = seatRearPassenger7 === -1 ? seatIndex : seatIndex + 1;
   if (calculatedDistance !== null && native.isVehicleSeatFree(vehicle, seatIndex, false) && calculatedDistance < closestSeatDistance) {
     closestSeatDistance = calculatedDistance;
     closestFreeSeatNumber = seatIndex;
   }
-
-  if (alt.debug)
-    alt.log(`18 closestSeatDistance: ${closestSeatDistance} | closestFreeSeatNumber: ${closestFreeSeatNumber}`);
 
   if (closestFreeSeatNumber === -1)
     return;

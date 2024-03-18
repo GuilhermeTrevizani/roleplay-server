@@ -1,6 +1,6 @@
 $(window).keyup((e) => {
   if (e.which === 27) {
-    $('#smartphone').animate({ bottom: '-29vw', opacity: '0.5' }, 250);
+    $('#smartphone').animate({ bottom: '-29vw', opacity: '0' }, 250);
     if ('alt' in window)
       alt.emit('smartphone:close');
   }

@@ -1,8 +1,3 @@
-$(window).keyup((e) => {
-  if (e.which === 27)
-    closeView();
-});
-
 $(document).ready(() => {
   $('#btn-deposit').click(() => {
     $.confirm({
@@ -229,10 +224,6 @@ function update(accountAmount, _savings, tickets, transactions) {
             </tr>`);
     });
   }
-}
-
-function closeView() {
-  alt.emit('closeView');
 }
 
 function policeTicketPayment(id) {

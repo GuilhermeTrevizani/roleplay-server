@@ -1,3 +1,0 @@
-deps = [ 'client' ]
-main = 'TrevizaniTextRoleplay.Server.dll'
-type = 'csharp'

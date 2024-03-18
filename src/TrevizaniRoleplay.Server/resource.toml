@@ -1,0 +1,3 @@
+deps = [ 'client' ]
+main = 'TrevizaniRoleplay.Server.dll'
+type = 'csharp'

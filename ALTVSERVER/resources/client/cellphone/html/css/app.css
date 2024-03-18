@@ -47,7 +47,7 @@ h5 {
 	bottom: -29vw;
 	border-radius: 0.75vw;
 	box-shadow: 0 0 1vw var(--border);
-	opacity: 0.5;
+	opacity: 0;
 }
 #head {
 	display: flex;

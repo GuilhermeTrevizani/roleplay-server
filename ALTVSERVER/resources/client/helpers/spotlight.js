@@ -1,6 +1,5 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { drawText2d } from '/helpers/text.js';
 import * as Constants from '/helpers/constants.js';
 
 const fov_max = 80.0;
@@ -147,9 +146,10 @@ alt.everyTick(() => {
 
     const vehicle = pointingAt(cam);
     if (vehicle != null) {
-      const veh = alt.Vehicle.streamedIn.find(x => x.scriptID == vehicle);
+      const veh = alt.Vehicle.getByScriptID(vehicle);
       if (native.isSphereVisible(veh.pos.x, veh.pos.y, veh.pos.z, 0.0099999998))
-        drawText2d(`Modelo: ${veh.getStreamSyncedMeta(Constants.Constants.VEHICLE_META_DATA_MODEL)}`, 0.5, 0.93, 0.55, 0, 255, 255, 255, 185);
+        alt.Utils.drawText2dThisFrame(`Modelo: ${veh.getStreamSyncedMeta(Constants.Constants.VEHICLE_META_DATA_MODEL)}`,
+          new alt.Vector2(0.5, 0.93), 0, 0.55, new alt.RGBA(255, 255, 255, 185), true, true, 0);
     }
 
     native.beginScaleformMovieMethod(scaleform, "SET_ALT_FOV_HEADING");
@@ -277,8 +277,8 @@ alt.onServer('Spotlight:Toggle', (state) => {
     const forwardVector = native.getEntityForwardVector(player.vehicle);
     const heading = native.getEntityHeading(player.vehicle);
 
-    let newY = player.vehicle.getStreamSyncedMeta("spotlightY") ?? 0;
-    let newZ = player.vehicle.getStreamSyncedMeta("spotlightZ") ?? 0;
+    let newY = player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_SPOTLIGHT_X) ?? 0;
+    let newZ = player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_SPOTLIGHT_Z) ?? 0;
 
     if (native.isControlPressed(0, 127)) { // NumPad 8
       newZ += 0.1;
@@ -308,8 +308,8 @@ alt.onServer('Spotlight:Toggle', (state) => {
 180
 360*/
 
-    alt.emitServer('SetVehicleMeta', player.vehicle, 'spotlightY', newY);
-    alt.emitServer('SetVehicleMeta', player.vehicle, 'spotlightZ', newZ);
+    alt.emitServer('SetVehicleSpotlightX', newY);
+    alt.emitServer('SetVehicleSpotlightZ', newZ);
     alt.emitServer('SpotlightAdd', new alt.Vector3(doorCoords.x, windowCoords.y, doorCoords.z),
       new alt.Vector3(forwardVector.x, forwardVector.y + newY, forwardVector.z + newZ),
       70.0, 50.0, 4.3, 25.0, 28.6,

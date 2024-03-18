@@ -3,11 +3,10 @@ import * as native from 'natives';
 import { view, setView, toggleView, closeView, getAddress, getRightCoordsZ } from '/helpers/cursor.js';
 import { activateChat } from '/chat/index.mjs';
 import { playAnimation } from '/helpers/animation.js';
-import { drawText2d } from '/helpers/text.js';
-import * as nametags from '/helpers/nametags.js';
+import * as nametags from '/nametags/index.js';
 import { enterVehicleAsDriver, enterVehicleAsPassenger } from '/helpers/enterVehicles.js';
 import * as charCreator from '/charcreator/editor.js';
-import * as vehtags from '/helpers/vehtags.js';
+import * as vehtags from '/vehtags/index.js';
 import * as clothes from '/clothes/editor.js';
 import Fingerpointing from '/helpers/fingerpointing.js';
 import * as spotlight from '/helpers/spotlight.js';
@@ -16,10 +15,11 @@ import * as bankSystem from '/bank/client.mjs';
 import * as staffSystem from '/staff/client.mjs';
 import * as factionSystem from '/faction/client.mjs';
 import * as tattoos from '/tattoos/editor.js';
-import * as inventorySystem from '/inventory/client.mjs';
+import * as inventorySystem from '/inventory/client.js';
 import * as tuningSystem from '/tuning/client.mjs';
 import * as Constants from '/helpers/constants.js';
 import * as audioSystem from '/helpers/audio.js';
+import * as staffAnimationSystem from '/staff/animation/client.js';
 
 const WeaponModel = {
   AntiqueCavalryDagger: 2460120199,
@@ -175,7 +175,6 @@ const directions = [
 ];
 const player = alt.Player.local;
 const pointing = new Fingerpointing();
-let playersCount = alt.Player.all.length;
 let streetName, zoneName, directionName = '';
 let playersViewLoading = false;
 let melee = false;
@@ -213,8 +212,6 @@ alt.setInterval(() => {
   if (!player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG))
     return;
 
-  playersCount = alt.Player.all.length;
-
   updateCellphone();
 
   if (player.hasMeta('animation_dic')) {
@@ -238,11 +235,10 @@ alt.setInterval(() => {
 }, 1000);
 
 alt.everyTick(() => {
+  alt.Utils.drawText2dThisFrame('Trevizani Roleplay', new alt.Vector2(0.99, 0.977), 0, 0.2, new alt.RGBA(255, 255, 255, 180), false, true, 2);
+
   if (!player.hasStreamSyncedMeta(Constants.PLAYER_META_DATA_NAMETAG))
     return;
-
-  drawText2d(`~s~Segunda Vida ~w~Roleplay`, 1, 0.90, 0.5, 4, 174, 106, 178, 180, true, true, 2, false);
-  drawText2d(`~s~v1.17 ~w~(${playersCount}/100)`, 1, 0.93, 0.4, 4, 174, 106, 178, 180, true, true, 2, false);
 
   [zoneName, streetName] = getAddress(player.pos);
 
@@ -339,18 +335,26 @@ alt.everyTick(() => {
           directionName = x.name;
       });
 
-      drawText2d(directionName, 0.15, 0.945, 1.0, 4, 255, 255, 255, 230, true, true, 1);
-      drawText2d(zoneName, 0.165, 0.945, 0.55, 4, 174, 106, 178, 230, true, true, 1);
-      drawText2d(streetName, 0.165, 0.975, 0.45, 4, 255, 255, 255, 230, true, true, 1);
+      alt.Utils.drawText2dThisFrame(directionName, new alt.Vector2(0.155, 0.94), 4, 0.9, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+      alt.Utils.drawText2dThisFrame(zoneName, new alt.Vector2(0.17, 0.94), 4, 0.45, new alt.RGBA(174, 106, 178, 230), true, true, 1);
+      alt.Utils.drawText2dThisFrame(streetName, new alt.Vector2(0.17, 0.97), 4, 0.45, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+
+      // drawText2d(directionName, 0.15, 0.945, 1.0, 4, 255, 255, 255, 230, true, true, 1);
+      // drawText2d(zoneName, 0.165, 0.945, 0.55, 4, 174, 106, 178, 230, true, true, 1);
+      // drawText2d(streetName, 0.165, 0.975, 0.45, 4, 255, 255, 255, 230, true, true, 1);
     }
 
     if (isDriver()) {
-      drawText2d(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL), 0.15, 0.905, 0.4, 4, 255, 255, 255, 230, true, true, 1);
-      drawText2d(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`,
-        0.15, 0.925,
-        0.4, 4,
-        255, 255, 255, 230,
-        true, true, 1);
+      alt.Utils.drawText2dThisFrame(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL),
+        new alt.Vector2(0.155, 0.905), 4, 0.5, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+      alt.Utils.drawText2dThisFrame(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`,
+        new alt.Vector2(0.15, 0.925), 4, 0.4, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+      // drawText2d(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL), 0.15, 0.905, 0.4, 4, 255, 255, 255, 230, true, true, 1);
+      //   drawText2d(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`,
+      //     0.15, 0.925,
+      //     0.4, 4,
+      //     255, 255, 255, 230,
+      //     true, true, 1);
     }
   }
 });
@@ -368,8 +372,8 @@ const functionsKeyDown = {
   },
   81() { // Q
     if (isDriver()) {
-      const hasMutedSirens = !player.vehicle.getStreamSyncedMeta('hasMutedSirens');
-      alt.emitServer('SetVehicleMeta', player.vehicle, 'hasMutedSirens', hasMutedSirens);
+      const hasMutedSirens = !player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_HAS_MUTED_SIRENS);
+      alt.emitServer('SetVehicleHasMutedSirens', hasMutedSirens);
     }
   },
   118() { // F7

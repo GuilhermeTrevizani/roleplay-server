@@ -1,8 +1,3 @@
-$(window).keyup((e) => {
-  if (e.which === 27)
-    closeView();
-});
-
 function abrirUCP(htmlComandos, htmlMinhasInformacoes, htmlConfiguracoes) {
   $('#tab-comandos').html(htmlComandos);
   $('#tab-minhasinformacoes').html(htmlMinhasInformacoes);
@@ -43,14 +38,6 @@ function filtrarComandos() {
         $(element).hide();
     }
   });
-}
-
-function removerAcentos(s) {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-}
-
-function closeView() {
-  alt.emit('closeView');
 }
 
 if ('alt' in window) {
