@@ -165,7 +165,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 {
                     veh = await veh.Reparar();
                     player.ToggleGameControls(true);
-                    player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} reparou o veículo {veh.VehicleDB.Model.ToUpper()} {veh.VehicleDB.Plate}.");
+                    player.SendFactionMessage($"{player.FactionRank!.Name} {player.Character.Name} reparou o veículo {veh.VehicleDB.Model.ToUpper()} {veh.VehicleDB.Plate}.");
                     await player.GravarLog(LogType.FactionVehicleRepair, veh.VehicleDB.Id.ToString(), null);
                     player.CancellationTokenSourceAcao = null;
                 });
@@ -222,7 +222,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("mostrardistintivo", "/mostrardistintivo (ID ou nome)")]
-        public static void CMD_mostrardistintivo(MyPlayer player, string idNome)
+        public static void CMD_mostrardistintivo(MyPlayer player, string idOrName)
         {
             if (player.Character.Badge == 0)
             {
@@ -230,7 +230,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -240,8 +240,8 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            target.SendMessage(Models.MessageType.None, $"{{#{player.Faction.Color}}}Distintivo #{player.Character.Badge} de {player.Character.Name}");
-            target.SendMessage(Models.MessageType.None, $"{player.Faction.Name} - {player.FactionRank.Name}");
+            target.SendMessage(Models.MessageType.None, $"{{#{player.Faction!.Color}}}Distintivo #{player.Character.Badge} de {player.Character.Name}");
+            target.SendMessage(Models.MessageType.None, $"{player.Faction.Name} - {player.FactionRank!.Name}");
             player.SendMessageToNearbyPlayers(player == target ? "olha seu próprio distintivo." : $"mostra seu distintivo para {target.ICName}.", MessageCategory.Ame, 10);
         }
 
@@ -364,7 +364,7 @@ namespace TrevizaniRoleplay.Server.Commands
             foreach (var barrier in barriers)
                 barrier.Destroy();
 
-            player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as barreiras da facção.");
+            player.SendFactionMessage($"{player.FactionRank!.Name} {player.Character.Name} removeu todas as barreiras da facção.");
             await player.GravarLog(LogType.Faction, $"/rball", null);
         }
 
@@ -387,7 +387,7 @@ namespace TrevizaniRoleplay.Server.Commands
             foreach (var barrier in barriers)
                 barrier.Destroy();
 
-            player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} removeu todas as suas barreiras.");
+            player.SendFactionMessage($"{player.FactionRank!.Name} {player.Character.Name} removeu todas as suas barreiras.");
             await player.GravarLog(LogType.Faction, $"/rballme", null);
         }
     }

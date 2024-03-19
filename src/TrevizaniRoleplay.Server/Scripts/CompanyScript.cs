@@ -1,5 +1,7 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
+using AltV.Net.Data;
+using Microsoft.EntityFrameworkCore;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
@@ -45,7 +47,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Empresa editada.", true);
 
             await player.GravarLog(LogType.Company, $"Gravar | {Functions.Serialize(company)}", null);
-            player.Emit("Companies", true, Functions.GetCompaniesByCharacterHTML(player));
+            player.Emit("Companies", true, GetCompaniesByCharacterHTML(player));
         }
 
         [AsyncClientEvent(nameof(CompanyEmployees))]
@@ -68,7 +70,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
             player.Emit("CompanyCharacters", false,
-                await Functions.GetCompanyCharactersHTML(company.Id),
+                await GetCompanyCharactersHTML(company.Id),
                 companyCharacter?.FlagsJSON ?? "[]", company.CharacterId == player.Character.Id,
                 company.Id, company.Name, companyFlagsJSON);
         }
@@ -102,7 +104,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Company, $"{(company.Open ? "Abrir" : "fechou")} Empresa {id}", null);
             player.EmitStaffShowMessage($"Você {(company.Open ? "abriu" : "fechou")} a empresa {company.Name}.", true);
-            player.Emit("Companies", true, Functions.GetCompaniesByCharacterHTML(player));
+            player.Emit("Companies", true, GetCompaniesByCharacterHTML(player));
         }
 
         [AsyncClientEvent(nameof(CompanyAnnounce))]
@@ -239,8 +241,144 @@ namespace TrevizaniRoleplay.Server.Scripts
             await player.GravarLog(LogType.Company, $"Expulsar Empresa {companyId} {characterId}", target);
 
             player.Emit("CompanyCharacters", true,
-                await Functions.GetCompanyCharactersHTML(company.Id),
+                await GetCompanyCharactersHTML(company.Id),
                 companyCharacter?.FlagsJSON ?? "[]", company.CharacterId == player.Character.Id);
+        }
+
+        [Command("empresa")]
+        public static void CMD_empresa(MyPlayer player)
+        {
+            if (player.Companies.Count == 0)
+            {
+                player.SendMessage(MessageType.Error, "Você não está em nenhuma empresa.");
+                return;
+            }
+
+            player.Emit("Companies", false, GetCompaniesByCharacterHTML(player));
+        }
+
+        private static string GetCompaniesByCharacterHTML(MyPlayer player)
+        {
+            var html = string.Empty;
+            if (player.Companies.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='11'>Não há empresas criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var company in player.Companies.OrderByDescending(x => x.Id))
+                {
+                    var companyCharacter = company.Characters!.FirstOrDefault(x => x.CharacterId == player.Character.Id);
+
+                    var htmlOptions = string.Empty;
+
+                    if (company.CharacterId == player.Character.Id || (companyCharacter?.GetFlags()?.Contains(CompanyFlag.Open) ?? false))
+                    {
+                        htmlOptions += $@"<button onclick='openClose({company.Id})' type='button' class='btn btn-dark btn-sm'>ABRIR/FECHAR</button>";
+
+                        if (company.GetIsOpen())
+                            htmlOptions += $@" <button onclick='announce({company.Id})' type='button' class='btn btn-dark btn-sm'>ANUNCIAR</button>";
+                    }
+
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{company.Id}</td>
+                        <td>{company.Name}</td>
+                        <td>${company.WeekRentValue:N0}</td>
+                        <td>{company.RentPaymentDate}</td>
+                        <td><span style='color:#{company.Color}'>#{company.Color}</span></td>
+                        <td>{company.BlipType}</td>
+                        <td>{company.BlipColor}</td>
+                        <td class='text-center'>{(company.GetIsOpen() ? "SIM" : "NÃO")}</td>
+                        <td class='text-center'>
+                            <input id='json{company.Id}' type='hidden' value='{Functions.Serialize(company)}' />
+                            {(company.CharacterId == player.Character.Id ? $"<button onclick='edit({company.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>" : string.Empty)}
+                            <button onclick='employees({company.Id})' type='button' class='btn btn-dark btn-sm'>FUNCIONÁRIOS</button>
+                            {htmlOptions}
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
+        }
+
+        private static async Task<string> GetCompanyCharactersHTML(Guid companyId)
+        {
+            await using var context = new DatabaseContext();
+            var characters = (await context.CompaniesCharacters
+                .Where(x => x.CompanyId == companyId)
+                .Include(x => x.Character)
+                .ThenInclude(x => x.User)
+                .ToListAsync())
+                .Select(x => new
+                {
+                    CompanyCharacter = x,
+                    OnlineCharacter = Global.SpawnedPlayers.FirstOrDefault(y => y.Character.Id == x.CharacterId),
+                })
+                .OrderByDescending(x => x.OnlineCharacter != null)
+                .ThenBy(x => x.CompanyCharacter.Character.Name);
+
+            var html = string.Empty;
+            if (!characters.Any())
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há funcionários na empresa.</td></tr>";
+            }
+            else
+            {
+                foreach (var character in characters)
+                {
+                    var online = character.OnlineCharacter != null ?
+                        $"<span class='label' style='background-color:{Global.SUCCESS_COLOR}'>ONLINE</span>"
+                        :
+                        $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>OFFLINE</span>";
+
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{character.CompanyCharacter.Character.Name} [{character.CompanyCharacter.Character.Id}]</td>
+                        <td>{character.CompanyCharacter.Character.User.Name} [{character.CompanyCharacter.Character.UserId}]</td>
+                        <td>{character.CompanyCharacter.Character.LastAccessDate}</td>
+                        <td class='text-center'>{online}</td>
+                        <td class='text-center tdOptions'>
+                            <input id='jsonMember{character.CompanyCharacter.Character.Id}' type='hidden' value='{Functions.Serialize(new { character.CompanyCharacter.Character.Name, character.CompanyCharacter.FlagsJSON })}' />
+                            <button onclick='edit({character.CompanyCharacter.Character.Id})' type='button' class='btn btn-dark btn-sm editMember'>EDITAR</button>
+                            <button onclick='remove(this, {character.CompanyCharacter.Character.Id})' type='button' class='btn btn-danger btn-sm removeMember'>EXPULSAR</button>
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
+        }
+
+        [Command("alugarempresa")]
+        public static async Task CMD_alugarempresa(MyPlayer player)
+        {
+            var company = Global.Companies.Where(x => !x.CharacterId.HasValue
+                && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE)
+                .MinBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE);
+            if (company == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está perto de uma empresa disponível para alugar.");
+                return;
+            }
+
+            if (player.Money < company.WeekRentValue)
+            {
+                player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, company.WeekRentValue));
+                return;
+            }
+
+            await player.RemoveStackedItem(ItemCategory.Money, company.WeekRentValue);
+
+            company.CharacterId = player.Character.Id;
+            company.RentPaymentDate = DateTime.Now.AddDays(7);
+            company.RemoveIdentifier();
+
+            await using var context = new DatabaseContext();
+            context.Companies.Update(company);
+            await context.SaveChangesAsync();
+
+            await player.GravarLog(LogType.Company, $"/alugarempresa {company.Id} {company.WeekRentValue}", null);
+
+            player.SendMessage(MessageType.Success, $"Você alugou a empresa {company.Name} [{company.Id}] por 7 dias por ${company.WeekRentValue:N0}.");
+            player.SendMessage(MessageType.Success, $"O próximo pagamento será em {company.RentPaymentDate} e será debitado da sua conta bancária. Se você não possuir este valor, a empresa será retirada do seu nome.");
         }
     }
 }

@@ -31,7 +31,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            player.Emit("StaffProperties", false, Functions.GetPropertiesHTML(), jsonInteriors);
+            player.Emit("StaffProperties", false, GetPropertiesHTML(), jsonInteriors);
         }
 
         [Command("int", "/int (tipo)")]
@@ -128,7 +128,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Propriedade | {Functions.Serialize(property)}", null);
 
-            var html = Functions.GetPropertiesHTML();
+            var html = GetPropertiesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Properties)))
                 target.Emit("StaffProperties", true, html);
         }
@@ -171,7 +171,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 player.EmitStaffShowMessage($"Propriedade {id} excluída.");
 
-                var html = Functions.GetPropertiesHTML();
+                var html = GetPropertiesHTML();
                 foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Properties)))
                     target.Emit("StaffProperties", true, html);
             }
@@ -179,6 +179,34 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 Functions.GetException(ex);
             }
+        }
+
+        public static string GetPropertiesHTML()
+        {
+            var html = string.Empty;
+            if (Global.Properties.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='7'>Não há propriedades criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var property in Global.Properties.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{property.Id}</td>
+                        <td>{property.Interior.GetDisplay()} [{(byte)property.Interior}]</td>
+                        <td>{property.Address}</td>
+                        <td>{property.Value:N0}</td>
+                        <td>{property.EntranceDimension}</td>
+                        <td>X: {property.EntrancePosX} | Y: {property.EntrancePosY} | Z: {property.EntrancePosZ}</td>
+                        <td class='text-center'>
+                            <input id='json{property.Id}' type='hidden' value='{Functions.Serialize(property)}' />
+                            <button onclick='ir({property.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='editar({property.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='excluir(this, {property.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

@@ -13,19 +13,19 @@ namespace TrevizaniRoleplay.Server.Commands
     public class Commands
     {
         [Command("id", "/id (ID ou nome)", GreedyArg = true)]
-        public static void CMD_id(MyPlayer player, string idNome)
+        public static void CMD_id(MyPlayer player, string idOrName)
         {
             var personagens = Global.SpawnedPlayers
-                .Where(x => (int.TryParse(idNome, out int id) && x.SessionId == id) || x.ICName.ToLower().Contains(idNome.ToLower()))
+                .Where(x => (int.TryParse(idOrName, out int id) && x.SessionId == id) || x.ICName.ToLower().Contains(idOrName.ToLower()))
                 .OrderBy(x => x.SessionId)
                 .ToList();
             if (personagens.Count == 0)
             {
-                player.SendMessage(MessageType.Error, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}.");
+                player.SendMessage(MessageType.Error, $"Nenhum jogador foi encontrado com a pesquisa: {idOrName}.");
                 return;
             }
 
-            player.SendMessage(MessageType.Title, $"Jogadores encontrados com a pesquisa: {idNome}.");
+            player.SendMessage(MessageType.Title, $"Jogadores encontrados com a pesquisa: {idOrName}.");
             foreach (var pl in personagens)
                 player.SendMessage(MessageType.None, $"{pl.ICName} [{pl.SessionId}]");
         }
@@ -53,6 +53,8 @@ namespace TrevizaniRoleplay.Server.Commands
                 player.SendMessage(MessageType.Error, "Jogador que enviou o convite não está online.");
                 return;
             }
+
+            await using var context = new DatabaseContext();
 
             switch ((InviteType)tipo)
             {
@@ -116,7 +118,6 @@ namespace TrevizaniRoleplay.Server.Commands
 
                     prop.CharacterId = player.Character.Id;
 
-                    await using (var context = new DatabaseContext())
                     {
                         context.Properties.Update(prop);
                         await context.SaveChangesAsync();
@@ -181,11 +182,8 @@ namespace TrevizaniRoleplay.Server.Commands
                     veh.VehicleDB.CharacterId = player.Character.Id;
                     veh.VehicleDB.Parked = false;
 
-                    await using (var context = new DatabaseContext())
-                    {
-                        context.Vehicles.Update(veh.VehicleDB);
-                        await context.SaveChangesAsync();
-                    }
+                    context.Vehicles.Update(veh.VehicleDB);
+                    await context.SaveChangesAsync();
 
                     player.SendMessage(MessageType.Success, $"Você comprou o veículo {veh.VehicleDB.Id} de {target.ICName} por ${valorVeh:N0}.");
                     target.SendMessage(MessageType.Success, $"Você vendeu o veículo {veh.VehicleDB.Id} para {player.ICName} por ${valorVeh:N0}.");
@@ -206,18 +204,15 @@ namespace TrevizaniRoleplay.Server.Commands
                     if (company == null)
                         return;
 
-                    await using (var context = new DatabaseContext())
+                    var companyCharacter = new CompanyCharacter
                     {
-                        var companyCharacter = new CompanyCharacter
-                        {
-                            CompanyId = companyId,
-                            CharacterId = player.Character.Id,
-                        };
-                        await context.CompaniesCharacters.AddAsync(companyCharacter);
-                        await context.SaveChangesAsync();
+                        CompanyId = companyId,
+                        CharacterId = player.Character.Id,
+                    };
+                    await context.CompaniesCharacters.AddAsync(companyCharacter);
+                    await context.SaveChangesAsync();
 
-                        company.Characters.Add(companyCharacter);
-                    }
+                    company.Characters!.Add(companyCharacter);
 
                     player.SendMessage(MessageType.Success, $"Você aceitou o convite para entrar na empresa.");
                     target.SendMessage(MessageType.Success, $"{player.Character.Name} aceitou seu convite para entrar na empresa.");
@@ -287,9 +282,9 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("revistar", "/revistar (ID ou nome)")]
-        public static void CMD_revistar(MyPlayer player, string idNome)
+        public static void CMD_revistar(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -474,9 +469,9 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("ferimentos", "/ferimentos (ID ou nome)")]
-        public static void CMD_ferimentos(MyPlayer player, string idNome)
+        public static void CMD_ferimentos(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -499,7 +494,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 <tbody>";
 
             foreach (var x in target.Wounds)
-                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.Arma}</td><td>{x.Dano}</td><td>{Functions.GetBodyPartName(x.BodyPart)}</td></tr>";
+                html += $@"<tr><td>{x.Date}</td><td>{(WeaponModel)x.Weapon}</td><td>{x.Damage}</td><td>{Functions.GetBodyPartName(x.BodyPart)}</td></tr>";
 
             html += $@"
                 </tbody>
@@ -577,9 +572,9 @@ namespace TrevizaniRoleplay.Server.Commands
         public static async Task CMD_trancar(MyPlayer player) => await Functions.CMDTrancar(player);
 
         [Command("mostraridentidade", "/mostraridentidade (ID ou nome)", Aliases = ["mostrarid"])]
-        public static void CMD_mostraridentidade(MyPlayer player, string idNome)
+        public static void CMD_mostraridentidade(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -630,7 +625,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("mostrarlicenca", "/mostrarlicenca (ID ou nome)", Aliases = ["ml"])]
-        public static void CMD_mostrarlicenca(MyPlayer player, string idNome)
+        public static void CMD_mostrarlicenca(MyPlayer player, string idOrName)
         {
             if (!player.Character.DriverLicenseValidDate.HasValue)
             {
@@ -638,7 +633,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -762,9 +757,9 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("levantar", "/levantar (ID ou nome)")]
-        public static void CMD_levantar(MyPlayer player, string idNome)
+        public static void CMD_levantar(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -774,7 +769,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            if (target.Character.Wound != CharacterWound.SeriouslyInjured || target.Wounds.Any(x => x.Arma != (uint)WeaponModel.Fist))
+            if (target.Character.Wound != CharacterWound.SeriouslyInjured || target.Wounds.Any(x => x.Weapon != (uint)WeaponModel.Fist))
             {
                 player.SendMessage(MessageType.Error, "Jogador não está gravemente ferido ou ferido somente com socos.");
                 return;
@@ -879,32 +874,6 @@ namespace TrevizaniRoleplay.Server.Commands
             target.Invites.RemoveAll(x => x.Type == type);
             player.SendMessage(MessageType.Success, $"Você cancelou o convite para {strPlayer}.");
             target.SendMessage(MessageType.Success, $"{player.ICName} cancelou o convite para {strTarget}.");
-        }
-
-        [Command("infos")]
-        public static void CMD_infos(MyPlayer player)
-        {
-            player.Emit("StaffInfos", false, Functions.GetInfosHTML(player.User.Id));
-        }
-
-        [Command("bocafumo")]
-        public static void CMD_bocafumo(MyPlayer player)
-        {
-            var crackDen = Global.CrackDens.FirstOrDefault(x =>
-                player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE
-                && x.Dimension == player.Dimension);
-            if (crackDen == null)
-            {
-                player.SendMessage(MessageType.Error, "Você não está próximo de nenhuma boca de fumo.");
-                return;
-            }
-
-            var html = Functions.GetCrackDensItemsHTML(crackDen.Id, false);
-
-            player.Emit("ShowCrackDen",
-                false,
-                html,
-                crackDen.Id);
         }
 
         [Command("usardroga", "/usardroga (nome) (quantidade)")]
@@ -1039,7 +1008,8 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            player.Emit("Boombox", item.Id, item.AudioSpot?.Source ?? string.Empty, item.AudioSpot?.Volume ?? 1);
+            var audioSpot = item.GetAudioSpot();
+            player.Emit("Boombox", item.Id, audioSpot?.Source ?? string.Empty, audioSpot?.Volume ?? 1);
         }
 
         [Command("mic", "/mic (mensagem)", GreedyArg = true)]
@@ -1052,96 +1022,6 @@ namespace TrevizaniRoleplay.Server.Commands
             }
 
             player.SendMessageToNearbyPlayers(mensagem, MessageCategory.Microphone, 55.0f);
-        }
-
-        [Command("colocar", "/colocar (ID ou nome)")]
-        public static async Task CMD_colocar(MyPlayer player, string idNome)
-        {
-            if (player.IsInVehicle)
-            {
-                player.SendMessage(MessageType.Error, "Você não pode fazer isso dentro de um veículo");
-                return;
-            }
-
-            var veh = Global.Vehicles.Where(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= Global.RP_DISTANCE
-                && x.Dimension == player.Dimension
-                && x.LockState == VehicleLockState.Unlocked)
-                .OrderBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)))
-                .FirstOrDefault();
-
-            if (veh == null)
-            {
-                player.SendMessage(MessageType.Error, "Você não está próximo de nenhum veículo destrancado.");
-                return;
-            }
-
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
-            if (target == null)
-                return;
-
-            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE
-                || player.Dimension != target.Dimension
-                || !target.Cuffed
-                || target.IsInVehicle)
-            {
-                player.SendMessage(MessageType.Error, "Jogador não está próximo de você ou não está algemado.");
-                return;
-            }
-
-            var passageiros = Global.SpawnedPlayers.Where(x => x.Vehicle == veh && x != veh.Driver).ToList();
-
-            if (!passageiros.Any(x => x.Seat == 3))
-            {
-                target.SetIntoVehicle(veh, 3);
-            }
-            else if (!passageiros.Any(x => x.Seat == 4))
-            {
-                target.SetIntoVehicle(veh, 4);
-            }
-            else
-            {
-                player.SendMessage(MessageType.Error, $"Todos os assentos traseiros do veículo estão ocupados.");
-                return;
-            }
-
-            player.SendMessage(MessageType.Success, $"Você colocou {target.ICName} dentro do veículo.");
-            target.SendMessage(MessageType.Success, $"{player.ICName} colocou você dentro do veículo.");
-            await player.GravarLog(LogType.PutInVehicle, veh.VehicleDB.Id.ToString(), target);
-        }
-
-        [Command("retirar", "/retirar (ID ou nome)")]
-        public static async Task CMD_retirar(MyPlayer player, string idNome)
-        {
-            if (player.IsInVehicle)
-            {
-                player.SendMessage(MessageType.Error, "Você não pode fazer isso dentro de um veículo");
-                return;
-            }
-
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
-            if (target == null)
-                return;
-
-
-            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE
-                || player.Dimension != target.Dimension
-                || !target.Cuffed
-                || !target.IsInVehicle
-                || target.Vehicle is not MyVehicle veh
-                || veh.LockState != VehicleLockState.Unlocked)
-            {
-                player.SendMessage(MessageType.Error, "Jogador não está próximo de você ou não está algemado em um veículo destrancado.");
-                return;
-            }
-
-            var vehId = veh.VehicleDB.Id;
-            var pos = player.Position;
-            pos.Y += 1.5f;
-            target.SetPosition(pos, target.Dimension, false);
-
-            player.SendMessage(MessageType.Success, $"Você retirou {target.ICName} do veículo.");
-            target.SendMessage(MessageType.Success, $"{player.ICName} retirou você de dentro do veículo.");
-            await player.GravarLog(LogType.RemoveFromVehicle, vehId.ToString(), target);
         }
 
         [Command("stopanim", Aliases = ["sa"])]
@@ -1293,74 +1173,6 @@ namespace TrevizaniRoleplay.Server.Commands
             await using var context = new DatabaseContext();
             context.Doors.Update(door);
             await context.SaveChangesAsync();
-        }
-
-        [Command("alugarempresa")]
-        public static async Task CMD_alugarempresa(MyPlayer player)
-        {
-            var company = Global.Companies.Where(x => !x.CharacterId.HasValue
-                && player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE)
-                .MinBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE);
-            if (company == null)
-            {
-                player.SendMessage(MessageType.Error, "Você não está perto de uma empresa disponível para alugar.");
-                return;
-            }
-
-            if (player.Money < company.WeekRentValue)
-            {
-                player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, company.WeekRentValue));
-                return;
-            }
-
-            await player.RemoveStackedItem(ItemCategory.Money, company.WeekRentValue);
-
-            company.CharacterId = player.Character.Id;
-            company.RentPaymentDate = DateTime.Now.AddDays(7);
-            company.RemoveIdentifier();
-
-            await using var context = new DatabaseContext();
-            context.Companies.Update(company);
-            await context.SaveChangesAsync();
-
-            await player.GravarLog(LogType.Company, $"/alugarempresa {company.Id} {company.WeekRentValue}", null);
-
-            player.SendMessage(MessageType.Success, $"Você alugou a empresa {company.Name} [{company.Id}] por 7 dias por ${company.WeekRentValue:N0}.");
-            player.SendMessage(MessageType.Success, $"O próximo pagamento será em {company.RentPaymentDate} e será debitado da sua conta bancária. Se você não possuir este valor, a empresa será retirada do seu nome.");
-        }
-
-        [Command("empresa")]
-        public static void CMD_empresa(MyPlayer player)
-        {
-            if (player.Companies.Count == 0)
-            {
-                player.SendMessage(MessageType.Error, "Você não está em nenhuma empresa.");
-                return;
-            }
-
-            player.Emit("Companies", false, Functions.GetCompaniesByCharacterHTML(player));
-        }
-
-        [Command("tunarver", "/tunarver (ID ou nome)")]
-        public static void CMD_tunarver(MyPlayer player, string idNome)
-        {
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
-            if (target == null)
-                return;
-
-            if (target.Character.Job != CharacterJob.Mechanic || !target.OnDuty)
-            {
-                player.SendMessage(MessageType.Error, "O jogador não é mecânico ou não está em serviço.");
-                return;
-            }
-
-            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE || player.Dimension != target.Dimension)
-            {
-                player.SendMessage(MessageType.Error, "Jogador não está próximo de você.");
-                return;
-            }
-
-            Functions.CMDTuning(player, target, false);
         }
     }
 }

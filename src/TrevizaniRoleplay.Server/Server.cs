@@ -202,7 +202,8 @@ namespace TrevizaniRoleplay.Server
             Global.QuestionsAnswers = await context.QuestionsAnswers.ToListAsync();
             Alt.Log($"QuestionsAnswers: {Global.QuestionsAnswers.Count}");
 
-            Global.Dealerships.ForEach(x => Functions.CreateMarkerColShape($"[{x.Name}] {{#FFFFFF}}Use /comprar ou /vupgrade.", x.Position));
+            foreach (var dealership in Global.Dealerships)
+                Functions.CreateMarkerColShape($"[{dealership.Name}] {{#FFFFFF}}Use /comprar ou /vupgrade.", dealership.Position);
             Alt.Log($"Dealerships: {Global.Dealerships.Count}");
 
             foreach (var job in Global.Jobs)
@@ -324,7 +325,7 @@ namespace TrevizaniRoleplay.Server
                         if (prop == null)
                             continue;
 
-                        prop.CharacterId = null;
+                        prop.RemoveOwner();
                         prop.CreateIdentifier();
 
                         context.Properties.Update(prop);

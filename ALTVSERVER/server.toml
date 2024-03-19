@@ -2,7 +2,7 @@ announcementDiscordChannel = 1218597555584368640
 companyAnnouncementDiscordChannel = 1218597579516936213
 dbConnectionString = 'Host=localhost;Port=5432;Database=trevizaniroleplay;User ID=postgres;Password=159357;Pooling=true;'
 debug = true
-discordBotToken = 'MTIxODU5NjczMzg2OTYyMTQ1MA.GhFhG6.LxUHiXRVBi2noxOaMl-V5t9XWXHzbM8auEwImI'
+discordBotToken = ''
 gamemode = 'Roleplay'
 governmentAnnouncementDiscordChannel = 1218597600161435779
 language = 'pt'

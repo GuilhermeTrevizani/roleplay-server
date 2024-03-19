@@ -89,5 +89,28 @@ namespace TrevizaniRoleplay.Domain.Entities
         {
             ExtraPayment += extraPayment;
         }
+
+        public void SetEvaluatingStaffUser(Guid userId)
+        {
+            EvaluatingStaffUserId = userId;
+        }
+
+        public void AcceptAplication(Guid userId)
+        {
+            EvaluatorStaffUserId = userId;
+            EvaluatingStaffUserId = null;
+        }
+
+        public void RejectApplication(Guid userId, string reason)
+        {
+            EvaluatorStaffUserId = userId;
+            EvaluatingStaffUserId = null;
+            RejectionReason = reason;
+        }
+
+        public void SetJailFinalDate(DateTime date)
+        {
+            JailFinalDate = date;
+        }
     }
 }

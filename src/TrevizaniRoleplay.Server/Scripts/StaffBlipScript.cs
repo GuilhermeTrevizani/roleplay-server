@@ -2,6 +2,7 @@
 using AltV.Net.Async;
 using AltV.Net.Data;
 using System.Numerics;
+using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
@@ -19,7 +20,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffBlips", false, Functions.GetBlipsHTML());
+            player.Emit("StaffBlips", false, GetBlipsHTML());
         }
 
         [ClientEvent(nameof(StaffBlipGoto))]
@@ -83,7 +84,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Blip | {Functions.Serialize(blip)}", null);
 
-            var html = Functions.GetBlipsHTML();
+            var html = GetBlipsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Blips)))
                 target.Emit("StaffBlips", true, html);
         }
@@ -110,9 +111,36 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Blip {id} excluído.");
 
-            var html = Functions.GetBlipsHTML();
+            var html = GetBlipsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Blips)))
                 target.Emit("StaffBlips", true, html);
+        }
+
+        private static string GetBlipsHTML()
+        {
+            var html = string.Empty;
+            if (Global.Blips.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há blips criados.</td></tr>";
+            }
+            else
+            {
+                foreach (var blip in Global.Blips.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{blip.Id}</td>
+                        <td>{blip.Name}</td>
+                        <td>{blip.Type}</td>
+                        <td>{blip.Color}</td>
+                        <td>X: {blip.PosX} | Y: {blip.PosY} | Z: {blip.PosZ}</td>
+                        <td class='text-center'>
+                            <input id='json{blip.Id}' type='hidden' value='{Functions.Serialize(blip)}' />
+                            <button onclick='ir({blip.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='editar({blip.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='excluir(this, {blip.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

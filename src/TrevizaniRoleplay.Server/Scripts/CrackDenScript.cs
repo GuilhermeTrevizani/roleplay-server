@@ -1,10 +1,12 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
+using AltV.Net.Data;
 using Microsoft.EntityFrameworkCore;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
+using TrevizaniRoleplay.Server.Models;
 
 namespace TrevizaniRoleplay.Server.Scripts
 {
@@ -104,12 +106,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Você vendeu {quantity}x {item.ItemCategory.GetDisplay()} por ${value:N0}.", true);
             await player.GravarLog(LogType.Drug, $"Vender Boca de Fumo {item.CrackDenId} {item.ItemCategory} {quantity}", null);
 
-            player.Emit("ShowCrackDen", true, Functions.GetCrackDensItemsHTML(item.CrackDenId, false));
+            player.Emit("ShowCrackDen", true, GetCrackDensItemsHTML(item.CrackDenId));
         }
 
         [AsyncClientEvent(nameof(CrackDenShowSells))]
-        public async Task CrackDenShowSells(MyPlayer player, int id)
+        public async Task CrackDenShowSells(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             await player.GravarLog(LogType.ViewCrackDenSales, id.ToString(), null);
 
             await using var context = new DatabaseContext();
@@ -158,6 +161,51 @@ namespace TrevizaniRoleplay.Server.Scripts
             </div>";
 
             player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"50 últimas vendas da Boca de Fumo {id}", html));
+        }
+
+        [Command("bocafumo")]
+        public static void CMD_bocafumo(MyPlayer player)
+        {
+            var crackDen = Global.CrackDens.FirstOrDefault(x =>
+                player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ)) <= Global.RP_DISTANCE
+                && x.Dimension == player.Dimension);
+            if (crackDen == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está próximo de nenhuma boca de fumo.");
+                return;
+            }
+
+            var html = GetCrackDensItemsHTML(crackDen.Id);
+
+            player.Emit("ShowCrackDen",
+                false,
+                html,
+                crackDen.Id);
+        }
+
+        private static string GetCrackDensItemsHTML(Guid crackDenId)
+        {
+            var html = string.Empty;
+            var items = Global.CrackDensItems.Where(x => x.CrackDenId == crackDenId);
+            if (!items.Any())
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há itens criados.</td></tr>";
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{item.Id}</td>
+                        <td>{item.ItemCategory.GetDisplay()}</td>
+                        <td>${item.Value:N0}</td>
+                        <td class='text-center'>
+                            <button onclick='sell({item.Id})' type='button' class='btn btn-dark btn-sm'>VENDER</button>
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
         }
     }
 }

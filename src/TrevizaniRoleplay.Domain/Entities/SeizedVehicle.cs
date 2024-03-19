@@ -11,7 +11,17 @@
         public Guid FactionId { get; private set; }
         public string? Description { get; private set; }
 
+        public Vehicle? Vehicle { get; private set; }
         public Character? PoliceOfficerCharacter { get; private set; }
         public Faction? Faction { get; private set; }
+
+        public void Create(Guid vehicleId, Guid policeOfficerCharacterId, int value, string reason, Guid factionId)
+        {
+            VehicleId = vehicleId;
+            PoliceOfficerCharacterId = policeOfficerCharacterId;
+            Value = value;
+            Reason = reason;
+            FactionId = factionId;
+        }
     }
 }

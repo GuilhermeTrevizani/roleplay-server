@@ -44,5 +44,40 @@ namespace TrevizaniRoleplay.Domain.Entities
 
         [NotMapped]
         public string Name => string.IsNullOrWhiteSpace(DiscordDisplayName) ? DiscordUsername : DiscordDisplayName;
+
+        public void SetVIP(UserVIP vip, int months)
+        {
+            VIP = vip;
+            VIPValidDate = (VIPValidDate > DateTime.Now && VIP == vip ? VIPValidDate.Value : DateTime.Now).AddMonths(months);
+            NameChanges += vip switch
+            {
+                UserVIP.Gold => 4,
+                UserVIP.Silver => 3,
+                _ => 2,
+            };
+
+            ForumNameChanges += vip switch
+            {
+                UserVIP.Gold => 2,
+                _ => 1,
+            };
+
+            PlateChanges += vip switch
+            {
+                UserVIP.Gold => 2,
+                UserVIP.Silver => 1,
+                _ => 0,
+            };
+        }
+
+        public void AddCharacterApplicationsQuantity()
+        {
+            CharacterApplicationsQuantity++;
+        }
+
+        public void AddHelpRequestsAnswersQuantity()
+        {
+            HelpRequestsAnswersQuantity++;
+        }
     }
 }

@@ -219,7 +219,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 await context.SaveChangesAsync();
 
                 player.OnDuty = !player.OnDuty;
-                player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} {(player.OnDuty ? "entrou em" : "saiu de")} serviço.");
+                player.SendFactionMessage($"{player.FactionRank!.Name} {player.Character.Name} {(player.OnDuty ? "entrou em" : "saiu de")} serviço.");
             }
         }
     }

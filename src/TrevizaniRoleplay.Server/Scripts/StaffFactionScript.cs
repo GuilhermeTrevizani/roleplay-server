@@ -30,7 +30,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            player.Emit("StaffFactions", false, Functions.GetFactionsHTML(), jsonTypes);
+            player.Emit("StaffFactions", false, GetFactionsHTML(), jsonTypes);
         }
 
         [AsyncClientEvent(nameof(StaffFactionSave))]
@@ -81,7 +81,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Facção | {Functions.Serialize(faction)}", null);
 
-            var html = Functions.GetFactionsHTML();
+            var html = GetFactionsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 target.Emit("StaffFactions", true, html);
         }
@@ -436,6 +436,34 @@ namespace TrevizaniRoleplay.Server.Scripts
             var html = await Functions.GetFactionMembersHTML(factionId);
             foreach (var targetStaff in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 targetStaff.Emit("StaffShowFactionMembers", true, html);
+        }
+
+        private static string GetFactionsHTML()
+        {
+            var html = string.Empty;
+            if (Global.Factions.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='7'>Não há facções criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var faction in Global.Factions.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{faction.Id}</td>
+                        <td>{faction.Name}</td>
+                        <td>{faction.Type.GetDisplay()}</td>
+                        <td><span style='color:#{faction.Color}'>#{faction.Color}</span></td>
+                        <td><span style='color:#{faction.ChatColor}'>#{faction.ChatColor}</span></td>
+                        <td>{faction.Slots}</td>
+                        <td class='text-center'>
+                            <input id='json{faction.Id}' type='hidden' value='{Functions.Serialize(faction)}' />
+                            <button onclick='editar({faction.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='ranks({faction.Id})' type='button' class='btn btn-dark btn-sm'>RANKS</button>
+                            <button onclick='members({faction.Id})' type='button' class='btn btn-dark btn-sm'>MEMBROS</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

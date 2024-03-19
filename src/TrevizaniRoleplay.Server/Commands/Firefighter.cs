@@ -7,7 +7,7 @@ namespace TrevizaniRoleplay.Server.Commands
     public class Firefighter
     {
         [Command("curar", "/curar (ID ou nome)")]
-        public static void CMD_curar(MyPlayer player, string idNome)
+        public static void CMD_curar(MyPlayer player, string idOrName)
         {
             if (player.Faction?.Type != FactionType.Firefighter || !player.OnDuty)
             {
@@ -15,7 +15,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 

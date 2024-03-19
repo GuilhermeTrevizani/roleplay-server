@@ -94,5 +94,10 @@ namespace TrevizaniRoleplay.Domain.Entities
         {
             Sold = true;
         }
+
+        public void SetSeizedValue(int value)
+        {
+            SeizedValue = value;
+        }
     }
 }

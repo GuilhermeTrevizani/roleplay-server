@@ -4,6 +4,7 @@ using AltV.Net.Data;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -20,11 +21,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffDoors", false, Functions.GetDoorsHTML());
+            player.Emit("StaffDoors", false, GetDoorsHTML());
         }
 
         [ClientEvent(nameof(StaffDoorGoto))]
-        public static void StaffDoorGoto(MyPlayer player, int id)
+        public static void StaffDoorGoto(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Doors))
             {
@@ -32,6 +33,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var door = Global.Doors.FirstOrDefault(x => x.Id == id);
             if (door == null)
                 return;
@@ -41,7 +43,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffDoorRemove))]
-        public static async Task StaffDoorRemove(MyPlayer player, int id)
+        public static async Task StaffDoorRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Doors))
             {
@@ -49,6 +51,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var door = Global.Doors.FirstOrDefault(x => x.Id == id);
             if (door == null)
                 return;
@@ -62,7 +65,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Porta {door.Id} excluída.");
 
-            var html = Functions.GetDoorsHTML();
+            var html = GetDoorsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Doors)))
                 target.Emit("StaffDoors", true, html);
 
@@ -122,9 +125,38 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Porta | {Functions.Serialize(door)}", null);
 
-            var html = Functions.GetDoorsHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.Doors)))
+            var html = GetDoorsHTML();
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Doors)))
                 target.Emit("StaffDoors", true, html);
+        }
+
+        private static string GetDoorsHTML()
+        {
+            var html = string.Empty;
+            if (Global.Doors.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='8'>Não há portas criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var door in Global.Doors.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{door.Id}</td>
+                        <td>{door.Name}</td>
+                        <td>{door.Hash}</td>
+                        <td>X: {door.PosX} | Y: {door.PosY} | Z: {door.PosZ}</td>
+                        <td>{door.FactionId}</td>
+                        <td>{door.CompanyId}</td>
+                        <td class='text-center'>{(door.Locked ? "SIM" : "NÃO")}</td>
+                        <td class='text-center'>
+                            <input id='json{door.Id}' type='hidden' value='{Functions.Serialize(door)}' />
+                            <button onclick='goto({door.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({door.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {door.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

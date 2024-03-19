@@ -13,7 +13,7 @@ namespace TrevizaniRoleplay.Server.Commands
     public class Staff
     {
         [Command("ban", "/ban (ID ou nome) (dias [0 para permanente]) (motivo)", GreedyArg = true)]
-        public static async Task CMD_ban(MyPlayer player, string idNome, int days, string reason)
+        public static async Task CMD_ban(MyPlayer player, string idOrName, int days, string reason)
         {
             if (player.User.Staff < UserStaff.GameAdministrator)
             {
@@ -21,7 +21,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -173,7 +173,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("vip", "/vip (usuário) (nível) (meses)")]
-        public static async Task CMD_vip(MyPlayer player, string usuario, int nivelVip, int meses)
+        public static async Task CMD_vip(MyPlayer player, string usuario, int nivelVip, int months)
         {
             if (player.User?.Staff < UserStaff.Manager)
             {
@@ -196,36 +196,12 @@ namespace TrevizaniRoleplay.Server.Commands
             }
 
             var vip = (UserVIP)nivelVip;
-            user.VIP = vip;
-            user.VIPValidDate = (user.VIPValidDate > DateTime.Now && user.VIP == vip ? user.VIPValidDate.Value : DateTime.Now).AddMonths(meses);
-            user.NameChanges += vip switch
-            {
-                UserVIP.Gold => 4,
-                UserVIP.Silver => 3,
-                _ => 2,
-            };
-
-            user.ForumNameChanges += vip switch
-            {
-                UserVIP.Gold => 2,
-                _ => 1,
-            };
-
-            user.PlateChanges += vip switch
-            {
-                UserVIP.Gold => 2,
-                UserVIP.Silver => 1,
-                _ => 0,
-            };
+            user.SetVIP(vip, months);
 
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
             if (target != null)
             {
-                target.User.VIP = user.VIP;
-                target.User.VIPValidDate = user.VIPValidDate;
-                target.User.NameChanges = user.NameChanges;
-                target.User.ForumNameChanges = user.ForumNameChanges;
-                target.User.PlateChanges = user.PlateChanges;
+                target.User = user;
                 target.SendMessage(MessageType.Success, $"{player.User!.Name} alterou seu nível VIP para {vip.GetDisplay()} expirando em {user.VIPValidDate}.");
             }
             else
@@ -234,12 +210,12 @@ namespace TrevizaniRoleplay.Server.Commands
                 await context.SaveChangesAsync();
             }
 
-            await player.GravarLog(LogType.Staff, $"/vip {user.Id} {vip} {meses}", target);
+            await player.GravarLog(LogType.Staff, $"/vip {user.Id} {vip} {months}", target);
             player.SendMessage(MessageType.Success, $"Você alterou o nível VIP de {user.Name} para {vip.GetDisplay()} expirando em {user.VIPValidDate}.");
         }
 
         [Command("ir", "/ir (ID ou nome)")]
-        public static void CMD_ir(MyPlayer player, string idNome)
+        public static void CMD_ir(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -247,7 +223,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -260,7 +236,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("trazer", "/trazer (ID ou nome)")]
-        public static void CMD_trazer(MyPlayer player, string idNome)
+        public static void CMD_trazer(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -268,7 +244,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -281,7 +257,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("tp", "/tp (ID ou nome) (ID ou nome)")]
-        public static void CMD_tp(MyPlayer player, string idNome, string idNomeDestino)
+        public static void CMD_tp(MyPlayer player, string idOrName, string idOrNameDestino)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -289,11 +265,11 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
-            var targetDest = player.ObterPersonagemPorIdNome(idNomeDestino, false);
+            var targetDest = player.ObterPersonagemPoridOrName(idOrNameDestino, false);
             if (targetDest == null)
                 return;
 
@@ -330,7 +306,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("kick", "/kick (ID ou nome) (motivo)", GreedyArg = true)]
-        public static async Task CMD_kick(MyPlayer player, string idNome, string reason)
+        public static async Task CMD_kick(MyPlayer player, string idOrName, string reason)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -338,7 +314,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -449,31 +425,30 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var sos = Global.HelpRequests.FirstOrDefault(x => x.CharacterSessionId == codigo);
-            if (sos == null)
+            var helpRequest = Global.HelpRequests.FirstOrDefault(x => x.CharacterSessionId == codigo);
+            if (helpRequest == null)
             {
                 player.SendMessage(MessageType.Error, $"SOS {codigo} não existe.");
                 return;
             }
 
-            var target = await sos.Check();
+            var target = await helpRequest.Check();
             if (target == null)
             {
                 player.SendMessage(MessageType.Error, $"Jogador do SOS não está conectado.");
                 return;
             }
 
-            sos.AnswerDate = DateTime.Now;
-            sos.StaffUserId = player.User.Id;
+            helpRequest.Answer(player.User.Id);
 
             await using var context = new DatabaseContext();
-            context.HelpRequests.Update(sos);
+            context.HelpRequests.Update(helpRequest);
             await context.SaveChangesAsync();
-            Global.HelpRequests.Remove(sos);
+            Global.HelpRequests.Remove(helpRequest);
 
-            player.User.HelpRequestsAnswersQuantity++;
+            player.User.AddHelpRequestsAnswersQuantity();
 
-            await Functions.SendStaffMessage($"{player.User.Name} atendeu o pedido de ajuda de {sos.CharacterName} [{sos.CharacterSessionId}] ({sos.UserName}).", true);
+            await Functions.SendStaffMessage($"{player.User.Name} atendeu o pedido de ajuda de {helpRequest.CharacterName} [{helpRequest.CharacterSessionId}] ({helpRequest.UserName}).", true);
             target.SendMessage(MessageType.Success, $"{player.User.Name} atendeu o seu pedido de ajuda.");
 
             var html = Functions.GetSOSJSON();
@@ -482,7 +457,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("spec", "/spec (ID ou nome)")]
-        public static async Task CMD_spec(MyPlayer player, string idNome)
+        public static async Task CMD_spec(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -496,7 +471,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -550,7 +525,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("aferimentos", "/aferimentos (ID ou nome)")]
-        public static void CMD_aferimentos(MyPlayer player, string idNome)
+        public static void CMD_aferimentos(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -558,7 +533,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -583,7 +558,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 <tbody>";
 
             foreach (var x in target.Wounds)
-                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.Arma}</td><td>{x.Dano}</td><td>{Functions.GetBodyPartName(x.BodyPart)}</td><td>{x.Attacker}</td><td>{x.Distancia}</td></tr>";
+                html += $@"<tr><td>{x.Date}</td><td>{(WeaponModel)x.Weapon}</td><td>{x.Damage}</td><td>{Functions.GetBodyPartName(x.BodyPart)}</td><td>{x.Attacker}</td><td>{x.Distance}</td></tr>";
 
             html += $@"
                 </tbody>
@@ -614,7 +589,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("acurar", "/acurar (ID ou nome)")]
-        public static async Task CMD_acurar(MyPlayer player, string idNome)
+        public static async Task CMD_acurar(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -622,7 +597,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -717,7 +692,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("checar", "/checar (ID ou nome)")]
-        public static async Task CMD_checar(MyPlayer player, string idNome)
+        public static async Task CMD_checar(MyPlayer player, string idOrName)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -725,7 +700,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome);
+            var target = player.ObterPersonagemPoridOrName(idOrName);
             if (target == null)
                 return;
 
@@ -877,11 +852,11 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            app.EvaluatingStaffUserId = player.User.Id;
+            app.SetEvaluatingStaffUser(player.User.Id);
             context.Update(app);
             await context.SaveChangesAsync();
 
-            player.User.CharacterApplicationsQuantity++;
+            player.User.AddCharacterApplicationsQuantity();
 
             ShowHTML();
         }
@@ -905,8 +880,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            app.EvaluatorStaffUserId = player.User.Id;
-            app.EvaluatingStaffUserId = null;
+            app.AcceptAplication(player.User.Id);
             context.Update(app);
             await context.SaveChangesAsync();
 
@@ -916,7 +890,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("negarapp", "/negarapp (motivo)", GreedyArg = true)]
-        public static async Task CMD_negarapp(MyPlayer player, string motivo)
+        public static async Task CMD_negarapp(MyPlayer player, string reason)
         {
             if (player.User.Staff < UserStaff.Moderator)
             {
@@ -934,15 +908,13 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            app.EvaluatorStaffUserId = player.User.Id;
-            app.EvaluatingStaffUserId = null;
-            app.RejectionReason = motivo;
+            app.RejectApplication(player.User.Id, reason);
             context.Update(app);
             await context.SaveChangesAsync();
 
-            await Functions.SendDiscordMessage(app.User!.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
+            await Functions.SendDiscordMessage(app.User!.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{reason}</strong>");
 
-            player.SendMessage(MessageType.Success, $"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{motivo}**");
+            player.SendMessage(MessageType.Success, $"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{reason}**");
         }
 
         [Command("apps")]

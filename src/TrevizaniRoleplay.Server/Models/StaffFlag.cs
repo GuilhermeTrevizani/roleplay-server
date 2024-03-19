@@ -16,8 +16,8 @@ namespace TrevizaniRoleplay.Server.Models
         [Display(Name = "Facções")]
         Factions = 4,
 
-        [Display(Name = "Arsenais de Facções")]
-        FactionsArmories = 5,
+        [Display(Name = "Armazenamentos de Facções")]
+        FactionsStorages = 5,
 
         [Display(Name = "Propriedades")]
         Properties = 6,
@@ -25,11 +25,13 @@ namespace TrevizaniRoleplay.Server.Models
         [Display(Name = "Pontos")]
         Spots = 7,
 
+        [Display(Name = "Blips")]
         Blips = 8,
 
         [Display(Name = "Veículos")]
         Vehicles = 9,
 
+        [Display(Name = "CK")]
         CK = 10,
 
         [Display(Name = "Dar Item")]

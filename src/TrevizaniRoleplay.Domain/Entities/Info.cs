@@ -12,5 +12,16 @@
         public string Message { get; private set; } = string.Empty;
 
         public User? User { get; set; }
+
+        public void Create(float posX, float posY, float posZ, int dimension, int days, Guid userId, string message)
+        {
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            Dimension = dimension;
+            ExpirationDate = DateTime.Now.AddDays(days);
+            UserId = userId;
+            Message = message;
+        }
     }
 }

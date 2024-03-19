@@ -25,5 +25,15 @@ namespace TrevizaniRoleplay.Domain.Entities
         public Character? Character { get; private set; }
         public ICollection<PropertyFurniture>? Furnitures { get; set; }
         public ICollection<PropertyItem>? Items { get; set; }
+
+        public void RemoveOwner()
+        {
+            CharacterId = null;
+            Locked = false;
+            ProtectionLevel = 0;
+            RobberyValue = 0;
+            RobberyCooldown = null;
+            LockNumber = 0;
+        }
     }
 }

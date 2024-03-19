@@ -18,7 +18,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffFurnitures", false, Functions.GetFurnituresHTML());
+            player.Emit("StaffFurnitures", false, GetFurnituresHTML());
         }
 
         [AsyncClientEvent(nameof(StaffFurnitureSave))]
@@ -61,13 +61,13 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Mobília | {Functions.Serialize(furniture)}", null);
 
-            var html = Functions.GetFurnituresHTML();
+            var html = GetFurnituresHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Furnitures)))
                 target.Emit("StaffFurnitures", true, html);
         }
 
         [AsyncClientEvent(nameof(StaffFurnitureRemove))]
-        public static async Task StaffFurnitureRemove(MyPlayer player, int id)
+        public static async Task StaffFurnitureRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Furnitures))
             {
@@ -75,6 +75,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var furniture = Global.Furnitures.FirstOrDefault(x => x.Id == id);
             if (furniture != null)
             {
@@ -87,9 +88,35 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Mobília {id} excluída.");
 
-            var html = Functions.GetFurnituresHTML();
+            var html = GetFurnituresHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Furnitures)))
                 target.Emit("StaffFurnitures", true, html);
+        }
+
+        private static string GetFurnituresHTML()
+        {
+            var html = string.Empty;
+            if (Global.Furnitures.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='6'>Não há mobílias criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var furniture in Global.Furnitures.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{furniture.Id}</td>
+                        <td>{furniture.Category}</td>
+                        <td>{furniture.Name}</td>
+                        <td>{furniture.Model}</td>
+                        <td>${furniture.Value:N0}</td>
+                        <td class='text-center'>
+                            <input id='json{furniture.Id}' type='hidden' value='{Functions.Serialize(furniture)}' />
+                            <button onclick='edit({furniture.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {furniture.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

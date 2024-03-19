@@ -13,6 +13,24 @@ namespace TrevizaniRoleplay.Server.Scripts
 {
     public class VehicleScript : IScript
     {
+        [Command("tunarcomprar")]
+        public static void CMD_tunarcomprar(MyPlayer player)
+        {
+            if (player.Character.Job != CharacterJob.Mechanic)
+            {
+                player.SendMessage(MessageType.Error, "Você não é um mecânico.");
+                return;
+            }
+
+            if (!player.OnDuty)
+            {
+                player.SendMessage(MessageType.Error, "Você não está em serviço.");
+                return;
+            }
+
+            Functions.CMDTuning(player, null, false);
+        }
+
         [Command("motor")]
         public static void CMD_motor(MyPlayer player) => Functions.CMDMotor(player);
 
@@ -146,7 +164,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("vvender", "/vvender (ID ou nome) (valor)")]
-        public static void CMD_vvender(MyPlayer player, string idNome, int valor)
+        public static void CMD_vvender(MyPlayer player, string idOrName, int valor)
         {
             var prox = Global.Vehicles
                 .Where(x => x.VehicleDB.CharacterId == player.Character.Id
@@ -160,7 +178,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -1862,6 +1880,118 @@ namespace TrevizaniRoleplay.Server.Scripts
             veh.SetDefaultMods();
 
             player.Emit("VehicleTuning:Close");
+        }
+
+        [Command("tunarver", "/tunarver (ID ou nome)")]
+        public static void CMD_tunarver(MyPlayer player, string idOrName)
+        {
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            if (target == null)
+                return;
+
+            if (target.Character.Job != CharacterJob.Mechanic || !target.OnDuty)
+            {
+                player.SendMessage(MessageType.Error, "O jogador não é mecânico ou não está em serviço.");
+                return;
+            }
+
+            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE || player.Dimension != target.Dimension)
+            {
+                player.SendMessage(MessageType.Error, "Jogador não está próximo de você.");
+                return;
+            }
+
+            Functions.CMDTuning(player, target, false);
+        }
+
+        [Command("colocar", "/colocar (ID ou nome)")]
+        public static async Task CMD_colocar(MyPlayer player, string idOrName)
+        {
+            if (player.IsInVehicle)
+            {
+                player.SendMessage(MessageType.Error, "Você não pode fazer isso dentro de um veículo");
+                return;
+            }
+
+            var veh = Global.Vehicles.Where(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= Global.RP_DISTANCE
+                && x.Dimension == player.Dimension
+                && x.LockState == VehicleLockState.Unlocked)
+                .OrderBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)))
+                .FirstOrDefault();
+
+            if (veh == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está próximo de nenhum veículo destrancado.");
+                return;
+            }
+
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            if (target == null)
+                return;
+
+            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE
+                || player.Dimension != target.Dimension
+                || !target.Cuffed
+                || target.IsInVehicle)
+            {
+                player.SendMessage(MessageType.Error, "Jogador não está próximo de você ou não está algemado.");
+                return;
+            }
+
+            var passageiros = Global.SpawnedPlayers.Where(x => x.Vehicle == veh && x != veh.Driver).ToList();
+
+            if (!passageiros.Any(x => x.Seat == 3))
+            {
+                target.SetIntoVehicle(veh, 3);
+            }
+            else if (!passageiros.Any(x => x.Seat == 4))
+            {
+                target.SetIntoVehicle(veh, 4);
+            }
+            else
+            {
+                player.SendMessage(MessageType.Error, $"Todos os assentos traseiros do veículo estão ocupados.");
+                return;
+            }
+
+            player.SendMessage(MessageType.Success, $"Você colocou {target.ICName} dentro do veículo.");
+            target.SendMessage(MessageType.Success, $"{player.ICName} colocou você dentro do veículo.");
+            await player.GravarLog(LogType.PutInVehicle, veh.VehicleDB.Id.ToString(), target);
+        }
+
+        [Command("retirar", "/retirar (ID ou nome)")]
+        public static async Task CMD_retirar(MyPlayer player, string idOrName)
+        {
+            if (player.IsInVehicle)
+            {
+                player.SendMessage(MessageType.Error, "Você não pode fazer isso dentro de um veículo");
+                return;
+            }
+
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            if (target == null)
+                return;
+
+
+            if (player.Position.Distance(target.Position) > Global.RP_DISTANCE
+                || player.Dimension != target.Dimension
+                || !target.Cuffed
+                || !target.IsInVehicle
+                || target.Vehicle is not MyVehicle veh
+                || veh.LockState != VehicleLockState.Unlocked)
+            {
+                player.SendMessage(MessageType.Error, "Jogador não está próximo de você ou não está algemado em um veículo destrancado.");
+                return;
+            }
+
+            var vehId = veh.VehicleDB.Id;
+            var pos = player.Position;
+            pos.Y += 1.5f;
+            target.SetPosition(pos, target.Dimension, false);
+
+            player.SendMessage(MessageType.Success, $"Você retirou {target.ICName} do veículo.");
+            target.SendMessage(MessageType.Success, $"{player.ICName} retirou você de dentro do veículo.");
+            await player.GravarLog(LogType.RemoveFromVehicle, vehId.ToString(), target);
         }
     }
 }

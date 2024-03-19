@@ -4,6 +4,7 @@ using AltV.Net.Enums;
 using Microsoft.EntityFrameworkCore;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -20,7 +21,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffVehicles", false, await Functions.GetVehiclesHTML());
+            player.Emit("StaffVehicles", false, await GetVehiclesHTML());
         }
 
         [Command("atunar")]
@@ -151,7 +152,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Veículo | {Functions.Serialize(vehicle)}", null);
 
-            var html = await Functions.GetVehiclesHTML();
+            var html = await GetVehiclesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Vehicles)))
                 target.Emit("StaffVehicles", true, html);
         }
@@ -184,9 +185,43 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Veículo {id} excluído.");
 
-            var html = await Functions.GetVehiclesHTML();
+            var html = await GetVehiclesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Vehicles)))
                 target.Emit("StaffVehicles", true, html);
+        }
+
+        private static async Task<string> GetVehiclesHTML()
+        {
+            var html = string.Empty;
+            await using var context = new DatabaseContext();
+            var vehicles = await context.Vehicles
+                .Where(x => !x.Sold && (
+                    x.Job != CharacterJob.None
+                    || x.FactionId.HasValue
+                    || (x.CharacterId.HasValue && x.FactionGift)))
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+            if (vehicles.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='6'>Não há veículos criados para facções, aluguel de empregos ou benefícios de personagens de facções.</td></tr>";
+            }
+            else
+            {
+                foreach (var vehicle in vehicles)
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{vehicle.Id}</td>
+                        <td>{vehicle.Model}</td>
+                        <td>{vehicle.Job.GetDisplay()}</td>
+                        <td>{vehicle.FactionId}</td>
+                        <td>{vehicle.CharacterId}</td>
+                        <td class='text-center'>
+                            <input id='json{vehicle.Id}' type='hidden' value='{Functions.Serialize(vehicle)}' />
+                            <button onclick='edit({vehicle.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {vehicle.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

@@ -4,6 +4,7 @@ using AltV.Net.Data;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -80,7 +81,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Empresa | {Functions.Serialize(company)}", null);
 
-            var html = Functions.GetCompaniesHTML();
+            var html = GetCompaniesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Companies)))
                 target.Emit("StaffCompanies", true, html);
         }
@@ -107,7 +108,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Empresa {id} excluída.");
 
-            var html = Functions.GetCompaniesHTML();
+            var html = GetCompaniesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Companies)))
                 target.Emit("StaffCompanies", true, html);
         }
@@ -130,9 +131,42 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Dono da empresa {id} removido.");
 
-            var html = Functions.GetCompaniesHTML();
+            var html = GetCompaniesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Companies)))
                 target.Emit("StaffCompanies", true, html);
+        }
+
+        public static string GetCompaniesHTML()
+        {
+            var html = string.Empty;
+            if (Global.Companies.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='11'>Não há empresas criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var company in Global.Companies.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{company.Id}</td>
+                        <td>{company.Name}</td>
+                        <td>X: {company.PosX} | Y: {company.PosY} | Z: {company.PosZ}</td>
+                        <td>${company.WeekRentValue:N0}</td>
+                        <td>{company.RentPaymentDate}</td>
+                        <td>{company.CharacterId}</td>
+                        <td><span style='color:#{company.Color}'>#{company.Color}</span></td>
+                        <td>{company.BlipType}</td>
+                        <td>{company.BlipColor}</td>
+                        <td class='text-center'>{(company.GetIsOpen() ? "SIM" : "NÃO")}</td>
+                        <td class='text-center'>
+                            <input id='json{company.Id}' type='hidden' value='{Functions.Serialize(company)}' />
+                            <button onclick='goto({company.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({company.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            {(company.CharacterId.HasValue ? $"<button onclick='removeOwner(this, {company.Id})' type='button' class='btn btn-dark btn-sm'>REMOVER DONO</button>" : string.Empty)}
+                            <button onclick='remove(this, {company.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

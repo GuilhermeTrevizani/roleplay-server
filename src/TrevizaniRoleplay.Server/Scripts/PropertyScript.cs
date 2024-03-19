@@ -1,8 +1,10 @@
 ﻿using AltV.Net;
+using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Enums;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -11,7 +13,7 @@ namespace TrevizaniRoleplay.Server.Scripts
     public class PropertyScript : IScript
     {
         [Command("pvender", "/pvender (ID ou nome) (valor)")]
-        public static void CMD_pvender(MyPlayer player, string idNome, int valor)
+        public static void CMD_pvender(MyPlayer player, string idOrName, int valor)
         {
             var prop = Global.Properties
                 .Where(x => x.CharacterId == player.Character.Id
@@ -29,7 +31,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -59,12 +61,12 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("pvendergoverno")]
-        public static async Task CMD_pvendergoverno(MyPlayer player) => await Functions.CMDVenderPropriedadeGoverno(player, false);
+        public static async Task CMD_pvendergoverno(MyPlayer player) => await CMDVenderPropriedadeGoverno(player, false);
 
         [Command("armazenamento")]
         public static void CMD_armazenamento(MyPlayer player)
         {
-            var prop = Global.Properties.FirstOrDefault(x => x.Id == player.Dimension);
+            var prop = Global.Properties.FirstOrDefault(x => x.Number == player.Dimension);
             if (prop == null)
             {
                 player.SendMessage(MessageType.Error, "Você não está no interior de uma propriedade.");
@@ -280,7 +282,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var prop = Global.Properties.FirstOrDefault(x => x.Id == player.Dimension
+            var prop = Global.Properties.FirstOrDefault(x => x.Number == player.Dimension
                 && !x.Locked
                 && x.CharacterId != player.Character.Id
                 && x.CharacterId.HasValue);
@@ -363,7 +365,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var prop = Global.Properties.FirstOrDefault(x => x.Id == player.Dimension
+            var prop = Global.Properties.FirstOrDefault(x => x.Number == player.Dimension
                 && !x.Locked
                 && x.CharacterId != player.Character.Id
                 && x.CharacterId.HasValue);
@@ -456,6 +458,58 @@ namespace TrevizaniRoleplay.Server.Scripts
             await using var context = new DatabaseContext();
             context.Properties.Update(prop);
             await context.SaveChangesAsync();
+        }
+
+        [AsyncClientEvent(nameof(VenderPropriedade))]
+        public static async Task VenderPropriedade(MyPlayer player) => await CMDVenderPropriedadeGoverno(player, true);
+
+        private static async Task CMDVenderPropriedadeGoverno(MyPlayer player, bool confirm)
+        {
+            var prop = Global.Properties
+                .Where(x => x.CharacterId == player.Character.Id
+                    && player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)) <= Global.RP_DISTANCE)
+                .MinBy(x => player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)));
+            if (prop == null)
+            {
+                player.SendMessage(MessageType.Error, "Você não está próximo de uma propriedade sua.");
+                return;
+            }
+
+            if (prop.RobberyValue > 0)
+            {
+                player.SendMessage(MessageType.Error, Global.ROBBED_PROPERTY_ERROR_MESSAGE);
+                return;
+            }
+
+            var value = Convert.ToInt32(prop.Value / 2) - prop.RobberyValue;
+
+            if (confirm)
+            {
+                var res = await player.GiveItem(new CharacterItem(ItemCategory.Money)
+                {
+                    Quantity = value
+                });
+
+                if (!string.IsNullOrWhiteSpace(res))
+                {
+                    player.SendMessage(MessageType.Error, res);
+                    return;
+                }
+
+                prop.RemoveOwner();
+                prop.CreateIdentifier();
+
+                await using var context = new DatabaseContext();
+                context.Properties.Update(prop);
+                await context.SaveChangesAsync();
+
+                player.SendMessage(MessageType.Success, $"Você vendeu sua propriedade {prop.Id} para o governo por ${value:N0}.");
+                await player.GravarLog(LogType.Sell, $"/pvendergoverno {prop.Id} {value}", null);
+            }
+            else
+            {
+                player.ShowConfirm("Confirmar Venda", $"Confirma vender a propriedade {prop.Id} para o governo por ${value:N0}?", "VenderPropriedade");
+            }
         }
     }
 }

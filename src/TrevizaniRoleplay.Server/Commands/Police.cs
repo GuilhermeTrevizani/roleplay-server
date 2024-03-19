@@ -12,7 +12,7 @@ namespace TrevizaniRoleplay.Server.Commands
     public class Police
     {
         [Command("prender", "/prender (ID ou nome) (minutos)")]
-        public static async Task CMD_prender(MyPlayer player, string idNome, int minutos)
+        public static async Task CMD_prender(MyPlayer player, string idOrName, int minutes)
         {
             if (player.Faction?.Type != FactionType.Police || !player.OnDuty)
             {
@@ -28,7 +28,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -38,30 +38,28 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            if (minutos <= 0)
+            if (minutes <= 0)
             {
                 player.SendMessage(MessageType.Error, "Minutos inválidos.");
                 return;
             }
 
-            target.Character.JailFinalDate = DateTime.Now.AddMinutes(minutos);
-
             await using var context = new DatabaseContext();
-            await context.Jails.AddAsync(new Jail
-            {
-                CharacterId = target.Character.Id,
-                PoliceOfficerCharacterId = player.Character.Id,
-                EndDate = target.Character.JailFinalDate!.Value,
-            });
+            var jail = new Jail();
+            jail.Create(target.Character.Id, player.Character.Id, player.Character.FactionId!.Value, minutes);
+            await context.Jails.AddAsync(jail);
+
             await context.SaveChangesAsync();
 
+            target.Character.SetJailFinalDate(jail.EndDate);
+
             await target.Save();
-            Functions.SendFactionTypeMessage(FactionType.Police, $"{player.FactionRank.Name} {player.Character.Name} prendeu {target.Character.Name} por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.", true, true);
-            await target.ListarPersonagens("Prisão", $"{player.Character.Name} prendeu você por {minutos} minuto{(minutos > 1 ? "s" : string.Empty)}.");
+            Functions.SendFactionTypeMessage(FactionType.Police, $"{player.FactionRank!.Name} {player.Character.Name} prendeu {target.Character.Name} por {minutes} minuto{(minutes > 1 ? "s" : string.Empty)}.", true, true);
+            await target.ListarPersonagens("Prisão", $"{player.Character.Name} prendeu você por {minutes} minuto{(minutes > 1 ? "s" : string.Empty)}.");
         }
 
         [Command("algemar", "/algemar (ID ou nome)")]
-        public static void CMD_algemar(MyPlayer player, string idNome)
+        public static void CMD_algemar(MyPlayer player, string idOrName)
         {
             if (player.Faction?.Type != FactionType.Police)
             {
@@ -69,7 +67,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -96,7 +94,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("apreender", "/apreender (valor) (motivo)", GreedyArg = true)]
-        public static async Task CMD_apreender(MyPlayer player, int valor, string motivo)
+        public static async Task CMD_apreender(MyPlayer player, int value, string reason)
         {
             if (player.Faction?.Type != FactionType.Police || !player.OnDuty)
             {
@@ -112,13 +110,13 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            if (valor <= 0)
+            if (value <= 0)
             {
                 player.SendMessage(MessageType.Error, "Valor da apreensão deve ser maior que 0.");
                 return;
             }
 
-            if (motivo.Length > 255)
+            if (reason.Length > 255)
             {
                 player.SendMessage(MessageType.Error, "Motivo não pode ter mais que 255 caracteres.");
                 return;
@@ -145,21 +143,16 @@ namespace TrevizaniRoleplay.Server.Commands
             }
 
             await using var context = new DatabaseContext();
-            await context.SeizedVehicles.AddAsync(new SeizedVehicle
-            {
-                VehicleId = veh.VehicleDB.Id,
-                Reason = motivo,
-                PoliceOfficerCharacterId = player.Character.Id,
-                Value = valor,
-                FactionId = player.Character.FactionId!.Value,
-            });
+            var seizedVehicle = new SeizedVehicle();
+            seizedVehicle.Create(veh.VehicleDB.Id, player.Character.Id, value, reason, player.Character.FactionId!.Value);
+            await context.SeizedVehicles.AddAsync(seizedVehicle);
             await context.SaveChangesAsync();
 
-            veh.VehicleDB.SeizedValue = valor;
+            veh.VehicleDB.SetSeizedValue(value);
 
             await veh.Estacionar(player);
 
-            player.SendFactionMessage($"{player.FactionRank.Name} {player.Character.Name} apreendeu o veículo de placa {veh.VehicleDB.Plate.ToUpper()} por ${valor:N0}.");
+            player.SendFactionMessage($"{player.FactionRank!.Name} {player.Character.Name} apreendeu o veículo de placa {veh.VehicleDB.Plate.ToUpper()} por ${value:N0}.");
         }
 
         [Command("radar", "/radar (velocidade)")]
@@ -180,28 +173,29 @@ namespace TrevizaniRoleplay.Server.Commands
             var pos = player.Position;
             pos.Z -= player.IsInVehicle ? 0.45f : 0.95f;
 
-            // ver no lixeiro como montar um Spot bacana
-            player.RadarSpot = new()
-            {
-                PosX = pos.X,
-                PosY = pos.Y,
-                PosZ = pos.Z,
-                Blip = Alt.CreateBlip(false, 4, pos, new MyPlayer[] { player }),
-            };
-            player.RadarSpot.Blip.Sprite = 225;
-            player.RadarSpot.Blip.Name = "Radar";
-            player.RadarSpot.Blip.Color = 59;
-            player.RadarSpot.Blip.ShortRange = false;
-            player.RadarSpot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
-            player.RadarSpot.Blip.Display = 2;
+            var newSpot = new Spot();
+            newSpot.Create(SpotType.GarbageCollector, pos.X, pos.Y, pos.Z, 0, 0, 0);
+
+            var blip = (MyBlip)Alt.CreateBlip(false, 4, new Position(newSpot.PosX, newSpot.PosY, newSpot.PosZ), new MyPlayer[] { player });
+            blip.Sprite = 225;
+            blip.Name = "Radar";
+            blip.Color = 59;
+            blip.ShortRange = false;
+            blip.ScaleXY = new Vector2(0.5f, 0.5f);
+            blip.Display = 2;
+            blip.SpotId = newSpot.Id;
 
             // TODO: Rollback commentary when alt:V implements
-            //player.RadarSpot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, pos, Global.MainRgba);
-            //player.RadarSpot.Marker.Scale = new Vector3(10, 10, 10);
+            //var marker = (MyMarker)Alt.CreateMarker(player, MarkerType.MarkerHalo, pos, Global.MainRgba);
+            //marker.Scale = new Vector3(10, 10, 10);
+            //marker.SpotId = newSpot.Id;
 
-            player.RadarSpot.ColShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 10, 3);
-            player.RadarSpot.ColShape.PoliceOfficerCharacterId = player.Character.Id;
-            player.RadarSpot.ColShape.MaxSpeed = velocidade;
+            var colShape = (MyColShape)Alt.CreateColShapeCylinder(pos, 10, 3);
+            colShape.PoliceOfficerCharacterId = player.Character.Id;
+            colShape.MaxSpeed = velocidade;
+            colShape.SpotId = newSpot.Id;
+
+            player.RadarSpot = newSpot;
 
             player.SendMessage(MessageType.Success, $"Você criou um radar com a velocidade {velocidade}.");
         }

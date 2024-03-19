@@ -5,6 +5,7 @@ using AltV.Net.Enums;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -21,7 +22,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffTruckerLocations", false, Functions.GetTruckerLocationsHTML());
+            player.Emit("StaffTruckerLocations", false, GetTruckerLocationsHTML());
         }
 
         [ClientEvent(nameof(StaffTruckerLocationGoto))]
@@ -65,7 +66,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Localização de caminhoneiro {truckerLocation.Id} excluída.");
 
-            var html = Functions.GetTruckerLocationsHTML();
+            var html = GetTruckerLocationsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.TruckerLocations)))
                 target.Emit("StaffTruckerLocations", true, html);
 
@@ -147,7 +148,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Localização de Caminhoneiro | {Functions.Serialize(truckerLocation)}", null);
 
-            var html = Functions.GetTruckerLocationsHTML();
+            var html = GetTruckerLocationsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.TruckerLocations)))
                 target.Emit("StaffTruckerLocations", true, html);
         }
@@ -165,7 +166,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("StaffTruckerLocationsDeliveries",
                 false,
-                Functions.GetTruckerLocationsDeliverysHTML(truckerLocationId),
+                GetTruckerLocationsDeliverysHTML(truckerLocationId),
                 truckerLocationId);
         }
 
@@ -224,13 +225,13 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Entrega Localização de Caminhoneiro | {Functions.Serialize(truckerLocationDelivery)}", null);
 
-            var html = Functions.GetTruckerLocationsDeliverysHTML(truckerLocationId);
+            var html = GetTruckerLocationsDeliverysHTML(truckerLocationId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.TruckerLocations)))
                 target.Emit("StaffTruckerLocationsDeliveries", true, html);
         }
 
         [AsyncClientEvent(nameof(StaffTruckerLocationDeliveryRemove))]
-        public static async Task StaffTruckerLocationDeliveryRemove(MyPlayer player, int truckerLocationDeliveryId)
+        public static async Task StaffTruckerLocationDeliveryRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
             {
@@ -238,7 +239,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == truckerLocationDeliveryId);
+            var id = new Guid(idString);
+            var truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == id);
             if (truckerLocationDelivery == null)
                 return;
 
@@ -251,9 +253,66 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Remover Entrega da Localização de Caminhoneiro | {Functions.Serialize(truckerLocationDelivery)}", null);
 
-            var html = Functions.GetTruckerLocationsDeliverysHTML(truckerLocationDelivery.TruckerLocationId);
+            var html = GetTruckerLocationsDeliverysHTML(truckerLocationDelivery.TruckerLocationId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.TruckerLocations)))
                 target.Emit("StaffTruckerLocationsDeliveries", true, html);
+        }
+
+        public static string GetTruckerLocationsHTML()
+        {
+            var html = string.Empty;
+            if (Global.TruckerLocations.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='8'>Não há localizações de caminhoneiros criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var truckerLocation in Global.TruckerLocations.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{truckerLocation.Id}</td>
+                        <td>{truckerLocation.Name}</td>
+                        <td>X: {truckerLocation.PosX} | Y: {truckerLocation.PosY} | Z: {truckerLocation.PosZ}</td>
+                        <td>${truckerLocation.DeliveryValue:N0}</td>
+                        <td>{truckerLocation.LoadWaitTime}</td>
+                        <td>{truckerLocation.UnloadWaitTime}</td>
+                        <td>{string.Join(", ", truckerLocation.GetAllowedVehicles())}</td>
+                        <td class='text-center'>
+                            <input id='json{truckerLocation.Id}' type='hidden' value='{Functions.Serialize(truckerLocation)}' />
+                            <button onclick='goto({truckerLocation.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({truckerLocation.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='editDeliveries({truckerLocation.Id})' type='button' class='btn btn-dark btn-sm'>ENTREGAS</button>
+                            <button onclick='remove(this, {truckerLocation.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
+        }
+
+        public static string GetTruckerLocationsDeliverysHTML(Guid truckerLocationId)
+        {
+            var html = string.Empty;
+            var truckerLocationDeliveries = Global.TruckerLocationsDeliveries.Where(x => x.TruckerLocationId == truckerLocationId);
+            if (!truckerLocationDeliveries.Any())
+            {
+                html = "<tr><td class='text-center' colspan='3'>Não há entregas criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var truckerLocationDelivery in truckerLocationDeliveries)
+                {
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{truckerLocationDelivery.Id}</td>
+                        <td>X: {truckerLocationDelivery.PosX} | Y: {truckerLocationDelivery.PosY} | Z: {truckerLocationDelivery.PosZ}</td>
+                        <td class='text-center'>
+                            <input id='json{truckerLocationDelivery.Id}' type='hidden' value='{Functions.Serialize(truckerLocationDelivery)}' />
+                            <button onclick='goto({truckerLocationDelivery.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({truckerLocationDelivery.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {truckerLocationDelivery.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
         }
     }
 }

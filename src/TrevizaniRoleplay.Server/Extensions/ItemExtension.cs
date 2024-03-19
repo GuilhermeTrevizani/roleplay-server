@@ -2,6 +2,7 @@
 using AltV.Net.Data;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Server.Factories;
+using TrevizaniRoleplay.Server.Models;
 
 namespace TrevizaniRoleplay.Server.Extensions
 {
@@ -39,5 +40,8 @@ namespace TrevizaniRoleplay.Server.Extensions
             foreach (var player in Global.SpawnedPlayers.Where(x => position.Distance(x.Position) <= Global.RP_DISTANCE && x.Dimension == item.Dimension))
                 player.ShowInventory(player, update: true);
         }
+
+        public static AudioSpot? GetAudioSpot(this Item item)
+            => Global.AudioSpots.FirstOrDefault(x => x.ItemId == item.Id);
     }
 }

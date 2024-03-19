@@ -10,7 +10,7 @@ namespace TrevizaniRoleplay.Server.Commands
         public static void CMD_b(MyPlayer player, string mensagem) => player.SendMessageToNearbyPlayers(mensagem, MessageCategory.ChatOOC, player.Dimension > 0 ? 5.0f : 10.0f);
 
         [Command("pm", "/pm (ID ou nome) (mensagem)", GreedyArg = true)]
-        public static async Task CMD_pm(MyPlayer player, string idNome, string mensagem)
+        public static async Task CMD_pm(MyPlayer player, string idOrName, string mensagem)
         {
             if (player.User.PMToggle && !player.OnAdminDuty)
             {
@@ -18,7 +18,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 

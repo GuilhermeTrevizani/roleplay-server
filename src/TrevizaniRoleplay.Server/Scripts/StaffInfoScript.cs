@@ -3,6 +3,7 @@ using AltV.Net.Async;
 using AltV.Net.Data;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -19,7 +20,13 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffInfos", false, Functions.GetInfosHTML(null));
+            player.Emit("StaffInfos", false, GetInfosHTML(null));
+        }
+
+        [Command("infos")]
+        public static void CMD_infos(MyPlayer player)
+        {
+            player.Emit("StaffInfos", false, GetInfosHTML(player.User.Id));
         }
 
         [AsyncClientEvent(nameof(StaffInfoSave))]
@@ -39,16 +46,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var info = new Info
-            {
-                PosX = player.Position.X,
-                PosY = player.Position.Y,
-                PosZ = player.Position.Z - 0.7f,
-                Dimension = player.Dimension,
-                ExpirationDate = DateTime.Now.AddDays(days),
-                UserId = player.User.Id,
-                Message = message,
-            };
+            var info = new Info();
+            info.Create(player.Position.X, player.Position.Y, player.Position.Z - 0.7f, player.Dimension, days, player.User.Id, message);
 
             await using var context = new DatabaseContext();
             await context.Infos.AddAsync(info);
@@ -60,12 +59,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             info.CreateIdentifier();
 
             player.EmitStaffShowMessage($"Info {info.Id} criada.", true);
-            player.Emit("StaffInfos", true, Functions.GetInfosHTML(player.User.Id));
+            player.Emit("StaffInfos", true, GetInfosHTML(player.User.Id));
         }
 
         [AsyncClientEvent(nameof(StaffInfoGoto))]
-        public static void StaffInfoGoto(MyPlayer player, int id)
+        public static void StaffInfoGoto(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var info = Global.Infos.FirstOrDefault(x => x.Id == id);
             if (info == null)
                 return;
@@ -77,12 +77,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             player.SetPosition(new Position(info.PosX, info.PosY, info.PosZ), info.Dimension, false);
-            player.Emit("StaffInfos", true, Functions.GetInfosHTML(player.User.Id));
+            player.Emit("StaffInfos", true, GetInfosHTML(player.User.Id));
         }
 
         [AsyncClientEvent(nameof(StaffInfoRemove))]
-        public static async Task StaffInfoRemove(MyPlayer player, int id)
+        public static async Task StaffInfoRemove(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var info = Global.Infos.FirstOrDefault(x => x.Id == id);
             if (info == null)
                 return;
@@ -101,7 +102,38 @@ namespace TrevizaniRoleplay.Server.Scripts
             await context.SaveChangesAsync();
 
             player.EmitStaffShowMessage($"Info {id} removida.");
-            player.Emit("StaffInfos", true, Functions.GetInfosHTML(info.UserId == player.User.Id ? player.User.Id : null));
+            player.Emit("StaffInfos", true, GetInfosHTML(info.UserId == player.User.Id ? player.User.Id : null));
+        }
+
+        private static string GetInfosHTML(Guid? userId)
+        {
+            var html = string.Empty;
+            var infos = Global.Infos;
+            if (userId.HasValue)
+                infos = infos.Where(x => x.UserId == userId).ToList();
+
+            if (infos.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='8'>Não há informações criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var info in infos.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{info.Id}</td>
+                        <td>{info.Date}</td>
+                        <td>{info.ExpirationDate}</td>
+                        <td>{info.User!.Name} [{info.UserId}]</td>
+                        <td>X: {info.PosX} | Y: {info.PosY} | Z: {info.PosZ}</td>
+                        <td>{info.Dimension}</td>
+                        <td>{info.Message}</td>
+                        <td class='text-center'>
+                            {(!userId.HasValue ? $"<button onclick='goto({info.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>" : string.Empty)}
+                            <button onclick='remove(this, {info.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

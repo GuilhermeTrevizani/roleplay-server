@@ -93,27 +93,24 @@ namespace TrevizaniRoleplay.Server.Commands
 
                 foreach (var delivery in Global.TruckerLocationsDeliveries.Where(x => x.TruckerLocationId == truckerLocation.Id))
                 {
-                    // ver no lixeiro como montar esses pontos
-                    var spot = new Spot
-                    {
-                        PosX = delivery.PosX,
-                        PosY = delivery.PosY,
-                        PosZ = delivery.PosZ,
-                    };
+                    var newSpot = new Spot();
+                    newSpot.Create(SpotType.GarbageCollector, delivery.PosX, delivery.PosY, delivery.PosZ, 0, 0, 0);
 
-                    spot.Blip = Alt.CreateBlip(false, 4, new Position(spot.PosX, spot.PosY, spot.PosZ), new MyPlayer[] { player });
-                    spot.Blip.Sprite = 1;
-                    spot.Blip.Name = "Ponto de Entrega";
-                    spot.Blip.Color = 2;
-                    spot.Blip.ShortRange = false;
-                    spot.Blip.ScaleXY = new Vector2(0.5f, 0.5f);
-                    spot.Blip.Display = 2;
+                    var blip = (MyBlip)Alt.CreateBlip(false, 4, new Position(newSpot.PosX, newSpot.PosY, newSpot.PosZ), new MyPlayer[] { player });
+                    blip.Sprite = 1;
+                    blip.Name = "Ponto de Entrega";
+                    blip.Color = 2;
+                    blip.ShortRange = false;
+                    blip.ScaleXY = new Vector2(0.5f, 0.5f);
+                    blip.Display = 2;
+                    blip.SpotId = newSpot.Id;
 
                     // TODO: Rollback commentary when alt:V implements
-                    //spot.Marker = Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(spot.PosX, spot.PosY, spot.PosZ - 0.95f), Global.MainRgba);
-                    //spot.Marker.Scale = new Vector3(5, 5, 5);
+                    //var marker = (MyMarker)Alt.CreateMarker(player, MarkerType.MarkerHalo, new Position(newSpot.PosX, newSpot.PosY, newSpot.PosZ - 0.95f), Global.MainRgba);
+                    //marker.Scale = new Vector3(5, 5, 5);
+                    //marker.SpotId = newSpot.Id;
 
-                    veh.CollectSpots.Add(spot);
+                    veh.CollectSpots.Add(newSpot);
                 }
 
                 veh.TruckerLocation = truckerLocation;

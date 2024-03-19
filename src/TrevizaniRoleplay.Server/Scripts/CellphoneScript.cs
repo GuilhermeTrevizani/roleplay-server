@@ -87,7 +87,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("ligar", "/ligar (número ou nome do contato)")]
-        public static async Task CMD_ligar(MyPlayer player, string numeroNomeContato) => await Functions.CMDLigar(player, numeroNomeContato);
+        public static async Task CMD_ligar(MyPlayer player, string numeroNomeContato) => await CMDLigar(player, numeroNomeContato);
 
         [Command("desligar", Aliases = ["des"])]
         public static async Task CMD_desligar(MyPlayer player)
@@ -242,7 +242,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(LigarContatoCelular))]
-        public async Task LigarContatoCelular(MyPlayer player, uint numero) => await Functions.CMDLigar(player, numero.ToString());
+        public async Task LigarContatoCelular(MyPlayer player, uint numero) => await CMDLigar(player, numero.ToString());
 
         [AsyncClientEvent(nameof(EnviarLocalizacaoContatoCelular))]
         public async Task EnviarLocalizacaoContatoCelular(MyPlayer player, uint numero)
@@ -347,6 +347,124 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:SetWaypoint", prop.EntrancePosX, prop.EntrancePosY);
             player.SendMessage(MessageType.None, $"[CELULAR] Propriedade {propriedade} foi marcada no GPS.", Global.CELLPHONE_SECONDARY_COLOR);
+        }
+
+        private static async Task CMDLigar(MyPlayer player, string numberNameContact)
+        {
+            if (player.Cellphone == 0)
+            {
+                player.SendMessage(Models.MessageType.Error, Global.UNEQUIPPED_CELPPHONE_ERROR_MESSAGE);
+                return;
+            }
+
+            if (player.Cuffed || player.Character.Wound != CharacterWound.None)
+            {
+                player.SendMessage(Models.MessageType.Error, Global.BLOCKED_CELLPHONE_ERROR_MESSAGE);
+                return;
+            }
+
+            if (player.CellphoneItem.FlightMode)
+            {
+                player.SendMessage(Models.MessageType.Error, "Seu celular está em modo avião.");
+                return;
+            }
+
+            if (player.CellphoneCall.Number > 0)
+            {
+                player.SendMessage(Models.MessageType.Error, "Você está em uma ligação.");
+                return;
+            }
+
+            if (!uint.TryParse(numberNameContact, out uint cellphone) || cellphone == 0)
+                cellphone = player.CellphoneItem.Contacts
+                    .FirstOrDefault(x => x.Name.Contains(numberNameContact, StringComparison.CurrentCultureIgnoreCase))?.Number ?? 0;
+
+            if (cellphone == player.Cellphone)
+            {
+                player.SendMessage(Models.MessageType.Error, "Você não pode ligar para você mesmo.");
+                return;
+            }
+
+            player.EmergencyCallType = null;
+
+            if (cellphone == Global.EMERGENCY_NUMBER)
+            {
+                player.CellphoneCall = new CellphoneItemCall
+                {
+                    Number = cellphone,
+                    Type = CellphoneCallType.Answered,
+                };
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] Você está ligando para {player.ObterNomeContato(cellphone)}.", Global.CELLPHONE_SECONDARY_COLOR);
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} diz: Central de emergência, deseja falar com polícia, bombeiros ou ambos?", Global.CELLPHONE_MAIN_COLOR);
+                return;
+            }
+
+            if (cellphone == Global.TAXI_NUMBER)
+            {
+                player.CellphoneCall = new CellphoneItemCall
+                {
+                    Number = cellphone,
+                    Type = CellphoneCallType.Answered,
+                };
+
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] Você está ligando para {player.ObterNomeContato(cellphone)}.", Global.CELLPHONE_SECONDARY_COLOR);
+                if (!Global.SpawnedPlayers.Any(x => x.Character.Job == CharacterJob.TaxiDriver && x.OnDuty))
+                {
+                    await player.EndCellphoneCall();
+                    player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} diz: Desculpe, não temos nenhum taxista em serviço no momento.", Global.CELLPHONE_MAIN_COLOR);
+                    return;
+                }
+
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} diz: Downtown Cab Company, para onde deseja ir?", Global.CELLPHONE_MAIN_COLOR);
+                return;
+            }
+
+            if (cellphone == Global.MECHANIC_NUMBER)
+            {
+                player.CellphoneCall = new CellphoneItemCall
+                {
+                    Number = cellphone,
+                    Type = CellphoneCallType.Answered,
+                };
+
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] Você está ligando para {player.ObterNomeContato(cellphone)}.", Global.CELLPHONE_SECONDARY_COLOR);
+                if (!Global.SpawnedPlayers.Any(x => x.Character.Job == CharacterJob.Mechanic && x.OnDuty))
+                {
+                    await player.EndCellphoneCall();
+                    player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} diz: Desculpe, não temos nenhum mecânico em serviço no momento.", Global.CELLPHONE_MAIN_COLOR);
+                    return;
+                }
+
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} diz: Central de Mecânicos, como podemos ajudar?", Global.CELLPHONE_MAIN_COLOR);
+                return;
+            }
+
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Cellphone == cellphone && cellphone > 0);
+            if (target == null || target.CellphoneItem.FlightMode || target.CellphoneCall.Number > 0)
+            {
+                player.SendMessage(Models.MessageType.None, $"[CELULAR] {player.ObterNomeContato(cellphone)} está indisponível.", Global.CELLPHONE_SECONDARY_COLOR);
+                return;
+            }
+
+            player.CellphoneCall = new CellphoneItemCall
+            {
+                Number = cellphone,
+            };
+
+            target.CellphoneCall = new CellphoneItemCall
+            {
+                Number = player.Cellphone,
+                StartDate = player.CellphoneCall.StartDate,
+                Origin = false,
+            };
+
+            player.TimerCelularElapsedCount = 0;
+            player.TimerCelular = new System.Timers.Timer(8000);
+            player.TimerCelular.Elapsed += player.TimerCelular_Elapsed;
+            player.TimerCelular.Start();
+            player.SendMessage(Models.MessageType.None, $"[CELULAR] Você está ligando para {player.ObterNomeContato(cellphone)}.", Global.CELLPHONE_SECONDARY_COLOR);
+            target.SendMessage(Models.MessageType.None, $"[CELULAR] O seu celular está tocando! Ligação de {target.ObterNomeContato(player.Cellphone)}. (/atender ou /des)", Global.CELLPHONE_SECONDARY_COLOR);
+            target.SendMessageToNearbyPlayers($"O celular de {target.ICName} está tocando.", MessageCategory.Do, 5, true);
         }
     }
 }

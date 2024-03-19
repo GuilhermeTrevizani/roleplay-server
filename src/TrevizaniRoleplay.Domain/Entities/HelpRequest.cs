@@ -21,5 +21,11 @@ namespace TrevizaniRoleplay.Domain.Entities
 
         [NotMapped]
         public string UserName { get; private set; } = string.Empty;
+
+        public void Answer(Guid staffUserId)
+        {
+            AnswerDate = DateTime.Now;
+            StaffUserId = staffUserId;
+        }
     }
 }

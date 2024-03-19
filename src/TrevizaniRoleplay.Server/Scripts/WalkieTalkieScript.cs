@@ -60,7 +60,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             else if (slot == 5)
                 player.RadioCommunicatorItem.Channel5 = extra.Channel5 = canal;
 
-            item.Extra = Functions.Serialize(extra);
+            item.SetExtra(Functions.Serialize(extra));
             await using var context = new DatabaseContext();
             context.CharactersItems.Update(item);
             await context.SaveChangesAsync();

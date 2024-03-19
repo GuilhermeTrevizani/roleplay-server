@@ -30,7 +30,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            player.Emit("StaffPrices", false, Functions.GetPricesHTML(), jsonTypes);
+            player.Emit("StaffPrices", false, GetPricesHTML(), jsonTypes);
         }
 
         [AsyncClientEvent(nameof(StaffPriceSave))]
@@ -127,7 +127,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Preço | {Functions.Serialize(price)}", null);
 
-            var html = Functions.GetPricesHTML();
+            var html = GetPricesHTML();
             foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
                 target.Emit("StaffPrices", true, html);
         }
@@ -153,9 +153,34 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Preço {id} excluído.");
 
-            var html = Functions.GetPricesHTML();
+            var html = GetPricesHTML();
             foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
                 target.Emit("StaffPrices", true, html);
+        }
+
+        private static string GetPricesHTML()
+        {
+            var html = string.Empty;
+            if (Global.Prices.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há preços criados.</td></tr>";
+            }
+            else
+            {
+                foreach (var price in Global.Prices.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{price.Id}</td>
+                        <td>{price.Type.GetDisplay()}</td>
+                        <td>{price.Name}</td>
+                        <td>{(price.Type == PriceType.Tuning ? $"{price.Value:N}%" : $"${price.Value:N0}")}</td>
+                        <td class='text-center'>
+                            <input id='json{price.Id}' type='hidden' value='{Functions.Serialize(price)}' />
+                            <button onclick='editar({price.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='excluir(this, {price.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }

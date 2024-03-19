@@ -112,7 +112,7 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                 var app = await context.Characters
                     .Where(x => !x.EvaluatorStaffUserId.HasValue && !x.EvaluatingStaffUserId.HasValue)
                     .Include(x => x.User)
-                    .OrderByDescending(x => x.User.VIP >= UserVIP.Silver ? 1 : 0)
+                    .OrderByDescending(x => x.User!.VIP >= UserVIP.Silver ? 1 : 0)
                     .FirstOrDefaultAsync();
                 if (app == null)
                 {
@@ -120,17 +120,17 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                     return;
                 }
 
-                app.EvaluatingStaffUserId = user.Id;
+                app.SetEvaluatingStaffUser(user.Id);
                 context.Update(app);
 
                 var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
                 if (target != null)
                 {
-                    target.User.CharacterApplicationsQuantity++;
+                    target.User.AddCharacterApplicationsQuantity();
                 }
                 else
                 {
-                    user.CharacterApplicationsQuantity++;
+                    user.AddCharacterApplicationsQuantity();
                     context.Users.Update(user);
                     await context.SaveChangesAsync();
                 }
@@ -147,7 +147,7 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                 x.AddField("Sexo", app.Sex.GetDisplay(), true);
                 x.AddField("Nascimento", $"{app.BirthdayDate.ToShortDateString()} ({Math.Truncate((DateTime.Now.Date - app.BirthdayDate).TotalDays / 365):N0} anos)", true);
                 x.AddField("Caracteres História", $"{app.History.Length} de 4096", false);
-                x.AddField("OOC", $"{app.User.Name} [{app.User.Id}]", true);
+                x.AddField("OOC", $"{app.User!.Name} [{app.User.Id}]", true);
                 x.WithFooter($"Enviada em {app.RegisterDate}.");
 
                 await ReplyAsync(embed: x.Build());
@@ -187,12 +187,11 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                     return;
                 }
 
-                app.EvaluatorStaffUserId = user.Id;
-                app.EvaluatingStaffUserId = null;
+                app.AcceptAplication(user.Id);
                 context.Update(app);
                 await context.SaveChangesAsync();
 
-                await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
+                await Functions.SendDiscordMessage(app.User!.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi aceita.");
 
                 await ReplyAsync($"Você aceitou a aplicação de **{app.Name} [{app.Id}]**.");
             }
@@ -236,13 +235,11 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                     return;
                 }
 
-                app.EvaluatorStaffUserId = user.Id;
-                app.EvaluatingStaffUserId = null;
-                app.RejectionReason = motivo;
+                app.RejectApplication(user.Id, motivo);
                 context.Update(app);
                 await context.SaveChangesAsync();
 
-                await Functions.SendDiscordMessage(app.User.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
+                await Functions.SendDiscordMessage(app.User!.DiscordId, $"A aplicação do seu personagem <strong>{app.Name}</strong> foi negada. Motivo: <strong>{motivo}</strong>");
 
                 await ReplyAsync($"Você negou a aplicação de **{app.Name} [{app.Id}]**. Motivo: **{motivo}**");
             }
@@ -275,7 +272,7 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                     .Where(x => !x.EvaluatorStaffUserId.HasValue)
                     .Include(x => x.User)
                     .Include(x => x.EvaluatingStaffUser)
-                    .OrderByDescending(x => x.User.VIP >= UserVIP.Silver ? 1 : 0)
+                    .OrderByDescending(x => x.User!.VIP >= UserVIP.Silver ? 1 : 0)
                     .ToListAsync();
                 if (apps.Count == 0)
                 {
@@ -286,7 +283,7 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                 var aplicacoes = string.Empty;
 
                 foreach (var app in apps)
-                    aplicacoes += $"Aplicação de {app.Name} [{app.Id}] (Responsável: {(!app.EvaluatingStaffUserId.HasValue ? "N/A" : $"{app.EvaluatingStaffUser.Name} [{app.EvaluatingStaffUserId}]")}){Environment.NewLine}";
+                    aplicacoes += $"Aplicação de {app.Name} [{app.Id}] (Responsável: {(!app.EvaluatingStaffUserId.HasValue ? "N/A" : $"{app.EvaluatingStaffUser!.Name} [{app.EvaluatingStaffUserId}]")}){Environment.NewLine}";
 
                 var x = new EmbedBuilder
                 {
@@ -337,36 +334,12 @@ namespace TrevizaniRoleplay.Server.DiscordBOT
                 }
 
                 var vip = (UserVIP)nivelVip;
-                user.VIP = vip;
-                user.VIPValidDate = (user.VIPValidDate > DateTime.Now && user.VIP == vip ? user.VIPValidDate.Value : DateTime.Now).AddMonths(meses);
-                user.NameChanges += vip switch
-                {
-                    UserVIP.Gold => 4,
-                    UserVIP.Silver => 3,
-                    _ => 2,
-                };
-
-                user.ForumNameChanges += vip switch
-                {
-                    UserVIP.Gold => 2,
-                    _ => 1,
-                };
-
-                user.PlateChanges += vip switch
-                {
-                    UserVIP.Gold => 2,
-                    UserVIP.Silver => 1,
-                    _ => 0,
-                };
+                user.SetVIP(vip, meses);
 
                 var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
                 if (target != null)
                 {
-                    target.User.VIP = user.VIP;
-                    target.User.VIPValidDate = user.VIPValidDate;
-                    target.User.NameChanges = user.NameChanges;
-                    target.User.ForumNameChanges = user.ForumNameChanges;
-                    target.User.PlateChanges = user.PlateChanges;
+                    target.User = user;
                     target.SendMessage(Models.MessageType.Success, $"{userStaff.Name} alterou seu nível VIP para {vip.GetDisplay()} expirando em {user.VIPValidDate}.");
                 }
                 else

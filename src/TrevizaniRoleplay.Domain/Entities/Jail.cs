@@ -12,5 +12,13 @@
         public Character? Character { get; private set; }
         public Character? PoliceOfficerCharacter { get; private set; }
         public Faction? Faction { get; private set; }
+
+        public void Create(Guid characterId, Guid policeOfficerCharacterId, Guid factionId, int minutes)
+        {
+            CharacterId = characterId;
+            PoliceOfficerCharacterId = policeOfficerCharacterId;
+            FactionId = factionId;
+            EndDate = DateTime.Now.AddMinutes(minutes);
+        }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Data;
-using Discord;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Factories;
@@ -11,8 +10,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 {
     public class FactionStorageScript : IScript
     {
-        [Command("arsenal")]
-        public static void CMD_arsenal(MyPlayer player)
+        [Command("farmazenamento")]
+        public static void CMD_farmazenamento(MyPlayer player)
         {
             if (!player.FactionFlags.Contains(FactionFlag.Storage))
             {
@@ -53,7 +52,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             var preco = 0;
             if (player.Faction.Type == FactionType.Criminal)
             {
-                preco = Convert.ToInt32(Math.Abs(Global.Prices.FirstOrDefault(x => x.Type == PriceType.Weapons && x.Name.ToLower() == weapon.Model.ToString().ToLower())?.Value ?? 0));
+                preco = Convert.ToInt32(Math.Abs(Global.Prices.FirstOrDefault(x => x.Type == PriceType.Weapons
+                    && x.Name.ToLower() == weapon.Model.ToString().ToLower())?.Value ?? 0));
                 if (player.Money < preco)
                 {
                     player.EmitStaffShowMessage(string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, preco));
@@ -63,8 +63,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 // Preço será apenas na droga e na arma.
                 // Se não achar preço, exibir mensagem que o preço não foi configurado
 
-
-                var value = Convert.ToInt32(Math.Abs(Global.Prices.FirstOrDefault(x => x.Type == PriceType.Drugs && x.Name.Equals(item.ItemCategory.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0))
+                var value = Convert.ToInt32(Math.Abs(Global.Prices.FirstOrDefault(x => x.Type == PriceType.Drugs
+                    && x.Name.Equals(item.ItemCategory.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0))
                     * quantity;
                 if (player.Money < value)
                 {

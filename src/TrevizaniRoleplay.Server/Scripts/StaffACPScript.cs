@@ -50,7 +50,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("ACPShow",
                 player.User.StaffFlagsJSON,
-                await Functions.GetBansJSON(),
+                await GetBansJSON(),
                 Functions.GetSOSJSON(),
                 jsonLogs,
                 staffersJson);
@@ -89,8 +89,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 player.EmitStaffShowMessage($"O banimento {id} não foi encontrado.");
             }
 
-            var html = await Functions.GetBansJSON();
-            foreach (var target in Global.Players.Where(x => x.User.Staff != UserStaff.None))
+            var html = await GetBansJSON();
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.User.Staff != UserStaff.None))
                 target.Emit("ACPUpdateBans", html);
         }
 
@@ -541,8 +541,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             var strBan = days == 0 ? "permanentemente" : $"por {days} dia{(days > 1 ? "s" : string.Empty)}";
             player.EmitStaffShowMessage($"Você baniu {character.Name} ({character.User.Name}) {strBan}. Motivo: {reason}");
 
-            var html = await Functions.GetBansJSON();
-            foreach (var targetStaff in Global.Players.Where(x => x.User.Staff != UserStaff.None))
+            var html = await GetBansJSON();
+            foreach (var targetStaff in Global.SpawnedPlayers.Where(x => x.User.Staff != UserStaff.None))
                 targetStaff.Emit("ACPUpdateBans", html);
 
             await StaffSearchCharacter(player, character.Id.ToString());
@@ -604,7 +604,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = Global.Players.FirstOrDefault(x => x.Character.Id == id);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
                 target.Character.DeathDate = DateTime.Now;
@@ -650,7 +650,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = Global.Players.FirstOrDefault(x => x.Character.Id == id);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
                 target.Character.CKAvaliation = true;
@@ -698,7 +698,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 :
                 CharacterNameChangeStatus.Allowed;
 
-            var target = Global.Players.FirstOrDefault(x => x.Character.Id == id);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
                 target.Character.NameChangeStatus = target.Character.NameChangeStatus == CharacterNameChangeStatus.Allowed
@@ -766,6 +766,29 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Você removeu {character.Name} da prisão.");
             await player.GravarLog(LogType.Staff, $"Remover da Prisão {character.Id}", null);
             await StaffSearchCharacter(player, character.Id.ToString());
+        }
+
+        private static async Task<string> GetBansJSON()
+        {
+            await using var context = new DatabaseContext();
+            var banishments = (await context.Banishments
+                .Include(x => x.Character)
+                .Include(x => x.User)
+                .Include(x => x.StaffUser)
+                .ToListAsync())
+                .OrderByDescending(x => x.ExpirationDate)
+                .Select(x => new
+                {
+                    x.Id,
+                    Date = x.Date.ToString(),
+                    ExpirationDate = x.ExpirationDate.HasValue ? x.ExpirationDate?.ToString() : "Permanente",
+                    x.Reason,
+                    Character = $"{x.Character.Name} [{x.CharacterId}]",
+                    User = x.UserId.HasValue ? $"{x.User.Name} [{x.UserId}]" : string.Empty,
+                    UserStaff = $"{x.StaffUser.Name} [{x.StaffUserId}]",
+                });
+
+            return Functions.Serialize(banishments);
         }
     }
 }

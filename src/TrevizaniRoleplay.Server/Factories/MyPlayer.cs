@@ -79,9 +79,9 @@ namespace TrevizaniRoleplay.Server.Factories
 
         public bool VehicleAnimation { get; set; }
 
-        public Faction Faction => Global.Factions.FirstOrDefault(x => x.Id == Character.FactionId);
+        public Faction? Faction => Global.Factions.FirstOrDefault(x => x.Id == Character.FactionId);
 
-        public FactionRank FactionRank => Global.FactionsRanks.FirstOrDefault(x => x.Id == Character.FactionRankId);
+        public FactionRank? FactionRank => Global.FactionsRanks.FirstOrDefault(x => x.Id == Character.FactionRankId);
 
         public string RealIp => Ip.Replace("::ffff:", string.Empty);
 
@@ -606,9 +606,9 @@ namespace TrevizaniRoleplay.Server.Factories
                 target.Emit("chat:sendMessage", $"[SPEC] {mensagem}", cor);
         }
 
-        public MyPlayer? ObterPersonagemPorIdNome(string idNome, bool isPodeProprioPlayer = true)
+        public MyPlayer? ObterPersonagemPoridOrName(string idOrName, bool isPodeProprioPlayer = true)
         {
-            if (int.TryParse(idNome, out int id))
+            if (int.TryParse(idOrName, out int id))
             {
                 var p = Global.SpawnedPlayers.FirstOrDefault(x => x.SessionId == id);
                 if (p != null)
@@ -623,7 +623,7 @@ namespace TrevizaniRoleplay.Server.Factories
                 }
             }
 
-            var ps = Global.SpawnedPlayers.Where(x => x.Character.Name.ToLower().Contains(idNome.ToLower())).ToList();
+            var ps = Global.SpawnedPlayers.Where(x => x.Character.Name.ToLower().Contains(idOrName.ToLower())).ToList();
             if (ps.Count == 1)
             {
                 if (!isPodeProprioPlayer && this == ps.FirstOrDefault())
@@ -637,13 +637,13 @@ namespace TrevizaniRoleplay.Server.Factories
 
             if (ps.Count > 0)
             {
-                SendMessage(MessageType.Error, $"Mais de um jogador foi encontrado com a pesquisa: {idNome}");
+                SendMessage(MessageType.Error, $"Mais de um jogador foi encontrado com a pesquisa: {idOrName}");
                 foreach (var pl in ps)
                     SendMessage(MessageType.None, $"[ID: {pl.SessionId}] {pl.Character.Name}");
             }
             else
             {
-                SendMessage(MessageType.Error, $"Nenhum jogador foi encontrado com a pesquisa: {idNome}");
+                SendMessage(MessageType.Error, $"Nenhum jogador foi encontrado com a pesquisa: {idOrName}");
             }
 
             return null;
@@ -1018,7 +1018,7 @@ namespace TrevizaniRoleplay.Server.Factories
             if (User.Staff > 0)
                 html += $"Staff: <strong>{User.Staff.GetDisplay()} [{(int)User.Staff}]</strong> | Tempo Serviço Administrativo (minutos): <strong>{User.StaffDutyTime}</strong> | SOSs Atendidos: <strong>{User.HelpRequestsAnswersQuantity}</strong><br/>";
 
-            if (Character.FactionId.HasValue)
+            if (Faction != null)
                 html += $"Facção: <strong>{Faction.Name} [{Character.FactionId}]</strong> | Rank: <strong>{FactionRank.Name} [{Character.FactionRankId}]</strong>";
 
             html += $"<h4>História (aceito por {Character.EvaluatorStaffUserId})</h4> {Character.History}";
@@ -1145,7 +1145,7 @@ namespace TrevizaniRoleplay.Server.Factories
             var salarioEmprego = 0;
             var salarioFaccao = 0;
 
-            if (Character.FactionId.HasValue && FactionRank.Salary > 0)
+            if (FactionRank?.Salary > 0)
                 salarioFaccao = FactionRank.Salary;
             else if (Character.Job > 0)
                 salarioEmprego = Convert.ToInt32(Math.Abs(Global.Prices.FirstOrDefault(x => x.Type == PriceType.Jobs && x.Name.Equals(Character.Job.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0));
@@ -1257,7 +1257,7 @@ namespace TrevizaniRoleplay.Server.Factories
             return descricaoPrevia;
         }
 
-        public void SetarPersonalizacao(Personalizacao personalizacaoDados)
+        public void SetarPersonalizacao(Personalization personalizacaoDados)
         {
             SetHeadBlendData(personalizacaoDados.FaceFather, personalizacaoDados.FaceMother, 0,
                 personalizacaoDados.SkinFather, personalizacaoDados.SkinMother, 0,
@@ -1531,6 +1531,7 @@ namespace TrevizaniRoleplay.Server.Factories
             FactionFlags = [];
             Character.FactionId = Character.FactionRankId = null;
             OnDuty = false;
+            // Se tiver FactioNDutySession tem que dar end e salvar
         }
 
         public void SetNametagDamaged()

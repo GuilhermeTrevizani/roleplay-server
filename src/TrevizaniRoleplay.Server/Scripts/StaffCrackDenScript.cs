@@ -1,9 +1,11 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -20,11 +22,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffCrackDens", false, Functions.GetCrackDensHTML());
+            player.Emit("StaffCrackDens", false, GetCrackDensHTML());
         }
 
         [ClientEvent(nameof(StaffCrackDenGoto))]
-        public static void StaffCrackDenGoto(MyPlayer player, int id)
+        public static void StaffCrackDenGoto(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
             {
@@ -32,6 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;
@@ -40,7 +43,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (crackDen.Dimension > 0)
             {
-                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Id == crackDen.Dimension).Interior);
+                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Number == crackDen.Dimension).Interior);
                 player.SetarIPLs();
             }
 
@@ -48,7 +51,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCrackDenRemove))]
-        public static async Task StaffCrackDenRemove(MyPlayer player, int id)
+        public static async Task StaffCrackDenRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
             {
@@ -56,6 +59,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;
@@ -71,7 +75,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Boca de fumo {crackDen.Id} excluída.");
 
-            var html = Functions.GetCrackDensHTML();
+            var html = GetCrackDensHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.CrackDens)))
                 target.Emit("StaffCrackDens", true, html);
 
@@ -136,7 +140,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Boca de Fumo | {Functions.Serialize(crackDen)}", null);
 
-            var html = Functions.GetCrackDensHTML();
+            var html = GetCrackDensHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.CrackDens)))
                 target.Emit("StaffCrackDens", true, html);
         }
@@ -154,7 +158,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("StaffCrackDensItems",
                 false,
-                Functions.GetCrackDensItemsHTML(crackDenId, true),
+                GetCrackDensItemsHTML(crackDenId),
                 crackDenId);
         }
 
@@ -213,7 +217,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Item Boca de Fumo | {Functions.Serialize(crackDenItem)}", null);
 
-            var html = Functions.GetCrackDensItemsHTML(crackDenId, true);
+            var html = GetCrackDensItemsHTML(crackDenId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.CrackDens)))
                 target.Emit("StaffCrackDensItems", true, html);
         }
@@ -240,7 +244,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Remover Item Boca de Fumo | {Functions.Serialize(crackDenItem)}", null);
 
-            var html = Functions.GetCrackDensItemsHTML(crackDenItem.CrackDenId, true);
+            var html = GetCrackDensItemsHTML(crackDenItem.CrackDenId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.CrackDens)))
                 target.Emit("StaffCrackDensItems", true, html);
         }
@@ -268,9 +272,72 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Revogar Cool Down Boca de Fumo | {id}", null);
 
-            var html = Functions.GetCrackDensHTML();
+            var html = GetCrackDensHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.CrackDens)))
                 target.Emit("StaffCrackDens", true, html);
+        }
+
+        private static string GetCrackDensHTML()
+        {
+            var html = string.Empty;
+            if (Global.CrackDens.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='9'>Não há bocas de fumo criadas.</td></tr>";
+            }
+            else
+            {
+                foreach (var crackDen in Global.CrackDens.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{crackDen.Id}</td>
+                        <td>X: {crackDen.PosX} | Y: {crackDen.PosY} | Z: {crackDen.PosZ}</td>
+                        <td>{crackDen.Dimension}</td>
+                        <td>{crackDen.OnlinePoliceOfficers}</td>
+                        <td>{crackDen.CooldownQuantityLimit}</td>
+                        <td>{crackDen.CooldownHours}</td>
+                        <td>{crackDen.CooldownDate}</td>
+                        <td>{crackDen.Quantity}</td>
+                        <td class='text-center'>
+                            <input id='json{crackDen.Id}' type='hidden' value='{Functions.Serialize(crackDen)}' />
+                            <button onclick='goto({crackDen.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({crackDen.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='editItems({crackDen.Id})' type='button' class='btn btn-dark btn-sm'>ITENS</button>
+                            <button onclick='revokeCooldown({crackDen.Id})' type='button' class='btn btn-dark btn-sm'>REVOGAR COOLDOWN</button>
+                            <button onclick='remove(this, {crackDen.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
+        }
+
+        private static string GetCrackDensItemsHTML(Guid crackDenId)
+        {
+            var html = string.Empty;
+            var items = Global.CrackDensItems.Where(x => x.CrackDenId == crackDenId);
+            if (!items.Any())
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há itens criados.</td></tr>";
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{item.Id}</td>
+                        <td>{item.ItemCategory.GetDisplay()}</td>
+                        <td>${item.Value:N0}</td>
+                        <td class='text-center'>
+                            <input id='json{item.Id}' type='hidden' value='{Functions.Serialize(new
+                    {
+                        ItemCategory = item.ItemCategory.ToString(),
+                        item.Value
+                    })}' />
+                            <button onclick='edit({item.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {item.Id})'   type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
         }
     }
 }

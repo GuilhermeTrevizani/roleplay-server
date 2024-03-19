@@ -84,13 +84,13 @@ namespace TrevizaniRoleplay.Server.Scripts
                     hasDamage = false;
                 }
 
-                playerTarget.Wounds.Add(new MyPlayer.Ferimento
+                playerTarget.Wounds.Add(new Wound
                 {
-                    Arma = weapon,
-                    Dano = damage,
+                    Weapon = weapon,
+                    Damage = damage,
                     BodyPart = bodyPart,
                     Attacker = $"{player.Character.Id} - {player.Character.Name}",
-                    Distancia = playerTarget.Position.Distance(player.Position),
+                    Distance = playerTarget.Position.Distance(player.Position),
                     ShotOffset = shotOffset,
                 });
                 playerTarget.SetNametagDamaged();
@@ -134,10 +134,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     player.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)player.Character.Wound);
                 }
 
-                var ferimento = new MyPlayer.Ferimento
+                var wound = new Wound
                 {
-                    Arma = weapon,
-                    Dano = armorDamage > 0 ? armorDamage : healthDamage,
+                    Weapon = weapon,
+                    Damage = armorDamage > 0 ? armorDamage : healthDamage,
                 };
 
                 MyPlayer? pAttacker = null;
@@ -148,11 +148,11 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 if (pAttacker != null)
                 {
-                    ferimento.Attacker = $"{pAttacker.Character.Id} - {pAttacker.Character.Name}";
-                    ferimento.Distancia = pAttacker.Position.Distance(player.Position);
+                    wound.Attacker = $"{pAttacker.Character.Id} - {pAttacker.Character.Name}";
+                    wound.Distance = pAttacker.Position.Distance(player.Position);
                 }
 
-                player.Wounds.Add(ferimento);
+                player.Wounds.Add(wound);
                 player.SetNametagDamaged();
             }
             catch (Exception ex)
@@ -210,14 +210,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                             {
                                 player.SendMessage(MessageType.None, $"[CELULAR] {player.ObterNomeContato(Global.EMERGENCY_NUMBER)} diz: Nossas unidades foram alertadas.", Global.CELLPHONE_MAIN_COLOR);
 
-                                var emergencyCall = new EmergencyCall
-                                {
-                                    Type = player.EmergencyCallType.Value,
-                                    Number = player.Cellphone,
-                                    PosX = player.ICPosition.X,
-                                    PosY = player.ICPosition.Y,
-                                    Message = message,
-                                };
+                                var emergencyCall = new EmergencyCall();
+                                emergencyCall.Create(player.EmergencyCallType!.Value, player.Cellphone, player.ICPosition.X, player.ICPosition.Y, message, string.Empty);
 
                                 player.AreaNameType = 2;
                                 player.AreaNameJSON = Functions.Serialize(emergencyCall);
@@ -693,7 +687,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         public static async Task ConfirmarPersonalizacao(MyPlayer player, string strPersonalizacao, int tipo, bool sucesso)
         {
             if (sucesso)
-                player.Personalization = Functions.Deserialize<MyPlayer.Personalizacao>(strPersonalizacao);
+                player.Personalization = Functions.Deserialize<Personalization>(strPersonalizacao);
 
             if (tipo == 0)
             {
@@ -900,7 +894,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     new("Facção", "/sairfaccao", "Sai da facção"),
                 ]);
 
-                if (player.Faction.Government)
+                if (player.Faction!.Government)
                     listaComandos.AddRange(
                     [
                         new("Facção", "/fspawn", "Spawna veículos da facção"),
@@ -962,13 +956,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (player.FactionFlags.Contains(FactionFlag.Storage))
                         listaComandos.AddRange(
                         [
-                            new("Flag Facção Arsenal", "/arsenal", "Usa o arsenal da facção"),
-                        ]);
-
-                    if (player.FactionFlags.Contains(FactionFlag.DrugHouse))
-                        listaComandos.AddRange(
-                        [
-                            new("Flag Facção Drogas", "/drughouse", "Usa a drug house da facção"),
+                            new("Flag Facção Armazenamento", "/farmazenamento", "Usa o armazenamento da facção"),
                         ]);
                 }
             }
@@ -993,10 +981,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                         new("Flag Staff Facções", "/faccoes", "Abre o painel de gerenciamento de facções"),
                     ]);
 
-                if (player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+                if (player.StaffFlags.Contains(StaffFlag.FactionsStorages))
                     listaComandos.AddRange(
                     [
-                        new("Flag Staff Arsenais", "/arsenais", "Abre o painel de gerenciamento de arsenais"),
+                        new("Flag Staff Arsenais", "/aarmazenamentos", "Abre o painel de gerenciamento de armazenamentos"),
                     ]);
 
                 if (player.StaffFlags.Contains(StaffFlag.Properties))
@@ -1010,12 +998,6 @@ namespace TrevizaniRoleplay.Server.Scripts
                     listaComandos.AddRange(
                     [
                         new("Flag Staff Dar Item", "/daritem", "Dá um item para um personagem"),
-                    ]);
-
-                if (player.StaffFlags.Contains(StaffFlag.FactionsDrugsHouses))
-                    listaComandos.AddRange(
-                    [
-                        new("Flag Staff Drug Houses", "/drughouses", "Abre o painel de gerenciamento de drug houses"),
                     ]);
 
                 if (player.StaffFlags.Contains(StaffFlag.CrackDens))
@@ -1265,7 +1247,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(SetarPersonalizacao))]
         public static void SetarPersonalizacao(MyPlayer player, string personalizacao)
         {
-            var personalizacaoDados = Functions.Deserialize<MyPlayer.Personalizacao>(personalizacao);
+            var personalizacaoDados = Functions.Deserialize<Personalization>(personalizacao);
             player.SetarPersonalizacao(personalizacaoDados);
         }
 
@@ -1370,9 +1352,6 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
         }
 
-        [AsyncClientEvent(nameof(VenderPropriedade))]
-        public static async Task VenderPropriedade(MyPlayer player) => await Functions.CMDVenderPropriedadeGoverno(player, true);
-
         [ClientEvent(nameof(KeyY))]
         public static void KeyY(MyPlayer player)
         {
@@ -1408,7 +1387,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 player.IPLs = Functions.GetIPLsByInterior(prox.Interior);
                 player.SetarIPLs();
-                player.SetPosition(new Position(prox.ExitPosX, prox.ExitPosY, prox.ExitPosZ), prox.Id, false);
+                player.SetPosition(new Position(prox.ExitPosX, prox.ExitPosY, prox.ExitPosZ), prox.Number, false);
                 return;
             }
 
@@ -1422,7 +1401,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             prox = Global.Properties
-                .Where(x => player.Dimension == x.Id
+                .Where(x => player.Dimension == x.Number
                     && player.Position.Distance(new Position(x.ExitPosX, x.ExitPosY, x.ExitPosZ)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.ExitPosX, x.ExitPosY, x.ExitPosZ)));
 
@@ -1505,16 +1484,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                 CharacterId = character.Id,
                 PoliceOfficerCharacterId = player.Character.Id,
                 FactionId = player.Faction.Id,
+                Items = confiscationItems,
             };
 
             await context.Confiscations.AddAsync(confiscation);
-            await context.SaveChangesAsync();
-
-            foreach (var confiscationItem in confiscationItems)
-                confiscationItem.ConfiscationId = confiscation.Id;
-
-            await context.ConfiscationsItems.AddRangeAsync(confiscationItems);
-
             await context.SaveChangesAsync();
 
             foreach (var item in items)
@@ -1538,7 +1511,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             if (sucesso)
             {
-                var tattoos = Functions.Deserialize<List<MyPlayer.Personalizacao.Tattoo>>(strTattoos);
+                var tattoos = Functions.Deserialize<List<Personalization.Tattoo>>(strTattoos);
 
                 if (estudio && tattoos.Count == 0)
                 {
@@ -1726,7 +1699,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 if (player.Dimension != 0)
                 {
-                    var prop = Global.Properties.FirstOrDefault(x => x.Id == player.Dimension);
+                    var prop = Global.Properties.FirstOrDefault(x => x.Number == player.Dimension);
                     if (prop != null)
                         areaName = prop.Address;
                 }

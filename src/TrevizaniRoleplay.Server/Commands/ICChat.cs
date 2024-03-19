@@ -19,7 +19,7 @@ namespace TrevizaniRoleplay.Server.Commands
         public static void CMD_baixo(MyPlayer player, string mensagem) => player.SendMessageToNearbyPlayers(mensagem, MessageCategory.ChatICBaixo, player.Dimension > 0 ? 3.75f : 5);
 
         [Command("s", "/s (ID ou nome) (mensagem)", GreedyArg = true)]
-        public static void CMD_s(MyPlayer player, string idNome, string mensagem)
+        public static void CMD_s(MyPlayer player, string idOrName, string mensagem)
         {
             if (player.Character.Wound != CharacterWound.None)
             {
@@ -27,7 +27,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPorIdNome(idNome, false);
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
             if (target == null)
                 return;
 

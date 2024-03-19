@@ -13,10 +13,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 {
     public class StaffFactionStorageScript : IScript
     {
-        [Command("arsenais")]
-        public static void CMD_arsenais(MyPlayer player)
+        [Command("aarmazenamento")]
+        public static void CMD_aarmazenamento(MyPlayer player)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
@@ -26,14 +26,15 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffFactionArmoryGoto))]
-        public static void StaffFactionArmoryGoto(MyPlayer player, int id)
+        public static void StaffFactionArmoryGoto(MyPlayer player, string idString)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
+            var id = new Guid(idString);
             var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
             if (factionArmory == null)
                 return;
@@ -42,7 +43,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (factionArmory.Dimension > 0)
             {
-                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Id == factionArmory.Dimension).Interior);
+                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Number == factionArmory.Dimension).Interior);
                 player.SetarIPLs();
             }
 
@@ -50,14 +51,15 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionArmoryRemove))]
-        public static async Task StaffFactionArmoryRemove(MyPlayer player, int id)
+        public static async Task StaffFactionArmoryRemove(MyPlayer player, string idString)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
+            var id = new Guid(idString);
             var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
             if (factionArmory == null)
                 return;
@@ -73,27 +75,29 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Arsenal {factionArmory.Id} excluído.");
 
             var html = Functions.GetFactionsArmoriesHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsArmories)))
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmories", true, html);
 
             await player.GravarLog(LogType.Staff, $"Remover Arsenal | {Functions.Serialize(factionArmory)}", null);
         }
 
         [AsyncClientEvent(nameof(StaffFactionArmorySave))]
-        public static async Task StaffFactionArmorySave(MyPlayer player, int id, int factionId, Vector3 pos, int dimension)
+        public static async Task StaffFactionArmorySave(MyPlayer player, string idString, string factionIdString, Vector3 pos, int dimension)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            if (factionId != 0 && !Global.Factions.Any(x => x.Id == factionId))
+            var factionId = new Guid(factionIdString);
+            if (!Global.Factions.Any(x => x.Id == factionId))
             {
                 player.EmitStaffShowMessage($"Facção {factionId} não existe.");
                 return;
             }
 
+            var id = new Guid(idString);
             var factionArmory = new FactionStorage();
             if (id > 0)
                 factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
@@ -123,14 +127,14 @@ namespace TrevizaniRoleplay.Server.Scripts
             await player.GravarLog(LogType.Staff, $"Gravar Arsenal | {Functions.Serialize(factionArmory)}", null);
 
             var html = Functions.GetFactionsArmoriesHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsArmories)))
+            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmories", true, html);
         }
 
         [ClientEvent(nameof(StaffFactionsArmorysWeaponsShow))]
-        public static void StaffFactionsArmorysWeaponsShow(MyPlayer player, int factionArmoryId)
+        public static void StaffFactionsArmorysWeaponsShow(MyPlayer player, string idString)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
@@ -138,17 +142,18 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
 
+            var id = new Guid(idString);
             player.Emit("StaffFactionsArmoriesWeapons",
                 false,
-                Functions.GetFactionArmoriesWeaponsHTML(factionArmoryId, true),
-                factionArmoryId);
+                Functions.GetFactionArmoriesWeaponsHTML(id, true),
+                idString);
         }
 
         [AsyncClientEvent(nameof(StaffFactionArmoryWeaponSave))]
-        public static async Task StaffFactionArmoryWeaponSave(MyPlayer player, int factionArmoryWeaponId, int factionArmoryId, string weapon,
+        public static async Task StaffFactionArmoryWeaponSave(MyPlayer player, string factionStorageItemIdString, string factionStorageIdString, string weapon,
             int ammo, int quantity, int tintIndex, string componentsJSON)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
@@ -232,20 +237,21 @@ namespace TrevizaniRoleplay.Server.Scripts
             await player.GravarLog(LogType.Staff, $"Gravar Arma Arsenal | {Functions.Serialize(factionArmoryWeapon)}", null);
 
             var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmoryId, true);
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsArmories)))
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmoriesWeapons", true, html);
         }
 
         [AsyncClientEvent(nameof(StaffFactionArmoryWeaponRemove))]
-        public static async Task StaffFactionArmoryWeaponRemove(MyPlayer player, int factionArmoryWeaponId)
+        public static async Task StaffFactionArmoryWeaponRemove(MyPlayer player, string idString)
         {
-            if (!player.StaffFlags.Contains(StaffFlag.FactionsArmories))
+            if (!player.StaffFlags.Contains(StaffFlag.FactionsStorages))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
-            var factionArmoryWeapon = Global.FactionsStoragesItems.FirstOrDefault(x => x.Id == factionArmoryWeaponId);
+            var id = new Guid(idString);
+            var factionArmoryWeapon = Global.FactionsStoragesItems.FirstOrDefault(x => x.Id == id);
             if (factionArmoryWeapon == null)
                 return;
 
@@ -258,9 +264,36 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Remover Arma Arsenal | {Functions.Serialize(factionArmoryWeapon)}", null);
 
-            var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmoryWeapon.FactionArmoryId, true);
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsArmories)))
+            var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmoryWeapon.FactionStorageId, true);
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmoriesWeapons", true, html);
+        }
+
+        private static string GetFactionsArmoriesHTML()
+        {
+            var html = string.Empty;
+            if (Global.FactionsStorages.Count == 0)
+            {
+                html = "<tr><td class='text-center' colspan='5'>Não há arsenais criados.</td></tr>";
+            }
+            else
+            {
+                foreach (var factionArmory in Global.FactionsStorages.OrderByDescending(x => x.Id))
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{factionArmory.Id}</td>
+                        <td>{factionArmory.FactionId}</td>
+                        <td>X: {factionArmory.PosX} | Y: {factionArmory.PosY} | Z: {factionArmory.PosZ}</td>
+                        <td>{factionArmory.Dimension}</td>
+                        <td class='text-center'>
+                            <input id='json{factionArmory.Id}' type='hidden' value='{Functions.Serialize(factionArmory)}' />
+                            <button onclick='goto({factionArmory.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit({factionArmory.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='editWeapons({factionArmory.Id})' type='button' class='btn btn-dark btn-sm'>ARMAS</button>
+                            <button onclick='remove(this, {factionArmory.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+            }
+            return html;
         }
     }
 }
