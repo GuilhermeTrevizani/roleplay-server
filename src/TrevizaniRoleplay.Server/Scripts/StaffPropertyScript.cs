@@ -88,30 +88,33 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var property = new Property();
-            var id = new Guid(idString);
-            if (id > 0)
-                property = Global.Properties.FirstOrDefault(x => x.Id == id);
-            else
-                property.LockNumber = Global.Properties.Select(x => x.LockNumber).DefaultIfEmpty(0u).Max() + 1;
-
             var propertyInterior = (PropertyInterior)Convert.ToByte(interior);
             var exit = Functions.GetExitPositionByInterior(propertyInterior);
 
-            property.Interior = propertyInterior;
-            property.EntrancePosX = pos.X;
-            property.EntrancePosY = pos.Y;
-            property.EntrancePosZ = pos.Z;
-            property.Value = value;
-            property.ExitPosX = exit.X;
-            property.ExitPosY = exit.Y;
-            property.ExitPosZ = exit.Z;
-            property.Dimension = dimension;
-            property.Address = address;
+            var property = new Property();
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
+            if (isNew)
+            {
+                property.Create(Global.Properties.Select(x => x.LockNumber).DefaultIfEmpty(0u).Max() + 1,
+                    propertyInterior, pos.X, pos.Y, pos.Z, dimension, value, exit.X, exit.Y, exit.Z,
+                    address, Global.Properties.Select(x => x.Number).DefaultIfEmpty(0).Max() + 1);
+            }
+            else
+            {
+                property = Global.Properties.FirstOrDefault(x => x.Id == id);
+                if (property == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
+
+                property.Update(propertyInterior, pos.X, pos.Y, pos.Z, dimension, value, exit.X, exit.Y, exit.Z, address);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (property.Id == 0)
+            if (isNew)
                 await context.Properties.AddAsync(property);
             else
                 context.Properties.Update(property);
@@ -120,13 +123,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             property.CreateIdentifier();
 
-            if (id == 0)
-            {
-                property.Items = [];
+            if (isNew)
                 Global.Properties.Add(property);
-            }
 
-            player.EmitStaffShowMessage($"Propriedade {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Propriedade {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Propriedade | {Functions.Serialize(property)}", null);
 

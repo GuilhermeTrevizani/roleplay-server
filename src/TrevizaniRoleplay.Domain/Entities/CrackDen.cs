@@ -12,14 +12,26 @@
         public DateTime CooldownDate { get; private set; } = DateTime.Now;
         public int Quantity { get; private set; }
 
-        public void Create()
+        public void Create(float posX, float posY, float posZ, int dimension, int onlinePoliceOfficers, int cooldownQuantityLimit, int cooldownHours)
         {
-
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            Dimension = dimension;
+            OnlinePoliceOfficers = onlinePoliceOfficers;
+            CooldownQuantityLimit = cooldownQuantityLimit;
+            CooldownHours = cooldownHours;
         }
 
-        public void Update()
+        public void Update(float posX, float posY, float posZ, int dimension, int onlinePoliceOfficers, int cooldownQuantityLimit, int cooldownHours)
         {
-
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            Dimension = dimension;
+            OnlinePoliceOfficers = onlinePoliceOfficers;
+            CooldownQuantityLimit = cooldownQuantityLimit;
+            CooldownHours = cooldownHours;
         }
 
         public void AddQuantity(int quantity)

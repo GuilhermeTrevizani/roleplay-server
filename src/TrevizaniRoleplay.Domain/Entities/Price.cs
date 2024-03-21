@@ -19,5 +19,12 @@ namespace TrevizaniRoleplay.Domain.Entities
             Name = name;
             Value = value;
         }
+
+        public void Update(PriceType type, string name, float value)
+        {
+            Type = type;
+            Name = name;
+            Value = value;
+        }
     }
 }

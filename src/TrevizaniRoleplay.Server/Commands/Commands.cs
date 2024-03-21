@@ -275,7 +275,7 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("revistar", "/revistar (ID ou nome)")]
         public static void CMD_revistar(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -456,7 +456,7 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("ferimentos", "/ferimentos (ID ou nome)")]
         public static void CMD_ferimentos(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 
@@ -555,7 +555,7 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("mostraridentidade", "/mostraridentidade (ID ou nome)", Aliases = ["mostrarid"])]
         public static void CMD_mostraridentidade(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 
@@ -614,7 +614,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 
@@ -740,7 +740,7 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("levantar", "/levantar (ID ou nome)")]
         public static void CMD_levantar(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 

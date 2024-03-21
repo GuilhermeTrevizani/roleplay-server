@@ -46,28 +46,12 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            Global.Parameter.VehicleParkValue = parameter.VehicleParkValue;
-            Global.Parameter.HospitalValue = parameter.HospitalValue;
-            Global.Parameter.BarberValue = parameter.BarberValue;
-            Global.Parameter.ClothesValue = parameter.ClothesValue;
-            Global.Parameter.DriverLicenseBuyValue = parameter.DriverLicenseBuyValue;
-            Global.Parameter.Paycheck = parameter.Paycheck;
-            Global.Parameter.DriverLicenseRenewValue = parameter.DriverLicenseRenewValue;
-            Global.Parameter.AnnouncementValue = parameter.AnnouncementValue;
-            Global.Parameter.ExtraPaymentGarbagemanValue = parameter.ExtraPaymentGarbagemanValue;
-            Global.Parameter.Blackout = parameter.Blackout;
-            Global.Parameter.KeyValue = parameter.KeyValue;
-            Global.Parameter.LockValue = parameter.LockValue;
-            Global.Parameter.IPLsJSON = parameter.IPLsJSON ?? "[]";
-            Global.Parameter.TattooValue = parameter.TattooValue;
-            Global.Parameter.CooldownDismantleHours = parameter.CooldownDismantleHours;
-            Global.Parameter.PropertyRobberyConnectedTime = parameter.PropertyRobberyConnectedTime;
-            Global.Parameter.CooldownPropertyRobberyRobberHours = parameter.CooldownPropertyRobberyRobberHours;
-            Global.Parameter.CooldownPropertyRobberyPropertyHours = parameter.CooldownPropertyRobberyPropertyHours;
-            Global.Parameter.PoliceOfficersPropertyRobbery = parameter.PoliceOfficersPropertyRobbery;
-            Global.Parameter.InitialTimeCrackDen = parameter.InitialTimeCrackDen;
-            Global.Parameter.EndTimeCrackDen = parameter.EndTimeCrackDen;
-            Global.Parameter.FirefightersBlockHeal = parameter.FirefightersBlockHeal;
+            Global.Parameter.Update(parameter.VehicleParkValue, parameter.HospitalValue, parameter.BarberValue,
+                parameter.ClothesValue, parameter.DriverLicenseBuyValue, parameter.Paycheck, parameter.DriverLicenseRenewValue,
+                parameter.AnnouncementValue, parameter.ExtraPaymentGarbagemanValue, parameter.Blackout, parameter.KeyValue,
+                parameter.LockValue, parameter.IPLsJSON ?? "[]", parameter.TattooValue, parameter.CooldownDismantleHours,
+                parameter.PropertyRobberyConnectedTime, parameter.CooldownPropertyRobberyRobberHours, parameter.CooldownPropertyRobberyPropertyHours,
+                parameter.PoliceOfficersPropertyRobbery, parameter.InitialTimeCrackDen, parameter.EndTimeCrackDen, parameter.FirefightersBlockHeal);
 
             Global.IPLs.ForEach(ipl => Alt.EmitAllClients("Server:RemoveIpl", ipl));
             Global.IPLs = Functions.Deserialize<List<string>>(Global.Parameter.IPLsJSON);

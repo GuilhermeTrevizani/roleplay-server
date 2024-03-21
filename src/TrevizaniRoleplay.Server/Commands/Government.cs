@@ -230,7 +230,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 

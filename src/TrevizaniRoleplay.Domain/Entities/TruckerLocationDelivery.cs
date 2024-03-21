@@ -8,5 +8,21 @@
         public float PosZ { get; private set; }
 
         public TruckerLocation? TruckerLocation { get; private set; }
+
+        public void Create(Guid truckerLocationId, float posX, float posY, float posZ)
+        {
+            TruckerLocationId = truckerLocationId;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+        }
+
+        public void Update(Guid truckerLocationId, float posX, float posY, float posZ)
+        {
+            TruckerLocationId = truckerLocationId;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+        }
     }
 }

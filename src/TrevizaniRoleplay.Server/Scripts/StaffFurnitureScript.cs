@@ -37,28 +37,37 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var furniture = new Furniture();
-            if (id > 0)
+            if (isNew)
+            {
+                furniture.Create(category, name, model, value);
+            }
+            else
+            {
                 furniture = Global.Furnitures.FirstOrDefault(x => x.Id == id);
+                if (furniture == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            furniture.Category = category;
-            furniture.Name = name;
-            furniture.Model = model;
-            furniture.Value = value;
+                furniture.Update(category, name, model, value);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (furniture.Id == 0)
+            if (isNew)
                 await context.Furnitures.AddAsync(furniture);
             else
                 context.Furnitures.Update(furniture);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.Furnitures.Add(furniture);
 
-            player.EmitStaffShowMessage($"Mobília {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Mobília {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Mobília | {Functions.Serialize(furniture)}", null);
 

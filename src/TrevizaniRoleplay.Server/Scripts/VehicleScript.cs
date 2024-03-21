@@ -162,19 +162,25 @@ namespace TrevizaniRoleplay.Server.Scripts
         [Command("vvender", "/vvender (ID ou nome) (valor)")]
         public static void CMD_vvender(MyPlayer player, string idOrName, int valor)
         {
-            var prox = Global.Vehicles
+            var vehicle = Global.Vehicles
                 .Where(x => x.VehicleDB.CharacterId == player.Character.Id
                     && player.Position.Distance(x.Position) <= Global.RP_DISTANCE
                     && x.Dimension == player.Dimension)
                 .MinBy(x => player.Position.Distance(x.Position));
 
-            if (prox == null)
+            if (vehicle == null)
             {
                 player.SendMessage(MessageType.Error, "Você não está próximo de nenhum veículo seu.");
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            if (vehicle.VehicleDB.StaffGift)
+            {
+                player.SendMessage(MessageType.Error, "Você não pode vender este veículo pois é um benefício da staff.");
+                return;
+            }
+
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -190,7 +196,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var restricao = Functions.CheckVIPVehicle(prox.VehicleDB.Model);
+            var restricao = Functions.CheckVIPVehicle(vehicle.VehicleDB.Model);
             if (restricao.Item2 != UserVIP.None && (restricao.Item2 > target.User.VIP || (target.User.VIPValidDate ?? DateTime.MinValue) < DateTime.Now))
             {
                 player.SendMessage(MessageType.Error, $"O veículo é restrito para VIP {restricao.Item2}.");
@@ -201,13 +207,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 Type = InviteType.VendaVeiculo,
                 SenderCharacterId = player.Character.Id,
-                Value = [prox.VehicleDB.Id.ToString(), valor.ToString()],
+                Value = [vehicle.VehicleDB.Id.ToString(), valor.ToString()],
             };
             target.Invites.RemoveAll(x => x.Type == InviteType.VendaVeiculo);
             target.Invites.Add(convite);
 
-            player.SendMessage(MessageType.Success, $"Você ofereceu seu veículo {prox.VehicleDB.Id} para {target.ICName} por ${valor:N0}.");
-            target.SendMessage(MessageType.Success, $"{player.ICName} ofereceu para você o veículo {prox.VehicleDB.Id} por ${valor:N0}. (/ac {(int)convite.Type} para aceitar ou /rc {(int)convite.Type} para recusar)");
+            player.SendMessage(MessageType.Success, $"Você ofereceu seu veículo {vehicle.VehicleDB.Id} para {target.ICName} por ${valor:N0}.");
+            target.SendMessage(MessageType.Success, $"{player.ICName} ofereceu para você o veículo {vehicle.VehicleDB.Id} por ${valor:N0}. (/ac {(int)convite.Type} para aceitar ou /rc {(int)convite.Type} para recusar)");
         }
 
         [Command("vliberar", "/vliberar (código do veículo)")]
@@ -260,7 +266,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             player.SendMessage(MessageType.Success, $"Você liberou seu veículo por ${value:N0}.");
-            veh.SeizedValue = veh.DismantledValue = 0;
+            veh.ResetSeizedAndDismantled();
             context.Vehicles.Update(veh);
             await context.SaveChangesAsync();
         }
@@ -395,9 +401,9 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("vplaca", "/vplaca (código do veículo) (placa)")]
-        public static async Task CMD_vplaca(MyPlayer player, string idString, string placa)
+        public static async Task CMD_vplaca(MyPlayer player, string idString, string plate)
         {
-            if (placa.Length > 8)
+            if (plate.Length > 8)
             {
                 player.SendMessage(MessageType.Error, "A placa deve ter até 8 caracteres.");
                 return;
@@ -417,27 +423,27 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id);
-            if (veh == null)
+            var vehicle = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id);
+            if (vehicle == null)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
                 return;
             }
 
-            if (await context.Vehicles.AnyAsync(x => x.Plate.Equals(placa, StringComparison.CurrentCultureIgnoreCase)))
+            if (await context.Vehicles.AnyAsync(x => x.Plate.Equals(plate, StringComparison.CurrentCultureIgnoreCase)))
             {
-                player.SendMessage(MessageType.Error, $"Já existe um veículo com a placa {placa.ToUpper()}.");
+                player.SendMessage(MessageType.Error, $"Já existe um veículo com a placa {plate.ToUpper()}.");
                 return;
             }
 
-            player.User.PlateChanges--;
-            veh.Plate = placa.ToUpper();
-            context.Vehicles.Update(veh);
+            player.User.RemovePlateChanges();
+            vehicle.SetPlate(plate.ToUpper());
+            context.Vehicles.Update(vehicle);
             await context.SaveChangesAsync();
             await player.Save();
 
-            player.SendMessage(MessageType.Success, $"Você alterou a placa do veículo {veh.Id} para {veh.Plate}.");
-            await player.GravarLog(LogType.PlateChange, $"{veh.Id} {veh.Plate}", null);
+            player.SendMessage(MessageType.Success, $"Você alterou a placa do veículo {vehicle.Id} para {vehicle.Plate}.");
+            await player.GravarLog(LogType.PlateChange, $"{vehicle.Id} {vehicle.Plate}", null);
         }
 
         [Command("vvenderconce", "/vvenderconce (código do veículo)")]
@@ -756,19 +762,19 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var veh = Global.Vehicles.Where(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= 5
+            var vehicle = Global.Vehicles.Where(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= 5
                 && x.Dimension == player.Dimension
                 && x.LockState == VehicleLockState.Unlocked)
                 .OrderBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)))
                 .FirstOrDefault();
 
-            if (veh == null)
+            if (vehicle == null)
             {
                 player.SendMessage(MessageType.Error, "Você não está próximo de nenhum veículo destrancado.");
                 return;
             }
 
-            if (veh.VehicleDB.Fuel == veh.VehicleDB.GetMaxFuel())
+            if (vehicle.VehicleDB.Fuel == vehicle.VehicleDB.GetMaxFuel())
             {
                 player.SendMessage(MessageType.Error, "Veículo está com tanque cheio.");
                 return;
@@ -780,39 +786,39 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var galaoCombustivel = player.Items.FirstOrDefault(x => x.Category == ItemCategory.Weapon
+            var jerryCan = player.Items.FirstOrDefault(x => x.Category == ItemCategory.Weapon
                 && x.Type == player.CurrentWeapon
                 && x.Slot < 0);
-            if (galaoCombustivel == null)
+            if (jerryCan == null)
             {
                 player.SendMessage(MessageType.Error, "Você não está com um galão de combustível em mãos.");
                 return;
             }
 
-            var extra = Functions.Deserialize<WeaponItem>(galaoCombustivel.Extra);
-            var combustivel = Convert.ToInt32(Math.Ceiling(extra.Ammo / 50f));
-            var combustivelNecessario = veh.VehicleDB.GetMaxFuel() - veh.VehicleDB.Fuel;
-            if (combustivelNecessario > combustivel)
-                combustivelNecessario = combustivel;
+            var extra = Functions.Deserialize<WeaponItem>(jerryCan.Extra);
+            var fuel = Convert.ToInt32(Math.Ceiling(extra.Ammo / 50f));
+            var necessaryFuel = vehicle.VehicleDB.GetMaxFuel() - vehicle.VehicleDB.Fuel;
+            if (necessaryFuel > fuel)
+                necessaryFuel = fuel;
 
-            veh.VehicleDB.SetFuel(veh.VehicleDB.Fuel + combustivelNecessario);
-            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.FuelHUD);
+            vehicle.VehicleDB.SetFuel(vehicle.VehicleDB.Fuel + necessaryFuel);
+            vehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, vehicle.FuelHUD);
 
-            combustivel -= combustivelNecessario;
-            if (combustivel == 0)
+            fuel -= necessaryFuel;
+            if (fuel == 0)
             {
-                await player.RemoveItem(galaoCombustivel);
+                await player.RemoveItem(jerryCan);
             }
             else
             {
-                extra.Ammo = combustivel * 50;
-                galaoCombustivel.SetExtra(Functions.Serialize(extra));
+                extra.Ammo = fuel * 50;
+                jerryCan.SetExtra(Functions.Serialize(extra));
                 await using var context = new DatabaseContext();
-                context.CharactersItems.Update(galaoCombustivel);
+                context.CharactersItems.Update(jerryCan);
                 await context.SaveChangesAsync();
             }
 
-            player.SendMessage(MessageType.Success, $"Você usou um galão de combustível e abasteceu seu veículo com {combustivelNecessario} litro{(combustivelNecessario > 1 ? "s" : string.Empty)}.");
+            player.SendMessage(MessageType.Success, $"Você usou um galão de combustível e abasteceu seu veículo com {necessaryFuel} litro{(necessaryFuel > 1 ? "s" : string.Empty)}.");
             player.SendMessageToNearbyPlayers("abastece o veículo usando um galão de combustível.", MessageCategory.Ame, 10);
         }
 
@@ -1132,7 +1138,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.SendMessage(MessageType.Success, $"Aguarde 300 segundos. Pressione DELETE para cancelar a ação.");
             player.CancellationTokenSourceAcao?.Cancel();
             player.CancellationTokenSourceAcao = new System.Threading.CancellationTokenSource();
-            await Task.Delay(300000, player.CancellationTokenSourceAcao.Token).ContinueWith(t =>
+            await Task.Delay(300_000, player.CancellationTokenSourceAcao.Token).ContinueWith(t =>
             {
                 if (t.IsCanceled)
                     return;
@@ -1149,10 +1155,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    veh.VehicleDB.DismantledValue = value;
+                    veh.VehicleDB.SetDismantledValue(value);
                     await veh.Estacionar(null);
 
-                    player.User.CooldownDismantle = DateTime.Now.AddHours(Global.Parameter.CooldownDismantleHours);
+                    player.User.SetCooldownDismantle(DateTime.Now.AddHours(Global.Parameter.CooldownDismantleHours));
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("desmancha o veículo.", MessageCategory.Ame, 5);
                     player.SendMessage(MessageType.Success, $"Você desmanchou o veículo e recebeu ${value:N0}.");
@@ -1769,39 +1775,18 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
 
                 var drawingColor1 = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.Color1);
-                veh.VehicleDB.Color1R = drawingColor1.R;
-                veh.VehicleDB.Color1G = drawingColor1.G;
-                veh.VehicleDB.Color1B = drawingColor1.B;
-
                 var drawingColor2 = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.Color2);
-                veh.VehicleDB.Color2R = drawingColor2.R;
-                veh.VehicleDB.Color2G = drawingColor2.G;
-                veh.VehicleDB.Color2B = drawingColor2.B;
-
-                veh.VehicleDB.WheelType = vehicleTuning.WheelType;
-                veh.VehicleDB.WheelVariation = vehicleTuning.WheelVariation;
-                veh.VehicleDB.WheelColor = vehicleTuning.WheelColor;
-
                 var drawingNeonColor = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.NeonColor);
-                veh.VehicleDB.NeonColorR = drawingNeonColor.R;
-                veh.VehicleDB.NeonColorG = drawingNeonColor.G;
-                veh.VehicleDB.NeonColorB = drawingNeonColor.B;
-                veh.VehicleDB.NeonLeft = Convert.ToBoolean(vehicleTuning.NeonLeft);
-                veh.VehicleDB.NeonRight = Convert.ToBoolean(vehicleTuning.NeonRight);
-                veh.VehicleDB.NeonFront = Convert.ToBoolean(vehicleTuning.NeonFront);
-                veh.VehicleDB.NeonBack = Convert.ToBoolean(vehicleTuning.NeonBack);
-
-                veh.VehicleDB.HeadlightColor = vehicleTuning.HeadlightColor;
-                veh.VehicleDB.LightsMultiplier = vehicleTuning.LightsMultiplier;
-
-                veh.VehicleDB.WindowTint = vehicleTuning.WindowTint;
-
                 var drawingTireSmokeColor = System.Drawing.ColorTranslator.FromHtml(vehicleTuning.TireSmokeColor);
-                veh.VehicleDB.TireSmokeColorR = drawingTireSmokeColor.R;
-                veh.VehicleDB.TireSmokeColorG = drawingTireSmokeColor.G;
-                veh.VehicleDB.TireSmokeColorB = drawingTireSmokeColor.B;
 
-                veh.VehicleDB.ModsJSON = Functions.Serialize(realMods);
+                veh.VehicleDB.SetColor(drawingColor1.R, drawingColor1.G, drawingColor1.B, drawingColor2.R, drawingColor2.G, drawingColor2.B);
+                veh.VehicleDB.SetTunning(vehicleTuning.WheelType, vehicleTuning.WheelVariation, vehicleTuning.WheelColor,
+                    drawingNeonColor.R, drawingNeonColor.G, drawingNeonColor.B,
+                    Convert.ToBoolean(vehicleTuning.NeonLeft), Convert.ToBoolean(vehicleTuning.NeonRight),
+                    Convert.ToBoolean(vehicleTuning.NeonFront), Convert.ToBoolean(vehicleTuning.NeonBack),
+                    vehicleTuning.HeadlightColor, vehicleTuning.LightsMultiplier,
+                    vehicleTuning.WindowTint, drawingTireSmokeColor.R, drawingTireSmokeColor.G, drawingTireSmokeColor.B,
+                    Functions.Serialize(realMods));
 
                 await using var context = new DatabaseContext();
                 context.Vehicles.Update(veh.VehicleDB);
@@ -1873,7 +1858,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [Command("tunarver", "/tunarver (ID ou nome)")]
         public static void CMD_tunarver(MyPlayer player, string idOrName)
         {
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -1913,7 +1898,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -1956,7 +1941,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -2028,9 +2013,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (veh.FactionGift)
+            if (veh.StaffGift)
             {
-                player.SendMessage(Models.MessageType.Error, "Você não pode vender este veículo pois é um benefício da facção.");
+                player.SendMessage(MessageType.Error, "Você não pode vender este veículo pois é um benefício da facção.");
                 return;
             }
 

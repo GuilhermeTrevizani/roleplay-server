@@ -17,6 +17,24 @@ namespace TrevizaniRoleplay.Domain.Entities
         [NotMapped]
         public bool Government => Type == FactionType.Police || Type == FactionType.Firefighter;
 
+        public void Create(string name, FactionType factionType, string color, int slots, string chatColor)
+        {
+            Name = name;
+            Type = factionType;
+            Color = color;
+            Slots = slots;
+            ChatColor = chatColor;
+        }
+
+        public void Update(string name, FactionType factionType, string color, int slots, string chatColor)
+        {
+            Name = name;
+            Type = factionType;
+            Color = color;
+            Slots = slots;
+            ChatColor = chatColor;
+        }
+
         public List<FactionFlag> GetFlags()
         {
             var flags = Enum.GetValues(typeof(FactionFlag)).Cast<FactionFlag>().ToList();

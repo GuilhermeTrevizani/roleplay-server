@@ -51,8 +51,7 @@ namespace TrevizaniRoleplay.Server.Extensions
 
         public static async Task RemoveOwner(this Company company)
         {
-            company.CharacterId = null;
-            company.RentPaymentDate = null;
+            company.ResetOwner();
             await using var context = new DatabaseContext();
             context.Companies.Update(company);
             await context.SaveChangesAsync();

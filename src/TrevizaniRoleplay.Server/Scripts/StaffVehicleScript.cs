@@ -37,26 +37,12 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffVehicleSave))]
-        public static async Task StaffVehicleSave(MyPlayer player, string idString, string model, int type, string typeIdString,
+        public static async Task StaffVehicleSave(MyPlayer player, string idString, string model, int type, string typeId,
             int livery, int color1R, int color1G, int color1B, int color2R, int color2G, int color2B)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Vehicles))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
-                return;
-            }
-
-            var typeId = new Guid(typeIdString);
-            var id = new Guid(idString);
-            if (id > 0 && Global.Vehicles.Any(x => x.VehicleDB.Id == id))
-            {
-                player.EmitStaffShowMessage($"Veículo {id} está spawnado.");
-                return;
-            }
-
-            if (id == 0 && !Enum.TryParse(model, true, out VehicleModel v1) && !Enum.TryParse(model, true, out VehicleModelMods v2))
-            {
-                player.EmitStaffShowMessage($"Modelo {model} não existe.");
                 return;
             }
 
@@ -66,89 +52,103 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             await using var context = new DatabaseContext();
-
-            var vehicle = new Vehicle();
-            if (id > 0)
-                vehicle = await context.Vehicles.FirstOrDefaultAsync(x => x.Id == id);
-
-            var government = false;
-            if (type == 1) // Faction
+            Vehicle? vehicle = null;
+            if (isNew)
             {
-                var faction = Global.Factions.FirstOrDefault(x => x.Id == typeId);
-                if (!(faction?.Government ?? false))
+                if (!Enum.TryParse(model, true, out VehicleModel v1) && !Enum.TryParse(model, true, out VehicleModelMods v2))
                 {
-                    player.EmitStaffShowMessage($"Facção {typeId} não é do tipo governamental.");
+                    player.EmitStaffShowMessage($"Modelo {model} não existe.");
                     return;
                 }
 
-                government = true;
-                vehicle.FactionId = typeId;
-            }
-            else if (type == 2) // Job
-            {
-                var job = Global.Jobs.FirstOrDefault(x => x.CharacterJob == (CharacterJob)typeId);
-                if (job == null)
+                vehicle = new();
+
+                var government = false;
+                if (type == 1) // Faction
                 {
-                    player.EmitStaffShowMessage($"Emprego {typeId} não existe.");
-                    return;
+                    var factionId = new Guid(typeId);
+                    var faction = Global.Factions.FirstOrDefault(x => x.Id == factionId);
+                    if (!(faction?.Government ?? false))
+                    {
+                        player.EmitStaffShowMessage($"Facção {typeId} não é do tipo governamental.");
+                        return;
+                    }
+
+                    government = true;
+                    vehicle.SetFaction(factionId);
+                }
+                else if (type == 2) // Job
+                {
+                    var job = Global.Jobs.FirstOrDefault(x => x.CharacterJob == (CharacterJob)Convert.ToByte(typeId));
+                    if (job == null)
+                    {
+                        player.EmitStaffShowMessage($"Emprego {typeId} não existe.");
+                        return;
+                    }
+
+                    vehicle.SetJob(job.CharacterJob);
+                    color1R = job.VehicleColor.R;
+                    color1G = job.VehicleColor.G;
+                    color1B = job.VehicleColor.B;
+                    color2R = job.VehicleColor.R;
+                    color2G = job.VehicleColor.G;
+                    color2B = job.VehicleColor.B;
+                }
+                else if (type == 3) // Faction Gift
+                {
+                    var characterId = new Guid(typeId);
+                    var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == characterId);
+                    if (character == null)
+                    {
+                        player.EmitStaffShowMessage($"Personagem {typeId} não existe.");
+                        return;
+                    }
+
+                    vehicle.SetOwner(characterId);
+                    vehicle.SetStaffGift();
                 }
 
-                vehicle.Job = job.CharacterJob;
-                vehicle.Color1R = job.VehicleColor.R;
-                vehicle.Color1G = job.VehicleColor.G;
-                vehicle.Color1B = job.VehicleColor.B;
-                vehicle.Color2R = job.VehicleColor.R;
-                vehicle.Color2G = job.VehicleColor.G;
-                vehicle.Color2B = job.VehicleColor.B;
-            }
-            else if (type == 3) // Faction Gift
-            {
-                var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == typeId);
-                if (character == null)
-                {
-                    player.EmitStaffShowMessage($"Personagem {typeId} não existe.");
-                    return;
-                }
-
-                vehicle.CharacterId = typeId;
-                vehicle.FactionGift = true;
-            }
-
-            vehicle.Livery = bLivery;
-
-            if (type != 2)
-            {
-                vehicle.Color1R = Convert.ToByte(color1R);
-                vehicle.Color1G = Convert.ToByte(color1G);
-                vehicle.Color1B = Convert.ToByte(color1B);
-                vehicle.Color2R = Convert.ToByte(color2R);
-                vehicle.Color2G = Convert.ToByte(color2G);
-                vehicle.Color2B = Convert.ToByte(color2B);
-            }
-
-            if (vehicle.Id == 0)
-            {
-                vehicle.Model = model;
-                vehicle.PosX = player.Position.X;
-                vehicle.PosY = player.Position.Y;
-                vehicle.PosZ = player.Position.Z;
-                vehicle.RotR = player.Rotation.Roll;
-                vehicle.RotP = player.Rotation.Pitch;
-                vehicle.RotY = player.Rotation.Yaw;
-                vehicle.Fuel = vehicle.GetMaxFuel();
-                vehicle.Plate = await Functions.GenerateVehiclePlate(government);
-                vehicle.LockNumber = await context.Vehicles.OrderByDescending(x => x.LockNumber).Select(x => x.LockNumber).FirstOrDefaultAsync() + 1;
-                await context.Vehicles.AddAsync(vehicle);
+                vehicle.Create(model, await Functions.GenerateVehiclePlate(government),
+                    Convert.ToByte(color1R), Convert.ToByte(color1G), Convert.ToByte(color1B),
+                    Convert.ToByte(color2R), Convert.ToByte(color2G), Convert.ToByte(color2B));
+                vehicle.ChangePosition(player.Position.X, player.Position.Y, player.Position.Z,
+                    player.Rotation.Roll, player.Rotation.Pitch, player.Rotation.Yaw);
+                vehicle.SetFuel(vehicle.GetMaxFuel());
+                vehicle.SetLivery(bLivery);
+                if (vehicle.CharacterId.HasValue)
+                    vehicle.SetLockNumber(await context.Vehicles.OrderByDescending(x => x.LockNumber).Select(x => x.LockNumber).FirstOrDefaultAsync() + 1);
             }
             else
             {
-                context.Vehicles.Update(vehicle);
+                if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
+                {
+                    player.EmitStaffShowMessage($"Veículo {id} está spawnado.");
+                    return;
+                }
+
+                vehicle = await context.Vehicles.FirstOrDefaultAsync(x => x.Id == id);
+                if (vehicle == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
+
+                vehicle.SetLivery(bLivery);
+                vehicle.SetColor(Convert.ToByte(color1R), Convert.ToByte(color1G), Convert.ToByte(color1B),
+                    Convert.ToByte(color2R), Convert.ToByte(color2G), Convert.ToByte(color2B));
             }
+
+            if (isNew)
+                await context.Vehicles.AddAsync(vehicle);
+            else
+                context.Vehicles.Update(vehicle);
 
             await context.SaveChangesAsync();
 
-            player.EmitStaffShowMessage($"Veículo {(id == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Veículo {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Veículo | {Functions.Serialize(vehicle)}", null);
 
@@ -198,7 +198,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 .Where(x => !x.Sold && (
                     x.Job != CharacterJob.None
                     || x.FactionId.HasValue
-                    || (x.CharacterId.HasValue && x.FactionGift)))
+                    || (x.CharacterId.HasValue && x.StaffGift)))
                 .OrderByDescending(x => x.Id)
                 .ToListAsync();
             if (vehicles.Count == 0)

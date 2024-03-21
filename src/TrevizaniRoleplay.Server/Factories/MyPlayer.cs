@@ -64,6 +64,7 @@ namespace TrevizaniRoleplay.Server.Factories
             UserStaff.LeadAdministrator => "#00AA00",
             UserStaff.HeadAdministrator => "#D55D28",
             UserStaff.Manager => "#CC4545",
+            UserStaff.Founder => "#E3F280",
             _ => string.Empty,
         };
 
@@ -471,7 +472,7 @@ namespace TrevizaniRoleplay.Server.Factories
             Timer.Start();
         }
 
-        public void SetarFerido()
+        public void SetWound()
         {
             if (Character.Wound >= CharacterWound.PK)
             {
@@ -596,7 +597,7 @@ namespace TrevizaniRoleplay.Server.Factories
                 target.Emit("chat:sendMessage", $"[SPEC] {mensagem}", cor);
         }
 
-        public MyPlayer? ObterPersonagemPoridOrName(string idOrName, bool isPodeProprioPlayer = true)
+        public MyPlayer? GetCharacterByIdOrName(string idOrName, bool isPodeProprioPlayer = true)
         {
             if (int.TryParse(idOrName, out int id))
             {

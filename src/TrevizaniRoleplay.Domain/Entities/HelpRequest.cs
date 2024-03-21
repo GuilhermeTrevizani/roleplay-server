@@ -31,7 +31,7 @@ namespace TrevizaniRoleplay.Domain.Entities
             UserName = userName;
         }
 
-        public void Answer(Guid staffUserId)
+        public void Answer(Guid? staffUserId)
         {
             AnswerDate = DateTime.Now;
             StaffUserId = staffUserId;

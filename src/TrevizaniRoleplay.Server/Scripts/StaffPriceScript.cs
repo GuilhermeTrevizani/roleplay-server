@@ -98,6 +98,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             if (Global.Prices.Any(x => x.Id != id && x.Type == priceType && x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 player.EmitStaffShowMessage($"Já existe um preço do tipo {priceType.GetDisplay()} com o nome {name}.");
@@ -105,36 +106,45 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var price = new Price();
-            if (id > 0)
+            if (isNew)
+            {
+                price.Create(priceType, name, value);
+            }
+            else
+            {
                 price = Global.Prices.FirstOrDefault(x => x.Id == id);
+                if (price == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            price.Type = priceType;
-            price.Name = name;
-            price.Value = value;
+                price.Update(priceType, name, value);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (price.Id == 0)
+            if (isNew)
                 await context.Prices.AddAsync(price);
             else
                 context.Prices.Update(price);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.Prices.Add(price);
 
-            player.EmitStaffShowMessage($"Preço {(id == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Preço {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Preço | {Functions.Serialize(price)}", null);
 
             var html = GetPricesHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
                 target.Emit("StaffPrices", true, html);
         }
 
         [AsyncClientEvent(nameof(StaffPriceRemove))]
-        public static async Task StaffPriceRemove(MyPlayer player, int id)
+        public static async Task StaffPriceRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Prices))
             {
@@ -142,6 +152,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var price = Global.Prices.FirstOrDefault(x => x.Id == id);
             if (price != null)
             {

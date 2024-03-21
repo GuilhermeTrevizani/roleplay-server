@@ -186,7 +186,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -207,7 +207,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -228,11 +228,11 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
-            var targetDest = player.ObterPersonagemPoridOrName(idOrNameDestino, false);
+            var targetDest = player.GetCharacterByIdOrName(idOrNameDestino, false);
             if (targetDest == null)
                 return;
 
@@ -277,7 +277,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -434,7 +434,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -496,7 +496,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 
@@ -560,7 +560,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 
@@ -663,7 +663,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName);
+            var target = player.GetCharacterByIdOrName(idOrName);
             if (target == null)
                 return;
 

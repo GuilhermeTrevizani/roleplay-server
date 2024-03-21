@@ -47,7 +47,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
 
                 await player.GravarLog(LogType.Death, Functions.Serialize(player.Wounds), killer is MyPlayer playerKiller ? playerKiller : null);
-                player.SetarFerido();
+                player.SetWound();
             }
             catch (Exception ex)
             {

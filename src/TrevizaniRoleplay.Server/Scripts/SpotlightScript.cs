@@ -28,9 +28,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (!veh.VehicleDB.Model.Equals(VehicleModel.Police.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 && !veh.VehicleDB.Model.Equals(VehicleModel.Police2.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 && !veh.VehicleDB.Model.Equals(VehicleModel.Police3.ToString(), StringComparison.CurrentCultureIgnoreCase)
-                && !veh.VehicleDB.Model.Equals(VehicleModel.Police4.ToString(), StringComparison.CurrentCultureIgnoreCase)
-                && !veh.VehicleDB.Model.Equals(VehicleModelMods.PSCOUT.ToString(), StringComparison.CurrentCultureIgnoreCase)
-                && !veh.VehicleDB.Model.Equals(VehicleModelMods.POLICE42.ToString(), StringComparison.CurrentCultureIgnoreCase))
+                && !veh.VehicleDB.Model.Equals(VehicleModel.Police4.ToString(), StringComparison.CurrentCultureIgnoreCase))
             {
                 player.SendMessage(MessageType.Error, "Você não está em um veículo policial com holofote.");
                 return;

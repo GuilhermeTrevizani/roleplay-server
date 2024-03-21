@@ -37,5 +37,35 @@
         {
             MaxCharactersOnline = value;
         }
+
+        public void Update(int vehicleParkValue, int hospitalValue, int barberValue, int clothesValue, int driverLicenseBuyValue,
+            int paycheck, int driverLicenseRenewValue, int announcementValue, int extraPaymentGarbagemanValue, bool blackout,
+            int keyValue, int lockValue, string iplsJSON, int tattooValue, int cooldownDismantleHours,
+            int propertyRobberyConnectedTime, int cooldownPropertyRobberyRobberHours, int cooldownPropertyRobberyPropertyHours,
+            int policeOfficersPropertyRobbery, byte initialTimeCrackDen, byte endTimeCrackDen, int firefightersBlockHeal)
+        {
+            VehicleParkValue = vehicleParkValue;
+            HospitalValue = hospitalValue;
+            BarberValue = barberValue;
+            ClothesValue = clothesValue;
+            DriverLicenseBuyValue = driverLicenseBuyValue;
+            Paycheck = paycheck;
+            DriverLicenseRenewValue = driverLicenseRenewValue;
+            AnnouncementValue = announcementValue;
+            ExtraPaymentGarbagemanValue = extraPaymentGarbagemanValue;
+            Blackout = blackout;
+            KeyValue = keyValue;
+            LockValue = lockValue;
+            IPLsJSON = iplsJSON;
+            TattooValue = tattooValue;
+            CooldownDismantleHours = cooldownDismantleHours;
+            PropertyRobberyConnectedTime = propertyRobberyConnectedTime;
+            CooldownPropertyRobberyRobberHours = cooldownPropertyRobberyRobberHours;
+            CooldownPropertyRobberyPropertyHours = cooldownPropertyRobberyPropertyHours;
+            PoliceOfficersPropertyRobbery = policeOfficersPropertyRobbery;
+            InitialTimeCrackDen = initialTimeCrackDen;
+            EndTimeCrackDen = endTimeCrackDen;
+            FirefightersBlockHeal = firefightersBlockHeal;
+        }
     }
 }

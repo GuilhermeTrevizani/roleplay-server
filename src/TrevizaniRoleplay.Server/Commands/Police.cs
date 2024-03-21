@@ -28,7 +28,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -67,7 +67,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 

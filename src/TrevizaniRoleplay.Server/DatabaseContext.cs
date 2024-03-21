@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TrevizaniRoleplay.Domain.Entities;
+using TrevizaniRoleplay.Infra.Data.ModelConfigurations;
 
 namespace TrevizaniRoleplay.Server
 {
@@ -62,7 +63,7 @@ namespace TrevizaniRoleplay.Server
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(typeof(UserModelConfiguration))!);
         }
     }
 }

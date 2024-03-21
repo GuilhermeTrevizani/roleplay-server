@@ -55,29 +55,38 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var faction = new Faction();
-            if (id > 0)
+            if (isNew)
+            {
+                faction.Create(name, (FactionType)type, color, slots, chatColor);
+            }
+            else
+            {
                 faction = Global.Factions.FirstOrDefault(x => x.Id == id);
+                if (faction == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            faction.Name = name;
-            faction.Type = (FactionType)Convert.ToByte(type);
-            faction.Color = color;
-            faction.Slots = slots;
-            faction.ChatColor = chatColor;
+                faction.Update(name, (FactionType)type, color, slots, chatColor);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (faction.Id == 0)
+            if (isNew)
                 await context.Factions.AddAsync(faction);
             else
                 context.Factions.Update(faction);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.Factions.Add(faction);
 
-            player.EmitStaffShowMessage($"Facção {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Facção {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Facção | {Functions.Serialize(faction)}", null);
 
@@ -96,12 +105,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             player.Emit("Server:CloseView");
-            var htmlFactionRanks = Functions.GetFactionRanksHTML(factionId);
+            var id = new Guid(idString);
+            var htmlFactionRanks = Functions.GetFactionRanksHTML(id);
             player.Emit("StaffShowFactionRanks",
                 false,
                 htmlFactionRanks,
-                factionId,
-                Global.Factions.FirstOrDefault(x => x.Id == factionId)?.Name);
+                idString,
+                Global.Factions.FirstOrDefault(x => x.Id == id)?.Name);
         }
 
         [AsyncClientEvent(nameof(StaffFactionRankSave))]
@@ -120,29 +130,41 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var factionId = new Guid(factionIdString);
+            var factionRankId = new Guid(factionRankIdString);
+            var isNew = string.IsNullOrWhiteSpace(factionRankIdString);
             var factionRank = new FactionRank();
-            if (factionRankId > 0)
-                factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == factionRankId);
+            if (isNew)
+            {
+                factionRank.Create(factionId,
+                    Global.FactionsRanks.Where(x => x.FactionId == factionId).Select(x => x.Position).DefaultIfEmpty(0).Max() + 1,
+                    name, salary);
+            }
             else
-                factionRank.Position = Global.FactionsRanks.Where(x => x.FactionId == factionId).Select(x => x.Position).DefaultIfEmpty(0).Max() + 1;
+            {
+                factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == factionRankId);
+                if (factionRank == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            factionRank.FactionId = factionId;
-            factionRank.Name = name;
-            factionRank.Salary = salary;
+                factionRank.Update(name, salary);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (factionRank.Id == 0)
+            if (isNew)
                 await context.FactionsRanks.AddAsync(factionRank);
             else
                 context.FactionsRanks.Update(factionRank);
 
             await context.SaveChangesAsync();
 
-            if (factionRankId == 0)
+            if (isNew)
                 Global.FactionsRanks.Add(factionRank);
 
-            player.EmitStaffShowMessage($"Rank {(factionRankId == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Rank {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Rank | {Functions.Serialize(factionRank)}", null);
 
@@ -160,15 +182,16 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == factionRankId);
+            var id = new Guid(idString);
+            var factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == id);
             if (factionRank == null)
                 return;
 
             await using var context = new DatabaseContext();
 
-            if (await context.Characters.AnyAsync(x => x.FactionRankId == factionRankId))
+            if (await context.Characters.AnyAsync(x => x.FactionRankId == factionRank.Id))
             {
-                player.EmitStaffShowMessage($"Não é possível remover o rank {factionRankId} pois existem personagens nele.");
+                player.EmitStaffShowMessage($"Não é possível remover o rank {factionRank.Id} pois existem personagens nele.");
                 return;
             }
 
@@ -186,7 +209,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionRankOrder))]
-        public static async Task StaffFactionRankOrder(MyPlayer player, string factionIdString, string ranksJSON)
+        public static async Task StaffFactionRankOrder(MyPlayer player, string idString, string ranksJSON)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -196,7 +219,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await using var context = new DatabaseContext();
 
-            var factionRanks = Global.FactionsRanks.Where(x => x.FactionId == factionId);
+            var id = new Guid(idString);
+            var factionRanks = Global.FactionsRanks.Where(x => x.FactionId == id);
             var ranks = Functions.Deserialize<List<FactionRank>>(ranksJSON);
             foreach (var rank in ranks)
             {
@@ -210,7 +234,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Faction, $"Ordenar Ranks | {ranksJSON}", null);
 
-            var html = Functions.GetFactionRanksHTML(factionId);
+            var html = Functions.GetFactionRanksHTML(id);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 target.Emit("StaffShowFactionRanks", true, html);
         }
@@ -219,9 +243,10 @@ namespace TrevizaniRoleplay.Server.Scripts
         public static async Task StaffFactionShowMembers(MyPlayer player, string idString)
         {
             player.Emit("Server:CloseView");
-            var ranksJson = Functions.Serialize(Global.FactionsRanks.Where(x => x.FactionId == factionId).OrderBy(x => x.Position));
+            var id = new Guid(idString);
+            var ranksJson = Functions.Serialize(Global.FactionsRanks.Where(x => x.FactionId == id).OrderBy(x => x.Position));
 
-            var faction = Global.Factions.FirstOrDefault(x => x.Id == factionId);
+            var faction = Global.Factions.FirstOrDefault(x => x.Id == id);
 
             var flagsJson = Functions.Serialize(
                 faction.GetFlags()
@@ -232,11 +257,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            var htmlFactionMembers = await Functions.GetFactionMembersHTML(factionId);
+            var htmlFactionMembers = await Functions.GetFactionMembersHTML(id);
             player.Emit("StaffShowFactionMembers",
                 false,
                 htmlFactionMembers,
-                factionId,
+                idString,
                 faction.Name,
                 faction.Government,
                 ranksJson,
@@ -252,6 +277,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var factionId = new Guid(factionIdString);
             var faction = Global.Factions.FirstOrDefault(x => x.Id == factionId);
             if (faction == null)
                 return;
@@ -303,7 +329,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionMemberSave))]
-        public static async Task StaffFactionMemberSave(MyPlayer player, string factionId, string characterId, string factionRankId,
+        public static async Task StaffFactionMemberSave(MyPlayer player, string factionIdString, string characterIdString, string factionRankIdString,
             int badge, string flagsJSON)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
@@ -313,6 +339,9 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var factionId = new Guid(factionIdString);
+            var characterId = new Guid(characterIdString);
+            var factionRankId = new Guid(factionRankIdString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == characterId);
             if (character == null)
             {
@@ -364,9 +393,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
             else
             {
-                character.FactionRankId = factionRankId;
-                character.Badge = badge;
-                character.FactionFlagsJSON = Functions.Serialize(factionFlags);
+                character.UpdateFaction(factionRankId, Functions.Serialize(factionFlags), badge);
                 context.Characters.Update(character);
                 await context.SaveChangesAsync();
             }
@@ -380,7 +407,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionMemberRemove))]
-        public static async Task StaffFactionMemberRemove(MyPlayer player, string factionId, string characterId)
+        public static async Task StaffFactionMemberRemove(MyPlayer player, string factionIdString, string characterIdString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -389,6 +416,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var factionId = new Guid(factionIdString);
+            var characterId = new Guid(characterIdString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == characterId);
             if (character == null)
             {
@@ -415,16 +444,12 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 if (faction?.Government ?? false)
                 {
-                    character.Badge = 0;
-                    character.Armor = 0;
-
-                    var items = (await context.CharactersItems.Where(x => x.CharacterId == character.Id).ToListAsync()).Select(x => new CharacterItem(x)).ToList();
+                    var items = await context.CharactersItems.Where(x => x.CharacterId == character.Id).ToListAsync();
                     items = items.Where(x => !Functions.CanDropItem(character.Sex, faction, x)).ToList();
                     context.CharactersItems.RemoveRange(items);
                 }
 
-                character.FactionFlagsJSON = "[]";
-                character.FactionId = character.FactionRankId = null;
+                character.ResetFaction();
                 context.Characters.Update(character);
                 await context.SaveChangesAsync();
             }

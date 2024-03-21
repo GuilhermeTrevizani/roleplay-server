@@ -120,34 +120,39 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var truckerLocation = new TruckerLocation();
-            if (id > 0)
+            if (isNew)
+            {
+                truckerLocation.Create(name, pos.X, pos.Y, pos.Z, deliveryValue, loadWaitTime, unloadWaitTime, Functions.Serialize(allowedVehicles));
+            }
+            else
+            {
                 truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
+                if (truckerLocation == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            truckerLocation.Name = name;
-            truckerLocation.PosX = pos.X;
-            truckerLocation.PosY = pos.Y;
-            truckerLocation.PosZ = pos.Z;
-            truckerLocation.DeliveryValue = deliveryValue;
-            truckerLocation.LoadWaitTime = loadWaitTime;
-            truckerLocation.UnloadWaitTime = unloadWaitTime;
-            truckerLocation.AllowedVehiclesJSON = Functions.Serialize(allowedVehicles);
+                truckerLocation.Update(name, pos.X, pos.Y, pos.Z, deliveryValue, loadWaitTime, unloadWaitTime, Functions.Serialize(allowedVehicles));
+            }
 
             await using var context = new DatabaseContext();
 
-            if (truckerLocation.Id == 0)
+            if (isNew)
                 await context.TruckerLocations.AddAsync(truckerLocation);
             else
                 context.TruckerLocations.Update(truckerLocation);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.TruckerLocations.Add(truckerLocation);
 
             truckerLocation.CreateIdentifier();
 
-            player.EmitStaffShowMessage($"Localização de caminhoneiro {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Localização de caminhoneiro {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Localização de Caminhoneiro | {Functions.Serialize(truckerLocation)}", null);
 
@@ -205,28 +210,39 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var truckerLocationDeliveryId = new Guid(truckerLocationDeliveryIdString);
+            var truckerLocationId = new Guid(truckerLocationIdString);
+            var isNew = string.IsNullOrWhiteSpace(truckerLocationDeliveryIdString);
             var truckerLocationDelivery = new TruckerLocationDelivery();
-            if (truckerLocationDeliveryId > 0)
+            if (isNew)
+            {
+                truckerLocationDelivery.Create(truckerLocationId, pos.X, pos.Y, pos.Z);
+            }
+            else
+            {
                 truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == truckerLocationDeliveryId);
+                if (truckerLocationDelivery == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            truckerLocationDelivery.TruckerLocationId = truckerLocationId;
-            truckerLocationDelivery.PosX = pos.X;
-            truckerLocationDelivery.PosY = pos.Y;
-            truckerLocationDelivery.PosZ = pos.Z;
+                truckerLocationDelivery.Update(truckerLocationId, pos.X, pos.Y, pos.Z);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (truckerLocationDelivery.Id == 0)
+            if (isNew)
                 await context.TruckerLocationsDeliveries.AddAsync(truckerLocationDelivery);
             else
                 context.TruckerLocationsDeliveries.Update(truckerLocationDelivery);
 
             await context.SaveChangesAsync();
 
-            if (truckerLocationDeliveryId == 0)
+            if (isNew)
                 Global.TruckerLocationsDeliveries.Add(truckerLocationDelivery);
 
-            player.EmitStaffShowMessage($"Entrega {(truckerLocationDeliveryId == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Entrega {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Entrega Localização de Caminhoneiro | {Functions.Serialize(truckerLocationDelivery)}", null);
 

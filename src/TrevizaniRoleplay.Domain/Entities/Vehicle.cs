@@ -33,7 +33,7 @@ namespace TrevizaniRoleplay.Domain.Entities
         public uint BodyAdditionalHealth { get; private set; } = 1000;
         public int PetrolTankHealth { get; private set; } = 1000;
         public uint LockNumber { get; private set; }
-        public bool FactionGift { get; private set; }
+        public bool StaffGift { get; private set; }
         public byte ProtectionLevel { get; private set; }
         public int DismantledValue { get; private set; }
         public bool XMR { get; private set; }
@@ -69,18 +69,6 @@ namespace TrevizaniRoleplay.Domain.Entities
             Color2R = color2R;
             Color2G = color2G;
             Color2B = color2B;
-
-            //var vehicle = new Vehicle()
-            //{
-            //    CharacterId = player.Character.Id,
-            //    Plate = ,
-            //    PosX = concessionaria.VehiclePosition.X,
-            //    PosY = concessionaria.VehiclePosition.Y,
-            //    PosZ = concessionaria.VehiclePosition.Z,
-            //    RotR = concessionaria.VehicleRotation.X,
-            //    RotP = concessionaria.VehicleRotation.Y,
-            //    RotY = concessionaria.VehicleRotation.Z,
-            //};
         }
 
         public void SetFuel(int fuel)
@@ -143,6 +131,77 @@ namespace TrevizaniRoleplay.Domain.Entities
         public void SetXMR()
         {
             XMR = true;
+        }
+
+        public void SetPlate(string plate)
+        {
+            Plate = plate;
+        }
+
+        public void ResetSeizedAndDismantled()
+        {
+            SeizedValue = DismantledValue = 0;
+        }
+
+        public void SetDismantledValue(int value)
+        {
+            DismantledValue = value;
+        }
+
+        public void SetStaffGift()
+        {
+            StaffGift = true;
+        }
+
+        public void SetFaction(Guid id)
+        {
+            FactionId = id;
+        }
+
+        public void SetJob(CharacterJob job)
+        {
+            Job = job;
+        }
+
+        public void SetLivery(byte value)
+        {
+            Livery = value;
+        }
+
+        public void SetColor(byte color1R, byte color1G, byte color1B, byte color2R, byte color2G, byte color2B)
+        {
+            Color1R = color1R;
+            Color1G = color1G;
+            Color1B = color1B;
+            Color2R = color2R;
+            Color2G = color2G;
+            Color2B = color2B;
+        }
+
+        public void SetTunning(byte wheelType, byte wheelVariation, byte wheelColor,
+            byte neonColorR, byte neonColorG, byte neonColorB,
+            bool neonLeft, bool neonRight, bool neonFront, bool neonBack,
+            byte headlightColor, float lightsMultiplier,
+            byte windowTint, byte tireSmokeColorR, byte tireSmokeColorG, byte tireSmokeColorB,
+            string modsJSON)
+        {
+            WheelType = wheelType;
+            WheelVariation = wheelVariation;
+            WheelColor = wheelColor;
+            NeonColorR = neonColorR;
+            NeonColorG = neonColorG;
+            NeonColorB = neonColorB;
+            NeonLeft = neonLeft;
+            NeonRight = neonRight;
+            NeonFront = neonFront;
+            NeonBack = neonBack;
+            HeadlightColor = headlightColor;
+            LightsMultiplier = lightsMultiplier;
+            WindowTint = windowTint;
+            TireSmokeColorR = tireSmokeColorR;
+            TireSmokeColorG = tireSmokeColorG;
+            TireSmokeColorB = tireSmokeColorB;
+            ModsJSON = modsJSON;
         }
     }
 }

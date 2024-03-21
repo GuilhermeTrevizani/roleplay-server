@@ -12,7 +12,7 @@ namespace TrevizaniRoleplay.Server.Extensions
             if (p != null)
                 return p;
 
-            helpRequest.AnswerDate = DateTime.Now;
+            helpRequest.Answer(null);
 
             await using var context = new DatabaseContext();
             context.HelpRequests.Update(helpRequest);

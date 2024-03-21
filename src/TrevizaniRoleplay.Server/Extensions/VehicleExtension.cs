@@ -17,45 +17,6 @@ namespace TrevizaniRoleplay.Server.Extensions
 
         public static string GetLiveryName(this Vehicle vehicle)
         {
-            if (vehicle.Model.ToUpper() == VehicleModelMods.NSCOUTLSPD.ToString().ToUpper())
-            {
-                if (vehicle.Livery == 1)
-                    return "366-18";
-                else if (vehicle.Livery == 2)
-                    return "301-18";
-                else if (vehicle.Livery == 3)
-                    return "974-18";
-            }
-            else if (vehicle.Model.ToUpper() == VehicleModel.Police3.ToString().ToUpper())
-            {
-                if (vehicle.Livery == 1)
-                    return "671-18";
-                else if (vehicle.Livery == 2)
-                    return "033-18";
-            }
-            else if (vehicle.Model.ToUpper() == VehicleModelMods.PSCOUT.ToString().ToUpper())
-            {
-                if (vehicle.Livery == 1)
-                    return "015-18";
-                else if (vehicle.Livery == 2)
-                    return "540-18";
-                else if (vehicle.Livery == 3)
-                    return "560-18";
-            }
-            else if (vehicle.Model.ToUpper() == VehicleModelMods.VVPI.ToString().ToUpper())
-            {
-                if (vehicle.Livery == 1)
-                    return "450-18";
-                else if (vehicle.Livery == 2)
-                    return "525-18";
-            }
-            else if (vehicle.Model.ToUpper() == VehicleModelMods.VVPI2.ToString().ToUpper())
-            {
-                if (vehicle.Livery == 1)
-                    return "989-18";
-                else if (vehicle.Livery == 2)
-                    return "741-18";
-            }
             return string.Empty;
         }
 

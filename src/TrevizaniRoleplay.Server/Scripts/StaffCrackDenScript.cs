@@ -43,7 +43,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (crackDen.Dimension > 0)
             {
-                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Number == crackDen.Dimension).Interior);
+                player.IPLs = Functions.GetIPLsByInterior(Global.Properties.FirstOrDefault(x => x.Number == crackDen.Dimension)!.Interior);
                 player.SetarIPLs();
             }
 
@@ -111,33 +111,39 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var crackDen = new CrackDen();
-            if (id > 0)
+            if (isNew)
+            {
+                crackDen.Create(pos.X, pos.Y, pos.Z, dimension, onlinePoliceOfficers, cooldownQuantityLimit, cooldownHours);
+            }
+            else
+            {
                 crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
+                if (crackDen == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            crackDen.PosX = pos.X;
-            crackDen.PosY = pos.Y;
-            crackDen.PosZ = pos.Z;
-            crackDen.Dimension = dimension;
-            crackDen.OnlinePoliceOfficers = onlinePoliceOfficers;
-            crackDen.CooldownQuantityLimit = cooldownQuantityLimit;
-            crackDen.CooldownHours = cooldownHours;
+                crackDen.Update(pos.X, pos.Y, pos.Z, dimension, onlinePoliceOfficers, cooldownQuantityLimit, cooldownHours);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (crackDen.Id == 0)
+            if (isNew)
                 await context.CrackDens.AddAsync(crackDen);
             else
                 context.CrackDens.Update(crackDen);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.CrackDens.Add(crackDen);
 
             crackDen.CreateIdentifier();
 
-            player.EmitStaffShowMessage($"Boca de fumo {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Boca de fumo {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Boca de Fumo | {Functions.Serialize(crackDen)}", null);
 
@@ -197,27 +203,37 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             var crackDenId = new Guid(crackDenIdString);
             var crackDenItemId = new Guid(crackDenItemIdString);
+            var isNew = string.IsNullOrWhiteSpace(crackDenItemIdString);
             var crackDenItem = new CrackDenItem();
-            if (crackDenItemId > 0)
+            if (isNew)
+            {
+                crackDenItem.Create(crackDenId, itemCategory, value);
+            }
+            else
+            {
                 crackDenItem = Global.CrackDensItems.FirstOrDefault(x => x.Id == crackDenItemId);
+                if (crackDenItem == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            crackDenItem.CrackDenId = crackDenId;
-            crackDenItem.ItemCategory = itemCategory;
-            crackDenItem.Value = value;
+                crackDenItem.Update(crackDenId, itemCategory, value);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (crackDenItem.Id == 0)
+            if (isNew)
                 await context.CrackDensItems.AddAsync(crackDenItem);
             else
                 context.CrackDensItems.Update(crackDenItem);
 
             await context.SaveChangesAsync();
 
-            if (crackDenItemId == 0)
+            if (isNew)
                 Global.CrackDensItems.Add(crackDenItem);
 
-            player.EmitStaffShowMessage($"Item {(crackDenItemId == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Item {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Item Boca de Fumo | {Functions.Serialize(crackDenItem)}", null);
 

@@ -31,7 +31,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -344,12 +344,12 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    prop.RobberyValue = value;
-                    prop.RobberyCooldown = DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyPropertyHours);
+                    prop.SetRobberyValue(value);
+                    prop.SetRobberyCooldown(DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyPropertyHours));
                     await using var context = new DatabaseContext();
                     context.Properties.Update(prop);
                     await context.SaveChangesAsync();
-                    player.User.PropertyRobberyCooldown = DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyRobberHours);
+                    player.User.SetPropertyRobberyCooldown(DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyRobberHours));
 
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("rouba a propriedade.", MessageCategory.Ame, 5);
@@ -419,12 +419,12 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 Task.Run(async () =>
                 {
-                    prop.RobberyCooldown = DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyPropertyHours);
+                    prop.SetRobberyCooldown(DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyPropertyHours));
                     await using var context = new DatabaseContext();
                     context.Properties.Update(prop);
                     await context.SaveChangesAsync();
 
-                    player.User.PropertyRobberyCooldown = DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyRobberHours);
+                    player.User.SetPropertyRobberyCooldown(DateTime.Now.AddHours(Global.Parameter.CooldownPropertyRobberyRobberHours));
 
                     player.ToggleGameControls(true);
                     player.SendMessageToNearbyPlayers("encontra o armazenamento da propriedade.", MessageCategory.Ame, 5);
@@ -458,7 +458,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             await player.RemoveStackedItem(ItemCategory.Money, prop.RobberyValue);
 
             player.SendMessage(MessageType.Success, $"Você liberou sua propriedade por ${prop.RobberyValue:N0}.");
-            prop.RobberyValue = 0;
+            prop.ResetRobberyValue();
             await using var context = new DatabaseContext();
             context.Properties.Update(prop);
             await context.SaveChangesAsync();

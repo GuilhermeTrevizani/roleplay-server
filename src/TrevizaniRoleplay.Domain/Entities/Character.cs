@@ -321,5 +321,33 @@ namespace TrevizaniRoleplay.Domain.Entities
             DriverLicenseValidDate = DateTime.Now.AddMonths(3);
             PoliceOfficerBlockedDriverLicenseCharacterId = null;
         }
+
+        public void RemoveDeath()
+        {
+            DeathDate = null;
+            DeathReason = string.Empty;
+            CKAvaliation = false;
+        }
+
+        public void SetDeath(string reason)
+        {
+            DeathDate = DateTime.Now;
+            DeathReason = reason;
+            CKAvaliation = false;
+        }
+
+        public void SetCKAvaliation()
+        {
+            CKAvaliation = true;
+        }
+
+        public void SetNameChangeStatus()
+        {
+            NameChangeStatus = NameChangeStatus == CharacterNameChangeStatus.Allowed
+                ?
+                CharacterNameChangeStatus.Blocked
+                :
+                CharacterNameChangeStatus.Allowed;
+        }
     }
 }

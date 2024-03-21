@@ -51,5 +51,11 @@
         {
             RentPaymentDate = DateTime.Now.AddDays(7);
         }
+
+        public void ResetOwner()
+        {
+            CharacterId = null;
+            RentPaymentDate = null;
+        }
     }
 }

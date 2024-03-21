@@ -147,5 +147,31 @@ namespace TrevizaniRoleplay.Domain.Entities
             ChatFontSize = chatFontSize;
             FactionToggle = factionToggle;
         }
+
+        public void RemoveForumNameChange()
+        {
+            ForumNameChanges--;
+        }
+
+        public void SetStaff(UserStaff staff, string staffFlagsJson)
+        {
+            Staff = staff;
+            StaffFlagsJSON = staffFlagsJson;
+        }
+
+        public void RemovePlateChanges()
+        {
+            PlateChanges--;
+        }
+
+        public void SetCooldownDismantle(DateTime date)
+        {
+            CooldownDismantle = date;
+        }
+
+        public void SetPropertyRobberyCooldown(DateTime date)
+        {
+            PropertyRobberyCooldown = date;
+        }
     }
 }

@@ -283,19 +283,14 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             var staffFlags = Functions.Deserialize<List<string>>(flagsJSON).Select(x => (StaffFlag)Convert.ToByte(x)).ToList();
 
-            user.Staff = (UserStaff)staff;
-            if (user.Staff == UserStaff.None)
-                user.StaffFlagsJSON = "[]";
-            else
-                user.StaffFlagsJSON = Functions.Serialize(staffFlags);
+            user.SetStaff((UserStaff)staff, user.Staff == UserStaff.None ? "[]" : Functions.Serialize(staffFlags));
 
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
             if (target != null)
             {
                 target.SendMessage(MessageType.Success, $"{player.User.Name} modificou suas configurações administrativas.");
-                target.User.Staff = user.Staff;
                 target.StaffFlags = staffFlags;
-                target.User.StaffFlagsJSON = user.StaffFlagsJSON;
+                target.User.SetStaff(user.Staff, user.StaffFlagsJSON);
                 await target.Save();
             }
             else
@@ -329,18 +324,18 @@ namespace TrevizaniRoleplay.Server.Scripts
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
             if (target != null)
             {
-                target.User.ForumNameChanges--;
+                target.User.RemoveForumNameChange();
                 target.SendMessage(MessageType.Success, $"{player.User.Name} debitou um namechange do fórum da sua conta.");
                 await target.Save();
             }
             else
             {
-                user.ForumNameChanges--;
+                user.RemoveForumNameChange();
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
             }
 
-            player.EmitStaffShowMessage($"Você debitou um namechange do fórum de {target.User.Name}.");
+            player.EmitStaffShowMessage($"Você debitou um namechange do fórum de {user.Name}.");
             await player.GravarLog(LogType.Staff, $"Debitar Mudança de Nome do Fórum {user.Id}", null);
             await StaffSearchUser(player, user.Id.ToString());
         }
@@ -481,7 +476,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            var target = player.GetCharacterByIdOrName(idOrName, false);
             if (target == null)
                 return;
 
@@ -602,9 +597,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            character.DeathDate = null;
-            character.DeathReason = string.Empty;
-            character.CKAvaliation = false;
+            character.RemoveDeath();
             context.Characters.Update(character);
             await context.SaveChangesAsync();
             await Functions.SendStaffMessage($"{player.User.Name} removeu o CK / avaliação de CK do personagem {character.Name}.", true);
@@ -639,17 +632,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
-                target.Character.DeathDate = DateTime.Now;
-                target.Character.DeathReason = reason;
-                target.Character.CKAvaliation = false;
+                target.Character.SetDeath(reason);
                 await target.Save();
                 await target.ListarPersonagens("CK", $"{player.User.Name} aplicou CK no seu personagem. Motivo: {reason}");
             }
             else
             {
-                character.DeathDate = DateTime.Now;
-                character.DeathReason = reason;
-                character.CKAvaliation = false;
+                character.SetDeath(reason);
                 context.Characters.Update(character);
                 await context.SaveChangesAsync();
             }
@@ -686,13 +675,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
-                target.Character.CKAvaliation = true;
+                target.Character.SetCKAvaliation();
                 await target.Save();
                 await target.ListarPersonagens("Avaliação de CK", $"{player.User.Name} colocou seu personagem na avaliação de CK.");
             }
             else
             {
-                character.CKAvaliation = true;
+                character.SetCKAvaliation();
                 context.Characters.Update(character);
                 await context.SaveChangesAsync();
             }
@@ -726,20 +715,12 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            character.NameChangeStatus = character.NameChangeStatus == CharacterNameChangeStatus.Allowed
-                ?
-                CharacterNameChangeStatus.Blocked
-                :
-                CharacterNameChangeStatus.Allowed;
+            character.SetNameChangeStatus();
 
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
-                target.Character.NameChangeStatus = target.Character.NameChangeStatus == CharacterNameChangeStatus.Allowed
-                ?
-                CharacterNameChangeStatus.Blocked
-                :
-                CharacterNameChangeStatus.Allowed;
+                target.Character.SetNameChangeStatus();
                 await target.Save();
                 target.SendMessage(MessageType.Success, $"{player.User.Name}{(target.Character.NameChangeStatus == CharacterNameChangeStatus.Allowed ? "des" : string.Empty)}bloqueou a troca de nome do seu personagem.");
             }
