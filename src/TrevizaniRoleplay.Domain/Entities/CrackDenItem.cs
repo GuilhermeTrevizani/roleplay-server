@@ -9,5 +9,15 @@ namespace TrevizaniRoleplay.Domain.Entities
         public int Value { get; private set; }
 
         public CrackDen? CrackDen { get; set; }
+
+        public void Create()
+        {
+
+        }
+
+        public void Update()
+        {
+
+        }
     }
 }

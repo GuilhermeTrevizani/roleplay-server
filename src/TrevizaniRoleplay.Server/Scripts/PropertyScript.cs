@@ -115,7 +115,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            prop.LockNumber = Global.Properties.Select(x => x.LockNumber).DefaultIfEmpty(0u).Max() + 1;
+            prop.SetLockNumber(Global.Properties.Select(x => x.LockNumber).DefaultIfEmpty(0u).Max() + 1);
             context.Properties.Update(prop);
             await context.SaveChangesAsync();
 
@@ -262,7 +262,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 Task.Run(async () =>
                 {
-                    prop.Locked = false;
+                    prop.SetLocked(false);
                     await using var context = new DatabaseContext();
                     context.Properties.Update(prop);
                     await context.SaveChangesAsync();
@@ -553,7 +553,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    property.ProtectionLevel = 1;
+                    property.SetProtectionLevel(1);
                     break;
                 case "Proteção Nível 2":
                     if (property.ProtectionLevel >= 2)
@@ -562,7 +562,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    property.ProtectionLevel = 2;
+                    property.SetProtectionLevel(2);
                     break;
                 case "Proteção Nível 3":
                     if (property.ProtectionLevel >= 3)
@@ -571,7 +571,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    property.ProtectionLevel = 3;
+                    property.SetProtectionLevel(3);
                     break;
             }
 

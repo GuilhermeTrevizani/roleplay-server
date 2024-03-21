@@ -12,43 +12,6 @@ namespace TrevizaniRoleplay.Server.Commands
 {
     public class Staff
     {
-        [Command("ban", "/ban (ID ou nome) (dias [0 para permanente]) (motivo)", GreedyArg = true)]
-        public static async Task CMD_ban(MyPlayer player, string idOrName, int days, string reason)
-        {
-            if (player.User.Staff < UserStaff.GameAdministrator)
-            {
-                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
-                return;
-            }
-
-            var target = player.ObterPersonagemPoridOrName(idOrName, false);
-            if (target == null)
-                return;
-
-            if (target.User.Staff >= player.User.Staff)
-            {
-                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
-                return;
-            }
-
-            await using var context = new DatabaseContext();
-
-            var banishment = new Banishment();
-            banishment.Create(days > 0 ? DateTime.Now.AddDays(days) : null, target.Character.Id, target.User.Id, reason, player.User.Id);
-            await context.Banishments.AddAsync(banishment);
-
-            var punishment = new Punishment();
-            punishment.Create(PunishmentType.Ban, days, target.Character.Id, reason, player.User.Id);
-            await context.Punishments.AddAsync(punishment);
-
-            await context.SaveChangesAsync();
-
-            await target.Save();
-            var strBan = days == 0 ? "permanentemente" : $"por {days} dia{(days > 1 ? "s" : string.Empty)}";
-            await Functions.SendStaffMessage($"{player.User.Name} baniu {target.Character.Name} ({target.User.Name}) {strBan}. Motivo: {reason}", false);
-            target.Kick($"{player.User.Name} baniu você {strBan}. Motivo: {reason}");
-        }
-
         [Command("pos", "/pos (x) (y) (z)")]
         public static async Task CMD_pos(MyPlayer player, float x, float y, float z)
         {
@@ -786,26 +749,6 @@ namespace TrevizaniRoleplay.Server.Commands
 
             if (!isTemAlgoProximo)
                 player.SendMessage(MessageType.Error, "Você não está próximo de nenhum item.");
-        }
-
-        [Command("debug")]
-        public static void CMD_debug(MyPlayer player)
-        {
-            if (player.User.Staff < UserStaff.Moderator)
-            {
-                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
-                return;
-            }
-
-            var html = $"<h3>Pontos de Áudio</h3>";
-            foreach (var audioSpot in Global.AudioSpots)
-                html += $@"Id: {audioSpot.Id} | Position: {audioSpot.Position.X} {audioSpot.Position.Y} {audioSpot.Position.Z} | VehicleId: {audioSpot.VehicleId} <br/><br/>";
-
-            html += $"<h3>Pontos de Luz</h3>";
-            foreach (var spotlight in Global.Spotlights)
-                html += $@"Id: {spotlight.Id} | Position: {spotlight.Position.X} {spotlight.Position.Y} {spotlight.Position.Z} | Player: {spotlight.Player} <br/><br/>";
-
-            player.Emit("Server:BaseHTML", Functions.GetBaseHTML($"{Global.SERVER_NAME} • Debug", html));
         }
 
         [Command("app")]

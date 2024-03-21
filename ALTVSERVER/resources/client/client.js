@@ -586,6 +586,7 @@ async function requestDiscordToken() {
     const token = await alt.Discord.requestOAuth2Token(Constants.DISCORD_APP_ID);
     alt.emitServer('ValidateDiscordToken', token);
   } catch (ex) {
+    alt.logError(ex);
     view.emit('mostrarErro', ex.message);
   }
 }
@@ -868,7 +869,7 @@ alt.onServer('SyncWeather', (weather) => {
 
   if (oldWeather != weather) {
     let i = 0;
-    let intervalWeather = alt.setInterval(() => {
+    intervalWeather = alt.setInterval(() => {
       i++;
       if (i < 100) {
         native.setCurrWeatherState(alt.hash(oldWeather), alt.hash(weather), (i / 100));

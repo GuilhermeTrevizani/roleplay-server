@@ -83,7 +83,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCrackDenSave))]
-        public static async Task StaffCrackDenSave(MyPlayer player, int id, Vector3 pos, int dimension,
+        public static async Task StaffCrackDenSave(MyPlayer player, string idString, Vector3 pos, int dimension,
             int onlinePoliceOfficers, int cooldownQuantityLimit, int cooldownHours)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
@@ -110,6 +110,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var crackDen = new CrackDen();
             if (id > 0)
                 crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
@@ -146,7 +147,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffCrackDensItemsShow))]
-        public static void StaffCrackDensItemsShow(MyPlayer player, int crackDenId)
+        public static void StaffCrackDensItemsShow(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
             {
@@ -156,16 +157,17 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
 
+            var id = new Guid(idString);
             player.Emit("StaffCrackDensItems",
                 false,
-                GetCrackDensItemsHTML(crackDenId),
-                crackDenId);
+                GetCrackDensItemsHTML(id),
+                idString);
         }
 
         [AsyncClientEvent(nameof(StaffCrackDenItemSave))]
         public static async Task StaffCrackDenItemSave(MyPlayer player,
-            int crackDenItemId,
-            int crackDenId,
+            string crackDenItemIdString,
+            string crackDenIdString,
             string strItemCategory,
             int value)
         {
@@ -193,6 +195,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var crackDenId = new Guid(crackDenIdString);
+            var crackDenItemId = new Guid(crackDenItemIdString);
             var crackDenItem = new CrackDenItem();
             if (crackDenItemId > 0)
                 crackDenItem = Global.CrackDensItems.FirstOrDefault(x => x.Id == crackDenItemId);
@@ -223,7 +227,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCrackDenItemRemove))]
-        public static async Task StaffCrackDenItemRemove(MyPlayer player, int crackDenItemId)
+        public static async Task StaffCrackDenItemRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
             {
@@ -231,7 +235,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var crackDenItem = Global.CrackDensItems.FirstOrDefault(x => x.Id == crackDenItemId);
+            var id = new Guid(idString);
+            var crackDenItem = Global.CrackDensItems.FirstOrDefault(x => x.Id == id);
             if (crackDenItem == null)
                 return;
 
@@ -250,7 +255,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCrackDenRevokeCooldown))]
-        public static async Task StaffCrackDenRevokeCooldown(MyPlayer player, int id)
+        public static async Task StaffCrackDenRevokeCooldown(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CrackDens))
             {
@@ -258,11 +263,12 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;
 
-            crackDen.CooldownDate = DateTime.Now;
+            crackDen.ResetCooldownDate();
 
             await using var context = new DatabaseContext();
             context.CrackDens.Update(crackDen);

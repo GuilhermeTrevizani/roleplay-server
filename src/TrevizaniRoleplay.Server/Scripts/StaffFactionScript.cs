@@ -34,7 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionSave))]
-        public static async Task StaffFactionSave(MyPlayer player, int id, string name, int type, string color,
+        public static async Task StaffFactionSave(MyPlayer player, string idString, string name, int type, string color,
             int slots, string chatColor)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
@@ -87,7 +87,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffFactionShowRanks))]
-        public static void StaffFactionShowRanks(MyPlayer player, int factionId)
+        public static void StaffFactionShowRanks(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -105,7 +105,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionRankSave))]
-        public static async Task StaffFactionRankSave(MyPlayer player, int factionId, int factionRankId,
+        public static async Task StaffFactionRankSave(MyPlayer player, string factionIdString, string factionRankIdString,
             string name, int salary)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
@@ -152,7 +152,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionRankRemove))]
-        public static async Task StaffFactionRankRemove(MyPlayer player, int factionRankId)
+        public static async Task StaffFactionRankRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -186,7 +186,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionRankOrder))]
-        public static async Task StaffFactionRankOrder(MyPlayer player, int factionId, string ranksJSON)
+        public static async Task StaffFactionRankOrder(MyPlayer player, string factionIdString, string ranksJSON)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -216,7 +216,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionShowMembers))]
-        public static async Task StaffFactionShowMembers(MyPlayer player, int factionId)
+        public static async Task StaffFactionShowMembers(MyPlayer player, string idString)
         {
             player.Emit("Server:CloseView");
             var ranksJson = Functions.Serialize(Global.FactionsRanks.Where(x => x.FactionId == factionId).OrderBy(x => x.Position));
@@ -244,7 +244,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionMemberInvite))]
-        public static async Task StaffFactionMemberInvite(MyPlayer player, int factionId, int characterSessionId)
+        public static async Task StaffFactionMemberInvite(MyPlayer player, string factionIdString, int characterSessionId)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {
@@ -303,7 +303,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionMemberSave))]
-        public static async Task StaffFactionMemberSave(MyPlayer player, int factionId, int characterId, int factionRankId,
+        public static async Task StaffFactionMemberSave(MyPlayer player, string factionId, string characterId, string factionRankId,
             int badge, string flagsJSON)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
@@ -380,7 +380,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFactionMemberRemove))]
-        public static async Task StaffFactionMemberRemove(MyPlayer player, int factionId, int characterId)
+        public static async Task StaffFactionMemberRemove(MyPlayer player, string factionId, string characterId)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Factions))
             {

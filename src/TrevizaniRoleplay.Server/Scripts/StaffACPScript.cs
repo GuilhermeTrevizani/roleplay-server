@@ -57,7 +57,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffUnban))]
-        public static async Task StaffUnban(MyPlayer player, int id, bool total)
+        public static async Task StaffUnban(MyPlayer player, string idString, bool total)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Unban))
             {
@@ -65,24 +65,25 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             using var context = new DatabaseContext();
-            var ban = await context.Banishments.FirstOrDefaultAsync(x => x.Id == id);
-            if (ban != null)
+            var banishment = await context.Banishments.FirstOrDefaultAsync(x => x.Id == id);
+            if (banishment != null)
             {
                 if (total)
                 {
-                    context.Banishments.Remove(ban);
+                    context.Banishments.Remove(banishment);
                 }
                 else
                 {
-                    ban.UserId = null;
-                    context.Banishments.Update(ban);
+                    banishment.ClearUserId();
+                    context.Banishments.Update(banishment);
                 }
 
                 await context.SaveChangesAsync();
 
-                player.EmitStaffShowMessage($"Você removeu o banimento {ban.Id} {(total ? "totalmente" : "do usuário")}.");
-                await player.GravarLog(LogType.Staff, $"Unban {ban} {total}", null);
+                player.EmitStaffShowMessage($"Você removeu o banimento {banishment.Id} {(total ? "totalmente" : "do usuário")}.");
+                await player.GravarLog(LogType.Staff, $"Unban {banishment} {total}", null);
             }
             else
             {
@@ -125,8 +126,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             var logs = await query
                 .Include(x => x.OriginCharacter)
                 .Include(x => x.TargetCharacter)
-                .Include(x => x.OriginCharacter.User)
-                .Include(x => x.TargetCharacter.User)
+                .Include(x => x.OriginCharacter!.User)
+                .Include(x => x.TargetCharacter!.User)
                 .OrderByDescending(x => x.Id)
                 .Take(50)
                 .ToListAsync();
@@ -137,11 +138,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                     Type = x.Type.GetDisplay(),
                     Date = x.Date.ToString(),
                     x.Description,
-                    OriginCharacterName = x.OriginCharacterId.HasValue ? $"{x.OriginCharacter.Name} [{x.OriginCharacterId}] ({x.OriginCharacter.User.Name})" : string.Empty,
+                    OriginCharacterName = x.OriginCharacterId.HasValue ? $"{x.OriginCharacter!.Name} [{x.OriginCharacterId}] ({x.OriginCharacter.User!.Name})" : string.Empty,
                     x.OriginIp,
                     x.OriginHardwareIdHash,
                     x.OriginHardwareIdExHash,
-                    TargetCharacterName = x.TargetCharacterId.HasValue ? $"{x.TargetCharacter.Name} [{x.TargetCharacterId}] ({x.TargetCharacter.User.Name})" : string.Empty,
+                    TargetCharacterName = x.TargetCharacterId.HasValue ? $"{x.TargetCharacter!.Name} [{x.TargetCharacterId}] ({x.TargetCharacter.User!.Name})" : string.Empty,
                     x.TargetIp,
                     x.TargetHardwareIdHash,
                     x.TargetHardwareIdExHash,
@@ -227,7 +228,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             var punicoes = await context.Punishments
                 .Include(x => x.Character)
                 .Include(x => x.StaffUser)
-                .Where(x => x.Character.UserId == user.Id)
+                .Where(x => x.Character!.UserId == user.Id)
                 .OrderByDescending(x => x.Id)
                 .ToListAsync();
             html += $"<h4>Punições Administrativas</h4>";
@@ -236,7 +237,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 foreach (var punicao in punicoes)
                 {
                     var duracao = punicao.Type == PunishmentType.Ban ? (punicao.Duration > 0 ? $"{punicao.Duration} dia{(punicao.Duration != 1 ? "s" : string.Empty)}" : "Permanente") : string.Empty;
-                    html += $"Personagem: <strong>{punicao.Character.Name} [{punicao.CharacterId}]</strong> |  Data: <strong>{punicao.Date}</strong> | Tipo: <strong>{punicao.Type}</strong> | Duração: <strong>{duracao}</strong> | Staffer: <strong>{punicao.StaffUser.Name}</strong> | Motivo: <strong>{punicao.Reason}</strong><br/>";
+                    html += $"Personagem: <strong>{punicao.Character!.Name} [{punicao.CharacterId}]</strong> |  Data: <strong>{punicao.Date}</strong> | Tipo: <strong>{punicao.Type}</strong> | Duração: <strong>{duracao}</strong> | Staffer: <strong>{punicao.StaffUser!.Name}</strong> | Motivo: <strong>{punicao.Reason}</strong><br/>";
                 }
             }
             else
@@ -251,7 +252,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffSaveUser))]
-        public static async Task StaffSaveUser(MyPlayer player, int userId, int staff, string flagsJSON)
+        public static async Task StaffSaveUser(MyPlayer player, string idString, int staff, string flagsJSON)
         {
             if (player.User.Staff < UserStaff.HeadAdministrator)
             {
@@ -266,16 +267,15 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var id = new Guid(idString);
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
-                player.EmitStaffShowMessage($"Nenhum usuário encontrado com o código {userId}.");
+                player.EmitStaffShowMessage($"Nenhum usuário encontrado com o código {id}.");
                 return;
             }
 
-            if ((user.Id == 1 && player.User.Id != 1)
-                ||
-                (player.User.Staff <= user.Staff && player.User.Id != user.Id))
+            if (player.User.Staff <= user.Staff && player.User.Id != user.Id)
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
@@ -289,7 +289,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             else
                 user.StaffFlagsJSON = Functions.Serialize(staffFlags);
 
-            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == userId);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
             if (target != null)
             {
                 target.SendMessage(MessageType.Success, $"{player.User.Name} modificou suas configurações administrativas.");
@@ -304,12 +304,12 @@ namespace TrevizaniRoleplay.Server.Scripts
                 await context.SaveChangesAsync();
             }
 
-            await player.GravarLog(LogType.Staff, $"Alterar Usuário {userId} {staff} {user.StaffFlagsJSON}", target);
+            await player.GravarLog(LogType.Staff, $"Alterar Usuário {user.Id} {staff} {user.StaffFlagsJSON}", target);
             player.EmitStaffShowMessage($"Você alterou as configurações administrativas de {user.Name}.");
         }
 
         [AsyncClientEvent(nameof(StaffRemoveForumNameChangeUser))]
-        public static async Task StaffRemoveForumNameChangeUser(MyPlayer player, int userId)
+        public static async Task StaffRemoveForumNameChangeUser(MyPlayer player, string idString)
         {
             if (player.User.Staff < UserStaff.Manager)
             {
@@ -318,14 +318,15 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var id = new Guid(idString);
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
-                player.EmitStaffShowMessage($"Usuário {userId} não existe.");
+                player.EmitStaffShowMessage($"Usuário {id} não existe.");
                 return;
             }
 
-            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == userId);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == user.Id);
             if (target != null)
             {
                 target.User.ForumNameChanges--;
@@ -340,7 +341,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             player.EmitStaffShowMessage($"Você debitou um namechange do fórum de {target.User.Name}.");
-            await player.GravarLog(LogType.Staff, $"Debitar Mudança de Nome do Fórum {userId}", null);
+            await player.GravarLog(LogType.Staff, $"Debitar Mudança de Nome do Fórum {user.Id}", null);
             await StaffSearchUser(player, user.Id.ToString());
         }
 
@@ -371,7 +372,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 var user = await context.Users.FirstOrDefaultAsync(x => x.Id == character.UserId);
 
-                html += $@"OOC: <strong>{user.Name} [{user.Id}]</strong> | Registro: <strong>{character.RegisterDate}</strong> | VIP: <strong>{user.VIP.GetDisplay()} {(user.VIPValidDate.HasValue ? $"- {(user.VIPValidDate < DateTime.Now ? "Expirado" : "Expira")} em {user.VIPValidDate}" : string.Empty)}</strong><br/>
+                html += $@"OOC: <strong>{user!.Name} [{user.Id}]</strong> | Registro: <strong>{character.RegisterDate}</strong> | VIP: <strong>{user.VIP.GetDisplay()} {(user.VIPValidDate.HasValue ? $"- {(user.VIPValidDate < DateTime.Now ? "Expirado" : "Expira")} em {user.VIPValidDate}" : string.Empty)}</strong><br/>
                 Tempo Conectado (minutos): <strong>{character.ConnectedTime}</strong> | Emprego: <strong>{character.Job.GetDisplay()}</strong> | Trocas de Nome: <strong>{user.NameChanges} {(character.NameChangeStatus == CharacterNameChangeStatus.Blocked ? "(BLOQUEADO)" : string.Empty)}</strong> | Trocas de Nome Fórum: <strong>{user.ForumNameChanges}</strong> | Trocas de Placa: <strong>{user.PlateChanges}</strong><br/>
                 Banco: <strong>${character.Bank:N0}</strong> | Poupança: <strong>${character.Savings:N0}</strong><br/>";
 
@@ -421,7 +422,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
 
                 html += $"<h4>Empresas</h4>";
-                var companies = Global.Companies.Where(x => x.CharacterId == character.Id || x.Characters.Any(y => y.CharacterId == character.Id)).ToList();
+                var companies = Global.Companies.Where(x => x.CharacterId == character.Id || x.Characters!.Any(y => y.CharacterId == character.Id)).ToList();
                 if (companies.Count != 0)
                 {
                     foreach (var company in companies)
@@ -436,7 +437,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     .Include(x => x.StaffUser)
                     .FirstOrDefaultAsync();
                 if (ban != null)
-                    html += $"<h4 style='color:red;'>ESTE USUÁRIO ESTÁ BANIDO.</h4>Data: <strong>{ban.Date}</strong><br/>Motivo: <strong>{ban.Reason}</strong><br/>Expiração: <strong>{(ban.ExpirationDate.HasValue ? ban.ExpirationDate?.ToString() : "Permanente")}</strong><br/>Staffer: <strong>{ban.StaffUser.Name}</strong>";
+                    html += $"<h4 style='color:red;'>ESTE USUÁRIO ESTÁ BANIDO.</h4>Data: <strong>{ban.Date}</strong><br/>Motivo: <strong>{ban.Reason}</strong><br/>Expiração: <strong>{(ban.ExpirationDate.HasValue ? ban.ExpirationDate?.ToString() : "Permanente")}</strong><br/>Staffer: <strong>{ban.StaffUser!.Name}</strong>";
                 else if (player.User.Staff >= UserStaff.GameAdministrator)
                     html += $"<br/><br/><button onClick='banirPersonagem({id})' class='btn btn-danger btn-md'>Banir</button>";
             }
@@ -471,8 +472,46 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.Emit("ACPUpdateCharacter", html);
         }
 
+        [Command("ban", "/ban (ID ou nome) (dias [0 para permanente]) (motivo)", GreedyArg = true)]
+        public static async Task CMD_ban(MyPlayer player, string idOrName, int days, string reason)
+        {
+            if (player.User.Staff < UserStaff.GameAdministrator)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            var target = player.ObterPersonagemPoridOrName(idOrName, false);
+            if (target == null)
+                return;
+
+            if (target.User.Staff >= player.User.Staff)
+            {
+                player.SendMessage(MessageType.Error, Global.MENSAGEM_SEM_AUTORIZACAO);
+                return;
+            }
+
+            await using var context = new DatabaseContext();
+
+            var banishment = new Banishment();
+            banishment.Create(days > 0 ? DateTime.Now.AddDays(days) : null, target.Character.Id, target.User.Id, reason, player.User.Id);
+            await context.Banishments.AddAsync(banishment);
+
+            var punishment = new Punishment();
+            punishment.Create(PunishmentType.Ban, days, target.Character.Id, reason, player.User.Id);
+            await context.Punishments.AddAsync(punishment);
+
+            await context.SaveChangesAsync();
+
+            await target.Save();
+            var strBan = days == 0 ? "permanentemente" : $"por {days} dia{(days > 1 ? "s" : string.Empty)}";
+            await Functions.SendStaffMessage($"{player.User.Name} baniu {target.Character.Name} ({target.User.Name}) {strBan}. Motivo: {reason}", false);
+            target.Kick($"{player.User.Name} baniu você {strBan}. Motivo: {reason}");
+        }
+
+
         [AsyncClientEvent(nameof(StaffBanCharacter))]
-        public static async Task StaffBanCharacter(MyPlayer player, int id, int days, string reason)
+        public static async Task StaffBanCharacter(MyPlayer player, string idString, int days, string reason)
         {
             if (player.User.Staff < UserStaff.GameAdministrator)
             {
@@ -480,76 +519,67 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
-                player.EmitStaffShowMessage($"O personagem está online! Use /ban {target.SessionId}.");
-                return;
+                await CMD_ban(player, target.SessionId.ToString(), days, reason);
             }
-
-            await using var context = new DatabaseContext();
-            var character = await context.Characters
-                .Include(x => x.User)
-                .FirstOrDefaultAsync(x => x.Id == id);
-            if (character == null)
+            else
             {
-                player.EmitStaffShowMessage($"Personagem {id} não existe.");
-                return;
+                await using var context = new DatabaseContext();
+                var character = await context.Characters
+                    .Include(x => x.User)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (character == null)
+                {
+                    player.EmitStaffShowMessage($"Personagem {id} não existe.");
+                    return;
+                }
+
+                target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == character.UserId);
+                if (target != null)
+                {
+                    player.EmitStaffShowMessage($"O usuário do personagem está online! Use /ban {target.SessionId}.");
+                    return;
+                }
+
+                if (character.User!.Staff >= player.User.Staff)
+                {
+                    player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
+                    return;
+                }
+
+                var banishment = await context.Banishments.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+                if (banishment != null)
+                {
+                    player.EmitStaffShowMessage($"Personagem {id} já está banido.");
+                    return;
+                }
+
+                banishment = new Banishment();
+                banishment.Create(days > 0 ? DateTime.Now.AddDays(days) : null, character.Id, character.User.Id, reason, player.User.Id);
+                await context.Banishments.AddAsync(banishment);
+
+                var punishment = new Punishment();
+                punishment.Create(PunishmentType.Ban, days, character.Id, reason, player.User.Id);
+                await context.Punishments.AddAsync(punishment);
+
+                await context.SaveChangesAsync();
+
+                var strBan = days == 0 ? "permanentemente" : $"por {days} dia{(days > 1 ? "s" : string.Empty)}";
+                player.EmitStaffShowMessage($"Você baniu {character.Name} ({character.User.Name}) {strBan}. Motivo: {reason}");
             }
-
-            target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == character.UserId);
-            if (target != null)
-            {
-                player.EmitStaffShowMessage($"O usuário do personagem está online! Use /ban {target.SessionId}.");
-                return;
-            }
-
-            if (character.User.Staff >= player.User.Staff)
-            {
-                player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
-                return;
-            }
-
-            var banishment = await context.Banishments.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
-            if (banishment != null)
-            {
-                player.EmitStaffShowMessage($"Personagem {id} já está banido.");
-                return;
-            }
-
-            banishment = new Banishment
-            {
-                ExpirationDate = days > 0 ? DateTime.Now.AddDays(days) : null,
-                Reason = reason,
-                CharacterId = character.Id,
-                UserId = character.User.Id,
-                StaffUserId = player.User.Id,
-            };
-
-            await context.Banishments.AddAsync(banishment);
-
-            await context.Punishments.AddAsync(new Punishment
-            {
-                Duration = days,
-                Reason = reason,
-                CharacterId = character.Id,
-                Type = PunishmentType.Ban,
-                StaffUserId = player.User.Id,
-            });
-            await context.SaveChangesAsync();
-
-            var strBan = days == 0 ? "permanentemente" : $"por {days} dia{(days > 1 ? "s" : string.Empty)}";
-            player.EmitStaffShowMessage($"Você baniu {character.Name} ({character.User.Name}) {strBan}. Motivo: {reason}");
 
             var html = await GetBansJSON();
             foreach (var targetStaff in Global.SpawnedPlayers.Where(x => x.User.Staff != UserStaff.None))
                 targetStaff.Emit("ACPUpdateBans", html);
 
-            await StaffSearchCharacter(player, character.Id.ToString());
+            await StaffSearchCharacter(player, idString);
         }
 
         [AsyncClientEvent(nameof(StaffCKAvalationRemoveCharacter))]
-        public static async Task StaffCKAvalationRemoveCharacter(MyPlayer player, int id)
+        public static async Task StaffCKAvalationRemoveCharacter(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CK))
             {
@@ -558,6 +588,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var id = new Guid(idString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -582,7 +613,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCKCharacter))]
-        public static async Task StaffCKCharacter(MyPlayer player, int id, string reason)
+        public static async Task StaffCKCharacter(MyPlayer player, string idString, string reason)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CK))
             {
@@ -591,6 +622,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var id = new Guid(idString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -628,7 +660,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCKAvalationCharacter))]
-        public static async Task StaffCKAvalationCharacter(MyPlayer player, int id)
+        public static async Task StaffCKAvalationCharacter(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CK))
             {
@@ -637,6 +669,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var id = new Guid(idString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -670,7 +703,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffNameChangeStatusCharacter))]
-        public static async Task StaffNameChangeStatusCharacter(MyPlayer player, int id)
+        public static async Task StaffNameChangeStatusCharacter(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.CK))
             {
@@ -679,6 +712,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var id = new Guid(idString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -721,7 +755,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffRemoveJailCharacter))]
-        public static async Task StaffRemoveJailCharacter(MyPlayer player, int id)
+        public static async Task StaffRemoveJailCharacter(MyPlayer player, string idString)
         {
             if (player.User.Staff < UserStaff.LeadAdministrator)
             {
@@ -730,6 +764,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
+            var id = new Guid(idString);
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -759,7 +794,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             context.Jails.Remove(jail);
             await context.SaveChangesAsync();
 
-            character.JailFinalDate = null;
+            character.SetJailFinalDate(null);
             context.Characters.Update(character);
             await context.SaveChangesAsync();
 
@@ -783,9 +818,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                     Date = x.Date.ToString(),
                     ExpirationDate = x.ExpirationDate.HasValue ? x.ExpirationDate?.ToString() : "Permanente",
                     x.Reason,
-                    Character = $"{x.Character.Name} [{x.CharacterId}]",
-                    User = x.UserId.HasValue ? $"{x.User.Name} [{x.UserId}]" : string.Empty,
-                    UserStaff = $"{x.StaffUser.Name} [{x.StaffUserId}]",
+                    Character = $"{x.Character!.Name} [{x.CharacterId}]",
+                    User = x.UserId.HasValue ? $"{x.User!.Name} [{x.UserId}]" : string.Empty,
+                    UserStaff = $"{x.StaffUser!.Name} [{x.StaffUserId}]",
                 });
 
             return Functions.Serialize(banishments);

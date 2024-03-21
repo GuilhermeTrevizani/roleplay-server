@@ -20,6 +20,7 @@
         public void Update(string name, int salary)
         {
             Name = name;
+            Salary = salary;
         }
 
         public void SetPosition(int position)

@@ -566,7 +566,7 @@ namespace TrevizaniRoleplay.Server
                 }
 
                 prox.StopAlarm();
-                prox.ToggleLocked();
+                prox.SetLocked(!prox.Locked);
                 player.SendMessageToNearbyPlayers($"{(!prox.Locked ? "des" : string.Empty)}tranca a porta.", MessageCategory.Ame, 5);
 
                 await using var context = new DatabaseContext();
@@ -602,36 +602,6 @@ namespace TrevizaniRoleplay.Server
             }
 
             player.SendMessage(Models.MessageType.Error, "Você não tem acesso a nenhuma propriedade ou veículo próximos.");
-        }
-
-        public static void CMDMotor(MyPlayer player)
-        {
-            if (player.Vehicle is not MyVehicle veh || veh.Driver != player)
-            {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_DRIVER_ERROR_MESSAGE);
-                return;
-            }
-
-            if (!veh.CanAccess(player))
-            {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_ACCESS_ERROR_MESSAGE);
-                return;
-            }
-
-            if (veh.VehicleDB.Fuel == 0)
-            {
-                player.SendMessage(Models.MessageType.Error, "Veículo não possui combustível.");
-                return;
-            }
-
-            if (veh.Info.Type == VehicleModelType.BMX)
-            {
-                player.SendMessage(Models.MessageType.Error, "Veículo não possui motor.");
-                return;
-            }
-
-            player.SendMessageToNearbyPlayers($"{(player.Vehicle.EngineOn ? "des" : string.Empty)}liga o motor do veículo.", MessageCategory.Ame, 5);
-            player.Vehicle.EngineOn = !player.Vehicle.EngineOn;
         }
 
         public static void CMDTuning(MyPlayer player, MyPlayer? target, bool staff)
@@ -771,70 +741,6 @@ namespace TrevizaniRoleplay.Server
             }
 
             player.Emit("VehicleTuning", Serialize(vehicleTuning));
-        }
-
-        public static async Task CMDVenderVeiculoConcessionaria(MyPlayer player, Guid id, bool confirm)
-        {
-            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
-            {
-                player.SendMessage(Models.MessageType.Error, $"Veículo {id} está spawnado.");
-                return;
-            }
-
-            await using var context = new DatabaseContext();
-            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id && !x.Sold);
-            if (veh == null)
-            {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
-                return;
-            }
-
-            if (veh.FactionGift)
-            {
-                player.SendMessage(Models.MessageType.Error, "Você não pode vender este veículo pois é um benefício da facção.");
-                return;
-            }
-
-            var price = Global.Prices.FirstOrDefault(x => x.IsVehicle && x.Name.Equals(veh.Model, StringComparison.CurrentCultureIgnoreCase));
-            if (price == null)
-            {
-                player.SendMessage(Models.MessageType.Error, "Preço do veículo não foi encontrado.");
-                return;
-            }
-
-            var dealership = Global.Dealerships.FirstOrDefault(x => x.PriceType == price.Type);
-            if (dealership == null || player.Position.Distance(dealership.Position) > Global.RP_DISTANCE)
-            {
-                player.SendMessage(Models.MessageType.Error, $"Você não está na concessionária que vende este veículo.");
-                return;
-            }
-
-            var value = Convert.ToInt32(price.Value / 2);
-
-            if (confirm)
-            {
-                var characterItem = new CharacterItem();
-                characterItem.Create(ItemCategory.Money, 0, value, null);
-                var res = await player.GiveItem(characterItem);
-
-                if (!string.IsNullOrWhiteSpace(res))
-                {
-                    player.SendMessage(Models.MessageType.Error, res);
-                    return;
-                }
-
-                veh.SetSold();
-                context.Vehicles.Update(veh);
-                await context.SaveChangesAsync();
-
-                player.SendMessage(Models.MessageType.Success, $"Você vendeu seu veículo {veh.Model.ToUpper()} ({veh.Plate.ToUpper()}) [{veh.Id}] para a concessionária por ${value:N0}.");
-                await player.GravarLog(LogType.Sell, $"/vvenderconce {veh.Id} {value}", null);
-            }
-            else
-            {
-                player.TargetConfirmation = [id];
-                player.ShowConfirm("Confirmar Venda", $"Confirma vender o veículo {veh.Model.ToUpper()} para a concessionária por ${value:N0}?", "VenderVeiculo");
-            }
         }
         #endregion Commands
 

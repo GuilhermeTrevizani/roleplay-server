@@ -59,10 +59,28 @@ namespace TrevizaniRoleplay.Domain.Entities
         public Faction? Faction { get; private set; }
         public ICollection<VehicleItem>? Items { get; private set; }
 
-        public void Create(string model, string plate)
+        public void Create(string model, string plate, byte color1R, byte color1G, byte color1B, byte color2R, byte color2G, byte color2B)
         {
             Model = model;
             Plate = plate;
+            Color1R = color1R;
+            Color1G = color1G;
+            Color1B = color1B;
+            Color2R = color2R;
+            Color2G = color2G;
+            Color2B = color2B;
+
+            //var vehicle = new Vehicle()
+            //{
+            //    CharacterId = player.Character.Id,
+            //    Plate = ,
+            //    PosX = concessionaria.VehiclePosition.X,
+            //    PosY = concessionaria.VehiclePosition.Y,
+            //    PosZ = concessionaria.VehiclePosition.Z,
+            //    RotR = concessionaria.VehicleRotation.X,
+            //    RotP = concessionaria.VehicleRotation.Y,
+            //    RotY = concessionaria.VehicleRotation.Z,
+            //};
         }
 
         public void SetFuel(int fuel)
@@ -105,6 +123,26 @@ namespace TrevizaniRoleplay.Domain.Entities
         {
             CharacterId = characterId;
             Parked = false;
+        }
+
+        public void SetParked()
+        {
+            Parked = true;
+        }
+
+        public void SetLockNumber(uint value)
+        {
+            LockNumber = value;
+        }
+
+        public void SetProtectionLevel(byte value)
+        {
+            ProtectionLevel = value;
+        }
+
+        public void SetXMR()
+        {
+            XMR = true;
         }
     }
 }

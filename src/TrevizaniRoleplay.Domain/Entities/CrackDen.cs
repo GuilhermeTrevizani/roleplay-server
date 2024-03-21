@@ -12,6 +12,16 @@
         public DateTime CooldownDate { get; private set; } = DateTime.Now;
         public int Quantity { get; private set; }
 
+        public void Create()
+        {
+
+        }
+
+        public void Update()
+        {
+
+        }
+
         public void AddQuantity(int quantity)
         {
             Quantity += quantity;
@@ -20,6 +30,11 @@
                 CooldownDate = DateTime.Now.AddHours(CooldownHours);
                 Quantity = 0;
             }
+        }
+
+        public void ResetCooldownDate()
+        {
+            CooldownDate = DateTime.Now;
         }
     }
 }

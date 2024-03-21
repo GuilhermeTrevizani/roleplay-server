@@ -23,5 +23,10 @@
             Reason = reason;
             FactionId = factionId;
         }
+
+        public void Pay()
+        {
+            PaymentDate = DateTime.Now;
+        }
     }
 }

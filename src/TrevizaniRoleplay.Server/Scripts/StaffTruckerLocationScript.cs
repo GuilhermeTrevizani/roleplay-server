@@ -195,8 +195,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
         [AsyncClientEvent(nameof(StaffTruckerLocationDeliverySave))]
         public static async Task StaffTruckerLocationDeliverySave(MyPlayer player,
-            int truckerLocationDeliveryId,
-            int truckerLocationId,
+            string truckerLocationDeliveryIdString,
+            string truckerLocationIdString,
             Vector3 pos)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))

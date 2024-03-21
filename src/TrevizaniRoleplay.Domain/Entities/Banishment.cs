@@ -24,5 +24,10 @@
             Reason = reason;
             StaffUserId = staffUserId;
         }
+
+        public void ClearUserId()
+        {
+            UserId = null;
+        }
     }
 }

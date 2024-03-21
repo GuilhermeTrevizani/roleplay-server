@@ -131,5 +131,6 @@
         public const string HQ = "HQ";
         public const string STORAGE = "Armazenamento";
         public const string REMOVE_ALL_BARRIERS = "Deletar Todas Barreiras";
+        public const string FOUNDER = "Founder";
     }
 }

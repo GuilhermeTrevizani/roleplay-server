@@ -92,7 +92,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (preco > 0)
                 await player.RemoveStackedItem(ItemCategory.Money, preco);
 
-            weapon.Quantity--;
+            weapon.SetQuantity(weapon.Quantity - 1);
             await using var context = new DatabaseContext();
             context.FactionStoragesItems.Update(weapon);
             await context.SaveChangesAsync();

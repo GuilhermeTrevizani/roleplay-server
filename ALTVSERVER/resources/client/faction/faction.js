@@ -313,9 +313,7 @@ function removeMember(id, name) {
         text: 'Confirmar',
         btnClass: 'btn-green',
         action: function () {
-          alt.emit('removeMember',
-            faction.Id,
-            parseInt(id));
+          alt.emit('removeMember', faction.Id, id);
           return false;
         }
       },

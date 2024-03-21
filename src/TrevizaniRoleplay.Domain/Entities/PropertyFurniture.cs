@@ -13,5 +13,22 @@
         public bool Interior { get; private set; }
 
         public Property? Property { get; set; }
+
+        public void Create(Guid propertyId, string model, bool interior)
+        {
+            PropertyId = propertyId;
+            Model = model;
+            Interior = interior;
+        }
+
+        public void SetPosition(float posX, float posY, float posZ, float rotR, float rotP, float rotY)
+        {
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            RotR = rotR;
+            RotP = rotP;
+            RotY = rotY;
+        }
     }
 }

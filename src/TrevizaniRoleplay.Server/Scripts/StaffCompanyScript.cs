@@ -25,8 +25,9 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffCompanyGoto))]
-        public static void StaffCompanyGoto(MyPlayer player, int id)
+        public static void StaffCompanyGoto(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
@@ -36,7 +37,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCompanySave))]
-        public static async Task StaffCompanySave(MyPlayer player, int id, string name, Vector3 pos, int weekRentValue)
+        public static async Task StaffCompanySave(MyPlayer player, string idString, string name, Vector3 pos, int weekRentValue)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Companies))
             {
@@ -51,18 +52,27 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var company = new Company();
-            if (id > 0)
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
+            if (isNew)
+            {
+                company.Create(name, pos.X, pos.Y, pos.Z, weekRentValue);
+            }
+            else
+            {
                 company = Global.Companies.FirstOrDefault(x => x.Id == id);
+                if (company == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            company.Name = name;
-            company.PosX = pos.X;
-            company.PosY = pos.Y;
-            company.PosZ = pos.Z;
-            company.WeekRentValue = weekRentValue;
+                company.Update(name, pos.X, pos.Y, pos.Z, weekRentValue);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (company.Id == 0)
+            if (isNew)
                 await context.Companies.AddAsync(company);
             else
                 context.Companies.Update(company);
@@ -71,13 +81,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             company.CreateIdentifier();
 
-            if (id == 0)
-            {
-                company.Characters = [];
+            if (isNew)
                 Global.Companies.Add(company);
-            }
 
-            player.EmitStaffShowMessage($"Empresa {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Empresa {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Empresa | {Functions.Serialize(company)}", null);
 
@@ -87,7 +94,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCompanyRemove))]
-        public static async Task StaffCompanyRemove(MyPlayer player, int id)
+        public static async Task StaffCompanyRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Companies))
             {
@@ -95,6 +102,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company != null)
             {
@@ -114,7 +122,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffCompanyRemoveOwner))]
-        public static async Task StaffCompanyRemoveOwner(MyPlayer player, int id)
+        public static async Task StaffCompanyRemoveOwner(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Companies))
             {
@@ -122,6 +130,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company != null)
             {

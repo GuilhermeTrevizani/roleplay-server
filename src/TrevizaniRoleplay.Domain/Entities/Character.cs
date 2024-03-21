@@ -141,7 +141,7 @@ namespace TrevizaniRoleplay.Domain.Entities
             RejectionReason = reason;
         }
 
-        public void SetJailFinalDate(DateTime date)
+        public void SetJailFinalDate(DateTime? date)
         {
             JailFinalDate = date;
         }

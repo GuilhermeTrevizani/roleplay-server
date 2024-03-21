@@ -34,7 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         private static string GetFurnituresHTML(MyPlayer player, Property property)
         {
             var html = string.Empty;
-            if (property.Furnitures.Count == 0)
+            if (property.Furnitures!.Count == 0)
             {
                 html = "<tr><td class='text-center' colspan='7'>Não há mobílias na propriedade.</td></tr>";
             }
@@ -58,7 +58,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(BuyPropertyFurniture))]
-        public static void BuyPropertyFurniture(MyPlayer player, int propertyId)
+        public static void BuyPropertyFurniture(MyPlayer player, string propertyId)
         {
             player.Emit("Server:CloseView");
 
@@ -106,33 +106,33 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(SelectBuyPropertyFurniture))]
-        public static void SelectBuyPropertyFurniture(MyPlayer player, int propertyId, int furnitureId)
+        public static void SelectBuyPropertyFurniture(MyPlayer player, string propertyIdString, string furnitureIdString)
         {
+            var propertyId = new Guid(propertyIdString);
             var property = Global.Properties.FirstOrDefault(x => x.Id == propertyId);
             if (property == null)
                 return;
 
+            var furnitureId = new Guid(furnitureIdString);
             var furniture = Global.Furnitures.FirstOrDefault(x => x.Id == furnitureId);
             if (furniture == null)
                 return;
 
-            player.DropPropertyFurniture = new PropertyFurniture
-            {
-                PropertyId = propertyId,
-                Model = furniture.Model,
-                Interior = player.Dimension != 0,
-            };
+            player.DropPropertyFurniture = new PropertyFurniture();
+            player.DropPropertyFurniture.Create(property.Id, furniture.Model, player.Dimension != 0);
             player.Emit("DropObject", player.DropPropertyFurniture.Model, 2);
         }
 
         [ClientEvent(nameof(EditPropertyFurniture))]
-        public static void EditPropertyFurniture(MyPlayer player, int propertyId, int propertyFurnitureId)
+        public static void EditPropertyFurniture(MyPlayer player, string propertyIdString, string propertyFurnitureIdString)
         {
+            var propertyId = new Guid(propertyIdString);
             var property = Global.Properties.FirstOrDefault(x => x.Id == propertyId);
             if (property == null)
                 return;
 
-            player.DropPropertyFurniture = property.Furnitures.FirstOrDefault(x => x.Id == propertyFurnitureId);
+            var propertyFurnitureId = new Guid(propertyFurnitureIdString);
+            player.DropPropertyFurniture = property.Furnitures!.FirstOrDefault(x => x.Id == propertyFurnitureId);
             if (player.DropPropertyFurniture == null)
                 return;
 
@@ -141,13 +141,15 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(RemovePropertyFurniture))]
-        public static async Task RemovePropertyFurniture(MyPlayer player, int propertyId, int propertyFurnitureId)
+        public static async Task RemovePropertyFurniture(MyPlayer player, string propertyIdString, string propertyFurnitureIdString)
         {
+            var propertyId = new Guid(propertyIdString);
             var property = Global.Properties.FirstOrDefault(x => x.Id == propertyId);
             if (property == null)
                 return;
 
-            var propertyFurniture = property.Furnitures.FirstOrDefault(x => x.Id == propertyFurnitureId);
+            var propertyFurnitureId = new Guid(propertyFurnitureIdString);
+            var propertyFurniture = property.Furnitures!.FirstOrDefault(x => x.Id == propertyFurnitureId);
             if (propertyFurniture == null)
                 return;
 
@@ -155,7 +157,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             context.PropertiesFurnitures.Remove(propertyFurniture);
             await context.SaveChangesAsync();
 
-            property.Furnitures.Remove(propertyFurniture);
+            property.Furnitures!.Remove(propertyFurniture);
             propertyFurniture.DeleteObject();
 
             player.SendMessage(MessageType.Success, $"Você removeu a mobília {propertyFurniture.Id}.", notify: true);
@@ -174,14 +176,14 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.SendMessage(MessageType.Success, "Você cancelou o drop da mobília.", notify: true);
 
-            if (player.DropPropertyFurniture.Id > 0)
+            if (player.DropPropertyFurniture.PosX > 0)
             {
                 player.DropPropertyFurniture.CreateObject();
                 player.Emit("PropertyFurnitures", property.Id, GetFurnituresHTML(player, property));
             }
             else
             {
-                BuyPropertyFurniture(player, player.DropPropertyFurniture.PropertyId);
+                BuyPropertyFurniture(player, player.DropPropertyFurniture.PropertyId.ToString());
             }
 
             player.DropPropertyFurniture = null;
@@ -208,7 +210,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
 
             var newFurniture = false;
-            if (player.DropPropertyFurniture.Id == 0)
+            if (player.DropPropertyFurniture.PosX == 0)
             {
                 newFurniture = true;
 
@@ -223,7 +225,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         maxFurnitures = 150;
                 }
 
-                if (property.Furnitures.Count == maxFurnitures)
+                if (property.Furnitures!.Count == maxFurnitures)
                 {
                     player.SendMessage(MessageType.Error, $"O limite de {maxFurnitures} mobílias da propriedade foi atingido.", notify: true);
                     return;
@@ -238,23 +240,18 @@ namespace TrevizaniRoleplay.Server.Scripts
                 await player.RemoveStackedItem(ItemCategory.Money, furniture.Value);
             }
 
-            player.DropPropertyFurniture.PosX = position.X;
-            player.DropPropertyFurniture.PosY = position.Y;
-            player.DropPropertyFurniture.PosZ = position.Z;
-            player.DropPropertyFurniture.RotR = rotation.X;
-            player.DropPropertyFurniture.RotP = rotation.Y;
-            player.DropPropertyFurniture.RotY = rotation.Z;
+            player.DropPropertyFurniture.SetPosition(position.X, position.Y, position.Z, rotation.X, rotation.Y, rotation.Z);
 
             await using var context = new DatabaseContext();
 
-            if (player.DropPropertyFurniture.Id == 0)
+            if (newFurniture)
                 await context.PropertiesFurnitures.AddAsync(player.DropPropertyFurniture);
             else
                 context.PropertiesFurnitures.Update(player.DropPropertyFurniture);
 
             await context.SaveChangesAsync();
 
-            if (!property.Furnitures.Contains(player.DropPropertyFurniture))
+            if (!property.Furnitures!.Contains(player.DropPropertyFurniture))
                 property.Furnitures.Add(player.DropPropertyFurniture);
 
             player.DropPropertyFurniture.CreateObject();
@@ -264,7 +261,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (newFurniture)
             {
                 player.SendMessage(MessageType.Success, $"Você comprou {furniture.Name} por ${furniture.Value:N0}.", notify: true);
-                BuyPropertyFurniture(player, player.DropPropertyFurniture.PropertyId);
+                BuyPropertyFurniture(player, player.DropPropertyFurniture.PropertyId.ToString());
             }
             else
             {

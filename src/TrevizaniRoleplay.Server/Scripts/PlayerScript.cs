@@ -1070,7 +1070,6 @@ namespace TrevizaniRoleplay.Server.Scripts
                     new("Moderator", "/checar", "Checa as informações de um personagem"),
                     new("Moderator", "/proximo /prox", "Lista os itens que estão próximos"),
                     new("Moderator", "/ainfos", "Gerencia todas marcas de informações"),
-                    new("Moderator", "/debug", "Lista os pontos de áudio e de luz ativos"),
                     new("Moderator", "/app", "Pega uma aplicação para avaliação"),
                     new("Moderator", "/aceitarapp", "Aceita a aplicação que você está avaliando"),
                     new("Moderator", "/negarapp", "Nega a aplicação que você está avaliando"),

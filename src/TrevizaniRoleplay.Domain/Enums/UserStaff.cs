@@ -3,7 +3,7 @@ using TrevizaniRoleplay.Domain.Entities;
 
 namespace TrevizaniRoleplay.Domain.Enums
 {
-    public enum UserStaff
+    public enum UserStaff : byte
     {
         [Display(Name = Globalization.NONE)]
         None = 1,
@@ -21,6 +21,9 @@ namespace TrevizaniRoleplay.Domain.Enums
         HeadAdministrator = 200,
 
         [Display(Name = Globalization.MANAGER)]
-        Manager = 1337,
+        Manager = 254,
+
+        [Display(Name = Globalization.FOUNDER)]
+        Founder = 255,
     }
 }

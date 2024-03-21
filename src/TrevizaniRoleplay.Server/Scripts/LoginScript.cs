@@ -36,7 +36,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     var hasUsers = context.Users.Any();
                     user = new();
                     user.Create(res.Id, res.Username, res.Global_Name, player.RealIp, player.HardwareIdHash, player.HardwareIdExHash,
-                        hasUsers ? UserStaff.None : UserStaff.Manager, hasUsers ? "[]" : Functions.Serialize(Enum.GetValues<StaffFlag>()));
+                        hasUsers ? UserStaff.None : UserStaff.Founder, hasUsers ? "[]" : Functions.Serialize(Enum.GetValues<StaffFlag>()));
                     await context.Users.AddAsync(user);
                     await context.SaveChangesAsync();
                 }

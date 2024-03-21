@@ -15,6 +15,25 @@
 
         public ICollection<CompanyCharacter>? Characters { get; private set; }
 
+        public void Create(string name, float posX, float posY, float posZ, int weekRentValue)
+        {
+            Name = name;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            WeekRentValue = weekRentValue;
+            Characters = [];
+        }
+
+        public void Update(string name, float posX, float posY, float posZ, int weekRentValue)
+        {
+            Name = name;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            WeekRentValue = weekRentValue;
+        }
+
         public void Rent(Guid characterId)
         {
             CharacterId = characterId;

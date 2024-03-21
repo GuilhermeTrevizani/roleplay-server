@@ -1,77 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../resources/css/nifty.min.css" rel="stylesheet">
-    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
-    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../resources/css/nifty.min.css" rel="stylesheet">
+  <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+  <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
 </head>
+
 <body style="background-image: url('background.jpg'); background-size: cover; background-repeat: no-repeat;">
-    <div id="container" class="cls-container" style="background-color:transparent;">
-		<div class="cls-content">
-		    <div class="cls-content-sm panel" style="background-color:#ededed;width:60%;height:70vh;overflow-y:auto;overflow-x:hidden;">
-		        <div class="panel-body">
-		            <div class="mar-ver pad-btm">
-                        <img src="../resources/img/logo.png" style="width:300px;" />
-		            </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-primary">
-                                Os nomes podem conter acentuação.
-                            </div>
-                        </div>
-                    </div>
-                    <form>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <input id="nome" type="text" class="form-control" placeholder="Nome" spellcheck="false" autofocus>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <input id="sobrenome" type="text" class="form-control" placeholder="Sobrenome" spellcheck="false">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <select name="sexo" id="sexo" class="form-control">
-                                        <option value="M" selected>Homem</option>
-                                        <option value="F">Mulher</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <input id="dataNascimento" type="text" class="form-control" placeholder="Data de Nascimento" maxlength="10">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="15" placeholder="História do Personagem" id="historia" spellcheck="false"></textarea>
-                                </div>
-                            </div>
-                        </div>
-		                <button id="btn-enviaraplicacao" onclick="enviarAplicacao()" class="btn btn-primary btn-lg" type="button">Enviar Aplicação</button>
-		            </form>
-		        </div>
-		        <div class="pad-all text-center">
-		            <a onclick="voltar()" href="#" class="btn-link mar-rgt">Voltar para a seleção de personagens</a>
-		        </div>
-		    </div>
-		</div>
+  <div id="container" class="cls-container" style="background-color:transparent;">
+    <div class="cls-content">
+      <div class="cls-content-sm panel"
+        style="background-color:#ededed;width:60%;height:70vh;overflow-y:auto;overflow-x:hidden;">
+        <div class="panel-body">
+          <div class="mar-ver pad-btm">
+            <img src="../resources/img/logo.png" style="width:300px;" />
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="alert alert-primary">
+                Os nomes podem conter acentuação.
+              </div>
+            </div>
+          </div>
+          <form>
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <input id="nome" type="text" class="form-control" placeholder="Nome" spellcheck="false" autofocus>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <input id="sobrenome" type="text" class="form-control" placeholder="Sobrenome" spellcheck="false">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <select name="sexo" id="sexo" class="form-control">
+                    <option value="M" selected>Homem</option>
+                    <option value="F">Mulher</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <input id="dataNascimento" type="text" class="form-control" placeholder="Data de Nascimento"
+                    maxlength="10">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <textarea class="form-control" rows="15" placeholder="História do Personagem" id="historia"
+                    spellcheck="false"></textarea>
+                </div>
+              </div>
+            </div>
+            <button id="btn-enviaraplicacao" onclick="enviarAplicacao()" class="btn btn-primary btn-lg"
+              type="button">Enviar Aplicação</button>
+          </form>
+        </div>
+        <div class="pad-all text-center">
+          <a onclick="voltar()" href="#" class="btn-link mar-rgt">Voltar para a seleção de personagens</a>
+        </div>
+      </div>
     </div>
-    <script src="../resources/js/jquery.min.js"></script>
-    <script src="../resources/js/bootstrap.min.js"></script>
-    <script src="../resources/js/nifty.min.js"></script>
-    <script src="../resources/js/loadingoverlay.min.js"></script>
-    <script src="../resources/js/jquery.mask.min.js"></script>
-    <script src="../resources/js/jquery-confirm.js"></script>
-    <script src="criarpersonagem.js"></script>
+  </div>
+  <script src="../resources/js/jquery.min.js"></script>
+  <script src="../resources/js/bootstrap.min.js"></script>
+  <script src="../resources/js/nifty.min.js"></script>
+  <script src="../resources/js/loadingoverlay.min.js"></script>
+  <script src="../resources/js/jquery.mask.min.js"></script>
+  <script src="../resources/js/jquery-confirm.js"></script>
+  <script src="criarpersonagem.js"></script>
 </body>
+
 </html>

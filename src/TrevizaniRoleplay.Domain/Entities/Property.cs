@@ -41,9 +41,19 @@ namespace TrevizaniRoleplay.Domain.Entities
             CharacterId = characterId;
         }
 
-        public void ToggleLocked()
+        public void SetLocked(bool locked)
         {
-            Locked = !Locked;
+            Locked = locked;
+        }
+
+        public void SetProtectionLevel(byte value)
+        {
+            ProtectionLevel = value;
+        }
+
+        public void SetLockNumber(uint value)
+        {
+            LockNumber = value;
         }
     }
 }
