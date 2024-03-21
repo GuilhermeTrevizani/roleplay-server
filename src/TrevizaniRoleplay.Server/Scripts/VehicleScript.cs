@@ -122,7 +122,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (veh.NomeEncarregado == player.Character.Name)
+            if (veh.NameInCharge == player.Character.Name)
             {
                 var emp = Global.Jobs.FirstOrDefault(x => x.CharacterJob == player.Character.Job)!;
                 if (player.Vehicle.Position.Distance(emp.VehicleRentPosition) > Global.RP_DISTANCE)
@@ -290,8 +290,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             porta--;
-            veh.StatusPortas[porta] = !veh.StatusPortas[porta];
-            player.Emit("SetVehicleDoorState", veh, porta, veh.StatusPortas[porta]);
+            veh.DoorsStates[porta] = !veh.DoorsStates[porta];
+            player.Emit("SetVehicleDoorState", veh, porta, veh.DoorsStates[porta]);
         }
 
         [Command("capo")]
@@ -308,9 +308,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            veh.StatusPortas[4] = !veh.StatusPortas[4];
-            player.SendMessageToNearbyPlayers($"{(veh.StatusPortas[4] ? "fecha" : "abre")} o capô do veículo.", MessageCategory.Ame, 5);
-            player.Emit("SetVehicleDoorState", veh, 4, veh.StatusPortas[4]);
+            veh.DoorsStates[4] = !veh.DoorsStates[4];
+            player.SendMessageToNearbyPlayers($"{(veh.DoorsStates[4] ? "fecha" : "abre")} o capô do veículo.", MessageCategory.Ame, 5);
+            player.Emit("SetVehicleDoorState", veh, 4, veh.DoorsStates[4]);
         }
 
         [Command("portamalas", "/portamalas (opção [abrir, fechar, ver])")]
@@ -320,7 +320,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 && player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.Position.X, x.Position.Y, x.Position.Z)));
 
-            if (veh == null || !(veh?.TemArmazenamento ?? false) || veh?.VehicleDB?.Job != CharacterJob.None)
+            if (veh == null || !(veh?.HasStorage ?? false) || veh?.VehicleDB?.Job != CharacterJob.None)
             {
                 player.SendMessage(MessageType.Error, "Você não está próximo de um veículo que possui armazenamento.");
                 return;
@@ -336,9 +336,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                veh.StatusPortas[5] = option == "fechar";
-                player.SendMessageToNearbyPlayers($"{(veh.StatusPortas[5] ? "fecha" : "abre")} o porta-malas do veículo.", MessageCategory.Ame, 5);
-                player.Emit("SetVehicleDoorState", veh, 5, veh.StatusPortas[5]);
+                veh.DoorsStates[5] = option == "fechar";
+                player.SendMessageToNearbyPlayers($"{(veh.DoorsStates[5] ? "fecha" : "abre")} o porta-malas do veículo.", MessageCategory.Ame, 5);
+                player.Emit("SetVehicleDoorState", veh, 5, veh.DoorsStates[5]);
             }
             else if (option == "ver")
             {
@@ -348,7 +348,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                if (veh.StatusPortas[5])
+                if (veh.DoorsStates[5])
                 {
                     player.SendMessage(MessageType.Error, "O porta-malas está fechado.");
                     return;
@@ -399,7 +399,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("vplaca", "/vplaca (código do veículo) (placa)")]
-        public static async Task CMD_vplaca(MyPlayer player, int codigo, string placa)
+        public static async Task CMD_vplaca(MyPlayer player, string idString, string placa)
         {
             if (placa.Length > 8)
             {
@@ -413,14 +413,15 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (Global.Vehicles.Any(x => x.VehicleDB.Id == codigo))
+            var id = new Guid(idString);
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
-                player.SendMessage(MessageType.Error, $"Veículo {codigo} está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {id} está spawnado.");
                 return;
             }
 
             await using var context = new DatabaseContext();
-            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == codigo);
+            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
@@ -465,7 +466,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
-            if (Global.Vehicles.Any(x => x.NomeEncarregado == player.Character.Name))
+            if (Global.Vehicles.Any(x => x.NameInCharge == player.Character.Name))
             {
                 player.SendMessage(MessageType.Error, "Você já possui um veículo alugado.");
                 return;
@@ -481,7 +482,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             MyVehicle? veh = null;
             if (player.IsInVehicle)
             {
-                veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.VehicleDB.Job == player.Character.Job && !x.DataExpiracaoAluguel.HasValue);
+                veh = Global.Vehicles.FirstOrDefault(x => x == player.Vehicle && x.VehicleDB.Job == player.Character.Job && !x.RentExpirationDate.HasValue);
                 if (veh == null)
                 {
                     player.SendMessage(MessageType.Error, "Você não está dentro de um veículo disponível para aluguel.");
@@ -491,7 +492,10 @@ namespace TrevizaniRoleplay.Server.Scripts
             else
             {
                 await using var context = new DatabaseContext();
-                var veiculos = await context.Vehicles.Where(x => x.Job == player.Character.Job && !x.Sold).ToListAsync();
+                var veiculos = await context.Vehicles
+                    .Where(x => x.Job == player.Character.Job && !x.Sold)
+                        .Include(x => x.Items)
+                    .ToListAsync();
                 var veiculo = veiculos.FirstOrDefault(x => !Global.Vehicles.Any(y => y.VehicleDB.Id == x.Id));
                 if (veiculo == null)
                 {
@@ -511,20 +515,20 @@ namespace TrevizaniRoleplay.Server.Scripts
                 player.SetIntoVehicle(veh, 1);
             }
 
-            veh.NomeEncarregado = player.Character.Name;
-            veh.DataExpiracaoAluguel = DateTime.Now.AddHours(1);
+            veh.NameInCharge = player.Character.Name;
+            veh.RentExpirationDate = DateTime.Now.AddHours(1);
 
             await player.RemoveStackedItem(ItemCategory.Money, preco);
-            player.SendMessage(MessageType.Success, $"Você alugou um {emp.VehicleModel.ToString().ToUpper()} por ${preco:N0} com expiração em {veh.DataExpiracaoAluguel}.");
+            player.SendMessage(MessageType.Success, $"Você alugou um {emp.VehicleModel.ToString().ToUpper()} por ${preco:N0} com expiração em {veh.RentExpirationDate}.");
         }
 
         [Command("danos", "/danos (veículo)")]
-        public static void CMD_danos(MyPlayer player, int veiculo)
+        public static void CMD_danos(MyPlayer player, int id)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == veiculo);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.Id == id);
             if (veh == null)
             {
-                player.SendMessage(MessageType.Error, $"Nenhum veículo encontrado com o código {veiculo}.");
+                player.SendMessage(MessageType.Error, $"Nenhum veículo encontrado com o código {id}.");
                 return;
             }
 
@@ -549,7 +553,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 <tbody>";
 
             foreach (var x in veh.Damages)
-                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.WeaponHash}</td><td>{x.BodyHealthDamage}</td><td>{x.AdditionalBodyHealthDamage}</td><td>{x.EngineHealthDamage}</td><td>{x.PetrolTankDamage}</td></tr>";
+                html += $@"<tr><td>{x.Date}</td><td>{(WeaponModel)x.WeaponHash}</td><td>{x.BodyHealthDamage}</td><td>{x.AdditionalBodyHealthDamage}</td><td>{x.EngineHealthDamage}</td><td>{x.PetrolTankDamage}</td></tr>";
 
             html += $@"
                 </tbody>
@@ -600,7 +604,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (!veh.TemJanelas)
+            if (!veh.HasWindows)
             {
                 player.SendMessage(MessageType.Error, "Veículo não possui janelas.");
                 return;
@@ -737,7 +741,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.VehicleKey, veh.VehicleDB.LockNumber));
+            var characterItem = new CharacterItem();
+            characterItem.Create(ItemCategory.VehicleKey, veh.VehicleDB.LockNumber, 1, null);
+            var res = await player.GiveItem(characterItem);
             if (!string.IsNullOrWhiteSpace(res))
             {
                 player.SendMessage(MessageType.Error, res);
@@ -798,7 +804,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 combustivelNecessario = combustivel;
 
             veh.VehicleDB.SetFuel(veh.VehicleDB.Fuel + combustivelNecessario);
-            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
+            veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.FuelHUD);
 
             combustivel -= combustivelNecessario;
             if (combustivel == 0)
@@ -839,16 +845,17 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("vupgrade", "/vupgrade (código do veículo)")]
-        public static async Task CMD_vupgrade(MyPlayer player, int vehicleId)
+        public static async Task CMD_vupgrade(MyPlayer player, string idString)
         {
-            if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
+            var id = new Guid(idString);
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
-                player.SendMessage(MessageType.Error, $"Veículo {vehicleId} está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {idString} está spawnado.");
                 return;
             }
 
             await using var context = new DatabaseContext();
-            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == vehicleId && !x.Sold);
+            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id && !x.Sold);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
@@ -894,18 +901,19 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [Command("vrastrear", "/vrastrear (código do veículo)")]
-        public static async Task CMD_vrastrear(MyPlayer player, int vehicleId)
+        public static async Task CMD_vrastrear(MyPlayer player, string idString)
         {
-            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
+            var id = new Guid(idString);
+            var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (veh == null)
             {
-                player.SendMessage(MessageType.Error, $"Veículo {vehicleId} não está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {idString} não está spawnado.");
                 return;
             }
 
             if (veh.VehicleDB.ProtectionLevel < 1)
             {
-                player.SendMessage(MessageType.Error, $"Veículo {vehicleId} não possui rastreador.");
+                player.SendMessage(MessageType.Error, $"Veículo {idString} não possui rastreador.");
                 return;
             }
 
@@ -1140,7 +1148,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 Task.Run(async () =>
                 {
                     var value = Convert.ToInt32(Math.Truncate(preco.Value * 0.1));
-                    var res = await player.GiveItem(new CharacterItem(ItemCategory.Money) { Quantity = value });
+                    var characterItem = new CharacterItem();
+                    characterItem.Create(ItemCategory.Money, 0, value, null);
+                    var res = await player.GiveItem(characterItem);
                     if (!string.IsNullOrWhiteSpace(res))
                     {
                         player.SendMessage(MessageType.Error, res);
@@ -1176,7 +1186,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            attachedVehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id
+            attachedVehicle = Global.Vehicles.FirstOrDefault(x => x.Id == id
                 && x != player.Vehicle
                 && x.Position.Distance(player.Vehicle.Position) <= 10);
             if (attachedVehicle == null)
@@ -1242,7 +1252,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
-            if (seat == 1 && vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
+            if (seat == 1 && vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.RentExpirationDate.HasValue)
             {
                 await Task.Delay(2000);
                 await vehicle.Estacionar(player);
@@ -1264,7 +1274,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 {
                     vehicle.EngineOn = false;
                 }
-                else if (vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.DataExpiracaoAluguel.HasValue)
+                else if (vehicle.VehicleDB.Job != CharacterJob.None && !vehicle.RentExpirationDate.HasValue)
                 {
                     vehicle.EngineOn = false;
                     if (player.Seat == 1)
@@ -1277,14 +1287,14 @@ namespace TrevizaniRoleplay.Server.Scripts
                     vehicle.EngineOn = true;
             }
 
-            if (vehicle.VehicleDB.Job != CharacterJob.None && vehicle.NomeEncarregado == player.Character.Name && vehicle.DataExpiracaoAluguel.HasValue)
-                player.SendMessage(MessageType.Error, $"O aluguel do veículo irá expirar em {vehicle.DataExpiracaoAluguel}.");
+            if (vehicle.VehicleDB.Job != CharacterJob.None && vehicle.NameInCharge == player.Character.Name && vehicle.RentExpirationDate.HasValue)
+                player.SendMessage(MessageType.Error, $"O aluguel do veículo irá expirar em {vehicle.RentExpirationDate}.");
         }
 
         [ScriptEvent(ScriptEventType.VehicleDamage)]
-        public static void OnVehicleDamage(MyVehicle veh, IEntity attacker, uint bodyHealthDamage, uint additionalBodyHealthDamage, uint engineHealthDamage, uint petrolTankDamage, uint weaponHash)
+        public static void OnVehicleDamage(MyVehicle veh, AltV.Net.Elements.Entities.IEntity attacker, uint bodyHealthDamage, uint additionalBodyHealthDamage, uint engineHealthDamage, uint petrolTankDamage, uint weaponHash)
         {
-            var dano = new MyVehicle.Damage()
+            var dano = new VehicleDamage()
             {
                 BodyHealthDamage = bodyHealthDamage,
                 AdditionalBodyHealthDamage = additionalBodyHealthDamage,
@@ -1296,7 +1306,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             MyPlayer? playerAttacker = null;
             if (attacker is not MyPlayer player)
             {
-                if (attacker is IVehicle vehicleAttacker)
+                if (attacker is MyVehicle vehicleAttacker)
                     playerAttacker = (MyPlayer)vehicleAttacker.Driver;
             }
             else
@@ -1385,10 +1395,11 @@ namespace TrevizaniRoleplay.Server.Scripts
         public void SetVehicleSpotlightZ(MyPlayer player, float spotlightZ) => player.Vehicle.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_SPOTLIGHT_Z, spotlightZ);
 
         [AsyncClientEvent(nameof(SpawnarVeiculoFaccao))]
-        public async Task SpawnarVeiculoFaccao(MyPlayer player, int spotId, int vehicleId)
+        public async Task SpawnarVeiculoFaccao(MyPlayer player, string spotIdString, string vehicleIdString)
         {
             try
             {
+                var vehicleId = new Guid(vehicleIdString);
                 if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
                 {
                     player.SendMessage(MessageType.Error, "Veículo já está spawnado.", notify: true);
@@ -1396,7 +1407,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
 
                 await using var context = new DatabaseContext();
-                var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var veh = await context.Vehicles
+                    .Include(x => x.Items)
+                    .FirstOrDefaultAsync(x => x.Id == vehicleId);
                 if (veh == null)
                 {
                     player.SendMessage(MessageType.Error, "Veículo não encontrado.", notify: true);
@@ -1407,6 +1420,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 veh.PosY = player.Position.Y;
                 veh.PosZ = player.Position.Z;
 
+                var spotId = new Guid(spotIdString);
                 var spot = Global.Spots.FirstOrDefault(x => x.Id == spotId);
                 if (spot != null)
                 {
@@ -1416,7 +1430,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
 
                 var vehicle = await veh.Spawnar(player);
-                vehicle.NomeEncarregado = player.Character.Name;
+                vehicle.NameInCharge = player.Character.Name;
                 vehicle.LockState = VehicleLockState.Unlocked;
                 player.SetIntoVehicle(vehicle, 1);
                 player.Emit("Server:CloseView");
@@ -1424,7 +1438,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
             catch (Exception ex)
             {
-                ex.HelpLink = $"Vehicle Id: {vehicleId}";
+                ex.HelpLink = $"Vehicle Id: {vehicleIdString}";
                 Functions.GetException(ex);
             }
         }
@@ -1481,18 +1495,19 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(SpawnarVeiculo))]
-        public async Task SpawnarVeiculo(MyPlayer player, int vehicleId)
+        public async Task SpawnarVeiculo(MyPlayer player, string idString)
         {
             try
             {
-                if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
+                var id = new Guid(idString);
+                if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
                 {
                     player.SendMessage(MessageType.Error, "Veículo já está spawnado.", notify: true);
                     return;
                 }
 
                 await using var context = new DatabaseContext();
-                var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.Id == vehicleId);
+                var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.Id == id);
                 if (veh == null)
                 {
                     player.SendMessage(MessageType.Error, "Veículo não encontrado.", notify: true);
@@ -1513,12 +1528,12 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 await veh.Spawnar(player);
                 player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
-                player.SendMessage(MessageType.Success, $"Você spawnou o veículo {vehicleId}.", notify: true);
+                player.SendMessage(MessageType.Success, $"Você spawnou o veículo {idString}.", notify: true);
                 player.Emit("Server:CloseView");
             }
             catch (Exception ex)
             {
-                ex.HelpLink = $"Vehicle Id: {vehicleId}";
+                ex.HelpLink = $"Vehicle Id: {idString}";
                 Functions.GetException(ex);
             }
         }
@@ -1539,16 +1554,17 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(BuyVehicleUpgrade))]
-        public static async Task BuyVehicleUpgrade(MyPlayer player, int vehicleId, string name)
+        public static async Task BuyVehicleUpgrade(MyPlayer player, string idString, string name)
         {
-            if (Global.Vehicles.Any(x => x.VehicleDB.Id == vehicleId))
+            var id = new Guid(idString);
+            if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
-                player.SendMessage(MessageType.Error, $"Veículo {vehicleId} está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {idString} está spawnado.");
                 return;
             }
 
             await using var context = new DatabaseContext();
-            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == vehicleId && !x.Sold);
+            var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id && !x.Sold);
             if (veh == null)
             {
                 player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE, notify: true);
@@ -1634,7 +1650,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(ConfirmXMR))]
-        public static void ConfirmXMR(MyPlayer player, int vehicleId, string url, float volume)
+        public static void ConfirmXMR(MyPlayer player, string idString, string url, float volume)
         {
             if (!(Uri.TryCreate(url, UriKind.Absolute, out Uri? uriResult)
                 && uriResult?.Scheme != Uri.UriSchemeHttp && uriResult?.Scheme != Uri.UriSchemeHttps))
@@ -1643,7 +1659,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
+            var id = new Guid(idString);
+            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (vehicle == null)
                 return;
 
@@ -1665,9 +1682,10 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(TurnOffXMR))]
-        public static void TurnOffXMR(MyPlayer player, int vehicleId)
+        public static void TurnOffXMR(MyPlayer player, string idString)
         {
-            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == vehicleId);
+            var id = new Guid(idString);
+            var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (vehicle == null)
                 return;
 

@@ -12,78 +12,26 @@ namespace TrevizaniRoleplay.Server.Factories
 {
     public class MyVehicle(ICore server, IntPtr nativePointer, uint id) : AsyncVehicle(server, nativePointer, id)
     {
-        public class Dano
-        {
-            public List<bool> WindowsDamaged { get; set; } = [];
-            public List<bool> LightsDamaged { get; set; } = [];
-            public List<bool> SpecialLightsDamaged { get; set; } = [];
-            public List<Wheel> Wheels { get; set; } = [];
-            public List<Part> Parts { get; set; } = [];
-            public List<Bumper> Bumpers { get; set; } = [];
-            public List<ArmoredWindow> ArmoredWindows { get; set; } = [];
-
-            public class Wheel(byte id, float health, bool detached, bool burst, bool hasTire)
-            {
-                public byte Id { get; set; } = id;
-                public float Health { get; set; } = health;
-                public bool Detached { get; set; } = detached;
-                public bool Burst { get; set; } = burst;
-                public bool HasTire { get; set; } = hasTire;
-            }
-
-            public class ArmoredWindow(byte id, float health, byte shootCount)
-            {
-                public byte Id { get; set; } = id;
-                public float Health { get; set; } = health;
-                public byte ShootCount { get; set; } = shootCount;
-            }
-
-            public class Part(VehiclePart vehiclePart, VehiclePartDamage vehiclePartDamage, byte bulletHoles)
-            {
-                public VehiclePart VehiclePart { get; set; } = vehiclePart;
-                public VehiclePartDamage VehiclePartDamage { get; set; } = vehiclePartDamage;
-                public byte BulletHoles { get; set; } = bulletHoles;
-            }
-
-            public class Bumper(VehicleBumper vehicleBumper, VehicleBumperDamage vehicleBumperDamage)
-            {
-                public VehicleBumper VehicleBumper { get; set; } = vehicleBumper;
-                public VehicleBumperDamage VehicleBumperDamage { get; set; } = vehicleBumperDamage;
-            }
-        }
-
-        public class Damage
-        {
-            public DateTime Data { get; set; } = DateTime.Now;
-            public uint BodyHealthDamage { get; set; }
-            public uint AdditionalBodyHealthDamage { get; set; }
-            public uint EngineHealthDamage { get; set; }
-            public uint PetrolTankDamage { get; set; }
-            public uint WeaponHash { get; set; }
-            public string? Attacker { get; set; }
-            public float Distance { get; set; }
-        }
-
-        public Domain.Entities.Vehicle VehicleDB { get; set; } = new();
+        public Vehicle VehicleDB { get; set; } = new();
 
         /// <summary>
         /// Nome do personagem que usou o /fspawn ou /valugar
         /// </summary>
-        public string NomeEncarregado { get; set; } = string.Empty;
+        public string NameInCharge { get; set; } = string.Empty;
 
         /// <summary>
-        /// TRUE: FECHADA
+        /// true = Closed
         /// 0 = Front Left Door
         /// 1 = Front Right Door
         /// 2 = Back Left Door
         /// 3 = Back Right Door
         /// 4 = Hood
         /// </summary>
-        public List<bool> StatusPortas { get; set; } = [true, true, true, true, true, true];
+        public List<bool> DoorsStates { get; set; } = [true, true, true, true, true, true];
 
         public int Speed { get => Convert.ToInt32(Math.Abs(Velocity.GetMagnitude() * 3.6)); }
 
-        public string CombustivelHUD
+        public string FuelHUD
         {
             get
             {
@@ -101,7 +49,7 @@ namespace TrevizaniRoleplay.Server.Factories
 
         public VehicleModelInfo Info { get => Alt.GetVehicleModelInfo(Model); }
 
-        public bool TemTanqueCombustivel
+        public bool HasFuelTank
         {
             get => !(VehicleDB.Model.Equals(VehicleModel.Polmav.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 || VehicleDB.Model.Equals(VehicleModelMods.LSPDHELI.ToString(), StringComparison.CurrentCultureIgnoreCase)
@@ -109,11 +57,11 @@ namespace TrevizaniRoleplay.Server.Factories
                 || new List<VehicleModelType> { VehicleModelType.BOAT, VehicleModelType.BMX, VehicleModelType.PLANE, VehicleModelType.HELI, VehicleModelType.TRAILER, VehicleModelType.TRAIN }.Contains(Info.Type));
         }
 
-        public DateTime? DataExpiracaoAluguel { get; set; }
+        public DateTime? RentExpirationDate { get; set; }
 
-        public List<Damage> Damages { get; set; } = [];
+        public List<VehicleDamage> Damages { get; set; } = [];
 
-        public bool TemJanelas
+        public bool HasWindows
         {
             get => !(VehicleDB.Model.Equals(VehicleModel.Policeb.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 || VehicleDB.Model.Equals(VehicleModelMods.POLTHRUST.ToString(), StringComparison.CurrentCultureIgnoreCase)
@@ -157,7 +105,7 @@ namespace TrevizaniRoleplay.Server.Factories
 
         public bool SpotlightActive { get; set; }
 
-        public bool TemArmazenamento
+        public bool HasStorage
         {
             get => !(VehicleDB.Model.Equals(VehicleModel.Policeb.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 || VehicleDB.Model.Equals(VehicleModelMods.POLTHRUST.ToString(), StringComparison.CurrentCultureIgnoreCase)
@@ -192,11 +140,14 @@ namespace TrevizaniRoleplay.Server.Factories
                 || new List<VehicleModelType> { VehicleModelType.BOAT, VehicleModelType.BMX, VehicleModelType.BIKE }.Contains(Info.Type));
         }
 
-        public List<VehicleItem> Itens { get; set; } = [];
         public System.Timers.Timer Timer { get; set; }
+
         public List<Spot> CollectSpots { get; set; } = [];
+
         public TruckerLocation? TruckerLocation { get; set; }
+
         public AudioSpot? AudioSpot { get; set; }
+
         public AudioSpot? AlarmAudioSpot { get; set; }
 
         public async Task<bool> Estacionar(MyPlayer? player)
@@ -206,24 +157,24 @@ namespace TrevizaniRoleplay.Server.Factories
 
             if (VehicleDB.Job == CharacterJob.None)
             {
-                var dano = new Dano();
+                var dano = new VehicleDamageInfo();
 
                 foreach (var x in Enum.GetValues(typeof(VehicleBumper)).Cast<VehicleBumper>())
-                    dano.Bumpers.Add(new Dano.Bumper(x, (VehicleBumperDamage)GetBumperDamageLevel((byte)x)));
+                    dano.Bumpers.Add(new VehicleDamageInfo.Bumper(x, (VehicleBumperDamage)GetBumperDamageLevel((byte)x)));
 
                 foreach (var x in Enum.GetValues(typeof(VehiclePart)).Cast<VehiclePart>())
-                    dano.Parts.Add(new Dano.Part(x, (VehiclePartDamage)GetPartDamageLevel((byte)x), GetPartBulletHoles((byte)x)));
+                    dano.Parts.Add(new VehicleDamageInfo.Part(x, (VehiclePartDamage)GetPartDamageLevel((byte)x), GetPartBulletHoles((byte)x)));
 
                 for (byte i = 0; i <= 20; i++)
                 {
                     dano.LightsDamaged.Add(IsLightDamaged(i));
                     dano.SpecialLightsDamaged.Add(IsSpecialLightDamaged(i));
                     dano.WindowsDamaged.Add(IsWindowDamaged(i));
-                    dano.ArmoredWindows.Add(new Dano.ArmoredWindow(i, GetArmoredWindowHealth(i), GetArmoredWindowShootCount(i)));
+                    dano.ArmoredWindows.Add(new VehicleDamageInfo.ArmoredWindow(i, GetArmoredWindowHealth(i), GetArmoredWindowShootCount(i)));
                 }
 
                 for (byte i = 0; i < WheelsCount; i++)
-                    dano.Wheels.Add(new Dano.Wheel(i, GetWheelHealth(i), IsWheelDetached(i), IsWheelBurst(i), DoesWheelHasTire(i)));
+                    dano.Wheels.Add(new VehicleDamageInfo.Wheel(i, GetWheelHealth(i), IsWheelDetached(i), IsWheelBurst(i), DoesWheelHasTire(i)));
 
                 VehicleDB.SetDamages(EngineHealth, BodyHealth, BodyAdditionalHealth, PetrolTankHealth,
                     Functions.Serialize(dano), Functions.Serialize(Damages));
@@ -284,7 +235,7 @@ namespace TrevizaniRoleplay.Server.Factories
             player.ShowInventory(player, InventoryShowType.Vehicle,
                 $"{VehicleDB.Model.ToUpper()} ({VehicleDB.Plate.ToUpper()}) [{VehicleDB.Id}]",
                 Functions.Serialize(
-                    Itens.Select(x => new
+                    VehicleDB.Items!.Select(x => new
                     {
                         ID = x.Id,
                         Image = x.GetImageName(),
@@ -301,7 +252,7 @@ namespace TrevizaniRoleplay.Server.Factories
         {
             return VehicleDB.CharacterId == player.Character.Id
                 || (VehicleDB.FactionId.HasValue && VehicleDB.FactionId == player.Character.FactionId)
-                || (!string.IsNullOrWhiteSpace(NomeEncarregado) && NomeEncarregado == player.Character.Name)
+                || (!string.IsNullOrWhiteSpace(NameInCharge) && NameInCharge == player.Character.Name)
                 || player.Items.Any(x => x.Category == ItemCategory.VehicleKey && x.Type == VehicleDB.LockNumber);
         }
 

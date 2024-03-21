@@ -59,17 +59,14 @@ namespace TrevizaniRoleplay.Server.Commands
             switch ((InviteType)tipo)
             {
                 case InviteType.Faccao:
-                    if (!Guid.TryParse(convite.Value[0], out Guid faccao) || !Guid.TryParse(convite.Value[1], out Guid rank))
+                    if (!Guid.TryParse(convite.Value[0], out Guid factionId) || !Guid.TryParse(convite.Value[1], out Guid factionRankId))
                         return;
 
-                    player.Character.FactionId = faccao;
-                    player.Character.FactionRankId = rank;
+                    var faction = Global.Factions.FirstOrDefault(x => x.Id == factionId)!;
+                    player.Character.SetFaction(factionId, factionRankId, faction.Type == FactionType.Criminal);
 
-                    if (player.Faction?.Type != FactionType.Criminal)
-                    {
-                        player.Character.Job = CharacterJob.None;
+                    if (faction.Type != FactionType.Criminal)
                         player.OnDuty = false;
-                    }
 
                     player.SendFactionMessage($"{player.Character.Name} entrou na facção.");
                     await player.Save();
@@ -103,10 +100,10 @@ namespace TrevizaniRoleplay.Server.Commands
                         return;
                     }
 
-                    var res = await target.GiveItem(new CharacterItem(ItemCategory.Money)
-                    {
-                        Quantity = valor
-                    });
+                    var characterItem = new CharacterItem();
+                    characterItem.Create(ItemCategory.Money, 0, valor, null);
+
+                    var res = await target.GiveItem(characterItem);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -116,12 +113,10 @@ namespace TrevizaniRoleplay.Server.Commands
 
                     await player.RemoveStackedItem(ItemCategory.Money, valor);
 
-                    prop.CharacterId = player.Character.Id;
+                    prop.SetOwner(player.Character.Id);
 
-                    {
-                        context.Properties.Update(prop);
-                        await context.SaveChangesAsync();
-                    }
+                    context.Properties.Update(prop);
+                    await context.SaveChangesAsync();
 
                     await target.GravarLog(LogType.Sell, $"/pvender {prop.Id} {valor}", player);
                     player.SendMessage(MessageType.Success, $"Você comprou a propriedade {prop.Id} de {target.ICName} por ${valor:N0}.");
@@ -166,10 +161,10 @@ namespace TrevizaniRoleplay.Server.Commands
                         return;
                     }
 
-                    res = await target.GiveItem(new CharacterItem(ItemCategory.Money)
-                    {
-                        Quantity = valorVeh
-                    });
+                    var characterItemVehicle = new CharacterItem();
+                    characterItemVehicle.Create(ItemCategory.Money, 0, valorVeh, null);
+
+                    res = await target.GiveItem(characterItemVehicle);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -179,8 +174,7 @@ namespace TrevizaniRoleplay.Server.Commands
 
                     await player.RemoveStackedItem(ItemCategory.Money, valorVeh);
 
-                    veh.VehicleDB.CharacterId = player.Character.Id;
-                    veh.VehicleDB.Parked = false;
+                    veh.VehicleDB.SetOwner(player.Character.Id);
 
                     context.Vehicles.Update(veh.VehicleDB);
                     await context.SaveChangesAsync();
@@ -204,11 +198,8 @@ namespace TrevizaniRoleplay.Server.Commands
                     if (company == null)
                         return;
 
-                    var companyCharacter = new CompanyCharacter
-                    {
-                        CompanyId = companyId,
-                        CharacterId = player.Character.Id,
-                    };
+                    var companyCharacter = new CompanyCharacter();
+                    companyCharacter.Create(companyId, player.Character.Id);
                     await context.CompaniesCharacters.AddAsync(companyCharacter);
                     await context.SaveChangesAsync();
 
@@ -218,7 +209,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     target.SendMessage(MessageType.Success, $"{player.Character.Name} aceitou seu convite para entrar na empresa.");
                     break;
                 case InviteType.Mechanic:
-                    player.VehicleTuning = Functions.Deserialize<VehicleTuning>(convite.Value.FirstOrDefault());
+                    player.VehicleTuning = Functions.Deserialize<VehicleTuning>(convite.Value.FirstOrDefault()!);
 
                     player.SendMessage(MessageType.Success, $"Você aceitou o convite para receber o catálogo de modificações veiculares.");
                     target.SendMessage(MessageType.Success, $"{player.Character.Name} aceitou seu convite para receber o catálogo de modificações veiculares.");
@@ -316,10 +307,10 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("comprar")]
         public static async Task CMD_comprar(MyPlayer player)
         {
-            var ponto = Global.Spots.OrderBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ))).FirstOrDefault();
-            if (ponto != null && player.Position.Distance(new Position(ponto.PosX, ponto.PosY, ponto.PosZ)) <= Global.RP_DISTANCE)
+            var spot = Global.Spots.OrderBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ))).FirstOrDefault();
+            if (spot != null && player.Position.Distance(new Position(spot.PosX, spot.PosY, spot.PosZ)) <= Global.RP_DISTANCE)
             {
-                if (ponto.Type == SpotType.ConvenienceStore)
+                if (spot.Type == SpotType.ConvenienceStore)
                 {
                     player.Emit("Server:ComprarConveniencia", Functions.Serialize(Global.Prices.Where(x => x.Type == PriceType.ConvenienceStore).OrderBy(x => x.Name).Select(x => new
                     {
@@ -329,7 +320,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     return;
                 }
 
-                if (ponto.Type == SpotType.BarberShop)
+                if (spot.Type == SpotType.BarberShop)
                 {
                     if (player.Money < Global.Parameter.BarberValue)
                     {
@@ -342,7 +333,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     return;
                 }
 
-                if (ponto.Type == SpotType.ClothesStore)
+                if (spot.Type == SpotType.ClothesStore)
                 {
                     if (player.Money < Global.Parameter.ClothesValue)
                     {
@@ -355,7 +346,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     return;
                 }
 
-                if (ponto.Type == SpotType.TattooShop)
+                if (spot.Type == SpotType.TattooShop)
                 {
                     if (player.Money < Global.Parameter.TattooValue)
                     {
@@ -369,36 +360,36 @@ namespace TrevizaniRoleplay.Server.Commands
                 }
             }
 
-            var prox = Global.Properties
+            var property = Global.Properties
                 .Where(x => !x.CharacterId.HasValue
                     && player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)) <= Global.RP_DISTANCE)
                 .MinBy(x => player.Position.Distance(new Position(x.EntrancePosX, x.EntrancePosY, x.EntrancePosZ)));
-            if (prox != null)
+            if (property != null)
             {
-                if (player.Money < prox.Value)
+                if (player.Money < property.Value)
                 {
-                    player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, prox.Value));
+                    player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, property.Value));
                     return;
                 }
 
-                await player.RemoveStackedItem(ItemCategory.Money, prox.Value);
+                await player.RemoveStackedItem(ItemCategory.Money, property.Value);
 
-                prox.CharacterId = player.Character.Id;
-                prox.CreateIdentifier();
+                property.SetOwner(player.Character.Id);
+                property.CreateIdentifier();
 
                 await using var context = new DatabaseContext();
-                context.Properties.Update(prox);
+                context.Properties.Update(property);
                 await context.SaveChangesAsync();
 
-                player.SendMessage(MessageType.Success, $"Você comprou a propriedade por ${prox.Value:N0}.");
+                player.SendMessage(MessageType.Success, $"Você comprou a propriedade por ${property.Value:N0}.");
                 return;
             }
 
-            var conce = Global.Dealerships.OrderBy(x => player.Position.Distance(x.Position))
+            var dealership = Global.Dealerships.OrderBy(x => player.Position.Distance(x.Position))
                 .FirstOrDefault();
-            if (conce != null && player.Position.Distance(conce.Position) <= Global.RP_DISTANCE)
+            if (dealership != null && player.Position.Distance(dealership.Position) <= Global.RP_DISTANCE)
             {
-                var veiculos = Global.Prices.Where(x => x.Type == conce.PriceType).OrderBy(x => x.Name).Select(x => new
+                var veiculos = Global.Prices.Where(x => x.Type == dealership.PriceType).OrderBy(x => x.Name).Select(x => new
                 {
                     Nome = x.Name.ToUpper(),
                     Preco = x.Value.ToString("N0"),
@@ -406,7 +397,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     Restricao = Functions.CheckVIPVehicle(x.Name).Item1,
                 }).ToList();
 
-                player.Emit("Server:ComprarVeiculo", conce.Name, (int)conce.PriceType, Functions.Serialize(veiculos));
+                player.Emit("Server:ComprarVeiculo", dealership.Name, (int)dealership.PriceType, Functions.Serialize(veiculos));
                 return;
             }
 
@@ -414,7 +405,7 @@ namespace TrevizaniRoleplay.Server.Commands
         }
 
         [Command("sos", "/sos (mensagem)", GreedyArg = true)]
-        public static async Task CMD_sos(MyPlayer player, string mensagem)
+        public static async Task CMD_sos(MyPlayer player, string message)
         {
             if (player.User.Staff > 0)
             {
@@ -422,10 +413,10 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var sos = Global.HelpRequests.FirstOrDefault(x => x.CharacterSessionId == player.SessionId);
-            if (sos != null)
+            var helpRequest = Global.HelpRequests.FirstOrDefault(x => x.CharacterSessionId == player.SessionId);
+            if (helpRequest != null)
             {
-                var target = await sos.Check();
+                var target = await helpRequest.Check();
                 if (target != null)
                 {
                     player.SendMessage(MessageType.Error, "Você já possui um SOS pendente de resposta.");
@@ -440,25 +431,19 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            sos = new HelpRequest()
-            {
-                CharacterSessionId = player.SessionId,
-                Message = mensagem,
-                UserId = player.User.Id,
-                CharacterName = player.Character.Name,
-                UserName = player.User.Name,
-            };
+            helpRequest = new HelpRequest();
+            helpRequest.Create(message, player.User.Id, player.SessionId, player.Character.Name, player.User.Name);
 
             using var context = new DatabaseContext();
-            await context.HelpRequests.AddAsync(sos);
+            await context.HelpRequests.AddAsync(helpRequest);
             await context.SaveChangesAsync();
 
-            Global.HelpRequests.Add(sos);
+            Global.HelpRequests.Add(helpRequest);
 
             foreach (var x in players)
             {
                 x.SendMessage(MessageType.None, $"SOS de {player.Character.Name} [{player.SessionId}] ({player.User.Name}) (use /at {player.SessionId} para atender)");
-                x.SendMessage(MessageType.None, mensagem, "#69d4f5");
+                x.SendMessage(MessageType.None, message, "#69d4f5");
             }
 
             player.SendMessage(MessageType.Success, "SOS enviado para os administradores em serviço.");
@@ -524,10 +509,7 @@ namespace TrevizaniRoleplay.Server.Commands
 
             player.Curar();
             await player.RemoveItem(player.Items.Where(x => x.Category == ItemCategory.Weapon));
-            player.Character.DrugItemCategory = null;
-            player.Character.DrugEndDate = null;
-            player.Character.ThresoldDeath = 0;
-            player.Character.ThresoldDeathEndDate = null;
+            player.Character.ClearDrug();
             player.DrugTimer?.Stop();
             player.ClearDrugEffect();
             player.Cuffed = false;
@@ -536,7 +518,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 x.SendMessage(MessageType.Error, $"(( {player.ICName} [{player.SessionId}] aceitou tratamento no hospital. ))");
 
             player.SetPosition(new Position(spot.PosX, spot.PosY, spot.PosZ), 0, true);
-            player.Character.Bank -= Global.Parameter.HospitalValue;
+            player.Character.RemoveBank(Global.Parameter.HospitalValue);
 
             await using var context = new DatabaseContext();
             var financialTransaction = new FinancialTransaction();
@@ -556,8 +538,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            player.Character.DeathDate = DateTime.Now;
-            player.Character.DeathReason = "Aceitou CK";
+            player.Character.SetDeath(DateTime.Now, "Aceitou CK");
 
             foreach (var x in Global.SpawnedPlayers.Where(x => x.Dimension == player.Dimension && player.Position.Distance(x.Position) <= 20))
                 x.SendMessage(MessageType.Error, $"(( {player.ICName} [{player.SessionId}] aceitou CK. ))");
@@ -797,7 +778,7 @@ namespace TrevizaniRoleplay.Server.Commands
         [Command("dl")]
         public static void CMD_dl(MyPlayer player)
         {
-            player.User.VehicleTagToggle = !player.User.VehicleTagToggle;
+            player.User.SetVehicleTagToggle(!player.User.VehicleTagToggle);
             player.Emit("dl:Config", player.User.VehicleTagToggle);
             player.SendMessage(MessageType.Success, $"Você {(!player.User.VehicleTagToggle ? "des" : string.Empty)}ativou o DL.");
         }
@@ -874,127 +855,6 @@ namespace TrevizaniRoleplay.Server.Commands
             target.Invites.RemoveAll(x => x.Type == type);
             player.SendMessage(MessageType.Success, $"Você cancelou o convite para {strPlayer}.");
             target.SendMessage(MessageType.Success, $"{player.ICName} cancelou o convite para {strTarget}.");
-        }
-
-        [Command("usardroga", "/usardroga (nome) (quantidade)")]
-        public static async void CMD_usardroga(MyPlayer player, string name, int quantity)
-        {
-            if (!Enum.TryParse(name, true, out ItemCategory itemCategory))
-            {
-                player.SendMessage(MessageType.Error, $"Droga {name} não existe.");
-                return;
-            }
-
-            if (!Functions.CheckIfIsDrug(itemCategory))
-            {
-                player.SendMessage(MessageType.Error, $"Droga {name} não existe.");
-                return;
-            }
-
-            if (quantity <= 0)
-            {
-                player.SendMessage(MessageType.Error, $"Quantidade deve ser maior que 0.");
-                return;
-            }
-
-            var item = player.Items.FirstOrDefault(x => x.Category == itemCategory && x.Quantity >= quantity);
-            if (item == null)
-            {
-                player.SendMessage(MessageType.Error, $"Você não possui essa quantidade de {itemCategory.GetDisplay()}.");
-                return;
-            }
-
-            if (player.Character.DrugItemCategory.HasValue && player.Character.DrugItemCategory != item.Category)
-            {
-                player.SendMessage(MessageType.Error, $"Você está sob efeito de {player.Character.DrugItemCategory.GetDisplay()}. Não é possível usar {item.Category.GetDisplay()}.");
-                return;
-            }
-
-            var minutesDuration = 0;
-            var thresoldDeath = 0;
-
-            switch (item.Category)
-            {
-                case ItemCategory.Weed:
-                    minutesDuration = 10;
-                    break;
-                case ItemCategory.Cocaine:
-                    minutesDuration = 3;
-                    thresoldDeath = 10;
-                    break;
-                case ItemCategory.Crack:
-                    minutesDuration = 1;
-                    thresoldDeath = 25;
-                    break;
-                case ItemCategory.Heroin:
-                    minutesDuration = 10;
-                    thresoldDeath = 25;
-                    break;
-                case ItemCategory.MDMA:
-                    minutesDuration = 10;
-                    thresoldDeath = 5;
-                    break;
-                case ItemCategory.Xanax:
-                    minutesDuration = 5;
-                    thresoldDeath = 1;
-                    break;
-                case ItemCategory.Oxycontin:
-                    minutesDuration = 3;
-                    thresoldDeath = 10;
-                    break;
-                case ItemCategory.Metanfetamina:
-                    minutesDuration = 2;
-                    thresoldDeath = 50;
-                    break;
-            }
-
-            minutesDuration *= quantity;
-            thresoldDeath *= quantity;
-
-            if (!player.Character.DrugItemCategory.HasValue)
-            {
-                switch (item.Category)
-                {
-                    case ItemCategory.Weed:
-                        player.Health = (ushort)(player.Health + 25);
-                        break;
-                    case ItemCategory.Cocaine:
-                        player.Health = (ushort)(player.Health + 50);
-                        break;
-                    case ItemCategory.Crack:
-                        player.Health = (ushort)(player.Health + 50);
-                        break;
-                    case ItemCategory.Heroin:
-                        player.Health = (ushort)(player.Health + 80);
-                        break;
-                    case ItemCategory.MDMA:
-                        player.Health = (ushort)(player.Health + 50);
-                        break;
-                    case ItemCategory.Xanax:
-                        player.Health = (ushort)(player.Health + 50);
-                        break;
-                    case ItemCategory.Oxycontin:
-                        player.Health = (ushort)(player.Health + 50);
-                        break;
-                }
-            }
-
-            await player.RemoveStackedItem(item.Category, quantity);
-
-            var newThresoldDeath = player.Character.ThresoldDeath + thresoldDeath;
-            player.Character.ThresoldDeath = Convert.ToByte(newThresoldDeath > 100 ? 100 : newThresoldDeath);
-            player.Character.DrugItemCategory = item.Category;
-            player.Character.DrugEndDate = (player.Character.ThresoldDeath == 100 ? DateTime.Now : player.Character.DrugEndDate ?? DateTime.Now).AddMinutes(minutesDuration);
-            player.Character.ThresoldDeathEndDate = null;
-
-            player.SendMessage(MessageType.Success, $"Você usou {quantity}x {player.Character.DrugItemCategory.GetDisplay()} e seu limiar da morte está em {player.Character.ThresoldDeath}/100.");
-            player.SetupDrugTimer(true);
-
-            if (player.Character.ThresoldDeath == 100)
-            {
-                player.Health = 0;
-                player.SendMessage(MessageType.Error, "Você atingiu 100 da limiar de morte e sofreu uma overdose.");
-            }
         }
 
         [Command("boombox")]
@@ -1166,7 +1026,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            door.Locked = !door.Locked;
+            door.SetLocked(!door.Locked);
             door.SetupAllClients();
             player.SendMessageToNearbyPlayers($"{(!door.Locked ? "des" : string.Empty)}tranca a porta.", MessageCategory.Ame, 5);
 

@@ -60,7 +60,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             context.Doors.Remove(door);
             await context.SaveChangesAsync();
             Global.Doors.Remove(door);
-            door.Locked = false;
+            door.SetLocked(false);
             door.SetupAllClients();
 
             player.EmitStaffShowMessage($"Porta {door.Id} excluída.");
@@ -73,8 +73,8 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffDoorSave))]
-        public static async Task StaffDoorSave(MyPlayer player, int id, string name, long hash, Vector3 pos,
-            int factionId, int companyId, bool locked)
+        public static async Task StaffDoorSave(MyPlayer player, string idString, string name, long hash, Vector3 pos,
+            string factionIdString, string companyIdString, bool locked)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Doors))
             {
@@ -82,46 +82,53 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (factionId != 0 && !Global.Factions.Any(x => x.Id == factionId))
+            var factionId = new Guid(factionIdString);
+            if (!string.IsNullOrWhiteSpace(factionIdString) && !Global.Factions.Any(x => x.Id == factionId))
             {
                 player.EmitStaffShowMessage($"Facção {factionId} não existe.");
                 return;
             }
 
-            if (companyId != 0 && !Global.Companies.Any(x => x.Id == companyId))
+            var companyId = new Guid(companyIdString);
+            if (!string.IsNullOrWhiteSpace(companyIdString) && !Global.Companies.Any(x => x.Id == companyId))
             {
                 player.EmitStaffShowMessage($"Empresa {factionId} não existe.");
                 return;
             }
 
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var door = new Door();
-            if (id > 0)
+            if (isNew)
+            {
+                door.Create(name, hash, pos.X, pos.Y, pos.Z, factionId, companyId, locked);
+            }
+            else
+            {
+                door.Update(name, hash, pos.X, pos.Y, pos.Z, factionId, companyId, locked);
                 door = Global.Doors.FirstOrDefault(x => x.Id == id);
-
-            door.Name = name;
-            door.Hash = hash;
-            door.PosX = pos.X;
-            door.PosY = pos.Y;
-            door.PosZ = pos.Z;
-            door.FactionId = factionId == 0 ? null : factionId;
-            door.CompanyId = companyId == 0 ? null : companyId;
-            door.Locked = locked;
+                if (door == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
+            }
 
             await using var context = new DatabaseContext();
 
-            if (door.Id == 0)
+            if (isNew)
                 await context.Doors.AddAsync(door);
             else
                 context.Doors.Update(door);
 
             await context.SaveChangesAsync();
 
-            if (id == 0)
+            if (isNew)
                 Global.Doors.Add(door);
 
             door.SetupAllClients();
 
-            player.EmitStaffShowMessage($"Porta {(id == 0 ? "criada" : "editada")}.", true);
+            player.EmitStaffShowMessage($"Porta {(isNew ? "criada" : "editada")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Porta | {Functions.Serialize(door)}", null);
 

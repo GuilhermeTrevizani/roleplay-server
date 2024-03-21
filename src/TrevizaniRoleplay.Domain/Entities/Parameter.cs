@@ -27,5 +27,15 @@
         public byte InitialTimeCrackDen { get; private set; }
         public byte EndTimeCrackDen { get; private set; }
         public int FirefightersBlockHeal { get; private set; }
+
+        public void SetInactivePropertiesDate()
+        {
+            InactivePropertiesDate = DateTime.Now.AddDays(1);
+        }
+
+        public void SetMaxCharactersOnline(int value)
+        {
+            MaxCharactersOnline = value;
+        }
     }
 }

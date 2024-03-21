@@ -97,7 +97,7 @@ namespace TrevizaniRoleplay.Server.Commands
                     Name = Alt.GetVehicleModelInfo(x.Model).Title,
                     LiveryName = x.GetLiveryName(),
                     x.Plate,
-                    InChargeCharacterName = Global.Vehicles.FirstOrDefault(y => y.VehicleDB.Id == x.Id)?.NomeEncarregado ?? "N/A",
+                    InChargeCharacterName = Global.Vehicles.FirstOrDefault(y => y.VehicleDB.Id == x.Id)?.NameInCharge ?? "N/A",
                 }).ToList();
 
             if (veiculos.Count == 0)

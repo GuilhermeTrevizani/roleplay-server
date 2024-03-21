@@ -22,7 +22,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffFactionsArmories", false, Functions.GetFactionsArmoriesHTML());
+            player.Emit("StaffFactionsArmories", false, GetFactionsArmoriesHTML());
         }
 
         [ClientEvent(nameof(StaffFactionArmoryGoto))]
@@ -74,7 +74,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Arsenal {factionArmory.Id} excluído.");
 
-            var html = Functions.GetFactionsArmoriesHTML();
+            var html = GetFactionsArmoriesHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmories", true, html);
 
@@ -126,8 +126,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Arsenal | {Functions.Serialize(factionArmory)}", null);
 
-            var html = Functions.GetFactionsArmoriesHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
+            var html = GetFactionsArmoriesHTML();
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmories", true, html);
         }
 
@@ -236,7 +236,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Arma Arsenal | {Functions.Serialize(factionArmoryWeapon)}", null);
 
-            var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmoryId, true);
+            var html = GetFactionArmoriesWeaponsHTML(factionArmoryId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmoriesWeapons", true, html);
         }
@@ -264,7 +264,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Remover Arma Arsenal | {Functions.Serialize(factionArmoryWeapon)}", null);
 
-            var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmoryWeapon.FactionStorageId, true);
+            var html = GetFactionArmoriesWeaponsHTML(factionArmoryWeapon.FactionStorageId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.FactionsStorages)))
                 target.Emit("StaffFactionsArmoriesWeapons", true, html);
         }
@@ -292,6 +292,55 @@ namespace TrevizaniRoleplay.Server.Scripts
                             <button onclick='remove(this, {factionArmory.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
+            }
+            return html;
+        }
+
+        private static string GetFactionArmoriesWeaponsHTML(Guid factionArmoryId)
+        {
+            var html = string.Empty;
+            var factionsArmoriesWeapons = Global.FactionsStoragesItems.Where(x => x.FactionStorageId == factionArmoryId);
+            if (!factionsArmoriesWeapons.Any())
+            {
+                html = "<tr><td class='text-center' colspan='8'>Não há armas criadas.</td></tr>";
+            }
+            else
+            {
+                var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == factionArmoryId);
+                var faction = Global.Factions.FirstOrDefault(x => x.Id == factionArmory.FactionId);
+
+                foreach (var factionArmoryWeapon in factionsArmoriesWeapons)
+                {
+                    var realComponents = new List<string>();
+                    foreach (var component in Functions.Deserialize<List<uint>>(factionArmoryWeapon.ComponentsJSON))
+                    {
+                        var comp = Global.WeaponComponents.FirstOrDefault(x => x.Hash == component && x.Weapon.ToString() == factionArmoryWeapon.Model);
+                        if (comp != null)
+                            realComponents.Add(comp.Name);
+                    }
+
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{factionArmoryWeapon.Id}</td>
+                        <td>{factionArmoryWeapon.Model}</td>
+                        <td>{factionArmoryWeapon.Ammo}</td>
+                        <td>{factionArmoryWeapon.Quantity}</td>
+                        <td>{factionArmoryWeapon.TintIndex}</td>
+                        {(!faction.Government && !staff ? $"<td>{Global.Prices.FirstOrDefault(y => y.Type == PriceType.Weapons && y.Name.Equals(factionArmoryWeapon.Model.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0:N0}</td>" : string.Empty)}
+                        <td>{string.Join(", ", realComponents)}</td>
+                        <td class='text-center'>
+                            <input id='json{factionArmoryWeapon.Id}' type='hidden' value='{Functions.Serialize(new
+                    {
+                        Weapon = factionArmoryWeapon.Model.ToString(),
+                        factionArmoryWeapon.Ammo,
+                        factionArmoryWeapon.Quantity,
+                        factionArmoryWeapon.TintIndex,
+                        Components = realComponents,
+                    })}' />
+                            <button onclick='edit({factionArmoryWeapon.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, {factionArmoryWeapon.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                        </td>
+                    </tr>";
+                }
             }
             return html;
         }

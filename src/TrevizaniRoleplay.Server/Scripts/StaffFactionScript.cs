@@ -124,7 +124,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (factionRankId > 0)
                 factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == factionRankId);
             else
-                factionRank.Position = Global.FactionsRanks.Select(x => x.Position).DefaultIfEmpty(0).Max() + 1;
+                factionRank.Position = Global.FactionsRanks.Where(x => x.FactionId == factionId).Select(x => x.Position).DefaultIfEmpty(0).Max() + 1;
 
             factionRank.FactionId = factionId;
             factionRank.Name = name;

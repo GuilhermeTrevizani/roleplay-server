@@ -31,12 +31,13 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            player.Emit("StaffSpots", false, Functions.GetSpotsHTML(), jsonTypes);
+            player.Emit("StaffSpots", false, GetSpotsHTML(), jsonTypes);
         }
 
         [ClientEvent(nameof(StaffSpotGoto))]
-        public static void StaffSpotGoto(MyPlayer player, int id)
+        public static void StaffSpotGoto(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var spot = Global.Spots.FirstOrDefault(x => x.Id == id);
             if (spot == null)
                 return;
@@ -46,7 +47,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffSpotSave))]
-        public static async Task StaffSpotSave(MyPlayer player, int id, int type, Vector3 pos, Vector3 auxiliarPos)
+        public static async Task StaffSpotSave(MyPlayer player, string idString, int type, Vector3 pos, Vector3 auxiliarPos)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Spots))
             {
@@ -61,20 +62,27 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var spot = new Spot();
-            if (id > 0)
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
+            if (isNew)
+            {
+                spot.Create((SpotType)type, pos.X, pos.Y, pos.Z, auxiliarPos.X, auxiliarPos.Y, auxiliarPos.Z);
+            }
+            else
+            {
                 spot = Global.Spots.FirstOrDefault(x => x.Id == id);
+                if (spot == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            spot.Type = (SpotType)type;
-            spot.PosX = pos.X;
-            spot.PosY = pos.Y;
-            spot.PosZ = pos.Z;
-            spot.AuxiliarPosX = auxiliarPos.X;
-            spot.AuxiliarPosY = auxiliarPos.Y;
-            spot.AuxiliarPosZ = auxiliarPos.Z;
+                spot.Update((SpotType)type, pos.X, pos.Y, pos.Z, auxiliarPos.X, auxiliarPos.Y, auxiliarPos.Z);
+            }
 
             await using var context = new DatabaseContext();
 
-            if (spot.Id == 0)
+            if (isNew)
                 await context.Spots.AddAsync(spot);
             else
                 context.Spots.Update(spot);
@@ -83,20 +91,20 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             spot.CreateIdentifier();
 
-            if (id == 0)
+            if (isNew)
                 Global.Spots.Add(spot);
 
-            player.EmitStaffShowMessage($"Ponto {(id == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Ponto {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Ponto | {Functions.Serialize(spot)}", null);
 
-            var html = Functions.GetSpotsHTML();
+            var html = GetSpotsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Spots)))
                 target.Emit("StaffSpots", true, html);
         }
 
         [AsyncClientEvent(nameof(StaffSpotRemove))]
-        public static async Task StaffSpotRemove(MyPlayer player, int id)
+        public static async Task StaffSpotRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Spots))
             {
@@ -104,6 +112,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var spot = Global.Spots.FirstOrDefault(x => x.Id == id);
             if (spot != null)
             {
@@ -117,7 +126,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.EmitStaffShowMessage($"Ponto {id} excluído.");
 
-            var html = Functions.GetSpotsHTML();
+            var html = GetSpotsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Spots)))
                 target.Emit("StaffSpots", true, html);
         }
@@ -138,7 +147,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         <td>X: {spot.PosX} | Y: {spot.PosY} | Z: {spot.PosZ}</td>
                         <td>X: {spot.AuxiliarPosX} | Y: {spot.AuxiliarPosY} | Z: {spot.AuxiliarPosZ}</td>
                         <td class='text-center'>
-                            <input id='json{spot.Id}' type='hidden' value='{Serialize(spot)}' />
+                            <input id='json{spot.Id}' type='hidden' value='{Functions.Serialize(spot)}' />
                             <button onclick='ir({spot.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
                             <button onclick='editar({spot.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
                             <button onclick='excluir(this, {spot.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>

@@ -10,7 +10,7 @@ namespace TrevizaniRoleplay.Infra.Data.ModelConfigurations
         {
             builder.ToTable("VehiclesItems");
             builder.HasKey(x => x.Id);
-            builder.HasOne(x => x.Vehicle).WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.Vehicle).WithMany(x => x.Items).HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

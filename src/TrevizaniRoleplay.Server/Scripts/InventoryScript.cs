@@ -171,11 +171,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                var itemTarget = new CharacterItem(item.Category, item.Type)
-                {
-                    Quantity = quantity,
-                    Extra = item.Extra,
-                };
+                var itemTarget = new CharacterItem();
+                itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
 
                 var res = await target.GiveItem(itemTarget);
                 if (!string.IsNullOrWhiteSpace(res))
@@ -281,18 +278,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                var item = new Item(player.DropItem.Category, player.DropItem.Type)
-                {
-                    Dimension = player.Dimension,
-                    PosX = position.X,
-                    PosY = position.Y,
-                    PosZ = position.Z,
-                    RotR = rotation.X,
-                    RotP = rotation.Y,
-                    RotY = rotation.Z,
-                    Extra = player.DropItem.Extra,
-                    Quantity = player.DropItemQuantity,
-                };
+                var item = new Item();
+                item.Create(player.DropItem.Category, player.DropItem.Type, player.DropItemQuantity, player.DropItem.Extra);
+                item.SetPosition(player.Dimension, position.X, position.Y, position.Z, rotation.X, rotation.Y, rotation.Z);
 
                 await using var context = new DatabaseContext();
                 await context.Items.AddAsync(item);
@@ -378,11 +366,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                var itemTarget = new CharacterItem(item.Category, item.Type)
-                {
-                    Quantity = quantity,
-                    Extra = item.Extra,
-                };
+                var itemTarget = new CharacterItem();
+                itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
 
                 var res = await player.GiveItem(itemTarget);
                 if (!string.IsNullOrWhiteSpace(res))
@@ -447,11 +432,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 else
                     await player.RemoveItem(item);
 
-                var itemTarget = new CharacterItem(item.Category, item.Type)
-                {
-                    Quantity = quantity,
-                    Extra = item.Extra,
-                };
+                var itemTarget = new CharacterItem();
+                itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
+
                 await player.GravarLog(LogType.DiscardItem, Functions.Serialize(itemTarget), null);
 
                 player.ShowInventory(player, update: true);
@@ -513,21 +496,18 @@ namespace TrevizaniRoleplay.Server.Scripts
                         it = prop.Items.FirstOrDefault(x => x.Category == item.Category);
                         if (it != null)
                         {
-                            it.Quantity += quantity;
+                            it.SetQuantity(it.Quantity + quantity);
                             context.PropertiesItems.Update(it);
                         }
                     }
 
                     if (it == null)
                     {
-                        it = new PropertyItem(item.Category, item.Type)
-                        {
-                            Quantity = quantity,
-                            PropertyId = player.InventoryRightTargetId,
-                            Extra = item.Extra,
-                            Slot = Convert.ToByte(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
-                                .FirstOrDefault(i => !prop.Items.Any(x => x.Slot == i))),
-                        };
+                        it = new PropertyItem();
+                        it.Create(item.Category, item.Type, quantity, item.Extra);
+                        it.SetPropertyId(player.InventoryRightTargetId!.Value);
+                        it.SetSlot(Convert.ToByte(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
+                            .FirstOrDefault(i => !prop.Items.Any(x => x.Slot == i))));
 
                         await context.PropertiesItems.AddAsync(it);
                         prop.Items.Add(it);
@@ -551,8 +531,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (veh == null)
                         return;
 
-                    if (veh.Itens.Count(x => x.Slot > 0)
-                        + ((!item.GetIsStack() || !veh.Itens.Any(x => x.Category == item.Category)) ? 1 : 0)
+                    if (veh.VehicleDB.Items.Count(x => x.Slot > 0)
+                        + ((!item.GetIsStack() || !veh.VehicleDB.Items.Any(x => x.Category == item.Category)) ? 1 : 0)
                         > Global.QUANTIDADE_SLOTS_INVENTARIO)
                     {
                         player.Emit("Server:MostrarErro", $"Não é possível prosseguir pois os novos itens ultrapassarão a quantidade de slots do armazenamento ({Global.QUANTIDADE_SLOTS_INVENTARIO}).");
@@ -563,27 +543,24 @@ namespace TrevizaniRoleplay.Server.Scripts
                     await using var context = new DatabaseContext();
                     if (item.GetIsStack())
                     {
-                        it = veh.Itens.FirstOrDefault(x => x.Category == item.Category);
+                        it = veh.VehicleDB.Items.FirstOrDefault(x => x.Category == item.Category);
                         if (it != null)
                         {
-                            it.Quantity += quantity;
+                            it.SetQuantity(it.Quantity + quantity);
                             context.VehiclesItems.Update(it);
                         }
                     }
 
                     if (it == null)
                     {
-                        it = new VehicleItem(item.Category, item.Type)
-                        {
-                            Quantity = quantity,
-                            VehicleId = player.InventoryRightTargetId,
-                            Extra = item.Extra,
-                            Slot = Convert.ToByte(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
-                                .FirstOrDefault(i => !veh.Itens.Any(x => x.Slot == i))),
-                        };
+                        it = new VehicleItem();
+                        it.Create(item.Category, item.Type, quantity, item.Extra);
+                        it.SetVehicleId(player.InventoryRightTargetId!.Value);
+                        it.SetSlot(Convert.ToByte(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
+                            .FirstOrDefault(i => !veh.VehicleDB.Items.Any(x => x.Slot == i))));
 
                         await context.VehiclesItems.AddAsync(it);
-                        veh.Itens.Add(it);
+                        veh.VehicleDB.Items.Add(it);
                     }
 
                     await context.SaveChangesAsync();
@@ -618,11 +595,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (prop == null)
                         return;
 
-                    var item = prop.Items.FirstOrDefault(x => x.Id == new Guid(id));
+                    var item = prop.Items!.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null || item.Slot == slot)
                         return;
 
-                    item.Slot = Convert.ToByte(slot);
+                    item.SetSlot(Convert.ToByte(slot));
 
                     await using var context = new DatabaseContext();
                     context.PropertiesItems.Update(item);
@@ -636,11 +613,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (veh == null)
                         return;
 
-                    var item = veh.Itens.FirstOrDefault(x => x.Id == new Guid(id));
+                    var item = veh.VehicleDB.Items.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null || item.Slot == slot)
                         return;
 
-                    item.Slot = Convert.ToByte(slot);
+                    item.SetSlot(Convert.ToByte(slot));
 
                     await using var context = new DatabaseContext();
                     context.VehiclesItems.Update(item);
@@ -697,13 +674,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                         }
                     }
 
-                    var personagemItem = new CharacterItem(item.Category, item.Type)
-                    {
-                        Extra = item.Extra,
-                        Quantity = quantity,
-                    };
+                    var itemTarget = new CharacterItem();
+                    itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
 
-                    var res = await player.GiveItem(personagemItem);
+                    var res = await player.GiveItem(itemTarget);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -711,7 +685,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    item.Quantity -= quantity;
+                    item.SetQuantity(item.Quantity - quantity);
                     if (item.Quantity == 0)
                     {
                         await using var context = new DatabaseContext();
@@ -733,7 +707,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (veh == null)
                         return;
 
-                    var item = veh.Itens.FirstOrDefault(x => x.Id == new Guid(id));
+                    var item = veh.VehicleDB.Items.FirstOrDefault(x => x.Id == new Guid(id));
                     if (item == null)
                         return;
 
@@ -753,13 +727,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                         }
                     }
 
-                    var personagemItem = new CharacterItem(item.Category, item.Type)
-                    {
-                        Extra = item.Extra,
-                        Quantity = quantity,
-                    };
+                    var itemTarget = new CharacterItem();
+                    itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
 
-                    var res = await player.GiveItem(personagemItem);
+                    var res = await player.GiveItem(itemTarget);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -767,13 +738,13 @@ namespace TrevizaniRoleplay.Server.Scripts
                         return;
                     }
 
-                    item.Quantity -= quantity;
+                    item.SetQuantity(item.Quantity - quantity);
                     if (item.Quantity == 0)
                     {
                         await using var context = new DatabaseContext();
                         context.VehiclesItems.Remove(item);
                         await context.SaveChangesAsync();
-                        veh.Itens.Remove(item);
+                        veh.VehicleDB.Items.Remove(item);
                     }
 
                     player.SendMessageToNearbyPlayers($"pega {quantity:N0}x {item.GetName()} do veículo.", MessageCategory.Ame, 5);
@@ -808,13 +779,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                         }
                     }
 
-                    var personagemItem = new CharacterItem(item.Category, item.Type)
-                    {
-                        Extra = item.Extra,
-                        Quantity = quantity,
-                    };
+                    var itemTarget = new CharacterItem();
+                    itemTarget.Create(item.Category, item.Type, quantity, item.Extra);
 
-                    var res = await player.GiveItem(personagemItem);
+                    var res = await player.GiveItem(itemTarget);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -823,7 +791,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     }
 
                     await using var context = new DatabaseContext();
-                    item.Quantity -= quantity;
+                    item.SetQuantity(item.Quantity - quantity);
                     if (item.Quantity == 0)
                     {
                         item.DeleteObject();
@@ -837,7 +805,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                     player.SendMessageToNearbyPlayers($"pega {quantity:N0}x {item.GetName()} do chão.", MessageCategory.Ame, 5);
                     player.Emit("Server:MostrarErro", $"Você pegou {quantity}x {item.GetName()} do chão.");
-                    await player.GravarLog(LogType.GetGroundItem, Functions.Serialize(personagemItem), null);
+                    await player.GravarLog(LogType.GetGroundItem, Functions.Serialize(itemTarget), null);
                 }
             }
             catch (Exception ex)
@@ -868,6 +836,82 @@ namespace TrevizaniRoleplay.Server.Scripts
             catch (Exception ex)
             {
                 Functions.GetException(ex);
+            }
+        }
+
+        [Command("usardroga", "/usardroga (nome) (quantidade)")]
+        public static async void CMD_usardroga(MyPlayer player, string name, int quantity)
+        {
+            if (!Enum.TryParse(name, true, out ItemCategory itemCategory))
+            {
+                player.SendMessage(MessageType.Error, $"Droga {name} não existe.");
+                return;
+            }
+
+            if (!Functions.CheckIfIsDrug(itemCategory))
+            {
+                player.SendMessage(MessageType.Error, $"Droga {name} não existe.");
+                return;
+            }
+
+            if (quantity <= 0)
+            {
+                player.SendMessage(MessageType.Error, $"Quantidade deve ser maior que 0.");
+                return;
+            }
+
+            var item = player.Items.FirstOrDefault(x => x.Category == itemCategory && x.Quantity >= quantity);
+            if (item == null)
+            {
+                player.SendMessage(MessageType.Error, $"Você não possui essa quantidade de {itemCategory.GetDisplay()}.");
+                return;
+            }
+
+            if (player.Character.DrugItemCategory.HasValue && player.Character.DrugItemCategory != item.Category)
+            {
+                player.SendMessage(MessageType.Error, $"Você está sob efeito de {player.Character.DrugItemCategory.GetDisplay()}. Não é possível usar {item.Category.GetDisplay()}.");
+                return;
+            }
+
+            if (!player.Character.DrugItemCategory.HasValue)
+            {
+                switch (item.Category)
+                {
+                    case ItemCategory.Weed:
+                        player.Health = (ushort)(player.Health + 25);
+                        break;
+                    case ItemCategory.Cocaine:
+                        player.Health = (ushort)(player.Health + 50);
+                        break;
+                    case ItemCategory.Crack:
+                        player.Health = (ushort)(player.Health + 50);
+                        break;
+                    case ItemCategory.Heroin:
+                        player.Health = (ushort)(player.Health + 80);
+                        break;
+                    case ItemCategory.MDMA:
+                        player.Health = (ushort)(player.Health + 50);
+                        break;
+                    case ItemCategory.Xanax:
+                        player.Health = (ushort)(player.Health + 50);
+                        break;
+                    case ItemCategory.Oxycontin:
+                        player.Health = (ushort)(player.Health + 50);
+                        break;
+                }
+            }
+
+            await player.RemoveStackedItem(item.Category, quantity);
+
+            player.Character.UseDrug(item.Category, quantity);
+
+            player.SendMessage(MessageType.Success, $"Você usou {quantity}x {player.Character.DrugItemCategory!.GetDisplay()} e seu limiar da morte está em {player.Character.ThresoldDeath}/100.");
+            player.SetupDrugTimer(true);
+
+            if (player.Character.ThresoldDeath == 100)
+            {
+                player.Health = 0;
+                player.SendMessage(MessageType.Error, "Você atingiu 100 da limiar de morte e sofreu uma overdose.");
             }
         }
     }

@@ -13,7 +13,7 @@ namespace TrevizaniRoleplay.Server.Scripts
     public class CrackDenScript : IScript
     {
         [AsyncClientEvent(nameof(CrackDenSellItem))]
-        public async Task CrackDenSellItem(MyPlayer player, int id, int quantity)
+        public async Task CrackDenSellItem(MyPlayer player, string idString, int quantity)
         {
             if (quantity <= 0)
             {
@@ -21,6 +21,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var item = Global.CrackDensItems.FirstOrDefault(x => x.Id == id);
             if (item == null)
                 return;
@@ -72,7 +73,9 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             var value = item.Value * quantity;
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.Money) { Quantity = value });
+            var characterItem = new CharacterItem();
+            characterItem.Create(ItemCategory.Money, 0, value, null);
+            var res = await player.GiveItem(characterItem);
 
             if (!string.IsNullOrWhiteSpace(res))
             {
@@ -82,25 +85,15 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.RemoveStackedItem(item.ItemCategory, quantity);
 
-            crackDen.Quantity += quantity;
-            if (crackDen.Quantity >= crackDen.CooldownQuantityLimit)
-            {
-                crackDen.CooldownDate = DateTime.Now.AddHours(crackDen.CooldownHours);
-                crackDen.Quantity = 0;
-            }
+            crackDen.AddQuantity(quantity);
 
             await using var context = new DatabaseContext();
             context.CrackDens.Update(crackDen);
             await context.SaveChangesAsync();
 
-            await context.CrackDensSells.AddAsync(new CrackDenSell
-            {
-                CrackDenId = item.CrackDenId,
-                CharacterId = player.Character.Id,
-                ItemCategory = item.ItemCategory,
-                Quantity = quantity,
-                Value = item.Value,
-            });
+            var crackDenSell = new CrackDenSell();
+            crackDenSell.Create(item.CrackDenId, player.Character.Id, item.ItemCategory, quantity, item.Value);
+            await context.CrackDensSells.AddAsync(crackDenSell);
             await context.SaveChangesAsync();
 
             player.EmitStaffShowMessage($"Você vendeu {quantity}x {item.ItemCategory.GetDisplay()} por ${value:N0}.", true);
@@ -123,7 +116,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 .Select(x => new
                 {
                     x.Date,
-                    Character = $"{x.Character.Name} [{x.CharacterId}] ({x.Character.User.Name})",
+                    Character = $"{x.Character!.Name} [{x.CharacterId}] ({x.Character.User!.Name})",
                     Item = x.ItemCategory.GetDisplay(),
                     Quantity = x.Quantity.ToString("N0"),
                     Value = $"${x.Value:N0}",

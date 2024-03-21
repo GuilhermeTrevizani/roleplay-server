@@ -13,5 +13,14 @@ namespace TrevizaniRoleplay.Domain.Entities
 
         public CrackDen? CrackDen { get; private set; }
         public Character? Character { get; private set; }
+
+        public void Create(Guid crackDenId, Guid characterId, ItemCategory itemCategory, int quantity, int value)
+        {
+            CrackDenId = crackDenId;
+            CharacterId = characterId;
+            ItemCategory = itemCategory;
+            Quantity = quantity;
+            Value = value;
+        }
     }
 }

@@ -33,21 +33,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                 var user = context.Users.FirstOrDefault(x => x.DiscordId == res.Id);
                 if (user == null)
                 {
-                    var anyUser = context.Users.Any();
-                    user = new User
-                    {
-                        DiscordId = res.Id,
-                        DiscordUsername = res.Username,
-                        DiscordDisplayName = res.Global_Name,
-                        RegisterIp = player.RealIp,
-                        LastAccessIp = player.RealIp,
-                        RegisterHardwareIdHash = player.HardwareIdHash,
-                        RegisterHardwareIdExHash = player.HardwareIdExHash,
-                        LastAccessHardwareIdHash = player.HardwareIdHash,
-                        LastAccessHardwareIdExHash = player.HardwareIdExHash,
-                        Staff = anyUser ? UserStaff.None : UserStaff.Manager,
-                        StaffFlagsJSON = anyUser ? "[]" : Functions.Serialize(Enum.GetValues<StaffFlag>()),
-                    };
+                    var hasUsers = context.Users.Any();
+                    user = new();
+                    user.Create(res.Id, res.Username, res.Global_Name, player.RealIp, player.HardwareIdHash, player.HardwareIdExHash,
+                        hasUsers ? UserStaff.None : UserStaff.Manager, hasUsers ? "[]" : Functions.Serialize(Enum.GetValues<StaffFlag>()));
                     await context.Users.AddAsync(user);
                     await context.SaveChangesAsync();
                 }
@@ -67,7 +56,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         {
                             var strBan = !banishment.ExpirationDate.HasValue ? " permanentemente." : $". Seu banimento expira em: {banishment.ExpirationDate?.ToString()}";
 
-                            player.Emit("Server:BaseHTML", Functions.GetBaseHTML("Banimento", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser.Name}</strong>"));
+                            player.Emit("Server:BaseHTML", Functions.GetBaseHTML("Banimento", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser!.Name}</strong>"));
                             return;
                         }
                     }
@@ -80,12 +69,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
 
                 player.User = user;
-                player.User.LastAccessDate = DateTime.Now;
-                player.User.LastAccessIp = player.RealIp;
-                player.User.LastAccessHardwareIdHash = player.HardwareIdHash;
-                player.User.LastAccessHardwareIdExHash = player.HardwareIdExHash;
-                player.User.DiscordUsername = res.Username;
-                player.User.DiscordDisplayName = res.Global_Name;
+                player.User.UpdateLastAccess(player.RealIp, player.HardwareIdHash, player.HardwareIdExHash, res.Username, res.Global_Name);
                 context.Users.Update(player.User);
                 await context.SaveChangesAsync();
                 player.StaffFlags = Functions.Deserialize<List<StaffFlag>>(player.User.StaffFlagsJSON);
@@ -136,7 +120,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            player.User.AnsweredQuestions = true;
+            player.User.SetAnsweredQuestions();
             context.Users.Update(player.User);
             await context.SaveChangesAsync();
 
@@ -197,7 +181,6 @@ namespace TrevizaniRoleplay.Server.Scripts
                 await using var context = new DatabaseContext();
                 var character = await context.Characters
                     .Where(x => x.Id == id && x.UserId == player.User.Id)
-                    .Include(x => x.EvaluatorStaffUser)
                     .FirstOrDefaultAsync();
                 if (character == null)
                 {
@@ -207,14 +190,13 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 if (!string.IsNullOrWhiteSpace(character.RejectionReason) || namechange)
                 {
+                    var evaluatorStaffUser = await context.Users.FirstOrDefaultAsync(x => x.Id == character.EvaluatingStaffUserId);
                     var nome = character.Name.Split(' ');
                     player.Emit("Server:CriarPersonagem", character.Id, nome.FirstOrDefault(), nome.LastOrDefault(),
                         character.Sex == CharacterSex.Man ? "M" : "F", character.BirthdayDate.ToShortDateString(),
-                        character.History, character.RejectionReason, character.EvaluatorStaffUser!.Name);
+                        character.History, character.RejectionReason, evaluatorStaffUser!.Name);
                     return;
                 }
-
-                character.EvaluatorStaffUser = null;
 
                 var banishment = await context.Banishments.Where(x => x.CharacterId == character.Id).Include(x => x.StaffUser).FirstOrDefaultAsync();
                 if (banishment != null)
@@ -227,29 +209,25 @@ namespace TrevizaniRoleplay.Server.Scripts
                     else
                     {
                         var strBan = !banishment.ExpirationDate.HasValue ? " permanentemente." : $". Seu banimento expira em: {banishment.ExpirationDate?.ToString()}";
-                        player.Emit("Server:MostrarErro", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser.Name}</strong>", $".btn-selecionarpersonagem{character.Id}");
+                        player.Emit("Server:MostrarErro", $"Você está banido{strBan}<br/>Data: <strong>{banishment.Date}</strong><br/>Motivo: <strong>{banishment.Reason}</strong><br/>Staffer: <strong>{banishment.StaffUser!.Name}</strong>", $".btn-selecionarpersonagem{character.Id}");
                         return;
                     }
                 }
 
                 player.Character = character;
-                player.Character.LastAccessIp = player.RealIp;
-                player.Character.LastAccessHardwareIdHash = player.HardwareIdHash;
-                player.Character.LastAccessHardwareIdExHash = player.HardwareIdExHash;
-                player.Character.JailFinalDate = null;
+                player.Character.UpdateLastAccess(player.RealIp, player.HardwareIdHash, player.HardwareIdExHash);
 
                 player.IPLs = Functions.Deserialize<List<string>>(player.Character.IPLsJSON);
                 player.SetarIPLs();
                 player.Model = player.Character.Model;
                 player.SetWeather((uint)Global.WeatherInfo.WeatherType);
-                player.Wounds = Functions.Deserialize<List<MyPlayer.Ferimento>>(player.Character.WoundsJSON);
-                player.Items = (await context.CharactersItems.Where(x => x.CharacterId == player.Character.Id).ToListAsync()).Select(x => new CharacterItem(x)).ToList();
-                player.Character.Mask = 0;
+                player.Wounds = Functions.Deserialize<List<Wound>>(player.Character.WoundsJSON);
+                player.Items = await context.CharactersItems.Where(x => x.CharacterId == player.Character.Id).ToListAsync();
                 player.FactionFlags = Functions.Deserialize<List<FactionFlag>>(player.Character.FactionFlagsJSON);
                 await player.SetarRoupas();
 
                 if (!string.IsNullOrWhiteSpace(player.Character.PersonalizationJSON))
-                    player.Personalization = Functions.Deserialize<MyPlayer.Personalizacao>(player.Character.PersonalizationJSON);
+                    player.Personalization = Functions.Deserialize<Personalization>(player.Character.PersonalizationJSON);
 
                 if (player.Personalization.Structure.Count == 0)
                     player.Personalization.Structure = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -279,7 +257,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 var qtdOnline = Global.SpawnedPlayers.Count();
                 if (qtdOnline > Global.Parameter.MaxCharactersOnline)
                 {
-                    Global.Parameter.MaxCharactersOnline = qtdOnline;
+                    Global.Parameter.SetMaxCharactersOnline(qtdOnline);
                     context.Parameters.Update(Global.Parameter);
                     await context.SaveChangesAsync();
                     await Functions.SendStaffMessage($"O novo recorde de jogadores online é: {Global.Parameter.MaxCharactersOnline}.", true, true);
@@ -312,21 +290,21 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(CriarPersonagem))]
-        public async Task CriarPersonagem(MyPlayer player, int id, string nome, string sobrenome, string sexo, string dataNascimento, string historia)
+        public async Task CriarPersonagem(MyPlayer player, string idString, string nome, string sobrenome, string sex, string dataNascimento, string history)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(sobrenome) || string.IsNullOrWhiteSpace(sexo)
-                    || string.IsNullOrWhiteSpace(dataNascimento) || string.IsNullOrWhiteSpace(historia))
+                if (string.IsNullOrWhiteSpace(nome) || string.IsNullOrWhiteSpace(sobrenome) || string.IsNullOrWhiteSpace(sex)
+                    || string.IsNullOrWhiteSpace(dataNascimento) || string.IsNullOrWhiteSpace(history))
                 {
                     player.Emit("Server:MostrarErro", "Verifique se todos os campos foram preenchidos corretamente.");
                     return;
                 }
 
-                historia = historia.Trim();
-                if (historia.Length < 500 || historia.Length > 4096)
+                history = history.Trim();
+                if (history.Length < 500 || history.Length > 4096)
                 {
-                    player.Emit("Server:MostrarErro", $"História deve possuir entre 500 até 4096 caracteres. Quantidade atual de caracteres: {historia.Length}.");
+                    player.Emit("Server:MostrarErro", $"História deve possuir entre 500 até 4096 caracteres. Quantidade atual de caracteres: {history.Length}.");
                     return;
                 }
 
@@ -337,22 +315,24 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                if (!DateTime.TryParse(dataNascimento, out DateTime dtNascimento) || dtNascimento == DateTime.MinValue)
+                if (!DateTime.TryParse(dataNascimento, out DateTime birthdayDate) || birthdayDate == DateTime.MinValue)
                 {
                     player.Emit("Server:MostrarErro", "Data de Nascimento não foi informada corretamente.");
                     return;
                 }
 
-                var anos = (DateTime.Now.Date - dtNascimento).TotalDays / 365;
+                var anos = (DateTime.Now.Date - birthdayDate).TotalDays / 365;
                 if (anos < 18 || anos > 90)
                 {
                     player.Emit("Server:MostrarErro", "Personagem precisa ter entre 18 e 90 anos.");
                     return;
                 }
 
+                var isNew = true;
                 Character? oldCharacter = null;
                 await using var context = new DatabaseContext();
-                if (id > 0)
+                var id = new Guid(idString);
+                if (!string.IsNullOrWhiteSpace(idString))
                 {
                     oldCharacter = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
                     if (oldCharacter == null)
@@ -368,8 +348,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                             player.Emit("Server:MostrarErro", "Não é possível prosseguir pois você possui veículos spawnados.");
                             return;
                         }
-
-                        id = 0;
+                    }
+                    else
+                    {
+                        isNew = false;
                     }
                 }
 
@@ -379,54 +361,41 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                var personagem = new Character
+                var character = new Character();
+                if (isNew)
                 {
-                    Id = id,
-                    Name = nomeCompleto,
-                    UserId = player.User.Id,
-                    BirthdayDate = dtNascimento,
-                    RegisterIp = player.RealIp,
-                    LastAccessIp = player.RealIp,
-                    Model = sexo == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01,
-                    RegisterHardwareIdHash = player.HardwareIdHash,
-                    RegisterHardwareIdExHash = player.HardwareIdExHash,
-                    LastAccessHardwareIdHash = player.HardwareIdHash,
-                    LastAccessHardwareIdExHash = player.HardwareIdExHash,
-                    History = historia,
-                    Health = player.MaxHealth,
-                    EvaluatorStaffUserId = player.User.Id == 1 ? 1 : null,
-                    Sex = sexo == "M" ? CharacterSex.Man : CharacterSex.Woman,
-                };
-
-                if (oldCharacter != null)
-                {
-                    personagem.Bank = oldCharacter.Bank;
-                    personagem.Savings = oldCharacter.Savings;
+                    character.Create(nomeCompleto, birthdayDate, history, sex == "M" ? CharacterSex.Man : CharacterSex.Woman,
+                        player.User.Id, player.RealIp, (uint)(sex == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01),
+                        player.HardwareIdHash, player.HardwareIdExHash, player.MaxHealth,
+                        player.User.Staff == UserStaff.Manager ? player.User.Id : null);
+                    await context.Characters.AddAsync(character);
                 }
-
-                if (id == 0)
-                    await context.Characters.AddAsync(personagem);
                 else
-                    context.Characters.Update(personagem);
+                {
+                    character.SetBankAndSavings(oldCharacter!.Bank, oldCharacter.Savings);
+                    context.Characters.Update(character);
+                }
 
                 await context.SaveChangesAsync();
 
                 if (oldCharacter != null)
                 {
-                    await player.GravarLog(LogType.NameChange, $"{oldCharacter.Name} [{oldCharacter.Id}] > {personagem.Name} [{personagem.Id}]", null);
+                    await player.GravarLog(LogType.NameChange, $"{oldCharacter.Name} [{oldCharacter.Id}] > {character.Name} [{character.Id}]", null);
 
-                    await context.Properties.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
-                    await context.Vehicles.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
-                    await context.CharactersItems.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, personagem.Id));
+                    await context.Properties.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, character.Id));
+                    await context.Vehicles.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, character.Id));
+                    await context.CharactersItems.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, character.Id));
+                    await context.Companies.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, character.Id));
+                    await context.CompaniesCharacters.Where(x => x.CharacterId == oldCharacter.Id).ExecuteUpdateAsync(x => x.SetProperty(y => y.CharacterId, character.Id));
 
-                    foreach (var x in Global.Properties.Where(x => x.CharacterId == oldCharacter.Id))
-                        x.CharacterId = personagem.Id;
+                    foreach (var property in Global.Properties.Where(x => x.CharacterId == oldCharacter.Id))
+                        property.SetOwner(character.Id);
 
-                    oldCharacter.NameChangeStatus = CharacterNameChangeStatus.Done;
+                    oldCharacter.SetNameChangeStatus(CharacterNameChangeStatus.Done);
                     context.Characters.Update(oldCharacter);
                     await context.SaveChangesAsync();
 
-                    player.User.NameChanges--;
+                    player.User.RemoveNameChange();
                     context.Users.Update(player.User);
                     await context.SaveChangesAsync();
                 }

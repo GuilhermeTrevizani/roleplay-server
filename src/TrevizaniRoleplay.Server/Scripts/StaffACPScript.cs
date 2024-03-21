@@ -289,7 +289,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             else
                 user.StaffFlagsJSON = Functions.Serialize(staffFlags);
 
-            var target = Global.Players.FirstOrDefault(x => x.User.Id == userId);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == userId);
             if (target != null)
             {
                 target.SendMessage(MessageType.Success, $"{player.User.Name} modificou suas configurações administrativas.");
@@ -325,7 +325,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = Global.Players.FirstOrDefault(x => x.User.Id == userId);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == userId);
             if (target != null)
             {
                 target.User.ForumNameChanges--;
@@ -384,7 +384,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 html += $"<h4>História (aceito por {character.EvaluatorStaffUserId})</h4> {character.History}";
 
-                var itens = (await context.CharactersItems.Where(x => x.CharacterId == character.Id).ToListAsync()).Select(x => new CharacterItem(x)).ToList();
+                var itens = await context.CharactersItems.Where(x => x.CharacterId == character.Id).ToListAsync();
                 html += $"<h4>Inventário</h4>";
                 if (itens.Count != 0)
                 {
@@ -480,7 +480,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var target = Global.Players.FirstOrDefault(x => x.Character.Id == id);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
                 player.EmitStaffShowMessage($"O personagem está online! Use /ban {target.SessionId}.");
@@ -497,7 +497,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            target = Global.Players.FirstOrDefault(x => x.User.Id == character.UserId);
+            target = Global.SpawnedPlayers.FirstOrDefault(x => x.User.Id == character.UserId);
             if (target != null)
             {
                 player.EmitStaffShowMessage($"O usuário do personagem está online! Use /ban {target.SessionId}.");

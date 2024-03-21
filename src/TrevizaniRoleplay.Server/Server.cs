@@ -229,9 +229,6 @@ namespace TrevizaniRoleplay.Server
                 .ToListAsync();
             Alt.Log($"FactionsUnits: {Global.FactionsUnits.Count}");
 
-            Global.FactionsUnitsCharacters.AddRange(Global.FactionsUnits.Select(x => x.Characters!).SelectMany(x => x));
-            Alt.Log($"FactionsUnitsCharacters: {Global.FactionsUnitsCharacters.Count}");
-
             Global.EmergencyCalls = (await context.EmergencyCalls.ToListAsync()).Where(x => (DateTime.Now - x.Date).TotalHours < 24).ToList();
             Alt.Log($"EmergencyCalls: {Global.EmergencyCalls.Count}");
 
@@ -331,7 +328,7 @@ namespace TrevizaniRoleplay.Server
                         context.Properties.Update(prop);
                     }
 
-                    Global.Parameter.InactivePropertiesDate = DateTime.Now.AddDays(1);
+                    Global.Parameter.SetInactivePropertiesDate();
                     context.Parameters.Update(Global.Parameter);
                     await context.SaveChangesAsync();
                 }
@@ -351,7 +348,7 @@ namespace TrevizaniRoleplay.Server
                                 continue;
                             }
 
-                            target.Character.Bank -= company.WeekRentValue;
+                            target.Character.RemoveBank(company.WeekRentValue);
                             await target.Save();
                         }
                         else
@@ -363,12 +360,12 @@ namespace TrevizaniRoleplay.Server
                                 continue;
                             }
 
-                            character.Bank -= company.WeekRentValue;
+                            character.RemoveBank(company.WeekRentValue);
                             context.Characters.Update(character);
                             await context.SaveChangesAsync();
                         }
 
-                        company.RentPaymentDate = DateTime.Now.AddDays(7);
+                        company.RenewRent();
                         context.Companies.Update(company);
                         await context.SaveChangesAsync();
 
@@ -386,7 +383,7 @@ namespace TrevizaniRoleplay.Server
                 var url = "https://api.openweathermap.org/data/2.5/weather?lat=34.0536909&lon=-118.242766&appid=401a061ac0ba4fb46e01ec97d0fb5593&units=metric";
 
                 using var httpClient = new HttpClient();
-                Global.WeatherInfo = await httpClient.GetFromJsonAsync<WeatherInfo>(url);
+                Global.WeatherInfo = await httpClient.GetFromJsonAsync<WeatherInfo>(url)!;
                 Global.WeatherInfo.WeatherType = Global.WeatherInfo.Weather.FirstOrDefault()?.Main switch
                 {
                     "Drizzle" => WeatherType.Clearing,

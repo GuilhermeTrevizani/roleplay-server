@@ -45,6 +45,29 @@ namespace TrevizaniRoleplay.Domain.Entities
         [NotMapped]
         public string Name => string.IsNullOrWhiteSpace(DiscordDisplayName) ? DiscordUsername : DiscordDisplayName;
 
+        public void Create(string discordId, string discordUsername, string discordDisplayName, string ip, ulong hardwareIdHash, ulong hardwareIdExHash,
+            UserStaff staff, string staffFlagsJson)
+        {
+            DiscordId = discordId;
+            DiscordUsername = discordUsername;
+            DiscordDisplayName = discordDisplayName;
+            RegisterIp = LastAccessIp = ip;
+            RegisterHardwareIdHash = LastAccessHardwareIdHash = hardwareIdHash;
+            RegisterHardwareIdExHash = LastAccessHardwareIdExHash = hardwareIdExHash;
+            Staff = staff;
+            StaffFlagsJSON = staffFlagsJson;
+        }
+
+        public void UpdateLastAccess(string ip, ulong hardwareIdHash, ulong hardwareIdExHash, string discordUsername, string discordDisplayName)
+        {
+            LastAccessDate = DateTime.Now;
+            LastAccessIp = ip;
+            LastAccessHardwareIdHash = hardwareIdHash;
+            LastAccessHardwareIdExHash = hardwareIdExHash;
+            DiscordUsername = discordUsername;
+            DiscordDisplayName = discordDisplayName;
+        }
+
         public void SetVIP(UserVIP vip, int months)
         {
             VIP = vip;
@@ -78,6 +101,36 @@ namespace TrevizaniRoleplay.Domain.Entities
         public void AddHelpRequestsAnswersQuantity()
         {
             HelpRequestsAnswersQuantity++;
+        }
+
+        public void SetVehicleTagToggle(bool value)
+        {
+            VehicleTagToggle = value;
+        }
+
+        public void SetLastAccessDate()
+        {
+            LastAccessDate = DateTime.Now;
+        }
+
+        public void SetPMToggle(bool value)
+        {
+            PMToggle = value;
+        }
+
+        public void AddStaffDutyTime()
+        {
+            StaffDutyTime++;
+        }
+
+        public void SetAnsweredQuestions()
+        {
+            AnsweredQuestions = true;
+        }
+
+        public void RemoveNameChange()
+        {
+            NameChanges--;
         }
     }
 }

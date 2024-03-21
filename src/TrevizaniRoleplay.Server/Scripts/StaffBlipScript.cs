@@ -4,6 +4,7 @@ using AltV.Net.Data;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 

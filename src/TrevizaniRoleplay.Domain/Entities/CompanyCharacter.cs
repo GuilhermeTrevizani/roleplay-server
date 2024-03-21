@@ -8,5 +8,16 @@
 
         public Character? Character { get; private set; }
         public Company? Company { get; private set; }
+
+        public void Create(Guid companyId, Guid characterId)
+        {
+            CompanyId = companyId;
+            CharacterId = characterId;
+        }
+
+        public void SetFlagsJSON(string flagsJSON)
+        {
+            FlagsJSON = flagsJSON;
+        }
     }
 }

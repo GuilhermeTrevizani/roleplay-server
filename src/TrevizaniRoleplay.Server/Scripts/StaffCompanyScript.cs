@@ -21,7 +21,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("StaffCompanies", false, Functions.GetCompaniesHTML());
+            player.Emit("StaffCompanies", false, GetCompaniesHTML());
         }
 
         [ClientEvent(nameof(StaffCompanyGoto))]

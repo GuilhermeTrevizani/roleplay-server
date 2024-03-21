@@ -8,5 +8,23 @@
         public int Salary { get; private set; }
 
         public Faction? Faction { get; private set; }
+
+        public void Create(Guid factionId, int position, string name, int salary)
+        {
+            FactionId = factionId;
+            Position = position;
+            Name = name;
+            Salary = salary;
+        }
+
+        public void Update(string name, int salary)
+        {
+            Name = name;
+        }
+
+        public void SetPosition(int position)
+        {
+            Position = position;
+        }
     }
 }

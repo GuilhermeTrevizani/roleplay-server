@@ -94,7 +94,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.RemoveStackedItem(ItemCategory.Money, value);
 
-            player.Character.Bank += value;
+            player.Character.AddBank(value);
 
             player.SendMessage(MessageType.Success, $"Você depositou ${value:N0}.", notify: true);
             await player.GravarLog(LogType.Money, $"Depositar {value}", null);
@@ -124,10 +124,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.Money)
-            {
-                Quantity = value
-            });
+            var characterItem = new CharacterItem();
+            characterItem.Create(ItemCategory.Money, 0, value, null);
+            var res = await player.GiveItem(characterItem);
 
             if (!string.IsNullOrWhiteSpace(res))
             {
@@ -135,7 +134,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Character.Bank -= value;
+            player.Character.RemoveBank(value);
 
             player.SendMessage(MessageType.Success, $"Você sacou ${value:N0}.", notify: true);
             await player.GravarLog(LogType.Money, $"Sacar {value}", null);
@@ -187,16 +186,16 @@ namespace TrevizaniRoleplay.Server.Scripts
             var playerTarget = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == target.Id);
             if (playerTarget != null)
             {
-                playerTarget.Character.Bank += value;
+                playerTarget.Character.AddBank(value);
                 playerTarget.SendMessage(MessageType.Success, $"{player.Character.Name} transferiu ${value:N0} para sua conta bancária.");
             }
             else
             {
-                target.Bank += value;
+                target.AddBank(value);
                 context.Characters.Update(target);
             }
 
-            player.Character.Bank -= value;
+            player.Character.RemoveBank(value);
 
             player.SendMessage(MessageType.Success, $"Você transferiu ${value:N0} para {target.Name}.", notify: true);
             await player.GravarLog(LogType.Money, $"Transferir {value} {target.Id}", playerTarget);
@@ -219,7 +218,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(BankSavingsDeposit))]
         public async Task BankSavingsDeposit(MyPlayer player)
         {
-            var poupanca = 50000;
+            var poupanca = Global.DEFAULT_SAVINGS;
             if (player.Character.Bank < poupanca)
             {
                 player.SendMessage(MessageType.Error, string.Format(Global.MENSAGEM_ERRO_SALDO_INSUFICIENTE, poupanca), notify: true);
@@ -232,8 +231,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Character.Bank -= poupanca;
-            player.Character.Savings = poupanca;
+            player.Character.RemoveBank(poupanca);
+            player.Character.SetSavings(poupanca);
 
             await using var context = new DatabaseContext();
 
@@ -261,7 +260,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Character.Bank += player.Character.Savings;
+            player.Character.AddBank(player.Character.Savings);
 
             await using var context = new DatabaseContext();
 
@@ -277,7 +276,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.SendMessage(MessageType.Success, $"Você sacou ${player.Character.Savings:N0} da poupança.");
             await player.GravarLog(LogType.Money, $"Sacar Poupança {player.Character.Savings}", null);
-            player.Character.Savings = 0;
+            player.Character.SetSavings(0);
             await ShowBank(player, true, true, true);
         }
 
@@ -299,9 +298,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Character.Bank -= fine.Value;
+            player.Character.RemoveBank(fine.Value);
 
-            fine.PaymentDate = DateTime.Now;
+            fine.Pay();
             context.Fines.Update(fine);
 
             var financialTransaction = new FinancialTransaction();

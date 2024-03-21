@@ -1,6 +1,7 @@
 ﻿using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Data;
+using Newtonsoft.Json.Linq;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Factories;
@@ -29,7 +30,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var html = Functions.GetFactionArmoriesWeaponsHTML(factionArmory.Id, false);
+            var html = GetFactionArmoriesWeaponsHTML(factionArmory.Id);
 
             player.Emit("ShowFactionArmory",
                 false,
@@ -73,15 +74,14 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)weapon.Model)
+            var characterItem = new CharacterItem();
+            characterItem.Create(ItemCategory.Weapon, (uint)weapon.Model, 1, Functions.Serialize(new WeaponItem
             {
-                Extra = Functions.Serialize(new WeaponItem
-                {
-                    Ammo = weapon.Ammo,
-                    TintIndex = weapon.TintIndex,
-                    Components = Functions.Deserialize<List<uint>>(weapon.ComponentsJSON),
-                }),
-            });
+                Ammo = weapon.Ammo,
+                TintIndex = weapon.TintIndex,
+                Components = Functions.Deserialize<List<uint>>(weapon.ComponentsJSON),
+            }));
+            var res = await player.GiveItem(characterItem);
 
             if (!string.IsNullOrWhiteSpace(res))
             {
@@ -100,7 +100,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Você equipou {weapon.Model}.");
             await player.GravarLog(LogType.Weapon, $"Pegar Item Arsenal {Functions.Serialize(weapon)}", null);
 
-            var html = Functions.GetFactionArmoriesWeaponsHTML(weapon.FactionStorageId, false);
+            var html = GetFactionArmoriesWeaponsHTML(weapon.FactionStorageId);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.Character.FactionId == player.Character.FactionId))
                 target.Emit("ShowFactionArmory", true, html);
         }
@@ -120,6 +120,46 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.Armor = 100;
             await player.GravarLog(LogType.Faction, $"Pegar Colete Arsenal", null);
             player.EmitStaffShowMessage($"Você equipou um colete.");
+        }
+
+        private static string GetFactionArmoriesWeaponsHTML(Guid factionArmoryId)
+        {
+            var html = string.Empty;
+            var factionsArmoriesWeapons = Global.FactionsStoragesItems.Where(x => x.FactionStorageId == factionArmoryId);
+            if (!factionsArmoriesWeapons.Any())
+            {
+                html = "<tr><td class='text-center' colspan='8'>Não há armas criadas.</td></tr>";
+            }
+            else
+            {
+                var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == factionArmoryId);
+                var faction = Global.Factions.FirstOrDefault(x => x.Id == factionArmory.FactionId);
+
+                foreach (var factionArmoryWeapon in factionsArmoriesWeapons)
+                {
+                    var realComponents = new List<string>();
+                    foreach (var component in Functions.Deserialize<List<uint>>(factionArmoryWeapon.ComponentsJSON))
+                    {
+                        var comp = Global.WeaponComponents.FirstOrDefault(x => x.Hash == component && x.Weapon.ToString() == factionArmoryWeapon.Model);
+                        if (comp != null)
+                            realComponents.Add(comp.Name);
+                    }
+
+                    html += $@"<tr class='pesquisaitem'>
+                        <td>{factionArmoryWeapon.Id}</td>
+                        <td>{factionArmoryWeapon.Model}</td>
+                        <td>{factionArmoryWeapon.Ammo}</td>
+                        <td>{factionArmoryWeapon.Quantity}</td>
+                        <td>{factionArmoryWeapon.TintIndex}</td>
+                        {(!faction.Government && !staff ? $"<td>{Global.Prices.FirstOrDefault(y => y.Type == PriceType.Weapons && y.Name.Equals(factionArmoryWeapon.Model.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0:N0}</td>" : string.Empty)}
+                        <td>{string.Join(", ", realComponents)}</td>
+                        <td class='text-center'>
+                            <button onclick='equip({factionArmoryWeapon.Id})' type='button' class='btn btn-dark btn-sm'>EQUIPAR</button>
+                        </td>
+                    </tr>";
+                }
+            }
+            return html;
         }
     }
 }

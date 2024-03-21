@@ -24,5 +24,18 @@ namespace TrevizaniRoleplay.Domain.Entities
             AuxiliarPosY = auxiliarPosY;
             AuxiliarPosZ = auxiliarPosZ;
         }
+
+        public void Update(SpotType type,
+            float posX, float posY, float posZ,
+            float auxiliarPosX, float auxiliarPosY, float auxiliarPosZ)
+        {
+            Type = type;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            AuxiliarPosX = auxiliarPosX;
+            AuxiliarPosY = auxiliarPosY;
+            AuxiliarPosZ = auxiliarPosZ;
+        }
     }
 }

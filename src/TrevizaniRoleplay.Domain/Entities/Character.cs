@@ -64,9 +64,37 @@ namespace TrevizaniRoleplay.Domain.Entities
         public User? EvaluatorStaffUser { get; private set; }
         public Character? PoliceOfficerBlockedDriverLicenseCharacter { get; private set; }
 
-        public void Create(string name)
+        public void Create(string name, DateTime birthdayDate, string history, CharacterSex sex,
+            Guid userId, string ip, uint model, ulong hardwareIdHash, ulong hardwareIdExHash, ushort health, Guid? evaluatorStaffUserId)
         {
             Name = name;
+            BirthdayDate = birthdayDate;
+            History = history;
+            Sex = sex;
+            UserId = userId;
+            RegisterIp = LastAccessIp = ip;
+            Model = model;
+            RegisterHardwareIdHash = LastAccessHardwareIdHash = hardwareIdHash;
+            RegisterHardwareIdExHash = LastAccessHardwareIdExHash = hardwareIdExHash;
+            Health = health;
+            EvaluatorStaffUserId = evaluatorStaffUserId;
+        }
+
+        public void Update(uint model, float posX, float posY, float posZ, ushort health, ushort armor, int dimension,
+            string iplsJSON, string personalizationJSON, string woundsJSON, string factionFlagsJSON)
+        {
+            Model = model;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            Health = health;
+            Armor = armor;
+            Dimension = dimension;
+            IPLsJSON = iplsJSON;
+            PersonalizationJSON = personalizationJSON;
+            WoundsJSON = woundsJSON;
+            FactionFlagsJSON = factionFlagsJSON;
+            SetLastAccessDate();
         }
 
         public void Delete()
@@ -82,6 +110,11 @@ namespace TrevizaniRoleplay.Domain.Entities
         public void QuitJob()
         {
             Job = CharacterJob.None;
+            ResetExtraPayment();
+        }
+
+        public void ResetExtraPayment()
+        {
             ExtraPayment = 0;
         }
 
@@ -111,6 +144,165 @@ namespace TrevizaniRoleplay.Domain.Entities
         public void SetJailFinalDate(DateTime date)
         {
             JailFinalDate = date;
+        }
+
+        public void SetWound(CharacterWound wound)
+        {
+            Wound = wound;
+        }
+
+        public void SetDeath(DateTime date, string reason)
+        {
+            DeathDate = date;
+            DeathReason = reason;
+        }
+
+        public void SetFaction(Guid factionId, Guid factionRankId, bool criminal)
+        {
+            FactionId = factionId;
+            FactionRankId = factionRankId;
+            if (!criminal)
+                Job = CharacterJob.None;
+        }
+
+        public void UpdateFaction(Guid factionRankId, string factionFlagsJSON, int badge)
+        {
+            FactionRankId = factionRankId;
+            FactionFlagsJSON = factionFlagsJSON;
+            Badge = badge;
+        }
+
+        public void UseDrug(ItemCategory itemCategory, int quantity)
+        {
+            var minutesDuration = 0;
+            var thresoldDeath = 0;
+
+            switch (itemCategory)
+            {
+                case ItemCategory.Weed:
+                    minutesDuration = 10;
+                    break;
+                case ItemCategory.Cocaine:
+                    minutesDuration = 3;
+                    thresoldDeath = 10;
+                    break;
+                case ItemCategory.Crack:
+                    minutesDuration = 1;
+                    thresoldDeath = 25;
+                    break;
+                case ItemCategory.Heroin:
+                    minutesDuration = 10;
+                    thresoldDeath = 25;
+                    break;
+                case ItemCategory.MDMA:
+                    minutesDuration = 10;
+                    thresoldDeath = 5;
+                    break;
+                case ItemCategory.Xanax:
+                    minutesDuration = 5;
+                    thresoldDeath = 1;
+                    break;
+                case ItemCategory.Oxycontin:
+                    minutesDuration = 3;
+                    thresoldDeath = 10;
+                    break;
+                case ItemCategory.Metanfetamina:
+                    minutesDuration = 2;
+                    thresoldDeath = 50;
+                    break;
+            }
+
+            minutesDuration *= quantity;
+            thresoldDeath *= quantity;
+
+            var newThresoldDeath = ThresoldDeath + thresoldDeath;
+            ThresoldDeath = Convert.ToByte(newThresoldDeath > 100 ? 100 : newThresoldDeath);
+            DrugItemCategory = itemCategory;
+            DrugEndDate = (ThresoldDeath == 100 ? DateTime.Now : DrugEndDate ?? DateTime.Now).AddMinutes(minutesDuration);
+            ThresoldDeathEndDate = null;
+        }
+
+        public void ClearDrug()
+        {
+            DrugItemCategory = null;
+            DrugEndDate = null;
+            ThresoldDeath = 0;
+            ThresoldDeathEndDate = null;
+        }
+
+        public void SetThresoldDeathEndDate()
+        {
+            DrugItemCategory = null;
+            DrugEndDate = null;
+            ThresoldDeathEndDate = DateTime.Now.AddHours(1);
+        }
+
+        public void AddBank(int value)
+        {
+            Bank += value;
+        }
+
+        public void RemoveBank(int value)
+        {
+            Bank -= value;
+        }
+
+        public void SetAnnouncementLastUseDate()
+        {
+            AnnouncementLastUseDate = DateTime.Now;
+        }
+
+        public void SetMask(ulong mask)
+        {
+            Mask = mask;
+        }
+
+        public void ResetFaction()
+        {
+            FactionId = FactionRankId = null;
+            Badge = 0;
+            FactionFlagsJSON = "[]";
+            Armor = 0;
+        }
+
+        public void SetLastAccessDate()
+        {
+            LastAccessDate = DateTime.Now;
+        }
+
+        public void SetSavings(int savings)
+        {
+            Savings = savings;
+        }
+
+        public void AddConnectedTime()
+        {
+            ConnectedTime++;
+        }
+
+        public void SetBankAndSavings(int bank, int savings)
+        {
+            Bank = bank;
+            Savings = savings;
+        }
+
+        public void SetNameChangeStatus(CharacterNameChangeStatus status)
+        {
+            NameChangeStatus = status;
+        }
+
+        public void UpdateLastAccess(string ip, ulong hardwareIdHash, ulong hardwareIdExHash)
+        {
+            LastAccessIp = ip;
+            LastAccessHardwareIdHash = hardwareIdHash;
+            LastAccessHardwareIdExHash = hardwareIdExHash;
+            JailFinalDate = null;
+            Mask = 0;
+        }
+
+        public void SetPoliceOfficerBlockedDriverLicenseCharacterId(Guid id)
+        {
+            PoliceOfficerBlockedDriverLicenseCharacterId = id;
         }
     }
 }

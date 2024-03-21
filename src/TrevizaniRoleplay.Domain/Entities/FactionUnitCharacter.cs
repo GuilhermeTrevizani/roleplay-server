@@ -7,5 +7,10 @@
 
         public FactionUnit? FactionUnit { get; private set; }
         public Character? Character { get; private set; }
+
+        public void Create(Guid characterId)
+        {
+            CharacterId = characterId;
+        }
     }
 }

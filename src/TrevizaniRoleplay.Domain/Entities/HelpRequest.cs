@@ -22,6 +22,15 @@ namespace TrevizaniRoleplay.Domain.Entities
         [NotMapped]
         public string UserName { get; private set; } = string.Empty;
 
+        public void Create(string message, Guid userId, int characterSessionId, string characterName, string userName)
+        {
+            Message = message;
+            UserId = userId;
+            CharacterSessionId = characterSessionId;
+            CharacterName = characterName;
+            UserName = userName;
+        }
+
         public void Answer(Guid staffUserId)
         {
             AnswerDate = DateTime.Now;

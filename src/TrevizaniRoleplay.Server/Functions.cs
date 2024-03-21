@@ -294,7 +294,7 @@ namespace TrevizaniRoleplay.Server
             {
                 Title = Global.SERVER_NAME,
                 Description = message,
-                Color = new Color(Global.MainRgba.R, Global.MainRgba.G, Global.MainRgba.B),
+                Color = new Discord.Color(Global.MainRgba.R, Global.MainRgba.G, Global.MainRgba.B),
             };
             embedBuilder.WithFooter($"Enviada em {DateTime.Now}.");
 
@@ -566,7 +566,7 @@ namespace TrevizaniRoleplay.Server
                 }
 
                 prox.StopAlarm();
-                prox.Locked = !prox.Locked;
+                prox.ToggleLocked();
                 player.SendMessageToNearbyPlayers($"{(!prox.Locked ? "des" : string.Empty)}tranca a porta.", MessageCategory.Ame, 5);
 
                 await using var context = new DatabaseContext();
@@ -813,10 +813,9 @@ namespace TrevizaniRoleplay.Server
 
             if (confirm)
             {
-                var res = await player.GiveItem(new CharacterItem(ItemCategory.Money)
-                {
-                    Quantity = value
-                });
+                var characterItem = new CharacterItem();
+                characterItem.Create(ItemCategory.Money, 0, value, null);
+                var res = await player.GiveItem(characterItem);
 
                 if (!string.IsNullOrWhiteSpace(res))
                 {
@@ -930,61 +929,6 @@ namespace TrevizaniRoleplay.Server
                             <input id='jsonMember{member.Character.Id}' type='hidden' value='{Serialize(new { member.Character.Name, member.Character.Badge, member.Character.FactionRankId, member.Character.FactionFlagsJSON })}' />
                             <button onclick='editMember({member.Character.Id})' type='button' class='btn btn-dark btn-sm editMember'>EDITAR</button>
                             <button onclick='removeMember({member.Character.Id}, `{member.Character.Name}`)' type='button' class='btn btn-danger btn-sm removeMember'>EXPULSAR</button>
-                        </td>
-                    </tr>";
-                }
-            }
-            return html;
-        }
-
-        public static string GetFactionArmoriesWeaponsHTML(Guid factionArmoryId, bool staff)
-        {
-            var html = string.Empty;
-            var factionsArmoriesWeapons = Global.FactionsStoragesItems.Where(x => x.FactionStorageId == factionArmoryId);
-            if (!factionsArmoriesWeapons.Any())
-            {
-                html = "<tr><td class='text-center' colspan='8'>Não há armas criadas.</td></tr>";
-            }
-            else
-            {
-                var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == factionArmoryId);
-                var faction = Global.Factions.FirstOrDefault(x => x.Id == factionArmory.FactionId);
-
-                foreach (var factionArmoryWeapon in factionsArmoriesWeapons)
-                {
-                    var realComponents = new List<string>();
-                    foreach (var component in Deserialize<List<uint>>(factionArmoryWeapon.ComponentsJSON))
-                    {
-                        var comp = Global.WeaponComponents.FirstOrDefault(x => x.Hash == component && x.Weapon.ToString() == factionArmoryWeapon.Model);
-                        if (comp != null)
-                            realComponents.Add(comp.Name);
-                    }
-
-                    var htmlOptions = string.Empty;
-                    if (staff)
-                        htmlOptions = $@"<input id='json{factionArmoryWeapon.Id}' type='hidden' value='{Serialize(new
-                        {
-                            Weapon = factionArmoryWeapon.Model.ToString(),
-                            factionArmoryWeapon.Ammo,
-                            factionArmoryWeapon.Quantity,
-                            factionArmoryWeapon.TintIndex,
-                            Components = realComponents,
-                        })}' />
-                            <button onclick='edit({factionArmoryWeapon.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='remove(this, {factionArmoryWeapon.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>";
-                    else
-                        htmlOptions = $@"<button onclick='equip({factionArmoryWeapon.Id})' type='button' class='btn btn-dark btn-sm'>EQUIPAR</button>";
-
-                    html += $@"<tr class='pesquisaitem'>
-                        <td>{factionArmoryWeapon.Id}</td>
-                        <td>{factionArmoryWeapon.Model}</td>
-                        <td>{factionArmoryWeapon.Ammo}</td>
-                        <td>{factionArmoryWeapon.Quantity}</td>
-                        <td>{factionArmoryWeapon.TintIndex}</td>
-                        {(!faction.Government && !staff ? $"<td>{Global.Prices.FirstOrDefault(y => y.Type == PriceType.Weapons && y.Name.Equals(factionArmoryWeapon.Model.ToString(), StringComparison.CurrentCultureIgnoreCase))?.Value ?? 0:N0}</td>" : string.Empty)}
-                        <td>{string.Join(", ", realComponents)}</td>
-                        <td class='text-center'>
-                            {htmlOptions}
                         </td>
                     </tr>";
                 }

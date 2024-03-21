@@ -13,5 +13,21 @@
         public Faction? Faction { get; private set; }
         public Character? Character { get; private set; }
         public ICollection<FactionUnitCharacter>? Characters { get; private set; }
+
+        public void Create(string name, string description, Guid factionId, Guid characterId, string plate,
+            ICollection<FactionUnitCharacter> characters)
+        {
+            Name = name;
+            Description = description;
+            FactionId = factionId;
+            CharacterId = characterId;
+            Plate = plate;
+            Characters = characters;
+        }
+
+        public void End()
+        {
+            FinalDate = DateTime.Now;
+        }
     }
 }

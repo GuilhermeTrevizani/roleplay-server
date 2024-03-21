@@ -26,5 +26,10 @@ namespace TrevizaniRoleplay.Domain.Entities
 
             return flags;
         }
+
+        public void ToggleBlockedChat()
+        {
+            BlockedChat = !BlockedChat;
+        }
     }
 }

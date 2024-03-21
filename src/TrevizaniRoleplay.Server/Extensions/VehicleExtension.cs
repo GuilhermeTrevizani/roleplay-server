@@ -1,7 +1,6 @@
 ﻿using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
-using Microsoft.EntityFrameworkCore;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
 using TrevizaniRoleplay.Server.Factories;
@@ -77,17 +76,14 @@ namespace TrevizaniRoleplay.Server.Extensions
             veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_PLATE, veh.VehicleDB.Plate);
             veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_MODEL, veh.VehicleDB.Model.ToUpper());
 
-            if (veh.TemTanqueCombustivel)
-                veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
+            if (veh.HasFuelTank)
+                veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.FuelHUD);
 
             veh.SetDefaultMods();
 
             if (vehicle.Job == CharacterJob.None)
             {
-                veh.Damages = Functions.Deserialize<List<MyVehicle.Damage>>(vehicle.DamagesJSON);
-
-                await using var context = new DatabaseContext();
-                veh.Itens = await context.VehiclesItems.Where(x => x.VehicleId == vehicle.Id).ToListAsync();
+                veh.Damages = Functions.Deserialize<List<VehicleDamage>>(vehicle.DamagesJSON);
 
                 if (player != null)
                 {
@@ -96,7 +92,7 @@ namespace TrevizaniRoleplay.Server.Extensions
                     veh.BodyAdditionalHealth = veh.VehicleDB.BodyAdditionalHealth;
                     veh.PetrolTankHealth = veh.VehicleDB.PetrolTankHealth;
 
-                    var dano = Functions.Deserialize<MyVehicle.Dano>(veh.VehicleDB.StructureDamagesJSON);
+                    var dano = Functions.Deserialize<VehicleDamageInfo>(veh.VehicleDB.StructureDamagesJSON);
                     if (dano?.WindowsDamaged?.Count > 0)
                     {
                         foreach (var x in dano.Bumpers)
@@ -143,22 +139,22 @@ namespace TrevizaniRoleplay.Server.Extensions
                 try
                 {
                     Alt.Log($"Vehicle Timer {veh.VehicleDB.Id}");
-                    if (veh.DataExpiracaoAluguel.HasValue)
+                    if (veh.RentExpirationDate.HasValue)
                     {
-                        if (veh.DataExpiracaoAluguel.Value < DateTime.Now)
+                        if (veh.RentExpirationDate.Value < DateTime.Now)
                         {
                             veh.EngineOn = false;
-                            veh.NomeEncarregado = string.Empty;
-                            veh.DataExpiracaoAluguel = null;
+                            veh.NameInCharge = string.Empty;
+                            veh.RentExpirationDate = null;
                             if (veh.Driver is MyPlayer driver)
                                 driver.SendMessage(MessageType.Error, "O aluguel do veículo expirou. Use /valugar para alugar novamente por uma hora. Se você sair do veículo, ele será levado para a central.");
                         }
                     }
 
-                    if (veh.EngineOn && veh.VehicleDB.Fuel > 0 && veh.TemTanqueCombustivel)
+                    if (veh.EngineOn && veh.VehicleDB.Fuel > 0 && veh.HasFuelTank)
                     {
                         veh.VehicleDB.SetFuel(veh.VehicleDB.Fuel - 1);
-                        veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.CombustivelHUD);
+                        veh.SetStreamSyncedMetaData(Constants.VEHICLE_META_DATA_FUEL, veh.FuelHUD);
                         if (veh.VehicleDB.Fuel == 0)
                             veh.EngineOn = false;
                     }

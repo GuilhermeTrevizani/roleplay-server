@@ -727,8 +727,6 @@ namespace TrevizaniRoleplay.Server
 
         public static List<FactionUnit> FactionsUnits { get; set; } = [];
 
-        public static List<FactionUnitCharacter> FactionsUnitsCharacters { get; set; } = [];
-
         public static List<Item> Items { get; set; } = [];
 
         public static List<ClotheAccessory> Clothes1Male { get; set; } = [];
@@ -945,5 +943,9 @@ namespace TrevizaniRoleplay.Server
         public static IEnumerable<MyMarker> Markers => Alt.GetAllMarkers().Cast<MyMarker>();
 
         public static IEnumerable<MyBlip> MyBlips => Alt.GetAllMarkers().Cast<MyBlip>();
+
+        public const int DEFAULT_SAVINGS = 50_000;
+
+        public const int MAX_SAVINGS = 1_000_000;
     }
 }

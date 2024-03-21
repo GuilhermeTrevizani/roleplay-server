@@ -77,7 +77,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (playerTarget.Character.Wound == CharacterWound.SeriouslyInjured)
                     {
                         playerTarget.SendMessage(MessageType.Error, Global.MENSAGEM_PK);
-                        playerTarget.Character.Wound = CharacterWound.PK;
+                        playerTarget.Character.SetWound(CharacterWound.PK);
                         playerTarget.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)playerTarget.Character.Wound);
                     }
 
@@ -130,7 +130,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 if (player.Character.Wound == CharacterWound.SeriouslyInjured)
                 {
                     player.SendMessage(MessageType.Error, Global.MENSAGEM_PK);
-                    player.Character.Wound = CharacterWound.PK;
+                    player.Character.SetWound(CharacterWound.PK);
                     player.SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)player.Character.Wound);
                 }
 
@@ -246,7 +246,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (player.IsInVehicle && player.Seat <= 4 && !player.OnAdminDuty)
                     {
                         var veh = (MyVehicle)player.Vehicle;
-                        if (veh.TemJanelas)
+                        if (veh.HasWindows)
                         {
                             if (!veh.IsWindowOpened(0) && !veh.IsWindowOpened(1) && !veh.IsWindowOpened(2) && !veh.IsWindowOpened(3))
                             {
@@ -387,10 +387,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                 case "Celular":
                     var celular = await Functions.GetNewCellphoneNumber();
 
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Cellphone, celular)
-                    {
-                        Extra = Functions.Serialize(new CellphoneItem { Contacts = Functions.GetDefaultsContacts() }),
-                    });
+                    var itemCellphone = new CharacterItem();
+                    itemCellphone.Create(ItemCategory.Cellphone, celular, 1, Functions.Serialize(new CellphoneItem { Contacts = Functions.GetDefaultsContacts() }));
+
+                    res = await player.GiveItem(itemCellphone);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -401,10 +401,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um celular. Seu número é: {celular}.";
                     break;
                 case "Rádio Comunicador":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.WalkieTalkie)
-                    {
-                        Extra = Functions.Serialize(new WalkieTalkieItem()),
-                    });
+                    var itemWalkieTalkie = new CharacterItem();
+                    itemWalkieTalkie.Create(ItemCategory.WalkieTalkie, 0, 1, Functions.Serialize(new WalkieTalkieItem()));
+
+                    res = await player.GiveItem(itemWalkieTalkie);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -415,10 +415,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um rádio comunicador.";
                     break;
                 case "Galão de Combustível":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.JerryCan)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem { Ammo = 5000 }),
-                    });
+                    var itemJerryCan = new CharacterItem();
+                    itemJerryCan.Create(ItemCategory.Weapon, (uint)WeaponModel.JerryCan, 1, Functions.Serialize(new WeaponItem { Ammo = 5000 }));
+
+                    res = await player.GiveItem(itemJerryCan);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -429,10 +429,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um galão de combustível.";
                     break;
                 case "Soco Inglês":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.BrassKnuckles)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemBrassKnuckles = new CharacterItem();
+                    itemBrassKnuckles.Create(ItemCategory.Weapon, (uint)WeaponModel.BrassKnuckles, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemBrassKnuckles);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -443,10 +443,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um soco inglês.";
                     break;
                 case "Garrafa":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.BrokenBottle)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemBrokenBottle = new CharacterItem();
+                    itemBrokenBottle.Create(ItemCategory.Weapon, (uint)WeaponModel.BrokenBottle, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemBrokenBottle);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -457,10 +457,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou uma garrafa.";
                     break;
                 case "Pé de Cabra":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.Crowbar)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemCrowbar = new CharacterItem();
+                    itemCrowbar.Create(ItemCategory.Weapon, (uint)WeaponModel.Crowbar, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemCrowbar);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -471,10 +471,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um pé de cabra.";
                     break;
                 case "Taco de Golfe":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.GolfClub)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemGolfClub = new CharacterItem();
+                    itemGolfClub.Create(ItemCategory.Weapon, (uint)WeaponModel.GolfClub, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemGolfClub);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -485,10 +485,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um taco de golfe.";
                     break;
                 case "Martelo":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.Hammer)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemHammer = new CharacterItem();
+                    itemHammer.Create(ItemCategory.Weapon, (uint)WeaponModel.Hammer, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemHammer);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -499,10 +499,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um martelo.";
                     break;
                 case "Chave de Grifo":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.PipeWrench)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemPipeWrench = new CharacterItem();
+                    itemPipeWrench.Create(ItemCategory.Weapon, (uint)WeaponModel.PipeWrench, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemPipeWrench);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -513,10 +513,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou uma chave de grifo.";
                     break;
                 case "Taco de Baseball":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.BaseballBat)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemBaseballBat = new CharacterItem();
+                    itemBaseballBat.Create(ItemCategory.Weapon, (uint)WeaponModel.BaseballBat, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemBaseballBat);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -527,10 +527,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou um taco de baseball.";
                     break;
                 case "Bola de Baseball":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Weapon, (uint)WeaponModel.Baseball)
-                    {
-                        Extra = Functions.Serialize(new WeaponItem()),
-                    });
+                    var itemBaseball = new CharacterItem();
+                    itemBaseball.Create(ItemCategory.Weapon, (uint)WeaponModel.Baseball, 1, Functions.Serialize(new WeaponItem()));
+
+                    res = await player.GiveItem(itemBaseball);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -541,7 +541,10 @@ namespace TrevizaniRoleplay.Server.Scripts
                     strMensagem = $"Você comprou uma bola de baseball.";
                     break;
                 case "Boombox":
-                    res = await player.GiveItem(new CharacterItem(ItemCategory.Boombox));
+                    var itemBoombox = new CharacterItem();
+                    itemBoombox.Create(ItemCategory.Boombox, 0, 1, null);
+
+                    res = await player.GiveItem(itemBoombox);
 
                     if (!string.IsNullOrWhiteSpace(res))
                     {
@@ -604,16 +607,22 @@ namespace TrevizaniRoleplay.Server.Scripts
                             _ => 0,
                         };
 
-                    items.AddRange(clothes.Select(x => new CharacterItem(tipoCategoriaItem, (uint)x.Drawable)
+                    var characterItems = new List<CharacterItem>();
+                    foreach (var clothe in clothes)
                     {
-                        Extra = Functions.Serialize(new ClotheAccessoryItem
+                        var characterItem = new CharacterItem();
+                        characterItem.Create(tipoCategoriaItem, (uint)clothe.Drawable, 1, Functions.Serialize(new ClotheAccessoryItem
                         {
-                            DLC = x.DLC,
-                            Texture = x.Texture,
+                            DLC = clothe.DLC,
+                            Texture = clothe.Texture,
                             Sex = player.Character.Sex,
-                        }),
-                        Slot = slot,
-                    }).ToList());
+                        }));
+                        characterItem.SetSlot(slot);
+
+                        characterItems.Add(characterItem);
+                    }
+
+                    items.AddRange(characterItems);
                 }
 
                 var roupas = Functions.Deserialize<List<ClotheAccessory>>(strRoupas);
@@ -1599,73 +1608,6 @@ namespace TrevizaniRoleplay.Server.Scripts
                 player.SendMessageToNearbyPlayers($"desliga a boombox.", MessageCategory.Ame, 5);
                 item.AudioSpot = null;
             }
-        }
-
-        [AsyncClientEvent(nameof(BuyPropertyUpgrade))]
-        public static async Task BuyPropertyUpgrade(MyPlayer player, int propertyId, string name)
-        {
-            var property = Global.Properties.FirstOrDefault(x => x.Id == propertyId);
-            if (property == null)
-                return;
-
-            var value = property.Value;
-
-            switch (name)
-            {
-                case "Proteção Nível 1":
-                    value = Convert.ToInt32(Math.Truncate(value * 0.05));
-                    break;
-                case "Proteção Nível 2":
-                    value = Convert.ToInt32(Math.Truncate(value * 0.08));
-                    break;
-                case "Proteção Nível 3":
-                    value = Convert.ToInt32(Math.Truncate(value * 0.15));
-                    break;
-            }
-
-            if (player.Money < value)
-            {
-                player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, value), notify: true);
-                return;
-            }
-
-            switch (name)
-            {
-                case "Proteção Nível 1":
-                    if (property.ProtectionLevel >= 1)
-                    {
-                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 1.", notify: true);
-                        return;
-                    }
-
-                    property.ProtectionLevel = 1;
-                    break;
-                case "Proteção Nível 2":
-                    if (property.ProtectionLevel >= 2)
-                    {
-                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 2.", notify: true);
-                        return;
-                    }
-
-                    property.ProtectionLevel = 2;
-                    break;
-                case "Proteção Nível 3":
-                    if (property.ProtectionLevel >= 3)
-                    {
-                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 3.", notify: true);
-                        return;
-                    }
-
-                    property.ProtectionLevel = 3;
-                    break;
-            }
-
-            await using var context = new DatabaseContext();
-            context.Properties.Update(property);
-            await context.SaveChangesAsync();
-
-            await player.RemoveStackedItem(ItemCategory.Money, value);
-            player.SendMessage(MessageType.Success, $"Você comprou {name}.", notify: true);
         }
 
         [ScriptEvent(ScriptEventType.ServerEvent)]

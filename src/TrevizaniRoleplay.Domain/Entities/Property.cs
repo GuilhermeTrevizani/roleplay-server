@@ -35,5 +35,15 @@ namespace TrevizaniRoleplay.Domain.Entities
             RobberyCooldown = null;
             LockNumber = 0;
         }
+
+        public void SetOwner(Guid characterId)
+        {
+            CharacterId = characterId;
+        }
+
+        public void ToggleLocked()
+        {
+            Locked = !Locked;
+        }
     }
 }

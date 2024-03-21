@@ -12,8 +12,9 @@ namespace TrevizaniRoleplay.Server.Scripts
     public class CompanyScript : IScript
     {
         [AsyncClientEvent(nameof(CompanySave))]
-        public static async Task CompanySave(MyPlayer player, int id, string color, int blipType, int blipColor)
+        public static async Task CompanySave(MyPlayer player, string idString, string color, int blipType, int blipColor)
         {
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company?.CharacterId != player.Character.Id)
                 return;
@@ -36,9 +37,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            company.Color = color;
-            company.BlipType = Convert.ToUInt16(blipType);
-            company.BlipColor = Convert.ToByte(blipColor);
+            company.Update(color, Convert.ToUInt16(blipType), Convert.ToByte(blipColor));
 
             await using var context = new DatabaseContext();
             context.Companies.Update(company);
@@ -51,13 +50,14 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(CompanyEmployees))]
-        public static async Task CompanyEmployees(MyPlayer player, int id)
+        public static async Task CompanyEmployees(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
 
-            var companyCharacter = company.Characters.FirstOrDefault(x => x.CharacterId == player.Character.Id);
+            var companyCharacter = company.Characters!.FirstOrDefault(x => x.CharacterId == player.Character.Id);
 
             var companyFlagsJSON = Functions.Serialize(
                 Enum.GetValues(typeof(CompanyFlag)).Cast<CompanyFlag>()
@@ -76,8 +76,9 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(CompanyOpenClose))]
-        public static async Task CompanyOpenClose(MyPlayer player, int id)
+        public static async Task CompanyOpenClose(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
@@ -102,19 +103,20 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             company.ToggleOpen();
 
-            await player.GravarLog(LogType.Company, $"{(company.Open ? "Abrir" : "fechou")} Empresa {id}", null);
-            player.EmitStaffShowMessage($"Você {(company.Open ? "abriu" : "fechou")} a empresa {company.Name}.", true);
+            await player.GravarLog(LogType.Company, $"{(company.GetIsOpen() ? "Abrir" : "fechou")} Empresa {id}", null);
+            player.EmitStaffShowMessage($"Você {(company.GetIsOpen() ? "abriu" : "fechou")} a empresa {company.Name}.", true);
             player.Emit("Companies", true, GetCompaniesByCharacterHTML(player));
         }
 
         [AsyncClientEvent(nameof(CompanyAnnounce))]
-        public static async Task CompanyAnnounce(MyPlayer player, int id, string message)
+        public static async Task CompanyAnnounce(MyPlayer player, string idString, string message)
         {
+            var id = new Guid(idString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
 
-            if (!company.Open)
+            if (!company.GetIsOpen())
             {
                 player.EmitStaffShowMessage("A empresa está fechada.");
                 return;
@@ -125,15 +127,16 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(CompanyCharacterInvite))]
-        public static async Task CompanyCharacterInvite(MyPlayer player, int companyId, int characterSessionId)
+        public static async Task CompanyCharacterInvite(MyPlayer player, string companyIdString, int characterSessionId)
         {
+            var companyId = new Guid(companyIdString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == companyId);
             if (company == null)
                 return;
 
-            var companyCharacter = company.Characters.FirstOrDefault(x => x.CharacterId == player.Character.Id);
+            var companyCharacter = company.Characters!.FirstOrDefault(x => x.CharacterId == player.Character.Id);
             if (company.CharacterId != player.Character.Id
-                && !(companyCharacter?.Flags?.Contains(CompanyFlag.InviteCharacter) ?? false))
+                && !(companyCharacter?.GetFlags()?.Contains(CompanyFlag.InviteCharacter) ?? false))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
@@ -146,7 +149,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            if (company.CharacterId == target.Character.Id || company.Characters.Any(x => x.CharacterId == target.Character.Id))
+            if (company.CharacterId == target.Character.Id || company.Characters!.Any(x => x.CharacterId == target.Character.Id))
             {
                 player.EmitStaffShowMessage("Personagem já está nessa empresa.");
                 return;
@@ -168,20 +171,22 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(CompanyCharacterSave))]
-        public static async Task CompanyCharacterSave(MyPlayer player, int companyId, int characterId, string flagsJSON)
+        public static async Task CompanyCharacterSave(MyPlayer player, string companyIdString, string characterIdString, string flagsJSON)
         {
+            var companyId = new Guid(companyIdString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == companyId);
             if (company == null)
                 return;
 
-            var companyCharacter = company.Characters.FirstOrDefault(x => x.CharacterId == player.Character.Id);
+            var companyCharacter = company.Characters!.FirstOrDefault(x => x.CharacterId == player.Character.Id);
             if (company.CharacterId != player.Character.Id
-                && !(companyCharacter?.Flags?.Contains(CompanyFlag.EditCharacter) ?? false))
+                && !(companyCharacter?.GetFlags()?.Contains(CompanyFlag.EditCharacter) ?? false))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
+            var characterId = new Guid(characterIdString);
             var companyCharacterTarget = company.Characters.FirstOrDefault(x => x.CharacterId == characterId);
             if (companyCharacterTarget == null)
             {
@@ -192,36 +197,38 @@ namespace TrevizaniRoleplay.Server.Scripts
             await using var context = new DatabaseContext();
 
             var companyFlags = Functions.Deserialize<List<string>>(flagsJSON).Select(x => (FactionFlag)Convert.ToByte(x)).ToList();
-            companyCharacterTarget.FlagsJSON = Functions.Serialize(companyFlags);
+            companyCharacterTarget.SetFlagsJSON(Functions.Serialize(companyFlags));
             context.CompaniesCharacters.Update(companyCharacterTarget);
             await context.SaveChangesAsync();
 
-            var target = Global.Players.FirstOrDefault(x => x.Character.Id == characterId);
+            var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == characterId);
             target?.SendMessage(MessageType.Success, $"{player.User.Name} alterou suas informações na empresa {company.Name}.");
 
             player.EmitStaffShowMessage($"Você alterou as informações do personagem {characterId} na empresa.", true);
             await player.GravarLog(LogType.Faction, $"Salvar Funcionário Empresa {companyId} {characterId} {flagsJSON}", target);
 
             player.Emit("CompanyCharacters", true,
-                await Functions.GetCompanyCharactersHTML(company.Id),
+                await GetCompanyCharactersHTML(company.Id),
                 companyCharacter?.FlagsJSON ?? "[]", company.CharacterId == player.Character.Id);
         }
 
         [AsyncClientEvent(nameof(CompanyCharacterRemove))]
-        public static async Task CompanyCharacterRemove(MyPlayer player, int companyId, int characterId)
+        public static async Task CompanyCharacterRemove(MyPlayer player, string companyIdString, string characterIdString)
         {
+            var companyId = new Guid(companyIdString);
             var company = Global.Companies.FirstOrDefault(x => x.Id == companyId);
             if (company == null)
                 return;
 
-            var companyCharacter = company.Characters.FirstOrDefault(x => x.CharacterId == player.Character.Id);
+            var companyCharacter = company.Characters!.FirstOrDefault(x => x.CharacterId == player.Character.Id);
             if (company.CharacterId != player.Character.Id
-                && !(companyCharacter?.Flags?.Contains(CompanyFlag.RemoveCharacter) ?? false))
+                && !(companyCharacter?.GetFlags()?.Contains(CompanyFlag.RemoveCharacter) ?? false))
             {
                 player.EmitStaffShowMessage(Global.MENSAGEM_SEM_AUTORIZACAO);
                 return;
             }
 
+            var characterId = new Guid(characterIdString);
             var companyCharacterTarget = company.Characters.FirstOrDefault(x => x.CharacterId == characterId);
             if (companyCharacterTarget == null)
             {
@@ -315,7 +322,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     OnlineCharacter = Global.SpawnedPlayers.FirstOrDefault(y => y.Character.Id == x.CharacterId),
                 })
                 .OrderByDescending(x => x.OnlineCharacter != null)
-                .ThenBy(x => x.CompanyCharacter.Character.Name);
+                .ThenBy(x => x.CompanyCharacter.Character!.Name);
 
             var html = string.Empty;
             if (!characters.Any())
@@ -332,8 +339,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                         $"<span class='label' style='background-color:{Global.ERROR_COLOR}'>OFFLINE</span>";
 
                     html += $@"<tr class='pesquisaitem'>
-                        <td>{character.CompanyCharacter.Character.Name} [{character.CompanyCharacter.Character.Id}]</td>
-                        <td>{character.CompanyCharacter.Character.User.Name} [{character.CompanyCharacter.Character.UserId}]</td>
+                        <td>{character.CompanyCharacter.Character!.Name} [{character.CompanyCharacter.Character.Id}]</td>
+                        <td>{character.CompanyCharacter.Character.User!.Name} [{character.CompanyCharacter.Character.UserId}]</td>
                         <td>{character.CompanyCharacter.Character.LastAccessDate}</td>
                         <td class='text-center'>{online}</td>
                         <td class='text-center tdOptions'>
@@ -367,8 +374,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.RemoveStackedItem(ItemCategory.Money, company.WeekRentValue);
 
-            company.CharacterId = player.Character.Id;
-            company.RentPaymentDate = DateTime.Now.AddDays(7);
+            company.Rent(player.Character.Id);
             company.RemoveIdentifier();
 
             await using var context = new DatabaseContext();

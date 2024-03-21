@@ -11,5 +11,15 @@
         public int CooldownHours { get; private set; }
         public DateTime CooldownDate { get; private set; } = DateTime.Now;
         public int Quantity { get; private set; }
+
+        public void AddQuantity(int quantity)
+        {
+            Quantity += quantity;
+            if (Quantity >= CooldownQuantityLimit)
+            {
+                CooldownDate = DateTime.Now.AddHours(CooldownHours);
+                Quantity = 0;
+            }
+        }
     }
 }

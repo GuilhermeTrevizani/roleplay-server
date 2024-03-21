@@ -149,7 +149,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var res = await player.GiveItem(new CharacterItem(ItemCategory.PropertyKey, prop.LockNumber));
+            var characterItem = new CharacterItem();
+            characterItem.Create(ItemCategory.PropertyKey, prop.LockNumber, 1, null);
+            var res = await player.GiveItem(characterItem);
             if (!string.IsNullOrWhiteSpace(res))
             {
                 player.SendMessage(MessageType.Error, res);
@@ -333,7 +335,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                 Task.Run(async () =>
                 {
                     var value = Convert.ToInt32(Math.Truncate(prop.Value * 0.1));
-                    var res = await player.GiveItem(new CharacterItem(ItemCategory.Money) { Quantity = value });
+                    var characterItem = new CharacterItem();
+                    characterItem.Create(ItemCategory.Money, 0, value, null);
+                    var res = await player.GiveItem(characterItem);
                     if (!string.IsNullOrWhiteSpace(res))
                     {
                         player.SendMessage(MessageType.Error, res);
@@ -485,10 +489,9 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (confirm)
             {
-                var res = await player.GiveItem(new CharacterItem(ItemCategory.Money)
-                {
-                    Quantity = value
-                });
+                var characterItem = new CharacterItem();
+                characterItem.Create(ItemCategory.Money, 0, value, null);
+                var res = await player.GiveItem(characterItem);
 
                 if (!string.IsNullOrWhiteSpace(res))
                 {
@@ -510,6 +513,74 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 player.ShowConfirm("Confirmar Venda", $"Confirma vender a propriedade {prop.Id} para o governo por ${value:N0}?", "VenderPropriedade");
             }
+        }
+
+        [AsyncClientEvent(nameof(BuyPropertyUpgrade))]
+        public static async Task BuyPropertyUpgrade(MyPlayer player, string idPropertyString, string name)
+        {
+            var idProperty = new Guid(idPropertyString);
+            var property = Global.Properties.FirstOrDefault(x => x.Id == idProperty);
+            if (property == null)
+                return;
+
+            var value = property.Value;
+
+            switch (name)
+            {
+                case "Proteção Nível 1":
+                    value = Convert.ToInt32(Math.Truncate(value * 0.05));
+                    break;
+                case "Proteção Nível 2":
+                    value = Convert.ToInt32(Math.Truncate(value * 0.08));
+                    break;
+                case "Proteção Nível 3":
+                    value = Convert.ToInt32(Math.Truncate(value * 0.15));
+                    break;
+            }
+
+            if (player.Money < value)
+            {
+                player.SendMessage(MessageType.Error, string.Format(Global.INSUFFICIENT_MONEY_ERROR_MESSAGE, value), notify: true);
+                return;
+            }
+
+            switch (name)
+            {
+                case "Proteção Nível 1":
+                    if (property.ProtectionLevel >= 1)
+                    {
+                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 1.", notify: true);
+                        return;
+                    }
+
+                    property.ProtectionLevel = 1;
+                    break;
+                case "Proteção Nível 2":
+                    if (property.ProtectionLevel >= 2)
+                    {
+                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 2.", notify: true);
+                        return;
+                    }
+
+                    property.ProtectionLevel = 2;
+                    break;
+                case "Proteção Nível 3":
+                    if (property.ProtectionLevel >= 3)
+                    {
+                        player.SendMessage(MessageType.Error, $"A propriedade já possui um nível de proteção igual ou maior que 3.", notify: true);
+                        return;
+                    }
+
+                    property.ProtectionLevel = 3;
+                    break;
+            }
+
+            await using var context = new DatabaseContext();
+            context.Properties.Update(property);
+            await context.SaveChangesAsync();
+
+            await player.RemoveStackedItem(ItemCategory.Money, value);
+            player.SendMessage(MessageType.Success, $"Você comprou {name}.", notify: true);
         }
     }
 }

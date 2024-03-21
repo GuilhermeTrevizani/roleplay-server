@@ -647,7 +647,7 @@ namespace TrevizaniRoleplay.Server.Commands
                 <tbody>";
 
             foreach (var x in veh.Damages)
-                html += $@"<tr><td>{x.Data}</td><td>{(WeaponModel)x.WeaponHash}</td><td>{x.BodyHealthDamage}</td><td>{x.AdditionalBodyHealthDamage}</td><td>{x.EngineHealthDamage}</td><td>{x.PetrolTankDamage}</td><td>{x.Attacker}</td><td>{x.Distance}</td></tr>";
+                html += $@"<tr><td>{x.Date}</td><td>{(WeaponModel)x.WeaponHash}</td><td>{x.BodyHealthDamage}</td><td>{x.AdditionalBodyHealthDamage}</td><td>{x.EngineHealthDamage}</td><td>{x.PetrolTankDamage}</td><td>{x.Attacker}</td><td>{x.Distance}</td></tr>";
 
             html += $@"
                 </tbody>
@@ -685,7 +685,7 @@ namespace TrevizaniRoleplay.Server.Commands
             }
             else if (veh.VehicleDB.Job != CharacterJob.None)
             {
-                dono = $"{veh.VehicleDB.Job.GetDisplay()} ({veh.NomeEncarregado}){{#FFFFFF}} | Término Aluguel: {{{Global.MAIN_COLOR}}}{veh.DataExpiracaoAluguel}";
+                dono = $"{veh.VehicleDB.Job.GetDisplay()} ({veh.NameInCharge}){{#FFFFFF}} | Término Aluguel: {{{Global.MAIN_COLOR}}}{veh.RentExpirationDate}";
             }
 
             player.SendMessage(MessageType.None, $"Veículo: {{{Global.MAIN_COLOR}}}{veh.VehicleDB.Id}{{#FFFFFF}} | Modelo: {{{Global.MAIN_COLOR}}}{veh.VehicleDB.Model}{{#FFFFFF}} | Proprietário: {{{Global.MAIN_COLOR}}}{dono}");

@@ -13,5 +13,34 @@
 
         public Faction? Faction { get; private set; }
         public Company? Company { get; private set; }
+
+        public void Create(string name, long hash, float posX, float posY, float posZ, Guid? factionId, Guid? companyId, bool locked)
+        {
+            Name = name;
+            Hash = hash;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            FactionId = factionId;
+            CompanyId = companyId;
+            Locked = locked;
+        }
+
+        public void Update(string name, long hash, float posX, float posY, float posZ, Guid? factionId, Guid? companyId, bool locked)
+        {
+            Name = name;
+            Hash = hash;
+            PosX = posX;
+            PosY = posY;
+            PosZ = posZ;
+            FactionId = factionId;
+            CompanyId = companyId;
+            Locked = locked;
+        }
+
+        public void SetLocked(bool locked)
+        {
+            Locked = locked;
+        }
     }
 }

@@ -126,8 +126,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                     htmlAPB += $@"<tr>
                             <td>{x.Id}</td>
                             <td>{x.Date}</td>
-                            <td>{x.PoliceOfficerCharacter.Name}</td>
-                            <td>{x.WantedCharacter.Name}</td>
+                            <td>{x.PoliceOfficerCharacter!.Name}</td>
+                            <td>{x.WantedCharacter!.Name}</td>
                             <td>{x.Reason}</td>
                             </tr>";
 
@@ -159,8 +159,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                     htmlBOLO += $@"<tr>
                             <td>{x.Id}</td>
                             <td>{x.Date}</td>
-                            <td>{x.PoliceOfficerCharacter.Name}</td>
-                            <td>{x.WantedVehicle.Model} {x.WantedVehicle.Plate}</td>
+                            <td>{x.PoliceOfficerCharacter!.Name}</td>
+                            <td>{x.WantedVehicle!.Model} {x.WantedVehicle.Plate}</td>
                             <td>{x.Reason}</td>
                             </tr>";
 
@@ -198,18 +198,12 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 foreach (var x in factionUnits)
                 {
-                    var characters = new List<Character>
-                    {
-                        x.Character
-                    };
-                    characters.AddRange(x.Characters.Select(y => y.Character));
-
                     html += $@"<tr>
                             <td>{x.Name}</td>
                             <td>{x.Description}</td>
                             <td>{x.Plate}</td>
                             <td>{x.InitialDate}</td>
-                            <td>{string.Join(", ", characters.Select(y => y.Name))}</td>
+                            <td>{string.Join(", ", x.Characters!.Select(y => y.Character!.Name))}</td>
                             <td class='text-center'>{(x.CharacterId == player.Character.Id ? $"<button id='btn-encerrarunidade{x.Id}' class='btn btn-dark btn-xs' onclick='encerrarUnidade({x.Id});'>Encerrar</button>" : string.Empty)}</td>
                             </tr>";
                 }
@@ -377,8 +371,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                         html += $@"<div class=""well"">Data: <strong>{x.Date}</strong> Policial: <strong>{x.PoliceOfficerCharacter?.Name ?? string.Empty}</strong> Itens: <br/>";
 
-                        foreach (var item in x.Items)
-                            html += $"<p>Nome: <strong>{item.Name}</strong> | Quantidade: <strong>{item.Quantity:N0}</strong>{(!string.IsNullOrWhiteSpace(item.Extra) ? $" | Extra: <strong>{Functions.GetItemExtra(item).Replace("<br/>", ", ")}</strong>" : string.Empty)}<p/>";
+                        foreach (var item in x.Items!)
+                            html += $"<p>Nome: <strong>{item.GetName()}</strong> | Quantidade: <strong>{item.Quantity:N0}</strong>{(!string.IsNullOrWhiteSpace(item.Extra) ? $" | Extra: <strong>{item.GetExtra().Replace("<br/>", ", ")}</strong>" : string.Empty)}<p/>";
 
                         html += $"<br/>{details}</div>";
                     }
@@ -411,7 +405,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     if (vehicle.Sold)
                         owner = "CONCESSIONÁRIA";
                     else
-                        owner = vehicle.Character.Name;
+                        owner = vehicle.Character!.Name;
 
                     var bolo = await context.Wanted.Where(x => x.WantedVehicleId == vehicle.Id && !x.DeletedDate.HasValue)
                         .Include(x => x.PoliceOfficerCharacter)
@@ -431,7 +425,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
                 else if (vehicle.FactionId.HasValue)
                 {
-                    owner = vehicle.Faction.Name;
+                    owner = vehicle.Faction!.Name;
                 }
 
                 html += $@"<div class='row'>
@@ -635,47 +629,43 @@ namespace TrevizaniRoleplay.Server.Scripts
         public void MDCRastrear911(MyPlayer player, string idString)
         {
             var id = new Guid(idString);
-            var ligacao911 = Global.EmergencyCalls.FirstOrDefault(x => x.Id == id);
-            if (ligacao911 == null)
+            var emergencyCall = Global.EmergencyCalls.FirstOrDefault(x => x.Id == id);
+            if (emergencyCall == null)
             {
                 player.SendMessage(MessageType.Error, Global.RECORD_NOT_FOUND, notify: true);
                 return;
             }
 
-            player.Emit("Server:SetWaypoint", ligacao911.PosX, ligacao911.PosY);
-            player.SendMessage(MessageType.Success, $"A localização da ligação de emergência #{codigo} foi marcada no seu GPS.", notify: true);
+            player.Emit("Server:SetWaypoint", emergencyCall.PosX, emergencyCall.PosY);
+            player.SendMessage(MessageType.Success, $"A localização da ligação de emergência foi marcada no seu GPS.", notify: true);
         }
 
         [AsyncClientEvent(nameof(MDCMultar))]
-        public async Task MDCMultar(MyPlayer player, string idString, string nome, int valor, string motivo)
+        public async Task MDCMultar(MyPlayer player, string idString, string nome, int value, string reason)
         {
             var id = new Guid(idString);
-            if (valor <= 0)
+            if (value <= 0)
             {
                 player.SendMessage(MessageType.Error, "Valor inválido.", notify: true);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(motivo) || motivo.Length > 255)
+            if (string.IsNullOrWhiteSpace(reason) || reason.Length > 255)
             {
                 player.SendMessage(MessageType.Error, "Motivo precisa ter entre 1 e 255 caracteres.", notify: true);
                 return;
             }
 
             await using var context = new DatabaseContext();
-            await context.Fines.AddAsync(new Fine()
-            {
-                Reason = motivo,
-                CharacterId = id,
-                PoliceOfficerCharacterId = player.Character.Id,
-                Value = valor,
-            });
+            var fine = new Fine();
+            fine.Create(id, player.Character.Id, reason, value);
+            await context.Fines.AddAsync(fine);
             await context.SaveChangesAsync();
 
-            player.SendMessage(MessageType.Success, $"Você multou {nome} por ${valor:N0}. Motivo: {motivo}", notify: true);
+            player.SendMessage(MessageType.Success, $"Você multou {nome} por ${value:N0}. Motivo: {reason}", notify: true);
 
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id && x.Cellphone > 0 && !x.CellphoneItem.FlightMode);
-            target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: Você recebeu uma multa de ${valor:N0}. Motivo: {motivo}", Global.CELLPHONE_MAIN_COLOR);
+            target?.SendMessage(MessageType.None, $"[CELULAR] SMS de {target.ObterNomeContato(Global.EMERGENCY_NUMBER)}: Você recebeu uma multa de ${value:N0}. Motivo: {reason}", Global.CELLPHONE_MAIN_COLOR);
 
             var html = await GetSearchPersonHTML(nome);
             foreach (var x in Global.SpawnedPlayers.Where(x => x.Character.FactionId == player.Character.FactionId))
@@ -695,10 +685,9 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
-            if (target != null)
-                target.Character.PoliceOfficerBlockedDriverLicenseCharacterId = player.Character.Id;
+            target?.Character.SetPoliceOfficerBlockedDriverLicenseCharacterId(player.Character.Id);
 
-            character.PoliceOfficerBlockedDriverLicenseCharacterId = player.Character.Id;
+            character.SetPoliceOfficerBlockedDriverLicenseCharacterId(player.Character.Id);
             context.Characters.Update(character);
             await context.SaveChangesAsync();
 
@@ -729,13 +718,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             if (Global.FactionsUnits.Any(x => x.CharacterId == player.Character.Id)
-                || Global.FactionsUnitsCharacters.Any(x => x.CharacterId == player.Character.Id))
+                || Global.FactionsUnits.SelectMany(x => x.Characters!).Any(x => x.CharacterId == player.Character.Id))
             {
                 player.Emit("Server:MostrarErro", "Você já está em uma unidade.", "btn-adicionarunidade");
                 return;
             }
 
-            var unidadesPersonagens = new List<MyPlayer>();
+            var factionUnitCharacters = new List<FactionUnitCharacter>();
             if (!string.IsNullOrWhiteSpace(parceiros))
             {
                 var personagens = (parceiros ?? string.Empty).Split(',').ToList();
@@ -761,50 +750,30 @@ namespace TrevizaniRoleplay.Server.Scripts
                     }
 
                     if (Global.FactionsUnits.Any(x => x.CharacterId == target.Character.Id)
-                        || Global.FactionsUnitsCharacters.Any(x => x.CharacterId == target.Character.Id))
+                        || Global.FactionsUnits.SelectMany(x => x.Characters!).Any(x => x.CharacterId == target.Character.Id))
                     {
                         player.Emit("Server:MostrarErro", $"ID {personagem} já está em uma unidade.", "btn-adicionarunidade");
                         return;
                     }
 
-                    unidadesPersonagens.Add(target);
+                    var factionUnitCharacter = new FactionUnitCharacter();
+                    factionUnitCharacter.Create(target.Character.Id);
                 }
             }
 
-            var factionUnit = new FactionUnit
-            {
-                CharacterId = player.Character.Id,
-                FactionId = player.Character.FactionId!.Value,
-                Name = nome,
-                Description = numeracao,
-                Plate = plate,
-            };
+            var factionUnit = new FactionUnit();
+            factionUnit.Create(nome, numeracao, player.Character.FactionId!.Value, player.Character.Id, plate, factionUnitCharacters);
 
             await using var context = new DatabaseContext();
             await context.FactionsUnits.AddAsync(factionUnit);
             await context.SaveChangesAsync();
 
-            factionUnit.Characters = [];
-
-            if (unidadesPersonagens.Count != 0)
-            {
-                var factionsUnitsCharacters = unidadesPersonagens.Select(x => new FactionUnitCharacter
-                {
-                    FactionUnitId = factionUnit.Id,
-                    CharacterId = x.Character.Id,
-                }).ToList();
-                await context.FactionsUnitsCharacters.AddRangeAsync(factionsUnitsCharacters);
-                await context.SaveChangesAsync();
-
-                foreach (var factionUnitCharacter in factionsUnitsCharacters)
-                    factionUnitCharacter.Character = unidadesPersonagens.FirstOrDefault(x => x.Character.Id == factionUnitCharacter.CharacterId)!.Character;
-
-                factionUnit.Characters = factionsUnitsCharacters;
-                Global.FactionsUnitsCharacters.AddRange(factionsUnitsCharacters);
-            }
-
-            factionUnit.Character = player.Character;
-            Global.FactionsUnits.Add(factionUnit);
+            Global.FactionsUnits = await context.FactionsUnits
+                .Where(x => !x.FinalDate.HasValue)
+                .Include(x => x.Character!)
+                .Include(x => x.Characters!)
+                    .ThenInclude(x => x.Character)
+                .ToListAsync();
 
             foreach (var target in Global.SpawnedPlayers.Where(x => x.Character.FactionId == player.Character.FactionId))
                 target.Emit("Server:AtualizarMDC", "btn-adicionarunidade", "div-unidades", GetFactionsUnitsHTML(player));
@@ -818,14 +787,13 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (factionUnit == null)
                 return;
 
-            factionUnit.FinalDate = DateTime.Now;
+            factionUnit.End();
 
             await using var context = new DatabaseContext();
             context.FactionsUnits.Update(factionUnit);
             await context.SaveChangesAsync();
 
             Global.FactionsUnits.Remove(factionUnit);
-            Global.FactionsUnitsCharacters.RemoveAll(x => x.FactionUnitId == factionUnit.Id);
 
             foreach (var target in Global.SpawnedPlayers.Where(x => x.Character.FactionId == player.Character.FactionId))
                 target.Emit("Server:AtualizarMDC", $"btn-encerrarunidade{factionUnit.Id}", "div-unidades", GetFactionsUnitsHTML(player));

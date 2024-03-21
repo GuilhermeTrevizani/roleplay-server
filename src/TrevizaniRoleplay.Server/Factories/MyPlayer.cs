@@ -238,15 +238,15 @@ namespace TrevizaniRoleplay.Server.Factories
                     var it = Items.FirstOrDefault(x => x.Category == item.Category);
                     if (it != null)
                     {
-                        it.Quantity += item.Quantity;
+                        it.SetQuantity(it.Quantity + item.Quantity);
                         context.CharactersItems.Update(it);
                         continue;
                     }
                 }
 
-                item.CharacterId = Character.Id;
-                item.Slot = Convert.ToInt16(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
-                    .FirstOrDefault(i => !Items.Any(x => x.Slot == i)));
+                item.SetCharacterId(Character.Id);
+                item.SetSlot(Convert.ToInt16(Enumerable.Range(1, Global.QUANTIDADE_SLOTS_INVENTARIO)
+                    .FirstOrDefault(i => !Items.Any(x => x.Slot == i))));
 
                 await context.CharactersItems.AddAsync(item);
 
@@ -346,7 +346,7 @@ namespace TrevizaniRoleplay.Server.Factories
                 SetPosition(Position, Dimension, true);
             }
 
-            Character.Wound = CharacterWound.None;
+            Character.SetWound(CharacterWound.None);
             SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, 0);
 
             if (!OnAdminDuty)
@@ -393,7 +393,7 @@ namespace TrevizaniRoleplay.Server.Factories
             SendMessage(MessageType.None, $"Seu ID é {{{Global.MAIN_COLOR}}}{SessionId}{{#FFFFFF}}.");
 
             if ((User.VIPValidDate ?? DateTime.MinValue) < DateTime.Now)
-                User.PMToggle = false;
+                User.SetPMToggle(false);
 
             ToggleGameControls(true);
             SetNametag();
@@ -403,17 +403,17 @@ namespace TrevizaniRoleplay.Server.Factories
             Invincible = false;
             Frozen = false;
             SetPosition(new Position(Character.PosX, Character.PosY, Character.PosZ), Character.Dimension, true);
-            Character.LastAccessDate = DateTime.Now;
+            Character.SetLastAccessDate();
             Emit("Server:setArtificialLightsState", Global.Parameter.Blackout);
             Health = Character.Health;
             Armor = Character.Armor;
             Emit("dl:Config", User.VehicleTagToggle);
 
-            var multas = await context.Fines.CountAsync(x => x.CharacterId == Character.Id && !x.PaymentDate.HasValue);
-            if (multas > 0)
+            var fines = await context.Fines.CountAsync(x => x.CharacterId == Character.Id && !x.PaymentDate.HasValue);
+            if (fines > 0)
             {
-                var strMultas = multas > 1 ? "s" : string.Empty;
-                SendMessage(MessageType.Error, $"Você possui {multas} multa{strMultas} pendente{strMultas}.");
+                var strFines = fines > 1 ? "s" : string.Empty;
+                SendMessage(MessageType.Error, $"Você possui {fines} multa{strFines} pendente{strFines}.");
             }
 
             if (Character.DriverLicenseValidDate.HasValue &&
@@ -451,10 +451,10 @@ namespace TrevizaniRoleplay.Server.Factories
                 try
                 {
                     Alt.Log($"Player Timer {Character.Id}");
-                    Character.ConnectedTime++;
+                    Character.AddConnectedTime();
 
                     if (OnAdminDuty)
-                        User.StaffDutyTime++;
+                        User.AddStaffDutyTime();
 
                     if (Character.ConnectedTime % 60 == 0)
                         await Paycheck(false);
@@ -498,7 +498,7 @@ namespace TrevizaniRoleplay.Server.Factories
                     if (t.IsCanceled)
                         return;
 
-                    Character.Wound = CharacterWound.CanHospitalCK;
+                    Character.SetWound(CharacterWound.CanHospitalCK);
                     SendMessage(MessageType.Error, "Digite /aceitarhospital para que você receba os cuidados dos médicos e seja levado ao hospital.");
                     SendMessage(MessageType.Error, "Digite /aceitarck para aplicar CK no seu personagem. (ATENÇÃO. ESSA OPERAÇÃO É IRREVERSÍVEL!)");
                     CancellationTokenSourceAceitarHospital = null;
@@ -510,7 +510,7 @@ namespace TrevizaniRoleplay.Server.Factories
 
             if (Character.Wound <= CharacterWound.SeriouslyInjuredInvincible)
             {
-                Character.Wound = CharacterWound.SeriouslyInjuredInvincible;
+                Character.SetWound(CharacterWound.SeriouslyInjuredInvincible);
                 StopAnimation();
                 SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, (int)Character.Wound);
                 SendMessage(MessageType.Error, "Você foi gravemente ferido. Você deverá ser socorrido em até 5 minutos ou você sofrerá um PK.");
@@ -521,7 +521,7 @@ namespace TrevizaniRoleplay.Server.Factories
                     if (t.IsCanceled)
                         return;
 
-                    Character.Wound = CharacterWound.SeriouslyInjured;
+                    Character.SetWound(CharacterWound.SeriouslyInjured);
                     CancellationTokenSourceSetarFerido = null;
                 });
             }
@@ -542,18 +542,8 @@ namespace TrevizaniRoleplay.Server.Factories
             if (Character.PersonalizationStep != CharacterPersonalizationStep.Ready)
                 return;
 
-            Character.Model = Model;
-            Character.PosX = Position.X;
-            Character.PosY = Position.Y;
-            Character.PosZ = Position.Z;
-            Character.Health = Health;
-            Character.Armor = Armor;
-            Character.Dimension = Dimension;
-            Character.LastAccessDate = User.LastAccessDate;
-            Character.IPLsJSON = Functions.Serialize(IPLs);
-            Character.PersonalizationJSON = Functions.Serialize(Personalization);
-            Character.WoundsJSON = Functions.Serialize(Wounds);
-            Character.FactionFlagsJSON = Functions.Serialize(FactionFlags);
+            Character.Update(Model, Position.X, Position.Y, Position.Z, Health, Armor, Dimension,
+                Functions.Serialize(IPLs), Functions.Serialize(Personalization), Functions.Serialize(Wounds), Functions.Serialize(FactionFlags));
             await using var context = new DatabaseContext();
             context.Characters.Update(Character);
             await context.SaveChangesAsync();
@@ -561,7 +551,7 @@ namespace TrevizaniRoleplay.Server.Factories
             context.CharactersItems.UpdateRange(Items);
             await context.SaveChangesAsync();
 
-            User.LastAccessDate = DateTime.Now;
+            User.SetLastAccessDate();
             await using var context2 = new DatabaseContext();
             context2.Users.Update(User);
             await context2.SaveChangesAsync();
@@ -784,7 +774,7 @@ namespace TrevizaniRoleplay.Server.Factories
         public void SendFactionMessage(string mensagem)
         {
             foreach (var x in Global.SpawnedPlayers.Where(x => x.Character.FactionId == Character.FactionId && !x.User.FactionToggle))
-                x.SendMessage(MessageType.None, mensagem, $"#{Faction.Color}");
+                x.SendMessage(MessageType.None, mensagem, $"#{Faction!.Color}");
         }
 
         public bool CheckAnimations(bool stopAnim = false, bool onlyInVehicle = false)
@@ -1019,7 +1009,7 @@ namespace TrevizaniRoleplay.Server.Factories
                 html += $"Staff: <strong>{User.Staff.GetDisplay()} [{(int)User.Staff}]</strong> | Tempo Serviço Administrativo (minutos): <strong>{User.StaffDutyTime}</strong> | SOSs Atendidos: <strong>{User.HelpRequestsAnswersQuantity}</strong><br/>";
 
             if (Faction != null)
-                html += $"Facção: <strong>{Faction.Name} [{Character.FactionId}]</strong> | Rank: <strong>{FactionRank.Name} [{Character.FactionRankId}]</strong>";
+                html += $"Facção: <strong>{Faction.Name} [{Character.FactionId}]</strong> | Rank: <strong>{FactionRank!.Name} [{Character.FactionRankId}]</strong>";
 
             html += $"<h4>História (aceito por {Character.EvaluatorStaffUserId})</h4> {Character.History}";
 
@@ -1097,7 +1087,7 @@ namespace TrevizaniRoleplay.Server.Factories
             Emit("SetPlayerCanDoDriveBy", status.HasValue ?
                 status
                 :
-                !((MyVehicle)Vehicle).TemJanelas || Vehicle.IsWindowOpened(seat));
+                !((MyVehicle)Vehicle).HasWindows || Vehicle.IsWindowOpened(seat));
         }
 
         public async Task<string> Paycheck(bool previa)
@@ -1167,8 +1157,8 @@ namespace TrevizaniRoleplay.Server.Factories
             {
                 descricaoPrevia = $"<h4>Prévia do Pagamento {(Global.Parameter.Paycheck > 1 ? $"(PAYCHECK {Global.Parameter.Paycheck}x)" : string.Empty)}</h4>";
 
-                if (Character.FactionId.HasValue && FactionRank.Salary > 0)
-                    descricaoPrevia += $"Salário {Faction.Name}: <strong>+ ${FactionRank.Salary:N0}</strong><br/>";
+                if (Character.FactionId.HasValue && FactionRank!.Salary > 0)
+                    descricaoPrevia += $"Salário {Faction!.Name}: <strong>+ ${FactionRank.Salary:N0}</strong><br/>";
 
                 if (salarioEmprego > 0)
                     descricaoPrevia += $"Salário Emprego: <strong>+ ${salarioEmprego:N0}</strong><br/>";
@@ -1191,18 +1181,18 @@ namespace TrevizaniRoleplay.Server.Factories
             {
                 if (poupanca > 0)
                 {
-                    Character.Savings += poupanca;
+                    Character.SetSavings(Character.Savings + poupanca);
 
                     var financialTransaction = new FinancialTransaction();
                     financialTransaction.Create(FinancialTransactionType.Deposit, Character.Id, poupanca, "Rendimento da Poupança");
 
                     await context.FinancialTransactions.AddAsync(financialTransaction);
 
-                    if (Character.Savings > 1000000)
+                    if (Character.Savings > Global.MAX_SAVINGS)
                     {
-                        var retiradaPoupanca = Character.Savings - 50000;
-                        Character.Bank += retiradaPoupanca;
-                        Character.Savings = 50000;
+                        var retiradaPoupanca = Character.Savings - Global.DEFAULT_SAVINGS;
+                        Character.AddBank(retiradaPoupanca);
+                        Character.SetSavings(Global.DEFAULT_SAVINGS);
 
                         var financialTransactionWithdraw = new FinancialTransaction();
                         financialTransactionWithdraw.Create(FinancialTransactionType.Withdraw, Character.Id, retiradaPoupanca, "Retirada Automática da Poupança");
@@ -1216,14 +1206,14 @@ namespace TrevizaniRoleplay.Server.Factories
                     }
                 }
 
-                Character.Bank += salario;
+                Character.AddBank(salario);
 
                 if (salario != 0)
                 {
                     SendMessage(MessageType.Title, $"Pagamento de {Character.Name} {(Global.Parameter.Paycheck > 1 ? $"(PAYCHECK {Global.Parameter.Paycheck}x)" : string.Empty)}");
 
-                    if (Character.FactionId.HasValue && FactionRank.Salary > 0)
-                        SendMessage(MessageType.None, $"Salário {Faction.Name}: {{{Global.SUCCESS_COLOR}}}+ ${FactionRank.Salary:N0}");
+                    if (Character.FactionId.HasValue && FactionRank!.Salary > 0)
+                        SendMessage(MessageType.None, $"Salário {Faction!.Name}: {{{Global.SUCCESS_COLOR}}}+ ${FactionRank.Salary:N0}");
 
                     if (salarioEmprego > 0)
                         SendMessage(MessageType.None, $"Salário Emprego: {{{Global.SUCCESS_COLOR}}}+ ${salarioEmprego:N0}");
@@ -1251,7 +1241,7 @@ namespace TrevizaniRoleplay.Server.Factories
                     await context.SaveChangesAsync();
                 }
 
-                Character.ExtraPayment = 0;
+                Character.ResetExtraPayment();
             }
 
             return descricaoPrevia;
@@ -1360,7 +1350,7 @@ namespace TrevizaniRoleplay.Server.Factories
             if (Masked && Character.Mask == 0)
             {
                 await using var context = new DatabaseContext();
-                Character.Mask = (await context.Characters.MaxAsync(x => x.Mask)) + 1;
+                Character.SetMask((await context.Characters.MaxAsync(x => x.Mask)) + 1);
                 context.Characters.Update(Character);
                 await context.SaveChangesAsync();
 
@@ -1523,15 +1513,20 @@ namespace TrevizaniRoleplay.Server.Factories
         {
             if (Faction?.Government ?? false)
             {
-                Character.Badge = 0;
                 Armor = 0;
                 await RemoveItem(Items.Where(x => !Functions.CanDropItem(Character.Sex, Faction, x)));
             }
 
             FactionFlags = [];
-            Character.FactionId = Character.FactionRankId = null;
+            Character.ResetFaction();
             OnDuty = false;
-            // Se tiver FactioNDutySession tem que dar end e salvar
+            if (FactionDutySession != null)
+            {
+                FactionDutySession.End();
+                await using var context = new DatabaseContext();
+                context.Sessions.Update(FactionDutySession);
+                await context.SaveChangesAsync();
+            }
         }
 
         public void SetNametagDamaged()
@@ -1654,9 +1649,7 @@ namespace TrevizaniRoleplay.Server.Factories
         {
             if (Character.DrugItemCategory.HasValue)
             {
-                Character.DrugItemCategory = null;
-                Character.DrugEndDate = null;
-                Character.ThresoldDeathEndDate = DateTime.Now.AddHours(1);
+                Character.SetThresoldDeathEndDate();
                 ClearDrugEffect();
                 SetupDrugTimer(false);
                 if (Health > MaxHealth)
@@ -1665,8 +1658,7 @@ namespace TrevizaniRoleplay.Server.Factories
             else
             {
                 DrugTimer?.Stop();
-                Character.ThresoldDeathEndDate = null;
-                Character.ThresoldDeath = 0;
+                Character.ClearDrug();
             }
         }
 

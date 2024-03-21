@@ -11,5 +11,10 @@
         {
             Slot = slot;
         }
+
+        public void SetCharacterId(Guid characterId)
+        {
+            CharacterId = characterId;
+        }
     }
 }

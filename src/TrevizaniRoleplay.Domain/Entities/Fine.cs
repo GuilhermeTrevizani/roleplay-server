@@ -12,5 +12,18 @@
 
         public Character? Character { get; private set; }
         public Character? PoliceOfficerCharacter { get; private set; }
+
+        public void Create(Guid characterId, Guid policeOfficerCharacterId, string reason, int value)
+        {
+            CharacterId = characterId;
+            Reason = reason;
+            PoliceOfficerCharacterId = policeOfficerCharacterId;
+            Value = value;
+        }
+
+        public void Pay()
+        {
+            PaymentDate = DateTime.Now;
+        }
     }
 }

@@ -57,6 +57,7 @@ namespace TrevizaniRoleplay.Domain.Entities
 
         public Character? Character { get; private set; }
         public Faction? Faction { get; private set; }
+        public ICollection<VehicleItem>? Items { get; private set; }
 
         public void Create(string model, string plate)
         {
@@ -98,6 +99,12 @@ namespace TrevizaniRoleplay.Domain.Entities
         public void SetSeizedValue(int value)
         {
             SeizedValue = value;
+        }
+
+        public void SetOwner(Guid characterId)
+        {
+            CharacterId = characterId;
+            Parked = false;
         }
     }
 }

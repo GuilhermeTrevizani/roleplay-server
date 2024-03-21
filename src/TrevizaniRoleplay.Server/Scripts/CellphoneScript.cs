@@ -193,7 +193,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Character.AnnouncementLastUseDate = DateTime.Now;
+            player.Character.SetAnnouncementLastUseDate();
             await player.RemoveStackedItem(ItemCategory.Money, Global.Parameter.AnnouncementValue);
 
             message = Functions.CheckFinalDot(message);

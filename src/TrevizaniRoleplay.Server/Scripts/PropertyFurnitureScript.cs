@@ -4,6 +4,7 @@ using AltV.Net.Data;
 using System.Numerics;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -14,7 +15,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [Command("mobilias")]
         public static void CMD_mobilias(MyPlayer player)
         {
-            var prop = Global.Properties.FirstOrDefault(x => x.Id == player.Dimension);
+            var prop = Global.Properties.FirstOrDefault(x => x.Number == player.Dimension);
             if (prop == null)
             {
                 player.SendMessage(MessageType.Error, "Você não está no interior de uma propriedade.");
@@ -42,7 +43,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 foreach (var furniture in property.Furnitures.OrderBy(x => player.Position.Distance(new Position(x.PosX, x.PosY, x.PosZ))))
                     html += $@"<tr class='pesquisaitem'>
                         <td>{furniture.Id}</td>
-                        <td>{furniture.ModelName}</td>
+                        <td>{furniture.GetModelName()}</td>
                         <td>X: {furniture.PosX} | Y: {furniture.PosY} | Z: {furniture.PosZ}</td>
                         <td>R: {furniture.RotR} | P: {furniture.RotP} | Y: {furniture.RotY}</td>
                         <td>{player.Position.Distance(new Position(furniture.PosX, furniture.PosY, furniture.PosZ))}</td>

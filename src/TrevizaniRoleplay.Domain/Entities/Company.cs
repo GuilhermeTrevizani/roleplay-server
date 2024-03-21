@@ -14,5 +14,23 @@
         public byte BlipColor { get; private set; }
 
         public ICollection<CompanyCharacter>? Characters { get; private set; }
+
+        public void Rent(Guid characterId)
+        {
+            CharacterId = characterId;
+            RenewRent();
+        }
+
+        public void Update(string color, ushort blipType, byte blipColor)
+        {
+            Color = color;
+            BlipType = Convert.ToUInt16(blipType);
+            BlipColor = Convert.ToByte(blipColor);
+        }
+
+        public void RenewRent()
+        {
+            RentPaymentDate = DateTime.Now.AddDays(7);
+        }
     }
 }

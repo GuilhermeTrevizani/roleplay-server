@@ -154,7 +154,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Preço {id} excluído.");
 
             var html = GetPricesHTML();
-            foreach (var target in Global.Players.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
+            foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Prices)))
                 target.Emit("StaffPrices", true, html);
         }
 
