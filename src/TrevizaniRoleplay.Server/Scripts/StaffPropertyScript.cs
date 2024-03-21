@@ -56,18 +56,19 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffPropertyGoto))]
-        public static void StaffPropertyGoto(MyPlayer player, int id)
+        public static void StaffPropertyGoto(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var property = Global.Properties.FirstOrDefault(x => x.Id == id);
             if (property == null)
                 return;
 
             player.LimparIPLs();
-            player.SetPosition(new Position(property.EntrancePosX, property.EntrancePosY, property.EntrancePosZ), property.Dimension, false);
+            player.SetPosition(new Position(property.EntrancePosX, property.EntrancePosY, property.EntrancePosZ), property.Number, false);
         }
 
         [AsyncClientEvent(nameof(StaffPropertySave))]
-        public static async Task StaffPropertySave(MyPlayer player, int id, int interior, int value, int dimension, Vector3 pos, string address)
+        public static async Task StaffPropertySave(MyPlayer player, string idString, int interior, int value, int dimension, Vector3 pos, string address)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Properties))
             {
@@ -88,6 +89,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var property = new Property();
+            var id = new Guid(idString);
             if (id > 0)
                 property = Global.Properties.FirstOrDefault(x => x.Id == id);
             else
@@ -134,7 +136,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffPropertyRemove))]
-        public static async Task StaffPropertyRemove(MyPlayer player, int id)
+        public static async Task StaffPropertyRemove(MyPlayer player, string idString)
         {
             try
             {
@@ -144,10 +146,11 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
+                var id = new Guid(idString);
                 var property = Global.Properties.FirstOrDefault(x => x.Id == id);
                 if (property != null)
                 {
-                    if (property.CharacterId > 0)
+                    if (property.CharacterId.HasValue)
                     {
                         player.EmitStaffShowMessage($"Propriedade {id} possui um dono.");
                         return;
@@ -157,7 +160,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     context.Properties.Remove(property);
                     await context.SaveChangesAsync();
 
-                    if (property.Items.Count != 0)
+                    if (property.Items!.Count != 0)
                     {
                         foreach (var propertyItem in property.Items)
                             context.PropertiesItems.Remove(propertyItem);

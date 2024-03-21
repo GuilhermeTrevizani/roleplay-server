@@ -668,7 +668,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (tipo == 0)
             {
-                player.Character.PersonalizationStep = CharacterPersonalizationStep.Ready;
+                player.Character.SetPersonalizationStep(CharacterPersonalizationStep.Ready);
                 await using var context = new DatabaseContext();
                 context.Characters.Update(player.Character);
                 await context.SaveChangesAsync();
@@ -700,8 +700,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (tipo == 0)
             {
-                player.Character.PersonalizationJSON = strPersonalizacao;
-                player.Character.PersonalizationStep = CharacterPersonalizationStep.Tattoos;
+                player.Character.SetPersonalizationStep(CharacterPersonalizationStep.Tattoos);
+                player.Character.SetPersonalizationJSON(strPersonalizacao);
                 await using var context = new DatabaseContext();
                 context.Characters.Update(player.Character);
                 await context.SaveChangesAsync();
@@ -1232,16 +1232,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.User.TimeStampToggle = timeStamp;
-            player.User.VehicleTagToggle = dl;
-            player.User.AnnouncementToggle = anuncios;
-            player.User.PMToggle = pm;
-            player.User.FactionChatToggle = chatFaccao;
-            player.User.StaffChatToggle = chatStaff;
-            player.User.ChatFontType = tipoFonteChat;
-            player.User.ChatLines = linhasChat;
-            player.User.ChatFontSize = tamanhoFonteChat;
-            player.User.FactionToggle = faction;
+            player.User.UpdateSettings(timeStamp, dl, anuncios, pm, chatFaccao, chatStaff, tipoFonteChat, linhasChat, tamanhoFonteChat, faction);
             player.ConfigurarChat();
             player.Emit("dl:Config", player.User.VehicleTagToggle);
             player.SendMessage(MessageType.Success, "Configurações gravadas com sucesso.", notify: true);
@@ -1303,9 +1294,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             if (!string.IsNullOrWhiteSpace(headShot))
             {
-                player.Character.Image = headShot;
-                player.Character.DriverLicenseValidDate = DateTime.Now.AddMonths(3);
-                player.Character.PoliceOfficerBlockedDriverLicenseCharacterId = null;
+                player.Character.SetDriverLicense(headShot);
 
                 await player.Save();
 
@@ -1478,23 +1467,14 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                confiscationItems.Add(new ConfiscationItem
-                {
-                    Id = it.Id,
-                    Category = it.Category,
-                    Type = it.Type,
-                    Quantity = item.Quantity,
-                    Extra = it.Extra,
-                });
+                var confiscationItem = new ConfiscationItem();
+                confiscationItem.Create(it.Category, it.Type, item.Quantity, it.Extra);
+
+                confiscationItems.Add(confiscationItem);
             }
 
-            var confiscation = new Confiscation
-            {
-                CharacterId = character.Id,
-                PoliceOfficerCharacterId = player.Character.Id,
-                FactionId = player.Faction.Id,
-                Items = confiscationItems,
-            };
+            var confiscation = new Confiscation();
+            confiscation.Create(character.Id, player.Character.Id, player.Faction!.Id, confiscationItems);
 
             await context.Confiscations.AddAsync(confiscation);
             await context.SaveChangesAsync();
@@ -1543,8 +1523,8 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             if (!estudio)
             {
-                player.Character.PersonalizationJSON = Functions.Serialize(player.Personalization);
-                player.Character.PersonalizationStep = CharacterPersonalizationStep.Clothes;
+                player.Character.SetPersonalizationStep(CharacterPersonalizationStep.Clothes);
+                player.Character.SetPersonalizationJSON(Functions.Serialize(player.Personalization));
                 await using var context = new DatabaseContext();
                 context.Characters.Update(player.Character);
                 await context.SaveChangesAsync();
@@ -1578,19 +1558,20 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (item == null)
                 return;
 
-            item.AudioSpot ??= new AudioSpot
+            var audioSpot = item.GetAudioSpot();
+            audioSpot ??= new AudioSpot
             {
                 Position = new Vector3(item.PosX, item.PosY, item.PosZ),
                 Dimension = item.Dimension,
             };
 
-            if (item.AudioSpot.Source != url)
-                item.AudioSpot.RemoveAllClients();
+            if (audioSpot.Source != url)
+                audioSpot.RemoveAllClients();
 
-            item.AudioSpot.Source = url;
-            item.AudioSpot.Volume = volume;
+            audioSpot.Source = url;
+            audioSpot.Volume = volume;
 
-            item.AudioSpot.SetupAllClients();
+            audioSpot.SetupAllClients();
 
             player.SendMessageToNearbyPlayers($"configura a boombox.", MessageCategory.Ame, 5);
         }
@@ -1602,11 +1583,11 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (item == null)
                 return;
 
-            if (item.AudioSpot != null)
+            var audioSpot = item.GetAudioSpot();
+            if (audioSpot != null)
             {
-                item.AudioSpot.RemoveAllClients();
+                audioSpot.RemoveAllClients();
                 player.SendMessageToNearbyPlayers($"desliga a boombox.", MessageCategory.Ame, 5);
-                item.AudioSpot = null;
             }
         }
 
@@ -1651,7 +1632,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 {
                     case 1:
                         var emergencyCall = Functions.Deserialize<EmergencyCall>(player.AreaNameJSON);
-                        emergencyCall.Location = areaName;
+                        emergencyCall.SetLocation(areaName);
 
                         await context.EmergencyCalls.AddAsync(emergencyCall);
                         await context.SaveChangesAsync();
@@ -1660,7 +1641,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                         break;
                     case 2:
                         var emergencyCall2 = Functions.Deserialize<EmergencyCall>(player.AreaNameJSON);
-                        emergencyCall2.Location = areaName;
+                        emergencyCall2.SetLocation(areaName);
 
                         await context.EmergencyCalls.AddAsync(emergencyCall2);
                         await context.SaveChangesAsync();

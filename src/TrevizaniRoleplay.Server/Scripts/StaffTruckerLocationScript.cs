@@ -26,7 +26,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffTruckerLocationGoto))]
-        public static void StaffTruckerLocationGoto(MyPlayer player, int id)
+        public static void StaffTruckerLocationGoto(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
             {
@@ -34,6 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
             if (truckerLocation == null)
                 return;
@@ -44,7 +45,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffTruckerLocationRemove))]
-        public static async Task StaffTruckerLocationRemove(MyPlayer player, int id)
+        public static async Task StaffTruckerLocationRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
             {
@@ -52,6 +53,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
             if (truckerLocation == null)
                 return;
@@ -74,7 +76,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffTruckerLocationSave))]
-        public static async Task StaffTruckerLocationSave(MyPlayer player, int id, string name, Vector3 pos,
+        public static async Task StaffTruckerLocationSave(MyPlayer player, string idString, string name, Vector3 pos,
             int deliveryValue, int loadWaitTime, int unloadWaitTime, string allowedVehiclesJSON)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
@@ -117,6 +119,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
+            var id = new Guid(idString);
             var truckerLocation = new TruckerLocation();
             if (id > 0)
                 truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
@@ -154,7 +157,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffTruckerLocationsDeliveriesShow))]
-        public static void StaffTruckerLocationsDeliveriesShow(MyPlayer player, int truckerLocationId)
+        public static void StaffTruckerLocationsDeliveriesShow(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
             {
@@ -164,14 +167,15 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
 
+            var id = new Guid(idString);
             player.Emit("StaffTruckerLocationsDeliveries",
                 false,
-                GetTruckerLocationsDeliverysHTML(truckerLocationId),
-                truckerLocationId);
+                GetTruckerLocationsDeliverysHTML(id),
+                idString);
         }
 
         [ClientEvent(nameof(StaffTruckerLocationDeliveryGoto))]
-        public static void StaffTruckerLocationDeliveryGoto(MyPlayer player, int id)
+        public static void StaffTruckerLocationDeliveryGoto(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.TruckerLocations))
             {
@@ -179,6 +183,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == id);
             if (truckerLocationDelivery == null)
                 return;

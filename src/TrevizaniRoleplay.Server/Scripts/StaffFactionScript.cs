@@ -196,11 +196,12 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await using var context = new DatabaseContext();
 
+            var factionRanks = Global.FactionsRanks.Where(x => x.FactionId == factionId);
             var ranks = Functions.Deserialize<List<FactionRank>>(ranksJSON);
             foreach (var rank in ranks)
             {
-                var factionRank = Global.FactionsRanks.FirstOrDefault(x => x.Id == rank.Id);
-                factionRank.Position = rank.Position;
+                var factionRank = factionRanks.FirstOrDefault(x => x.Id == rank.Id);
+                factionRank.SetPosition(rank.Position);
                 context.FactionsRanks.Update(factionRank);
             }
 
@@ -356,10 +357,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == character.Id);
             if (target != null)
             {
-                target.Character.FactionRankId = factionRankId;
-                target.Character.Badge = badge;
+                target.Character.UpdateFaction(factionRankId, Functions.Serialize(factionFlags), badge);
                 target.FactionFlags = factionFlags;
-                target.Character.FactionFlagsJSON = Functions.Serialize(target.FactionFlags);
                 target.SendMessage(MessageType.Success, $"{player.User.Name} alterou suas informações na facção.");
                 await target.Save();
             }

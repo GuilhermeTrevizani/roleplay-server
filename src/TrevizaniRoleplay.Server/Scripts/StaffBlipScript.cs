@@ -25,8 +25,9 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [ClientEvent(nameof(StaffBlipGoto))]
-        public static void StaffBlipGoto(MyPlayer player, int id)
+        public static void StaffBlipGoto(MyPlayer player, string idString)
         {
+            var id = new Guid(idString);
             var blip = Global.Blips.FirstOrDefault(x => x.Id == id);
             if (blip == null)
                 return;
@@ -36,7 +37,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffBlipSave))]
-        public static async Task StaffBlipSave(MyPlayer player, int id, string name, Vector3 pos, int type, int color)
+        public static async Task StaffBlipSave(MyPlayer player, string idString, string name, Vector3 pos, int type, int color)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Blips))
             {
@@ -56,20 +57,28 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
+            var isNew = string.IsNullOrWhiteSpace(idString);
             var blip = new Blip();
-            if (id > 0)
+            if (isNew)
+            {
+                blip.Create(name, pos.X, pos.Y, pos.Z, Convert.ToUInt16(type), Convert.ToByte(color));
+            }
+            else
+            {
                 blip = Global.Blips.FirstOrDefault(x => x.Id == id);
+                if (blip == null)
+                {
+                    player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
+                    return;
+                }
 
-            blip.Name = name;
-            blip.PosX = pos.X;
-            blip.PosY = pos.Y;
-            blip.PosZ = pos.Z;
-            blip.Type = Convert.ToUInt16(type);
-            blip.Color = Convert.ToByte(color);
+                blip.Update(name, pos.X, pos.Y, pos.Z, Convert.ToUInt16(type), Convert.ToByte(color));
+            }
 
             await using var context = new DatabaseContext();
 
-            if (blip.Id == 0)
+            if (isNew)
                 await context.Blips.AddAsync(blip);
             else
                 context.Blips.Update(blip);
@@ -78,10 +87,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             blip.CreateIdentifier();
 
-            if (id == 0)
+            if (isNew)
                 Global.Blips.Add(blip);
 
-            player.EmitStaffShowMessage($"Blip {(id == 0 ? "criado" : "editado")}.", true);
+            player.EmitStaffShowMessage($"Blip {(isNew ? "criado" : "editado")}.", true);
 
             await player.GravarLog(LogType.Staff, $"Gravar Blip | {Functions.Serialize(blip)}", null);
 
@@ -91,7 +100,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffBlipRemove))]
-        public static async Task StaffBlipRemove(MyPlayer player, int id)
+        public static async Task StaffBlipRemove(MyPlayer player, string idString)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Blips))
             {
@@ -99,6 +108,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var blip = Global.Blips.FirstOrDefault(x => x.Id == id);
             if (blip != null)
             {

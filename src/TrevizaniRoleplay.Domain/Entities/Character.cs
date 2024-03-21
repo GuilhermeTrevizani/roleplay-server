@@ -304,5 +304,22 @@ namespace TrevizaniRoleplay.Domain.Entities
         {
             PoliceOfficerBlockedDriverLicenseCharacterId = id;
         }
+
+        public void SetPersonalizationStep(CharacterPersonalizationStep step)
+        {
+            PersonalizationStep = step;
+        }
+
+        public void SetPersonalizationJSON(string json)
+        {
+            PersonalizationJSON = json;
+        }
+
+        public void SetDriverLicense(string image)
+        {
+            Image = image;
+            DriverLicenseValidDate = DateTime.Now.AddMonths(3);
+            PoliceOfficerBlockedDriverLicenseCharacterId = null;
+        }
     }
 }

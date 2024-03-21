@@ -21,5 +21,10 @@ namespace TrevizaniRoleplay.Domain.Entities
             Message = message;
             Location = location;
         }
+
+        public void SetLocation(string location)
+        {
+            Location = location;
+        }
     }
 }

@@ -12,5 +12,13 @@
         public Character? PoliceOfficerCharacter { get; private set; }
         public Faction? Faction { get; private set; }
         public ICollection<ConfiscationItem>? Items { get; private set; }
+
+        public void Create(Guid characterId, Guid policeOfficerCharacterid, Guid factionId, ICollection<ConfiscationItem> items)
+        {
+            CharacterId = characterId;
+            PoliceOfficerCharacterId = policeOfficerCharacterid;
+            FactionId = factionId;
+            Items = items;
+        }
     }
 }

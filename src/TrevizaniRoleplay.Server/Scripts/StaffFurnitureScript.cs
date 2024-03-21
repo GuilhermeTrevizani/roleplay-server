@@ -22,7 +22,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffFurnitureSave))]
-        public static async Task StaffFurnitureSave(MyPlayer player, int id, string category, string name, string model, int value)
+        public static async Task StaffFurnitureSave(MyPlayer player, string idString, string category, string name, string model, int value)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Furnitures))
             {
@@ -36,6 +36,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
+            var id = new Guid(idString);
             var furniture = new Furniture();
             if (id > 0)
                 furniture = Global.Furnitures.FirstOrDefault(x => x.Id == id);

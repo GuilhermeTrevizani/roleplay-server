@@ -132,5 +132,20 @@ namespace TrevizaniRoleplay.Domain.Entities
         {
             NameChanges--;
         }
+
+        public void UpdateSettings(bool timeStampToggle, bool vehicleTagToggle, bool announcementToggle, bool pmToggle,
+            bool factionChatToggle, bool staffChatToggle, int chatFontType, int chatLines, int chatFontSize, bool factionToggle)
+        {
+            TimeStampToggle = timeStampToggle;
+            VehicleTagToggle = vehicleTagToggle;
+            AnnouncementToggle = announcementToggle;
+            PMToggle = pmToggle;
+            FactionChatToggle = factionChatToggle;
+            StaffChatToggle = staffChatToggle;
+            ChatFontType = chatFontType;
+            ChatLines = chatLines;
+            ChatFontSize = chatFontSize;
+            FactionToggle = factionToggle;
+        }
     }
 }

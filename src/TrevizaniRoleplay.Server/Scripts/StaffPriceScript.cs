@@ -34,7 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         }
 
         [AsyncClientEvent(nameof(StaffPriceSave))]
-        public static async Task StaffPriceSave(MyPlayer player, int id, int type, string name, float value)
+        public static async Task StaffPriceSave(MyPlayer player, string idString, int type, string name, float value)
         {
             if (!player.StaffFlags.Contains(StaffFlag.Prices))
             {
@@ -97,6 +97,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
+            var id = new Guid(idString);
             if (Global.Prices.Any(x => x.Id != id && x.Type == priceType && x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)))
             {
                 player.EmitStaffShowMessage($"Já existe um preço do tipo {priceType.GetDisplay()} com o nome {name}.");

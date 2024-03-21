@@ -113,10 +113,10 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (DateTime.TryParse(stringFinalDate, out DateTime finalDate))
                 query = query.Where(x => x.Date <= finalDate);
 
-            if (int.TryParse(strOriginCharacter, out int originCharacterId))
+            if (Guid.TryParse(strOriginCharacter, out Guid originCharacterId))
                 query = query.Where(x => x.OriginCharacterId == originCharacterId);
 
-            if (int.TryParse(strTargetCharacter, out int targetCharacterId))
+            if (Guid.TryParse(strTargetCharacter, out Guid targetCharacterId))
                 query = query.Where(x => x.TargetCharacterId == targetCharacterId);
 
             if (!string.IsNullOrWhiteSpace(description))
@@ -156,7 +156,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             await using var context = new DatabaseContext();
             User? user;
-            if (int.TryParse(search, out int id))
+            if (Guid.TryParse(search, out Guid id))
                 user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
             else
                 user = await context.Users.FirstOrDefaultAsync(x => x.Name.ToLower() == search.ToLower());
@@ -171,11 +171,11 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             var htmlFlags = string.Empty;
             foreach (var flag in Enum.GetValues(typeof(StaffFlag)).Cast<StaffFlag>())
-                htmlFlags += $@"<option value='{(int)flag}' {(staffFlags.Contains(flag) ? "selected" : string.Empty)}>{Functions.GetEnumDisplay(flag)}</option>";
+                htmlFlags += $@"<option value='{(int)flag}' {(staffFlags.Contains(flag) ? "selected" : string.Empty)}>{flag.GetDisplay()}</option>";
 
             var htmlStaff = string.Empty;
             foreach (var staff in Enum.GetValues(typeof(UserStaff)).Cast<UserStaff>())
-                htmlStaff += $@"<option value='{(int)staff}' {(user.Staff == staff ? "selected" : string.Empty)}>{Functions.GetEnumDisplay(staff)}</option>";
+                htmlStaff += $@"<option value='{(int)staff}' {(user.Staff == staff ? "selected" : string.Empty)}>{staff.GetDisplay()}</option>";
 
             var htmlSave = string.Empty;
             if (player.User.Staff >= UserStaff.HeadAdministrator)
@@ -349,7 +349,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             await using var context = new DatabaseContext();
             Character? character;
-            if (int.TryParse(search, out int id))
+            if (Guid.TryParse(search, out Guid id))
                 character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             else
                 character = await context.Characters.FirstOrDefaultAsync(x => x.Name.ToLower() == search.ToLower());
@@ -371,8 +371,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             {
                 var user = await context.Users.FirstOrDefaultAsync(x => x.Id == character.UserId);
 
-                html += $@"OOC: <strong>{user.Name} [{user.Id}]</strong> | Registro: <strong>{character.RegisterDate}</strong> | VIP: <strong>{Functions.GetEnumDisplay(user.VIP)} {(user.VIPValidDate.HasValue ? $"- {(user.VIPValidDate < DateTime.Now ? "Expirado" : "Expira")} em {user.VIPValidDate}" : string.Empty)}</strong><br/>
-                Tempo Conectado (minutos): <strong>{character.ConnectedTime}</strong> | Emprego: <strong>{Functions.GetEnumDisplay(character.Job)}</strong> | Trocas de Nome: <strong>{user.NameChanges} {(character.NameChangeStatus == CharacterNameChangeStatus.Blocked ? "(BLOQUEADO)" : string.Empty)}</strong> | Trocas de Nome Fórum: <strong>{user.ForumNameChanges}</strong> | Trocas de Placa: <strong>{user.PlateChanges}</strong><br/>
+                html += $@"OOC: <strong>{user.Name} [{user.Id}]</strong> | Registro: <strong>{character.RegisterDate}</strong> | VIP: <strong>{user.VIP.GetDisplay()} {(user.VIPValidDate.HasValue ? $"- {(user.VIPValidDate < DateTime.Now ? "Expirado" : "Expira")} em {user.VIPValidDate}" : string.Empty)}</strong><br/>
+                Tempo Conectado (minutos): <strong>{character.ConnectedTime}</strong> | Emprego: <strong>{character.Job.GetDisplay()}</strong> | Trocas de Nome: <strong>{user.NameChanges} {(character.NameChangeStatus == CharacterNameChangeStatus.Blocked ? "(BLOQUEADO)" : string.Empty)}</strong> | Trocas de Nome Fórum: <strong>{user.ForumNameChanges}</strong> | Trocas de Placa: <strong>{user.PlateChanges}</strong><br/>
                 Banco: <strong>${character.Bank:N0}</strong> | Poupança: <strong>${character.Savings:N0}</strong><br/>";
 
                 if (character.FactionId.HasValue)
@@ -389,7 +389,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 if (itens.Count != 0)
                 {
                     foreach (var item in itens)
-                        html += $"Código: <strong>{item.Id}</strong> | Nome: <strong>{item.Name}</strong> | Quantidade: <strong>{item.Quantity:N0}</strong>{(!string.IsNullOrWhiteSpace(item.Extra) ? $" | Extra: <strong>{Functions.GetItemExtra(item).Replace("<br/>", ", ")}</strong>" : string.Empty)}<br/>";
+                        html += $"Código: <strong>{item.Id}</strong> | Nome: <strong>{item.GetName()}</strong> | Quantidade: <strong>{item.Quantity:N0}</strong>{(!string.IsNullOrWhiteSpace(item.Extra) ? $" | Extra: <strong>{item.GetExtra().Replace("<br/>", ", ")}</strong>" : string.Empty)}<br/>";
                 }
                 else
                 {
@@ -510,14 +510,14 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var ban = await context.Banishments.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
-            if (ban != null)
+            var banishment = await context.Banishments.FirstOrDefaultAsync(x => x.CharacterId == character.Id);
+            if (banishment != null)
             {
                 player.EmitStaffShowMessage($"Personagem {id} já está banido.");
                 return;
             }
 
-            ban = new Banishment
+            banishment = new Banishment
             {
                 ExpirationDate = days > 0 ? DateTime.Now.AddDays(days) : null,
                 Reason = reason,
@@ -526,7 +526,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 StaffUserId = player.User.Id,
             };
 
-            await context.Banishments.AddAsync(ban);
+            await context.Banishments.AddAsync(banishment);
 
             await context.Punishments.AddAsync(new Punishment
             {
