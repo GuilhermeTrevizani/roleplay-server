@@ -171,7 +171,6 @@ namespace TrevizaniRoleplay.Server
             Global.Properties = await context.Properties
                 .Include(x => x.Items)
                 .Include(x => x.Furnitures!)
-                    .ThenInclude(x => x.Property)
                 .ToListAsync();
             foreach (var property in Global.Properties)
             {
