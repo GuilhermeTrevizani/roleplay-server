@@ -27,7 +27,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(StaffBlipGoto))]
         public static void StaffBlipGoto(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var blip = Global.Blips.FirstOrDefault(x => x.Id == id);
             if (blip == null)
                 return;
@@ -57,7 +57,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             var blip = new Blip();
             if (isNew)
@@ -108,7 +108,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var blip = Global.Blips.FirstOrDefault(x => x.Id == id);
             if (blip != null)
             {

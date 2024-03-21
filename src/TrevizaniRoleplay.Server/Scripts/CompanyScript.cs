@@ -14,7 +14,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(CompanySave))]
         public static async Task CompanySave(MyPlayer player, string idString, string color, int blipType, int blipColor)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company?.CharacterId != player.Character.Id)
                 return;
@@ -52,7 +52,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(CompanyEmployees))]
         public static async Task CompanyEmployees(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
@@ -78,7 +78,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(CompanyOpenClose))]
         public static async Task CompanyOpenClose(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
@@ -111,7 +111,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(CompanyAnnounce))]
         public static async Task CompanyAnnounce(MyPlayer player, string idString, string message)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;

@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrevizaniRoleplay.Domain", "src\TrevizaniRoleplay.Domain\TrevizaniRoleplay.Domain.csproj", "{55D683E7-8444-4FB9-84BD-D83F9A764651}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrevizaniRoleplay.Infra", "src\TrevizaniRoleplay.Infra\TrevizaniRoleplay.Infra.csproj", "{EE81CCD5-4DF9-440D-A692-D711EA962DD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrevizaniRoleplay.Infra", "src\TrevizaniRoleplay.Infra\TrevizaniRoleplay.Infra.csproj", "{EE81CCD5-4DF9-440D-A692-D711EA962DD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -57,6 +57,7 @@ namespace TrevizaniRoleplay.Server
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             optionsBuilder.UseNpgsql(Global.DbConnectionString)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging();
         }

@@ -1,30 +1,33 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="utf-8" />
-	<link rel="stylesheet" href="../resources/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="players.css" />
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="../resources/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="players.css" />
 </head>
+
 <body>
-	<div id="title" class="playerListTitle"></div>
-	<div class="playerList" style='max-height:70vh;overflow-y:auto'>
-		<table class="table">
-			<thead>
-				<tr>
-					<th scope="col" width="10%">ID</th>
-					<th scope="col" width="75%">Nome</th>
-					<th scope="col" width="20%">RTT</th>
-				</tr>
-			</thead>
-			<tbody class="playerBody" id="onlineplayers">
-				<tr>
-					<td colspan="3" style="text-align:center;">Carregando...</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div id="bottom" class="playerListBottom">Carregando...</div>
-    <script src="../resources/js/jquery.min.js"></script>
-    <script src="players.js" defer></script>
+  <div id="title" class="playerListTitle"></div>
+  <div class="playerList" style='max-height:70vh;overflow-y:auto'>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" width="10%">ID</th>
+          <th scope="col" width="75%">Nome</th>
+          <th scope="col" width="20%">RTT</th>
+        </tr>
+      </thead>
+      <tbody class="playerBody" id="onlineplayers">
+        <tr>
+          <td colspan="3" style="text-align:center;">Carregando...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="bottom" class="playerListBottom">Carregando...</div>
+  <script src="../resources/js/jquery.min.js"></script>
+  <script src="players.js" defer></script>
 </body>
+
 </html>

@@ -1,16 +1,16 @@
 Vue.component('tab-overlays', {
-    props: ['data'],
-    methods: {
-        handleChange(e, parameter, index) {
-            const value = parseFloat(e.target.value);
-            this.data.info.OpacityOverlays[index][parameter] = value;
-            this.$root.$emit('updateCharacter');
-        },
-        getOverlayColorCount() {
-            return 63;
-        }
+  props: ['data'],
+  methods: {
+    handleChange(e, parameter, index) {
+      const value = parseFloat(e.target.value);
+      this.data.info.OpacityOverlays[index][parameter] = value;
+      this.$root.$emit('updateCharacter');
     },
-    template: `
+    getOverlayColorCount() {
+      return 63;
+    }
+  },
+  template: `
         <div class="options">
             <div v-for="(name, i) in opacityOverlays" :key="i" class="option">
                 <div class="labelContainer">

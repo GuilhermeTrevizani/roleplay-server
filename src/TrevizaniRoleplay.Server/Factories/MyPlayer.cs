@@ -300,7 +300,7 @@ namespace TrevizaniRoleplay.Server.Factories
         {
             Dimension = dimension;
             if (spawn)
-                Spawn(position, 0);
+                Spawn(position);
             else
                 Position = position;
 
@@ -381,6 +381,16 @@ namespace TrevizaniRoleplay.Server.Factories
         public async Task Spawnar()
         {
             await using var context = new DatabaseContext();
+
+            var qtdOnline = Global.SpawnedPlayers.Count();
+            if (qtdOnline > Global.Parameter.MaxCharactersOnline)
+            {
+                Global.Parameter.SetMaxCharactersOnline(qtdOnline);
+                context.Parameters.Update(Global.Parameter);
+                await context.SaveChangesAsync();
+                await Functions.SendStaffMessage($"O novo recorde de jogadores online é: {Global.Parameter.MaxCharactersOnline}.", true, true);
+            }
+
             LoginSession = new();
             LoginSession.Create(Character.Id, SessionType.Login);
             await context.Sessions.AddAsync(LoginSession);
@@ -402,7 +412,6 @@ namespace TrevizaniRoleplay.Server.Factories
             ConfigurarChat();
             SetStreamSyncedMetaData(Constants.PLAYER_META_DATA_INJURED, 0);
             Invincible = false;
-            Frozen = false;
             SetPosition(new Position(Character.PosX, Character.PosY, Character.PosZ), Character.Dimension, true);
             Character.SetLastAccessDate();
             Emit("Server:setArtificialLightsState", Global.Parameter.Blackout);
@@ -553,9 +562,8 @@ namespace TrevizaniRoleplay.Server.Factories
             await context.SaveChangesAsync();
 
             User.SetLastAccessDate();
-            await using var context2 = new DatabaseContext();
-            context2.Users.Update(User);
-            await context2.SaveChangesAsync();
+            context.Users.Update(User);
+            await context.SaveChangesAsync();
         }
 
         public void SendMessage(MessageType tipoMensagem, string mensagem, string cor = "#FFFFFF", bool notify = false)
@@ -876,7 +884,7 @@ namespace TrevizaniRoleplay.Server.Factories
         {
             try
             {
-                if (Character.PersonalizationStep != CharacterPersonalizationStep.Ready)
+                if (Character?.PersonalizationStep != CharacterPersonalizationStep.Ready)
                     return;
 
                 Timer?.Stop();

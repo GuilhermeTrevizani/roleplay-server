@@ -92,39 +92,13 @@ if ('alt' in window) {
   });
 }
 
-$(document).keyup((e) => {
-  if (e.which === 27)
-    closeView();
-});
-
-$("#searchMembers").on('input', function () {
-  var pesquisa = removerAcentos($("#searchMembers").val());
-  $.each($(".searchMember"), function (index, element) {
-    $(element).show();
-
-    if (pesquisa != "") {
-      if (!removerAcentos($(element).html().toLowerCase()).includes(pesquisa.toLowerCase()))
-        $(element).hide();
-    }
-  });
-});
-
-$("#searchRanks").on('input', function () {
-  var pesquisa = removerAcentos($("#searchRanks").val());
-  $.each($(".searchRank"), function (index, element) {
-    $(element).show();
-
-    if (pesquisa != "") {
-      if (!removerAcentos($(element).html().toLowerCase()).includes(pesquisa.toLowerCase()))
-        $(element).hide();
-    }
-  });
-});
+initSearch('#searchMembers', '.searchMember');
+initSearch('#searchRanks', '.searchRank');
 
 let modal;
 function addEditRank(id, name) {
   modal = $.confirm({
-    title: id == 0 ? `Adicionar Rank` : `Editar Rank ${id}`,
+    title: id == '' ? `Adicionar Rank` : `Editar Rank ${id}`,
     content: '<form action="">' +
       '<div class="form-group">' +
       '<label>Nome</label>' +
@@ -208,7 +182,7 @@ $('#btn-addMember').click(() => {
 });
 
 $('#btn-addRank').click(() => {
-  addEditRank(0, '');
+  addEditRank('', '');
 });
 
 $('#btn-orderRanks').click(() => {
@@ -269,7 +243,7 @@ function editMember(id) {
 
           alt.emit('saveMember',
             faction.Id,
-            parseInt(id),
+            id,
             parseInt(rank),
             parseInt($('#badge').val()),
             JSON.stringify($('#flags').val()));
@@ -330,12 +304,4 @@ function removeMember(id, name) {
       });
     }
   });
-}
-
-function closeView() {
-  alt.emit('closeView');
-}
-
-function removerAcentos(s) {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 }

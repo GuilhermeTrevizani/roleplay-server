@@ -34,7 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
             if (truckerLocation == null)
                 return;
@@ -53,7 +53,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var truckerLocation = Global.TruckerLocations.FirstOrDefault(x => x.Id == id);
             if (truckerLocation == null)
                 return;
@@ -119,7 +119,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             var truckerLocation = new TruckerLocation();
             if (isNew)
@@ -172,10 +172,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             player.Emit("StaffTruckerLocationsDeliveries",
                 false,
-                GetTruckerLocationsDeliverysHTML(id),
+                GetTruckerLocationsDeliverysHTML(id.Value),
                 idString);
         }
 
@@ -188,7 +188,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == id);
             if (truckerLocationDelivery == null)
                 return;
@@ -260,7 +260,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var truckerLocationDelivery = Global.TruckerLocationsDeliveries.FirstOrDefault(x => x.Id == id);
             if (truckerLocationDelivery == null)
                 return;

@@ -1,46 +1,46 @@
 Vue.component('tab-sex', {
-    props: ['data'],
-    methods: {
-        isActive(parameter, value) {
-            if (this.data.info[parameter] === value)
-                return { active: true };
+  props: ['data'],
+  methods: {
+    isActive(parameter, value) {
+      if (this.data.info[parameter] === value)
+        return { active: true };
 
-            return { active: false };
-        },
-        setParameter(parameter, value) {
-            if (isNaN(value)) 
-                this.data.info[parameter] = value;
-            else
-                this.data.info[parameter] = parseFloat(value);
-
-            this.$root.$emit('updateCharacter');
-        },
-        decrementParameter(parameter, min, max, incrementValue) {
-            this.data.info[parameter] -= incrementValue;
-
-            if (this.data.info[parameter] < min) 
-                this.data.info[parameter] = max;
-
-            this.$root.$emit('updateCharacter');
-        },
-        incrementParameter(parameter, min, max, incrementValue) {
-            this.data.info[parameter] += incrementValue;
-
-            if (this.data.info[parameter] > max) 
-                this.data.info[parameter] = min;
-
-            this.$root.$emit('updateCharacter');
-        }
+      return { active: false };
     },
-    watch: {
-        'data.info.FaceMix': function(newVal, oldVal) {
-            this.$root.$emit('updateCharacter');
-        },
-        'data.info.SkinMix': function(newVal, oldVal) {
-            this.$root.$emit('updateCharacter');
-        }
+    setParameter(parameter, value) {
+      if (isNaN(value))
+        this.data.info[parameter] = value;
+      else
+        this.data.info[parameter] = parseFloat(value);
+
+      this.$root.$emit('updateCharacter');
     },
-    template: `
+    decrementParameter(parameter, min, max, incrementValue) {
+      this.data.info[parameter] -= incrementValue;
+
+      if (this.data.info[parameter] < min)
+        this.data.info[parameter] = max;
+
+      this.$root.$emit('updateCharacter');
+    },
+    incrementParameter(parameter, min, max, incrementValue) {
+      this.data.info[parameter] += incrementValue;
+
+      if (this.data.info[parameter] > max)
+        this.data.info[parameter] = min;
+
+      this.$root.$emit('updateCharacter');
+    }
+  },
+  watch: {
+    'data.info.FaceMix': function (newVal, oldVal) {
+      this.$root.$emit('updateCharacter');
+    },
+    'data.info.SkinMix': function (newVal, oldVal) {
+      this.$root.$emit('updateCharacter');
+    }
+  },
+  template: `
         <div class="options">
             <div class="option">
                 <div class="labelContainer">

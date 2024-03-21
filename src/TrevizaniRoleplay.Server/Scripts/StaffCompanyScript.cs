@@ -27,7 +27,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(StaffCompanyGoto))]
         public static void StaffCompanyGoto(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company == null)
                 return;
@@ -52,7 +52,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var company = new Company();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             if (isNew)
             {
@@ -102,7 +102,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company != null)
             {
@@ -130,7 +130,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var company = Global.Companies.FirstOrDefault(x => x.Id == id);
             if (company != null)
             {

@@ -507,7 +507,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(MDCRastrearVeiculo))]
         public void MDCRastrearVeiculo(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (veh == null)
             {
@@ -524,11 +524,11 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             var wanted = new Wanted();
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (type == 1)
-                wanted.CreateByCharacter(player.Character.Id, id, reason);
+                wanted.CreateByCharacter(player.Character.Id, id.Value, reason);
             else
-                wanted.CreateByVehicle(player.Character.Id, id, reason);
+                wanted.CreateByVehicle(player.Character.Id, id.Value, reason);
 
             await using var context = new DatabaseContext();
             await context.Wanted.AddAsync(wanted);
@@ -574,7 +574,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(MDCRemoverBOLO))]
         public async Task MDCRemoverBOLO(MyPlayer player, string idString, string pesquisa)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             await using var context = new DatabaseContext();
             var wanted = await context.Wanted.FirstOrDefaultAsync(x => x.Id == id);
             if (wanted == null)
@@ -628,7 +628,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(MDCRastrear911))]
         public void MDCRastrear911(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var emergencyCall = Global.EmergencyCalls.FirstOrDefault(x => x.Id == id);
             if (emergencyCall == null)
             {
@@ -643,7 +643,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(MDCMultar))]
         public async Task MDCMultar(MyPlayer player, string idString, string nome, int value, string reason)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (value <= 0)
             {
                 player.SendMessage(MessageType.Error, "Valor inválido.", notify: true);
@@ -658,7 +658,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await using var context = new DatabaseContext();
             var fine = new Fine();
-            fine.Create(id, player.Character.Id, reason, value);
+            fine.Create(id.Value, player.Character.Id, reason, value);
             await context.Fines.AddAsync(fine);
             await context.SaveChangesAsync();
 
@@ -675,7 +675,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(MDCRevogarLicencaMotorista))]
         public async Task MDCRevogarLicencaMotorista(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             await using var context = new DatabaseContext();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
@@ -782,7 +782,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(MDCEncerrarUnidade))]
         public async Task MDCEncerrarUnidade(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var factionUnit = Global.FactionsUnits.FirstOrDefault(x => x.Id == id && x.CharacterId == player.Character.Id);
             if (factionUnit == null)
                 return;

@@ -2,6 +2,7 @@
 using AltV.Net.Async;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -36,7 +37,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             var furniture = new Furniture();
             if (isNew)
@@ -85,7 +86,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var furniture = Global.Furnitures.FirstOrDefault(x => x.Id == id);
             if (furniture != null)
             {

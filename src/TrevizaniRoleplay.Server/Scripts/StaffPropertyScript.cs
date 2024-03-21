@@ -58,7 +58,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(StaffPropertyGoto))]
         public static void StaffPropertyGoto(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var property = Global.Properties.FirstOrDefault(x => x.Id == id);
             if (property == null)
                 return;
@@ -92,7 +92,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             var exit = Functions.GetExitPositionByInterior(propertyInterior);
 
             var property = new Property();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             if (isNew)
             {
@@ -146,7 +146,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     return;
                 }
 
-                var id = new Guid(idString);
+                var id = idString.ToGuid();
                 var property = Global.Properties.FirstOrDefault(x => x.Id == id);
                 if (property != null)
                 {

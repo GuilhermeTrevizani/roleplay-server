@@ -42,7 +42,7 @@
 //        [AsyncClientEvent(nameof(FactionArmoryEquipWeapon))]
 //        public async Task FactionArmoryEquipWeapon(MyPlayer player, string idString)
 //        {
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            var weapon = Global.FactionsStoragesItems.FirstOrDefault(x => x.Id == id);
 //            if (weapon == null || weapon.Quantity == 0)
 //            {

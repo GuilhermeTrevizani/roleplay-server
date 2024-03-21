@@ -1,17 +1,17 @@
 Vue.component('tab-structure', {
-    props: ['data'],
-    methods: {
-        setParameter(parameter, value) {
-            this.data.info[parameter] = value;
-            this.$root.$emit('updateCharacter');
-        }
-    },
-    watch: {
-        'data.info.Structure': function(newVal, oldVal) {
-            this.$root.$emit('updateCharacter');
-        }
-    },
-    template: `
+  props: ['data'],
+  methods: {
+    setParameter(parameter, value) {
+      this.data.info[parameter] = value;
+      this.$root.$emit('updateCharacter');
+    }
+  },
+  watch: {
+    'data.info.Structure': function (newVal, oldVal) {
+      this.$root.$emit('updateCharacter');
+    }
+  },
+  template: `
         <div class="options">
             <div v-for="(name, i) in structureLabels" :key="i" class="option">
                 <div class="labelContainer">

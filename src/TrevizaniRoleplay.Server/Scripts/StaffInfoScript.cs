@@ -65,7 +65,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(StaffInfoGoto))]
         public static void StaffInfoGoto(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var info = Global.Infos.FirstOrDefault(x => x.Id == id);
             if (info == null)
                 return;
@@ -83,7 +83,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(StaffInfoRemove))]
         public static async Task StaffInfoRemove(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var info = Global.Infos.FirstOrDefault(x => x.Id == id);
             if (info == null)
                 return;

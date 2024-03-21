@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { toggleInput } from '/chat/index.mjs';
+import { toggleInput } from '/chat/index.js';
 
 let cursorCount = 0;
 export var view;

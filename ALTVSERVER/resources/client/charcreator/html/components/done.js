@@ -1,16 +1,16 @@
 Vue.component('tab-done', {
-    props: ['data'],
-    methods: {
-        saveCharacter() {
-            if ('alt' in window) 
-                alt.emit('character:Done', this.data.info);
-        },
-        cancel() {
-            if ('alt' in window) 
-                alt.emit('character:Cancel');
-        },
+  props: ['data'],
+  methods: {
+    saveCharacter() {
+      if ('alt' in window)
+        alt.emit('character:Done', this.data.info);
     },
-    template: `
+    cancel() {
+      if ('alt' in window)
+        alt.emit('character:Cancel');
+    },
+  },
+  template: `
         <div class="options">
             <p>Clique no botão abaixo para confirmar a customização do seu personagem.</p>
             <template v-if="!data.barbearia">

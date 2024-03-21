@@ -1,8 +1,3 @@
-$(window).keyup((e) => {
-  if (e.which === 27)
-    closeView();
-});
-
 function abrirSpawnVeiculos(titulo, itens) {
   $('#titulo').text(titulo);
   $('#tbody-veiculos').html('');
@@ -24,10 +19,6 @@ function abrirSpawnVeiculos(titulo, itens) {
 
 function spawnarVeiculo(item) {
   alt.emit("spawnarVeiculo", parseInt(item));
-}
-
-function closeView() {
-  alt.emit('closeView');
 }
 
 if ('alt' in window)

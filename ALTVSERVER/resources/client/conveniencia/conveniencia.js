@@ -1,8 +1,3 @@
-$(window).keyup((e) => {
-  if (e.which === 27)
-    closeView();
-});
-
 function comprarConveniencia(x) {
   const itens = JSON.parse(x);
   itens.forEach(function (p) {
@@ -18,10 +13,6 @@ function comprarConveniencia(x) {
 
 function confirmarCompra(item) {
   alt.emit("confirmarCompra", item);
-}
-
-function closeView() {
-  alt.emit('closeView');
 }
 
 if ('alt' in window)

@@ -33,7 +33,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var door = Global.Doors.FirstOrDefault(x => x.Id == id);
             if (door == null)
                 return;
@@ -51,7 +51,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var door = Global.Doors.FirstOrDefault(x => x.Id == id);
             if (door == null)
                 return;
@@ -96,7 +96,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             var door = new Door();
             if (isNew)

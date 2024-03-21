@@ -65,7 +65,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             using var context = new DatabaseContext();
             var banishment = await context.Banishments.FirstOrDefaultAsync(x => x.Id == id);
             if (banishment != null)
@@ -267,7 +267,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
@@ -313,7 +313,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
@@ -514,7 +514,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == id);
             if (target != null)
             {
@@ -583,7 +583,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -615,7 +615,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -658,7 +658,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -701,7 +701,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {
@@ -745,7 +745,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character == null)
             {

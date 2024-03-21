@@ -1,64 +1,69 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../resources/css/nifty.min.css" rel="stylesheet">
-    <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
-    <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="../resources/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../resources/css/nifty.min.css" rel="stylesheet">
+  <link href="../resources/css/theme-dark.min.css" rel="stylesheet">
+  <link href="../resources/css/jquery-confirm.css" rel="stylesheet">
 </head>
+
 <body style="background-color:transparent;text-align:center;">
-    <div class="panel panel-bordered panel-primary" style="width:60%;text-align: left;display: inline-block;margin-top:3%;">
-        <div class="panel-heading">
-            <div class="panel-control">
-                <button class="btn btn-default" onclick="closeView();">
-                    Fechar
-                </button>
-            </div>
-            <h3 id="titulo" class="panel-title">Confisco</h3>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div id="col-extra" class="col-md-12">
-                    <div class='form-group'>
-                        <label class='control-label'>Item</label>
-                        <select id='select-item' class='form-control'></select>
-                    </div>
-                </div>
-                <div id="col-quantity" class="col-md-12">
-                    <div class='form-group'>
-                        <label class='control-label'>Quantidade</label>
-                        <input type='number' id='input-quantity' class='form-control' />
-                    </div>
-                </div>
-                <div class="pad-all text-center">
-		            <button id="btn-addItem" class="btn btn-dark btn-md" type="button">Adicionar Item</button>
-		        </div>
-                <div class="col-md-12">
-                    <div class='form-group'>
-                        <label class='control-label'>Nome do Personagem</label>
-                        <input type='text' id='input-characterName' class='form-control' />
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class='form-group'>
-                        <strong class='control-label'>Itens</strong> <br/>
-                        <span id="span-items">Nenhum item selecionado.</span>
-                    </div>
-                </div>
-                <div class="pad-all text-center">
-		            <button id="btn-confirm" class="btn btn-primary btn-lg" type="button">Criar Registro</button>
-		        </div>
-            </div>
-        </div>
+  <div class="panel panel-bordered panel-primary"
+    style="width:60%;text-align: left;display: inline-block;margin-top:3%;">
+    <div class="panel-heading">
+      <div class="panel-control">
+        <button class="btn btn-default" onclick="closeView();">
+          Fechar
+        </button>
+      </div>
+      <h3 id="titulo" class="panel-title">Confisco</h3>
     </div>
-    <script src="../resources/js/jquery.min.js"></script>
-    <script src="../resources/js/bootstrap.min.js"></script>
-    <script src="../resources/js/nifty.min.js"></script>
-    <script src="../resources/js/loadingoverlay.min.js"></script>
-    <script src="../resources/js/jquery-confirm.js"></script>
-    <script src="confiscation.js" defer></script>
+    <div class="panel-body">
+      <div class="row">
+        <div id="col-extra" class="col-md-12">
+          <div class='form-group'>
+            <label class='control-label'>Item</label>
+            <select id='select-item' class='form-control'></select>
+          </div>
+        </div>
+        <div id="col-quantity" class="col-md-12">
+          <div class='form-group'>
+            <label class='control-label'>Quantidade</label>
+            <input type='number' id='input-quantity' class='form-control' />
+          </div>
+        </div>
+        <div class="pad-all text-center">
+          <button id="btn-addItem" class="btn btn-dark btn-md" type="button">Adicionar Item</button>
+        </div>
+        <div class="col-md-12">
+          <div class='form-group'>
+            <label class='control-label'>Nome do Personagem</label>
+            <input type='text' id='input-characterName' class='form-control' />
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class='form-group'>
+            <strong class='control-label'>Itens</strong> <br />
+            <span id="span-items">Nenhum item selecionado.</span>
+          </div>
+        </div>
+        <div class="pad-all text-center">
+          <button id="btn-confirm" class="btn btn-primary btn-lg" type="button">Criar Registro</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../resources/js/jquery.min.js"></script>
+  <script src="../resources/js/bootstrap.min.js"></script>
+  <script src="../resources/js/nifty.min.js"></script>
+  <script src="../resources/js/loadingoverlay.min.js"></script>
+  <script src="../resources/js/jquery-confirm.js"></script>
+  <script src="../resources/js/core.js"></script>
+  <script src="confiscation.js" defer></script>
 </body>
+
 </html>

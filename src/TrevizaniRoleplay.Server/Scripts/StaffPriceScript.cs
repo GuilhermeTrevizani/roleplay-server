@@ -97,7 +97,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 }
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             if (Global.Prices.Any(x => x.Id != id && x.Type == priceType && x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)))
             {
@@ -152,7 +152,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var price = Global.Prices.FirstOrDefault(x => x.Id == id);
             if (price != null)
             {

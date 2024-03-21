@@ -34,7 +34,7 @@
 //                return;
 //            }
 
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
 //            if (factionArmory == null)
 //                return;
@@ -59,7 +59,7 @@
 //                return;
 //            }
 
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            var factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
 //            if (factionArmory == null)
 //                return;
@@ -97,7 +97,7 @@
 //                return;
 //            }
 
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            var factionArmory = new FactionStorage();
 //            if (id > 0)
 //                factionArmory = Global.FactionsStorages.FirstOrDefault(x => x.Id == id);
@@ -142,7 +142,7 @@
 
 //            player.Emit("Server:CloseView");
 
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            player.Emit("StaffFactionsArmoriesWeapons",
 //                false,
 //                GetFactionArmoriesWeaponsHTML(id),
@@ -250,7 +250,7 @@
 //                return;
 //            }
 
-//            var id = new Guid(idString);
+//            var id = idString.ToGuid();
 //            var factionArmoryWeapon = Global.FactionsStoragesItems.FirstOrDefault(x => x.Id == id);
 //            if (factionArmoryWeapon == null)
 //                return;

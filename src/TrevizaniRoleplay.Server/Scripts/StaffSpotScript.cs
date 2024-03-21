@@ -37,7 +37,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(StaffSpotGoto))]
         public static void StaffSpotGoto(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var spot = Global.Spots.FirstOrDefault(x => x.Id == id);
             if (spot == null)
                 return;
@@ -62,7 +62,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             var spot = new Spot();
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             if (isNew)
             {
@@ -112,7 +112,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var spot = Global.Spots.FirstOrDefault(x => x.Id == id);
             if (spot != null)
             {

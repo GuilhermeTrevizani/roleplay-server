@@ -52,7 +52,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             await using var context = new DatabaseContext();
             Vehicle? vehicle = null;
@@ -166,7 +166,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.EmitStaffShowMessage($"Veículo {id} está spawnado.");

@@ -1,89 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
-    </head>
-    <body>
-        <div id="app">
-            <div class="editor2">
-                <div class="options">
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Tipo
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="arrowLeft" @click="decrementParameter('componente', 0, data.componentes.length - 1, 1)">&#8249;</button>
-                            <span> {{ data.componentes[data.componente].label }}</span>
-                            <button class="arrowRight" @click="incrementParameter('componente', 0, data.componentes.length - 1, 1)">&#8250;</button>
-                        </div>
-                    </div>
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Modelo
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="arrowLeft" @click="decrementParameter('modelo', 0, data.modelos.length - 1, 1)">&#8249;</button>
-                            <span style="text-align: center;"> {{ data.modelos[data.modelo] != undefined ? data.modelos[data.modelo].drawable : 0 }} {{ data.modelos[data.modelo]?.dlc ? `(${data.modelos[data.modelo]?.dlc})` : '' }}</span>
-                            <button class="arrowRight" @click="incrementParameter('modelo', 0, data.modelos.length - 1, 1)">&#8250;</button>
-                        </div>
-                    </div>
-                    <div class="option">
-                        <div class="labelContainer">
-                            <div class="label">
-                                Textura
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="arrowLeft" @click="decrementParameter('textura', 0, data.modelos[data.modelo]?.maxTexture ?? 0, 1)">&#8249;</button>
-                            <span> {{ data.textura }}</span>
-                            <button class="arrowRight" @click="incrementParameter('textura', 0, data.modelos[data.modelo]?.maxTexture ?? 0, 1)">&#8250;</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="navigation-bottom">
-                    <button @click="adicionar"> {{ data.tipo == 0 ? 'Confirmar' : 'Adicionar' }}</button>
-                </div>
-                <div class="commands">Controles: W, A, S, D, Botão Direito e Scroll</div>
-                <div class="stuyk">https://github.com/stuyk</div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet/less" type="text/css" href="../../resources/css/style.less" />
+</head>
+
+<body>
+  <div id="app">
+    <div class="editor2">
+      <div class="options">
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Tipo
             </div>
-            <template v-if="data.message != ''">
-                <div class="message">
-                    <p>{{ data.message }}</p>
-                    <div class="navigation-bottom">
-                        <button @click="closeMessage" class="danger">OK</button>
-                    </div>
-                </div>
-            </template>
-            <template v-if="data.tipo != 0">
-                <div class="editor3">
-                    <p>Itens Selecionados</p>
-                    <div class="options">
-                        <div v-for="(name, i) in data.itensCarrinho" :key="i" class="option">
-                            <div class="labelContainer">
-                                <div class="label">
-                                    {{ data.itensCarrinho[i].Label }} {{ data.itensCarrinho[i].DLC ? `(${data.itensCarrinho[i].DLC})` : '' }}
-                                    <button class="danger" style="padding:5px;" @click="removerItem(i)">Remover</button>
-                                </div>
-                            </div>
-                            <span> Drawable: {{ data.itensCarrinho[i].Drawable }}</span> <br/>
-                            <span> Texture: {{ data.itensCarrinho[i].Texture }}</span>
-                        </div>
-                    </div>
-                    <div class="navigation">
-                        <button @click="cancel" class="danger">Cancelar</button>
-                        <button @click="confirm">Confirmar</button>
-                    </div>
-                </div>
-            </template>
+          </div>
+          <div class="controls">
+            <button class="arrowLeft"
+              @click="decrementParameter('componente', 0, data.componentes.length - 1, 1)">&#8249;</button>
+            <span> {{ data.componentes[data.componente].label }}</span>
+            <button class="arrowRight"
+              @click="incrementParameter('componente', 0, data.componentes.length - 1, 1)">&#8250;</button>
+          </div>
         </div>
-        <script src="../../resources/js/vue.min.js"></script>
-        <script src="../../resources/js/less.min.js"></script>
-        <script src="./app.js" type="text/javascript"></script>
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Modelo
+            </div>
+          </div>
+          <div class="controls">
+            <button class="arrowLeft"
+              @click="decrementParameter('modelo', 0, data.modelos.length - 1, 1)">&#8249;</button>
+            <span style="text-align: center;"> {{ data.modelos[data.modelo] != undefined ?
+              data.modelos[data.modelo].drawable : 0 }} {{ data.modelos[data.modelo]?.dlc ?
+              `(${data.modelos[data.modelo]?.dlc})` : '' }}</span>
+            <button class="arrowRight"
+              @click="incrementParameter('modelo', 0, data.modelos.length - 1, 1)">&#8250;</button>
+          </div>
+        </div>
+        <div class="option">
+          <div class="labelContainer">
+            <div class="label">
+              Textura
+            </div>
+          </div>
+          <div class="controls">
+            <button class="arrowLeft"
+              @click="decrementParameter('textura', 0, data.modelos[data.modelo]?.maxTexture ?? 0, 1)">&#8249;</button>
+            <span> {{ data.textura }}</span>
+            <button class="arrowRight"
+              @click="incrementParameter('textura', 0, data.modelos[data.modelo]?.maxTexture ?? 0, 1)">&#8250;</button>
+          </div>
+        </div>
+      </div>
+      <div class="navigation-bottom">
+        <button @click="adicionar"> {{ data.tipo == 0 ? 'Confirmar' : 'Adicionar' }}</button>
+      </div>
+      <div class="commands">Controles: W, A, S, D, Botão Direito e Scroll</div>
+      <div class="stuyk">https://github.com/stuyk</div>
+    </div>
+    <template v-if="data.message != ''">
+      <div class="message">
+        <p>{{ data.message }}</p>
+        <div class="navigation-bottom">
+          <button @click="closeMessage" class="danger">OK</button>
+        </div>
+      </div>
+    </template>
+    <template v-if="data.tipo != 0">
+      <div class="editor3">
+        <p>Itens Selecionados</p>
+        <div class="options">
+          <div v-for="(name, i) in data.itensCarrinho" :key="i" class="option">
+            <div class="labelContainer">
+              <div class="label">
+                {{ data.itensCarrinho[i].Label }} {{ data.itensCarrinho[i].DLC ? `(${data.itensCarrinho[i].DLC})` : ''
+                }}
+                <button class="danger" style="padding:5px;" @click="removerItem(i)">Remover</button>
+              </div>
+            </div>
+            <span> Drawable: {{ data.itensCarrinho[i].Drawable }}</span> <br />
+            <span> Texture: {{ data.itensCarrinho[i].Texture }}</span>
+          </div>
+        </div>
+        <div class="navigation">
+          <button @click="cancel" class="danger">Cancelar</button>
+          <button @click="confirm">Confirmar</button>
+        </div>
+      </div>
+    </template>
+  </div>
+  <script src="../../resources/js/vue.min.js"></script>
+  <script src="../../resources/js/less.min.js"></script>
+  <script src="./app.js" type="text/javascript"></script>
 </body>
+
 </html>

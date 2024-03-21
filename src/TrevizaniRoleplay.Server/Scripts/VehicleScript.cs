@@ -226,7 +226,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.SendMessage(MessageType.Error, "Veículo está spawnado.");
@@ -415,7 +415,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {id} está spawnado.");
@@ -845,7 +845,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [Command("vupgrade", "/vupgrade (código do veículo)")]
         public static async Task CMD_vupgrade(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {idString} está spawnado.");
@@ -901,7 +901,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [Command("vrastrear", "/vrastrear (código do veículo)")]
         public static async Task CMD_vrastrear(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var veh = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (veh == null)
             {
@@ -1475,7 +1475,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             try
             {
-                var id = new Guid(idString);
+                var id = idString.ToGuid();
                 if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
                 {
                     player.SendMessage(MessageType.Error, "Veículo já está spawnado.", notify: true);
@@ -1532,7 +1532,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(BuyVehicleUpgrade))]
         public static async Task BuyVehicleUpgrade(MyPlayer player, string idString, string name)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
                 player.SendMessage(MessageType.Error, $"Veículo {idString} está spawnado.");
@@ -1635,7 +1635,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (vehicle == null)
                 return;
@@ -1660,7 +1660,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ClientEvent(nameof(TurnOffXMR))]
         public static void TurnOffXMR(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var vehicle = Global.Vehicles.FirstOrDefault(x => x.VehicleDB.Id == id);
             if (vehicle == null)
                 return;

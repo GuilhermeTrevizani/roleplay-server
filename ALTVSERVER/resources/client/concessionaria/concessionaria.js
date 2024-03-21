@@ -1,16 +1,4 @@
-$(document).ready(function () {
-  $("#pesquisa").on('input', function () {
-    var pesquisa = removerAcentos($("#pesquisa").val());
-    $.each($(".pesquisaveh"), function (index, element) {
-      $(element).show();
-
-      if (pesquisa != "") {
-        if (!removerAcentos($(element).html().toLowerCase()).includes(pesquisa.toLowerCase()))
-          $(element).hide();
-      }
-    });
-  });
-});
+initSearch('#pesquisa', '.pesquisaveh');
 
 function comprarVeiculo() {
   const rgb1 = hexToRgb($('#color1').val());

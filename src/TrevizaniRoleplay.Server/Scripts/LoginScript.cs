@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Json;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -163,12 +164,12 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (!x.CKAvaliation && !x.DeathDate.HasValue && x.EvaluatorStaffUserId.HasValue && (x.JailFinalDate ?? DateTime.MinValue) < DateTime.Now)
             {
                 if (string.IsNullOrWhiteSpace(x.RejectionReason))
-                    opcoes = $"<button class='btn btn-primary btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem({x.Id}, false);'>LOGAR</button>";
+                    opcoes = $"<button class='btn btn-primary btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem(`{x.Id}`, false);'>LOGAR</button>";
                 else
-                    opcoes = $"<button class='btn btn-dark btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem({x.Id}, false);'>REFAZER APLICAÇÃO</button>";
+                    opcoes = $"<button class='btn btn-dark btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem(`{x.Id}`, false);'>REFAZER APLICAÇÃO</button>";
             }
-            opcoes += x.NameChangeStatus == CharacterNameChangeStatus.Allowed && u.NameChanges > 0 && string.IsNullOrWhiteSpace(x.RejectionReason) && x.EvaluatorStaffUserId.HasValue ? $" <button class='btn btn-dark btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem({x.Id}, true);'>ALTERAR NOME</button>" : string.Empty;
-            opcoes += $" <button class='btn btn-danger btn-sm mar-sm-top' onclick='deletarPersonagem({x.Id});' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
+            opcoes += x.NameChangeStatus == CharacterNameChangeStatus.Allowed && u.NameChanges > 0 && string.IsNullOrWhiteSpace(x.RejectionReason) && x.EvaluatorStaffUserId.HasValue ? $" <button class='btn btn-dark btn-sm mar-sm-top btn-selecionarpersonagem{x.Id}' onclick='selecionarPersonagem(`{x.Id}`, true);'>ALTERAR NOME</button>" : string.Empty;
+            opcoes += $" <button class='btn btn-danger btn-sm mar-sm-top' onclick='deletarPersonagem(`{x.Id}`);' style='background-color:#d12c0f;color:#fff;'>DELETAR</button>";
             return opcoes;
         }
 
@@ -177,7 +178,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             try
             {
-                var id = new Guid(idString);
+                var id = idString.ToGuid();
                 await using var context = new DatabaseContext();
                 var character = await context.Characters
                     .Where(x => x.Id == id && x.UserId == player.User.Id)
@@ -254,15 +255,6 @@ namespace TrevizaniRoleplay.Server.Scripts
                 player.ClearBloodDamage();
                 player.SetarPersonalizacao(player.Personalization);
 
-                var qtdOnline = Global.SpawnedPlayers.Count();
-                if (qtdOnline > Global.Parameter.MaxCharactersOnline)
-                {
-                    Global.Parameter.SetMaxCharactersOnline(qtdOnline);
-                    context.Parameters.Update(Global.Parameter);
-                    await context.SaveChangesAsync();
-                    await Functions.SendStaffMessage($"O novo recorde de jogadores online é: {Global.Parameter.MaxCharactersOnline}.", true, true);
-                }
-
                 await player.GravarLog(LogType.Entrance, string.Empty, null);
 
                 player.SetDateTime(DateTime.Now.AddHours(2));
@@ -331,8 +323,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                 var isNew = true;
                 Character? oldCharacter = null;
                 await using var context = new DatabaseContext();
-                var id = new Guid(idString);
-                if (!string.IsNullOrWhiteSpace(idString))
+                var id = idString.ToGuid();
+                if (id.HasValue)
                 {
                     oldCharacter = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
                     if (oldCharacter == null)
@@ -367,7 +359,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                     character.Create(nomeCompleto, birthdayDate, history, sex == "M" ? CharacterSex.Man : CharacterSex.Woman,
                         player.User.Id, player.RealIp, (uint)(sex == "M" ? PedModel.FreemodeMale01 : PedModel.FreemodeFemale01),
                         player.HardwareIdHash, player.HardwareIdExHash, player.MaxHealth,
-                        player.User.Staff == UserStaff.Manager ? player.User.Id : null);
+                        player.User.Staff == UserStaff.Founder ? player.User.Id : null);
                     await context.Characters.AddAsync(character);
                 }
                 else
@@ -413,7 +405,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(DeletarPersonagem))]
         public async Task DeletarPersonagem(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             await using var context = new DatabaseContext();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == id);
             if (character != null)

@@ -4,6 +4,7 @@ using AltV.Net.Data;
 using Microsoft.EntityFrameworkCore;
 using TrevizaniRoleplay.Domain.Entities;
 using TrevizaniRoleplay.Domain.Enums;
+using TrevizaniRoleplay.Server.Extensions;
 using TrevizaniRoleplay.Server.Factories;
 using TrevizaniRoleplay.Server.Models;
 
@@ -283,7 +284,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(BankPoliceTicketPayment))]
         public async Task BankPoliceTicketPayment(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             await using var context = new DatabaseContext();
             var fine = await context.Fines.FirstOrDefaultAsync(x => x.Id == id);
             if (fine == null)

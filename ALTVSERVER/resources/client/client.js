@@ -1,7 +1,7 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
 import { view, setView, toggleView, closeView, getAddress, getRightCoordsZ } from '/helpers/cursor.js';
-import { activateChat } from '/chat/index.mjs';
+import { activateChat } from '/chat/index.js';
 import { playAnimation } from '/helpers/animation.js';
 import * as nametags from '/nametags/index.js';
 import { enterVehicleAsDriver, enterVehicleAsPassenger } from '/helpers/enterVehicles.js';
@@ -10,16 +10,36 @@ import * as vehtags from '/vehtags/index.js';
 import * as clothes from '/clothes/editor.js';
 import Fingerpointing from '/helpers/fingerpointing.js';
 import * as spotlight from '/helpers/spotlight.js';
-import { updateCellphone, isCellphoneOpened } from '/cellphone/client.mjs';
-import * as bankSystem from '/bank/client.mjs';
-import * as staffSystem from '/staff/client.mjs';
-import * as factionSystem from '/faction/client.mjs';
+import { updateCellphone, isCellphoneOpened } from '/cellphone/client.js';
+import * as bankSystem from '/bank/client.js';
 import * as tattoos from '/tattoos/editor.js';
 import * as inventorySystem from '/inventory/client.js';
-import * as tuningSystem from '/tuning/client.mjs';
+import * as tuningSystem from '/tuning/client.js';
 import * as Constants from '/helpers/constants.js';
 import * as audioSystem from '/helpers/audio.js';
-import * as staffAnimationSystem from '/staff/animation/client.js';
+
+import * as staffAcp from '/staff/acp/client.js';
+import * as staffAnimation from '/staff/animation/client.js';
+import * as staffBlip from '/staff/blip/client.js';
+import * as staffCompany from '/staff/company/client.js';
+import * as staffCrackDen from '/staff/crackden/client.js';
+import * as staffCrackDenItem from '/staff/crackdenitem/client.js';
+import * as staffDoor from '/staff/door/client.js';
+import * as staffFaction from '/staff/faction/client.js';
+import * as staffFactionMember from '/staff/factionmember/client.js';
+import * as staffFactionRank from '/staff/factionrank/client.js';
+import * as staffFactionStorage from '/staff/factionstorage/client.js';
+import * as staffFactionStorageItem from '/staff/factionstorageitem/client.js';
+import * as staffFurniture from '/staff/furniture/client.js';
+import * as staffGiveItem from '/staff/giveitem/client.js';
+import * as staffInfo from '/staff/info/client.js';
+import * as staffParameter from '/staff/parameter/client.js';
+import * as staffPrice from '/staff/price/client.js';
+import * as staffProperty from '/staff/property/client.js';
+import * as staffSpot from '/staff/spot/client.js';
+import * as staffTruckerLocation from '/staff/truckerlocation/client.js';
+import * as staffTruckerLocationDelivery from '/staff/truckerlocationdelivery/client.js';
+import * as staffVehicle from '/staff/vehicle/client.js';
 
 const WeaponModel = {
   AntiqueCavalryDagger: 2460120199,
@@ -586,7 +606,7 @@ async function requestDiscordToken() {
     const token = await alt.Discord.requestOAuth2Token(Constants.DISCORD_APP_ID);
     alt.emitServer('ValidateDiscordToken', token);
   } catch (ex) {
-    alt.logError(ex);
+    alt.logError(ex.toString());
     view.emit('mostrarErro', ex.message);
   }
 }
@@ -646,14 +666,14 @@ alt.onServer('Server:PunicoesAdministrativas', (nome, data, punicoesAdministrati
 });
 
 alt.onServer('Server:CriarPersonagem', criarPersonagem);
-function criarPersonagem(codigo = 0, nome = '', sobrenome = '', sexo = '', dataNascimento = '', historia = '', motivoRejeicao = '', staffer = '') {
+function criarPersonagem(id = '', nome = '', sobrenome = '', sexo = '', dataNascimento = '', historia = '', motivoRejeicao = '', staffer = '') {
   view.destroy();
   setView(new alt.WebView('http://resource/login/criarpersonagem.html'));
   view.on('load', () => {
     view.emit('showHTML', nome, sobrenome, sexo, dataNascimento, historia, motivoRejeicao, staffer);
   });
   view.on('criarPersonagem', (nome, sobrenome, sexo, dataNascimento, historia) => {
-    alt.emitServer('CriarPersonagem', codigo, nome, sobrenome, sexo, dataNascimento, historia);
+    alt.emitServer('CriarPersonagem', id, nome, sobrenome, sexo, dataNascimento, historia);
   });
   view.on('voltar', () => {
     alt.emitServer('ListarPersonagens');
@@ -982,4 +1002,8 @@ alt.on('windowFocusChange', (isFocused) => {
 
 alt.on('playerWeaponShoot', (weaponHash, totalAmmo, ammoInClip) => {
   alt.emitServer('UpdateWeaponAmmo', weaponHash);
+});
+
+alt.onServer('Staff:MostrarMensagem', (mensagem, fechar) => {
+  view.emit('mostrarMensagem', mensagem, fechar);
 });

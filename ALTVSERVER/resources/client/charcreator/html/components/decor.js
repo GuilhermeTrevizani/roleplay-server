@@ -1,14 +1,14 @@
 Vue.component('tab-decor', {
-    props: ['data'],
-    methods: {
-        handleChange() {
-            this.$root.$emit('updateCharacter');
-        },
-        getOverlayColorCount() {
-            return 59;
-        }
+  props: ['data'],
+  methods: {
+    handleChange() {
+      this.$root.$emit('updateCharacter');
     },
-    template: `
+    getOverlayColorCount() {
+      return 59;
+    }
+  },
+  template: `
         <div class="options">
             <div v-for="(name, i) in colorOverlays" :key="i" class="option">
                 <div class="labelContainer">

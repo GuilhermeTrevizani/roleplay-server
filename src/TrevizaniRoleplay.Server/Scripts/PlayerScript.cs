@@ -1611,7 +1611,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [ScriptEvent(ScriptEventType.PlayerCustomEvent)]
         public static void OnPlayerCustomEvent(MyPlayer player, string eventName, AltV.Net.Elements.Args.MValueConst[] mValueArray)
         {
-            Alt.Log($"OnPlayerCustomEvent | {player.Character.Id} | {eventName} | {string.Join(" ; ", mValueArray)}");
+            Alt.Log($"OnPlayerCustomEvent | {player.Character?.Id} | {eventName} | {string.Join(" ; ", mValueArray)}");
         }
 
         [AsyncClientEvent(nameof(SetAreaName))]

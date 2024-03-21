@@ -1,122 +1,122 @@
 Vue.component('tab-hair', {
-    props: ['data'],
-    methods: {
-        getHairCount() {
-            if (this.data.sexo === 0) 
-                return femaleHairs.length - 1;
+  props: ['data'],
+  methods: {
+    getHairCount() {
+      if (this.data.sexo === 0)
+        return femaleHairs.length - 1;
 
-            return maleHairs.length - 1;
-        },
-        getHairOverlayCount() {
-            if (this.data.sexo === 0) 
-                return femaleHairOverlays.length - 1;
-
-            return maleHairOverlays.length - 1;
-        },
-        getColorCount() {
-            return 59;
-        },
-        getFacialCount() {
-            return 30;
-        },
-        getEyebrowsCount() {
-            return 34;
-        },
-        setParameter(parameter, value) {
-            this.data.info[parameter] = value;
-            this.$root.$emit('updateCharacter');
-        },
-        decrementParameter(parameter, min, max, incrementValue) {
-            if (parameter == 'cabelo') {
-                this.data.cabelo -= incrementValue;
-
-                if (this.data.cabelo < min)
-                    this.data.cabelo = max;
-
-                if (this.data.sexo === 0) {
-                    const hair = femaleHairs[this.data.cabelo];
-                    this.data.info.Hair = hair.drawable;
-                    this.data.info.HairDLC = hair.dlc;
-                } else if (this.data.sexo === 1) {
-                    const hair = maleHairs[this.data.cabelo];
-                    this.data.info.Hair = hair.drawable;
-                    this.data.info.HairDLC = hair.dlc;
-                }
-            } else if (parameter == 'cabeloDetalhe') {
-                this.data.cabeloDetalhe -= incrementValue;
-
-                if (this.data.cabeloDetalhe < min)
-                    this.data.cabeloDetalhe = max;
-
-                if (this.data.sexo === 0) {
-                    const hair = femaleHairOverlays[this.data.cabeloDetalhe];
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                } else if (this.data.sexo === 1) {
-                    const hair = maleHairOverlays[this.data.cabeloDetalhe];
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                }
-            } else {
-                this.data.info[parameter] -= incrementValue;
-
-                if (this.data.info[parameter] < min)
-                    this.data.info[parameter] = max;
-            }
-
-            this.$root.$emit('updateCharacter');
-        },
-        incrementParameter(parameter, min, max, incrementValue) {
-            if (parameter == 'cabelo') {
-                this.data.cabelo += incrementValue;
-
-                if (this.data.cabelo > max)
-                    this.data.cabelo = min;
-
-                if (this.data.sexo === 0) {
-                    const hair = femaleHairs[this.data.cabelo];
-                    this.data.info.Hair = hair.drawable;
-                    this.data.info.HairDLC = hair.dlc;
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                } else if (this.data.sexo === 1) {
-                    const hair = maleHairs[this.data.cabelo];
-                    this.data.info.Hair = hair.drawable;
-                    this.data.info.HairDLC = hair.dlc;
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                }
-            } else if (parameter == 'cabeloDetalhe') {
-                this.data.cabeloDetalhe += incrementValue;
-
-                if (this.data.cabeloDetalhe > max)
-                    this.data.cabeloDetalhe = min;
-
-                if (this.data.sexo === 0) {
-                    const hair = femaleHairOverlays[this.data.cabeloDetalhe];
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                } else if (this.data.sexo === 1) {
-                    const hair = maleHairOverlays[this.data.cabeloDetalhe];
-                    this.data.info.HairCollection = hair.collection;
-                    this.data.info.HairOverlay = hair.overlay;
-                }
-            } else {
-                this.data.info[parameter] += incrementValue;
-
-                if (this.data.info[parameter] > max)
-                    this.data.info[parameter] = min;
-            }
-
-            this.$root.$emit('updateCharacter');
-        },
-        handleChange(e, parameter, index) {
-            const value = parseFloat(e.target.value);
-            this.data.info.ColorOverlays[index][parameter] = value;
-            this.$root.$emit('updateCharacter');
-        },
+      return maleHairs.length - 1;
     },
-    template: `
+    getHairOverlayCount() {
+      if (this.data.sexo === 0)
+        return femaleHairOverlays.length - 1;
+
+      return maleHairOverlays.length - 1;
+    },
+    getColorCount() {
+      return 59;
+    },
+    getFacialCount() {
+      return 30;
+    },
+    getEyebrowsCount() {
+      return 34;
+    },
+    setParameter(parameter, value) {
+      this.data.info[parameter] = value;
+      this.$root.$emit('updateCharacter');
+    },
+    decrementParameter(parameter, min, max, incrementValue) {
+      if (parameter == 'cabelo') {
+        this.data.cabelo -= incrementValue;
+
+        if (this.data.cabelo < min)
+          this.data.cabelo = max;
+
+        if (this.data.sexo === 0) {
+          const hair = femaleHairs[this.data.cabelo];
+          this.data.info.Hair = hair.drawable;
+          this.data.info.HairDLC = hair.dlc;
+        } else if (this.data.sexo === 1) {
+          const hair = maleHairs[this.data.cabelo];
+          this.data.info.Hair = hair.drawable;
+          this.data.info.HairDLC = hair.dlc;
+        }
+      } else if (parameter == 'cabeloDetalhe') {
+        this.data.cabeloDetalhe -= incrementValue;
+
+        if (this.data.cabeloDetalhe < min)
+          this.data.cabeloDetalhe = max;
+
+        if (this.data.sexo === 0) {
+          const hair = femaleHairOverlays[this.data.cabeloDetalhe];
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        } else if (this.data.sexo === 1) {
+          const hair = maleHairOverlays[this.data.cabeloDetalhe];
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        }
+      } else {
+        this.data.info[parameter] -= incrementValue;
+
+        if (this.data.info[parameter] < min)
+          this.data.info[parameter] = max;
+      }
+
+      this.$root.$emit('updateCharacter');
+    },
+    incrementParameter(parameter, min, max, incrementValue) {
+      if (parameter == 'cabelo') {
+        this.data.cabelo += incrementValue;
+
+        if (this.data.cabelo > max)
+          this.data.cabelo = min;
+
+        if (this.data.sexo === 0) {
+          const hair = femaleHairs[this.data.cabelo];
+          this.data.info.Hair = hair.drawable;
+          this.data.info.HairDLC = hair.dlc;
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        } else if (this.data.sexo === 1) {
+          const hair = maleHairs[this.data.cabelo];
+          this.data.info.Hair = hair.drawable;
+          this.data.info.HairDLC = hair.dlc;
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        }
+      } else if (parameter == 'cabeloDetalhe') {
+        this.data.cabeloDetalhe += incrementValue;
+
+        if (this.data.cabeloDetalhe > max)
+          this.data.cabeloDetalhe = min;
+
+        if (this.data.sexo === 0) {
+          const hair = femaleHairOverlays[this.data.cabeloDetalhe];
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        } else if (this.data.sexo === 1) {
+          const hair = maleHairOverlays[this.data.cabeloDetalhe];
+          this.data.info.HairCollection = hair.collection;
+          this.data.info.HairOverlay = hair.overlay;
+        }
+      } else {
+        this.data.info[parameter] += incrementValue;
+
+        if (this.data.info[parameter] > max)
+          this.data.info[parameter] = min;
+      }
+
+      this.$root.$emit('updateCharacter');
+    },
+    handleChange(e, parameter, index) {
+      const value = parseFloat(e.target.value);
+      this.data.info.ColorOverlays[index][parameter] = value;
+      this.$root.$emit('updateCharacter');
+    },
+  },
+  template: `
         <div class="options">
             <div class="option">
                 <div class="labelContainer">

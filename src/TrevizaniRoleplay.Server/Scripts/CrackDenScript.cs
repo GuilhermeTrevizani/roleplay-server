@@ -21,7 +21,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var item = Global.CrackDensItems.FirstOrDefault(x => x.Id == id);
             if (item == null)
                 return;
@@ -105,7 +105,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         [AsyncClientEvent(nameof(CrackDenShowSells))]
         public async Task CrackDenShowSells(MyPlayer player, string idString)
         {
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             await player.GravarLog(LogType.ViewCrackDenSales, id.ToString(), null);
 
             await using var context = new DatabaseContext();

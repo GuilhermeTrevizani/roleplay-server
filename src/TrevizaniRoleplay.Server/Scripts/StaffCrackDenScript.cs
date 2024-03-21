@@ -34,7 +34,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;
@@ -59,7 +59,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;
@@ -110,7 +110,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(idString);
             var crackDen = new CrackDen();
             if (isNew)
@@ -163,10 +163,10 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             player.Emit("Server:CloseView");
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             player.Emit("StaffCrackDensItems",
                 false,
-                GetCrackDensItemsHTML(id),
+                GetCrackDensItemsHTML(id.Value),
                 idString);
         }
 
@@ -251,7 +251,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var crackDenItem = Global.CrackDensItems.FirstOrDefault(x => x.Id == id);
             if (crackDenItem == null)
                 return;
@@ -279,7 +279,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var id = new Guid(idString);
+            var id = idString.ToGuid();
             var crackDen = Global.CrackDens.FirstOrDefault(x => x.Id == id);
             if (crackDen == null)
                 return;

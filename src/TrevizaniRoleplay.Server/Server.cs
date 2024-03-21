@@ -152,6 +152,7 @@ namespace TrevizaniRoleplay.Server
             {
                 parameter ??= new();
                 await context.Parameters.AddAsync(parameter);
+                await context.SaveChangesAsync();
             }
 
             Global.Parameter = parameter;
