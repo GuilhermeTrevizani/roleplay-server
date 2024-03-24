@@ -69,7 +69,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.Emit("BankShow",
                 update,
                 atm,
-                player.Character.Id, player.Character.Name,
+                player.Character.Id.ToString(), player.Character.Name,
                 player.Character.Bank, player.Character.Savings,
                 Functions.Serialize(multas),
                 Functions.Serialize(transactions));

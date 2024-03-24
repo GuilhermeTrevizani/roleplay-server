@@ -145,9 +145,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                         <td>X: {blip.PosX} | Y: {blip.PosY} | Z: {blip.PosZ}</td>
                         <td class='text-center'>
                             <input id='json{blip.Id}' type='hidden' value='{Functions.Serialize(blip)}' />
-                            <button onclick='ir({blip.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
-                            <button onclick='editar({blip.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='excluir(this, {blip.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                            <button onclick='ir(`{blip.Id}`)' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='editar(`{blip.Id}`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='excluir(this, `{blip.Id}`)' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
             }

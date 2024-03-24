@@ -28,7 +28,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            player.Emit("PropertyFurnitures", prop.Id, GetFurnituresHTML(player, prop));
+            player.Emit("PropertyFurnitures", prop.Id.ToString(), GetFurnituresHTML(player, prop));
         }
 
         private static string GetFurnituresHTML(MyPlayer player, Property property)
@@ -161,7 +161,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             propertyFurniture.DeleteObject();
 
             player.SendMessage(MessageType.Success, $"Você removeu a mobília {propertyFurniture.Id}.", notify: true);
-            player.Emit("PropertyFurnitures", property.Id, GetFurnituresHTML(player, property));
+            player.Emit("PropertyFurnitures", property.Id.ToString(), GetFurnituresHTML(player, property));
         }
 
         [ClientEvent(nameof(CancelDropFurniture))]
@@ -179,7 +179,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             if (player.DropPropertyFurniture.PosX > 0)
             {
                 player.DropPropertyFurniture.CreateObject();
-                player.Emit("PropertyFurnitures", property.Id, GetFurnituresHTML(player, property));
+                player.Emit("PropertyFurnitures", property.Id.ToString(), GetFurnituresHTML(player, property));
             }
             else
             {
@@ -266,7 +266,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             else
             {
                 player.SendMessage(MessageType.Success, $"Você editou a posição de {furniture.Name}.", notify: true);
-                player.Emit("PropertyFurnitures", property.Id, GetFurnituresHTML(player, property));
+                player.Emit("PropertyFurnitures", property.Id.ToString(), GetFurnituresHTML(player, property));
             }
 
             player.DropPropertyFurniture = null;

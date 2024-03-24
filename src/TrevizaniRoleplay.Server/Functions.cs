@@ -776,8 +776,8 @@ namespace TrevizaniRoleplay.Server
                         <td>{rank.Salary:N0}</td>
                         <td class='leader text-center'>
                             <input id='jsonRank{rank.Id}' type='hidden' value='{Serialize(rank)}' />
-                            <button onclick='editRank({rank.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='removeRank(this, {rank.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                            <button onclick='editRank(`{rank.Id}`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='removeRank(this, `{rank.Id}`)' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
             }
@@ -833,8 +833,8 @@ namespace TrevizaniRoleplay.Server
                         {(faction.Government ? $"<td class='text-center'>{status}</td>" : string.Empty)}
                         <td class='text-center tdOptions'>
                             <input id='jsonMember{member.Character.Id}' type='hidden' value='{Serialize(new { member.Character.Name, member.Character.Badge, member.Character.FactionRankId, member.Character.FactionFlagsJSON })}' />
-                            <button onclick='editMember({member.Character.Id})' type='button' class='btn btn-dark btn-sm editMember'>EDITAR</button>
-                            <button onclick='removeMember({member.Character.Id}, `{member.Character.Name}`)' type='button' class='btn btn-danger btn-sm removeMember'>EXPULSAR</button>
+                            <button onclick='editMember(`{member.Character.Id}`)' type='button' class='btn btn-dark btn-sm editMember'>EDITAR</button>
+                            <button onclick='removeMember(`{member.Character.Id}`, `{member.Character.Name}`)' type='button' class='btn btn-danger btn-sm removeMember'>EXPULSAR</button>
                         </td>
                     </tr>";
                 }

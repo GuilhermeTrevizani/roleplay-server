@@ -7,6 +7,7 @@ import { activateChat } from '/chat/index.js';
 let sexo;
 let oldData = {};
 let barbearia;
+let registerInterval;
 
 alt.onServer('AbrirBarbearia', (sexo, personalizacao) => {
   native.displayHud(false);
@@ -30,8 +31,26 @@ async function handleEdit(_sexo, _oldData, _barbearia) {
   view.focus();
   toggleView(true, false);
 
-  if (!barbearia)
+  if (!barbearia) {
+    native.freezeEntityPosition(alt.Player.local, true);
+
+    if (registerInterval) {
+      alt.clearInterval(registerInterval);
+      registerInterval = null;
+    }
+
+    registerInterval = alt.setInterval(() => {
+      if (alt.Player.local.isSpawned) {
+        native.freezeEntityPosition(alt.Player.local, false);
+        native.setEntityHeading(alt.Player.local, 169.24);
+        configureCamera();
+        alt.clearInterval(registerInterval);
+        registerInterval = null;
+      }
+    }, 500);
+
     return;
+  }
 
   configureCamera();
 }
@@ -39,13 +58,8 @@ async function handleEdit(_sexo, _oldData, _barbearia) {
 function configureCamera() {
   createPedEditCamera();
   setFov(50);
-  setZPos(0.6);
+  setZPos(-0.38);
 }
-
-alt.once('spawned', () => {
-  native.setEntityHeading(alt.Player.local, 169.24);
-  configureCamera();
-});
 
 function closeEditor() {
   closeView();

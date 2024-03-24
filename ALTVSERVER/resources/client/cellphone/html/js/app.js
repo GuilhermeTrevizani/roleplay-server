@@ -8,10 +8,6 @@ $(window).keyup((e) => {
 
 let isCharging = false;
 let isFlightMode = false;
-let audioVolume = 0.25;
-
-let audioClick = new Audio('./audio/click.mp3');
-audioClick.volume = audioVolume;
 
 let noAppScreen = [
   'appAirplaneButton',
@@ -70,13 +66,10 @@ $('#appAirplaneButton').click(() => {
 });
 
 $('#homeButton').click(() => {
-  audioClick.play();
   toggleHomeScreen();
 });
 
 $('.app').click(function () {
-  audioClick.play();
-
   if (!noAppScreen.includes($(this).attr('id')))
     toggleHomeScreen($(this).attr('id'));
 });

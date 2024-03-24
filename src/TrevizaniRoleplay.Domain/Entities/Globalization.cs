@@ -44,7 +44,7 @@
         public const string LEAD_ADMINISTRATOR = "Lead Administrator";
         public const string HEAD_ADMINISTRATOR = "Head Administrator";
         public const string MANAGER = "Manager";
-        public const string BANK = "Bank";
+        public const string BANK = "Banco";
         public const string CONVENIENCE_STORE = "Loja de Conveniência";
         public const string CLTOHES_STORE = "Loja de Roupas";
         public const string FACTION_VEHICLE_SPAWN = "Spawn de Veículos da Facção";

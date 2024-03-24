@@ -86,9 +86,13 @@ $(document).ready(() => {
         '<form action="">' +
         '<div class="form-group">' +
         '<label>Conta Bancária</label>' +
-        `<input id="targetId" type="number" class="form-control"/>` +
+        `<input id="targetId" type="text" class="form-control"/>` +
+        '</div>' +
+        '<div class="form-group">' +
         '<label>Valor</label>' +
         `<input id="value" type="number" class="form-control"/>` +
+        '</div>' +
+        '<div class="form-group">' +
         '<label>Descrição</label>' +
         `<input id="description" type="text" class="form-control"/>` +
         '</div>' +
@@ -116,7 +120,7 @@ $(document).ready(() => {
               return false;
             }
 
-            alt.emit('transfer', parseInt(targetId), parseInt(value), description);
+            alt.emit('transfer', targetId, parseInt(value), description);
           }
         },
         cancel: {

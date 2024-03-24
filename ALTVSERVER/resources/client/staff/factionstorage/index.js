@@ -7,8 +7,9 @@ function addEdit(id, factionId, posX, posY, posZ, dimension) {
     content: '<form action="">' +
       '<div class="form-group">' +
       '<label>ID da Facção</label>' +
-      `<input value="${factionId}" id="factionId" type="number" class="form-control"/>` +
+      `<input value="${factionId}" id="factionId" type="text" class="form-control"/>` +
       '</div>' +
+      '<button type="button" onclick="getPosition()" class="btn btn-sm btn-dark">Obter Posição</button><br/>' +
       '<div class="form-group">' +
       '<label>Posição X</label>' +
       `<input value="${posX}" id="posX" type="text" class="form-control"/>` +
@@ -57,12 +58,12 @@ function addEdit(id, factionId, posX, posY, posZ, dimension) {
 
           const dimension = this.$content.find('#dimension').val();
           if (!dimension) {
-            $.alert('Dimensão é obrigatório.');
+            $.alert('Dimensão é obrigatória.');
             return false;
           }
 
           alt.emit('save', id,
-            parseInt(factionId),
+            factionId,
             Number(posX),
             Number(posY),
             Number(posZ),
@@ -91,7 +92,7 @@ $('#btn-add').click(() => {
 });
 
 function loaded(factionsArmories) {
-  $('#tbody-factionsarmories').html(factionsArmories);
+  $('#tbody-factionsstorages').html(factionsArmories);
 }
 
 function goto(id) {
@@ -104,8 +105,8 @@ function remove(button, id) {
 }
 
 function edit(id) {
-  const factionArmory = JSON.parse($(`#json${id}`).val());
-  addEdit(id, factionArmory.FactionId, factionArmory.PosX, factionArmory.PosY, factionArmory.PosZ, factionArmory.Dimension);
+  const factionStorage = JSON.parse($(`#json${id}`).val());
+  addEdit(id, factionStorage.FactionId, factionStorage.PosX, factionStorage.PosY, factionStorage.PosZ, factionStorage.Dimension);
 }
 
 function editWeapons(id) {
@@ -121,7 +122,19 @@ function mostrarMensagem(mensagem, fechar) {
   }
 }
 
+function getPosition() {
+  alt.emit('getPosition');
+}
+
+function setPosition(x, y, z, dimension) {
+  $('#posX').val(x);
+  $('#posY').val(y);
+  $('#posZ').val(z);
+  $('#dimension').val(dimension);
+}
+
 if ('alt' in window) {
   alt.on('loaded', loaded);
   alt.on('mostrarMensagem', mostrarMensagem);
+  alt.on('setPosition', setPosition);
 }

@@ -942,7 +942,7 @@ namespace TrevizaniRoleplay.Server
 
         public static IEnumerable<MyMarker> Markers => Alt.GetAllMarkers().Cast<MyMarker>();
 
-        public static IEnumerable<MyBlip> MyBlips => Alt.GetAllMarkers().Cast<MyBlip>();
+        public static IEnumerable<MyBlip> MyBlips => Alt.GetAllBlips().Cast<MyBlip>();
 
         public const int DEFAULT_SAVINGS = 50_000;
 

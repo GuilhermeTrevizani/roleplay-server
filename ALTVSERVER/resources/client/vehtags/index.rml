@@ -18,7 +18,7 @@
             .nametag {
                 position: absolute;
                 font-effect: outline(1px black);
-                color: #FFFFFFFF;
+                color: #2d63ba;
                 width: auto;
                 height: auto;
                 text-align: center;

@@ -16,7 +16,6 @@ export async function enterVehicleAsDriver() {
     return;
 
   const vehicle = alt.Utils.getClosestVehicle({ range: 7 });
-  console.log(vehicle);
   if (!vehicle)
     return;
 

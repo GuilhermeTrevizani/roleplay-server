@@ -5,10 +5,6 @@ function loadInteriors(_interiors) {
   interiors = _interiors;
 }
 
-function removerAcentos(s) {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-}
-
 let modal;
 function addEdit(id, interior, value, dimension, posX, posY, posZ) {
   modal = $.confirm({

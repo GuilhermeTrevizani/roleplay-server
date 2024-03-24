@@ -13,7 +13,6 @@ const drawDistance = 10;
 alt.on('gameEntityCreate', entity => {
   if (entity instanceof alt.Vehicle) {
     const rmlElement = document.createElement("button");
-    rmlElement.zIndex = -1;
     rmlElement.rmlId = entity.id.toString();
     rmlElement.addClass("nametag");
     rmlElement.addClass("hide");

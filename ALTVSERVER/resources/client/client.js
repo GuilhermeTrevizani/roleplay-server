@@ -355,26 +355,16 @@ alt.everyTick(() => {
           directionName = x.name;
       });
 
-      alt.Utils.drawText2dThisFrame(directionName, new alt.Vector2(0.155, 0.94), 4, 0.9, new alt.RGBA(255, 255, 255, 230), true, true, 1);
-      alt.Utils.drawText2dThisFrame(zoneName, new alt.Vector2(0.17, 0.94), 4, 0.45, new alt.RGBA(174, 106, 178, 230), true, true, 1);
-      alt.Utils.drawText2dThisFrame(streetName, new alt.Vector2(0.17, 0.97), 4, 0.45, new alt.RGBA(255, 255, 255, 230), true, true, 1);
-
-      // drawText2d(directionName, 0.15, 0.945, 1.0, 4, 255, 255, 255, 230, true, true, 1);
-      // drawText2d(zoneName, 0.165, 0.945, 0.55, 4, 174, 106, 178, 230, true, true, 1);
-      // drawText2d(streetName, 0.165, 0.975, 0.45, 4, 255, 255, 255, 230, true, true, 1);
+      alt.Utils.drawText2dThisFrame(directionName, new alt.Vector2(0.16, 0.94), 4, 0.9, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+      alt.Utils.drawText2dThisFrame(zoneName, new alt.Vector2(0.175, 0.94), 4, 0.45, new alt.RGBA(174, 106, 178, 230), true, true, 1);
+      alt.Utils.drawText2dThisFrame(streetName, new alt.Vector2(0.175, 0.965), 4, 0.45, new alt.RGBA(255, 255, 255, 230), true, true, 1);
     }
 
     if (isDriver()) {
       alt.Utils.drawText2dThisFrame(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL),
-        new alt.Vector2(0.155, 0.905), 4, 0.5, new alt.RGBA(255, 255, 255, 230), true, true, 1);
+        new alt.Vector2(0.16, 0.89), 4, 0.5, new alt.RGBA(255, 255, 255, 230), true, true, 1);
       alt.Utils.drawText2dThisFrame(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`,
-        new alt.Vector2(0.15, 0.925), 4, 0.4, new alt.RGBA(255, 255, 255, 230), true, true, 1);
-      // drawText2d(player.vehicle.getStreamSyncedMeta(Constants.VEHICLE_META_DATA_FUEL), 0.15, 0.905, 0.4, 4, 255, 255, 255, 230, true, true, 1);
-      //   drawText2d(`${(native.getEntitySpeed(player.vehicle) * 3.6).toFixed(0)} KM/H${(cruiseEveryTick ? ' ~g~(CRUISE CONTROL)' : '')}`,
-      //     0.15, 0.925,
-      //     0.4, 4,
-      //     255, 255, 255, 230,
-      //     true, true, 1);
+        new alt.Vector2(0.16, 0.92), 4, 0.4, new alt.RGBA(255, 255, 255, 230), true, true, 1);
     }
   }
 });
@@ -606,8 +596,7 @@ async function requestDiscordToken() {
     const token = await alt.Discord.requestOAuth2Token(Constants.DISCORD_APP_ID);
     alt.emitServer('ValidateDiscordToken', token);
   } catch (ex) {
-    alt.logError(ex.toString());
-    view.emit('mostrarErro', ex.message);
+    view.emit('mostrarErro', ex.toString());
   }
 }
 

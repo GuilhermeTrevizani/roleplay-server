@@ -1504,7 +1504,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 await veh.Spawnar(player);
                 player.Emit("Server:SetWaypoint", veh.PosX, veh.PosY);
-                player.SendMessage(MessageType.Success, $"Você spawnou o veículo {idString}.", notify: true);
+                player.SendMessage(MessageType.Success, $"Você spawnou o {veh.Model.ToUpper()}.", notify: true);
                 player.Emit("Server:CloseView");
             }
             catch (Exception ex)
@@ -1971,25 +1971,25 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             if (player.Vehicle is not MyVehicle veh || veh.Driver != player)
             {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_DRIVER_ERROR_MESSAGE);
+                player.SendMessage(MessageType.Error, Global.VEHICLE_DRIVER_ERROR_MESSAGE);
                 return;
             }
 
             if (!veh.CanAccess(player))
             {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_ACCESS_ERROR_MESSAGE);
+                player.SendMessage(MessageType.Error, Global.VEHICLE_ACCESS_ERROR_MESSAGE);
                 return;
             }
 
             if (veh.VehicleDB.Fuel == 0)
             {
-                player.SendMessage(Models.MessageType.Error, "Veículo não possui combustível.");
+                player.SendMessage(MessageType.Error, "Veículo não possui combustível.");
                 return;
             }
 
             if (veh.Info.Type == VehicleModelType.BMX)
             {
-                player.SendMessage(Models.MessageType.Error, "Veículo não possui motor.");
+                player.SendMessage(MessageType.Error, "Veículo não possui motor.");
                 return;
             }
 
@@ -2001,7 +2001,7 @@ namespace TrevizaniRoleplay.Server.Scripts
         {
             if (Global.Vehicles.Any(x => x.VehicleDB.Id == id))
             {
-                player.SendMessage(Models.MessageType.Error, $"Veículo {id} está spawnado.");
+                player.SendMessage(MessageType.Error, $"Veículo {id} está spawnado.");
                 return;
             }
 
@@ -2009,7 +2009,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             var veh = await context.Vehicles.FirstOrDefaultAsync(x => x.CharacterId == player.Character.Id && x.Id == id && !x.Sold);
             if (veh == null)
             {
-                player.SendMessage(Models.MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
+                player.SendMessage(MessageType.Error, Global.VEHICLE_OWNER_ERROR_MESSAGE);
                 return;
             }
 
@@ -2022,14 +2022,14 @@ namespace TrevizaniRoleplay.Server.Scripts
             var price = Global.Prices.FirstOrDefault(x => x.IsVehicle && x.Name.Equals(veh.Model, StringComparison.CurrentCultureIgnoreCase));
             if (price == null)
             {
-                player.SendMessage(Models.MessageType.Error, "Preço do veículo não foi encontrado.");
+                player.SendMessage(MessageType.Error, "Preço do veículo não foi encontrado.");
                 return;
             }
 
             var dealership = Global.Dealerships.FirstOrDefault(x => x.PriceType == price.Type);
             if (dealership == null || player.Position.Distance(dealership.Position) > Global.RP_DISTANCE)
             {
-                player.SendMessage(Models.MessageType.Error, $"Você não está na concessionária que vende este veículo.");
+                player.SendMessage(MessageType.Error, $"Você não está na concessionária que vende este veículo.");
                 return;
             }
 
@@ -2043,7 +2043,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
                 if (!string.IsNullOrWhiteSpace(res))
                 {
-                    player.SendMessage(Models.MessageType.Error, res);
+                    player.SendMessage(MessageType.Error, res);
                     return;
                 }
 
@@ -2051,7 +2051,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 context.Vehicles.Update(veh);
                 await context.SaveChangesAsync();
 
-                player.SendMessage(Models.MessageType.Success, $"Você vendeu seu veículo {veh.Model.ToUpper()} ({veh.Plate.ToUpper()}) [{veh.Id}] para a concessionária por ${value:N0}.");
+                player.SendMessage(MessageType.Success, $"Você vendeu seu veículo {veh.Model.ToUpper()} ({veh.Plate.ToUpper()}) [{veh.Id}] para a concessionária por ${value:N0}.");
                 await player.GravarLog(LogType.Sell, $"/vvenderconce {veh.Id} {value}", null);
             }
             else

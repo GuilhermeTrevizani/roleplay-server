@@ -27,11 +27,11 @@ function addEdit(id, name, hash, posX, posY, posZ, factionId, companyId, locked)
       '</div>' +
       '<div class="form-group">' +
       '<label>Facção</label>' +
-      `<input value="${(factionId ? factionId : '')}" id="factionId" type="number" class="form-control"/>` +
+      `<input value="${(factionId ? factionId : '')}" id="factionId" type="text" class="form-control"/>` +
       '</div>' +
       '<div class="form-group">' +
       '<label>Empresa</label>' +
-      `<input value="${(companyId ? companyId : '')}" id="companyId" type="number" class="form-control"/>` +
+      `<input value="${(companyId ? companyId : '')}" id="companyId" type="text" class="form-control"/>` +
       '</div>' +
       '<div class="form-group">' +
       `<input ${locked ? 'checked' : ''} value="true" id="locked" type="checkbox" class="form-control"/>` +

@@ -41,8 +41,8 @@ namespace TrevizaniTextRoleplay.Server.Scripts
                         <td class='text-center'>{(animation.OnlyInVehicle ? "SIM" : "NÃO")}</td>
                         <td class='text-center'>
                             <input id='json{animation.Id}' type='hidden' value='{Functions.Serialize(animation)}' />
-                            <button onclick='edit(""{animation.Id}"")' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='remove(this, ""{animation.Id}"")' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                            <button onclick='edit(`{animation.Id}`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, `{animation.Id}`)' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
             }

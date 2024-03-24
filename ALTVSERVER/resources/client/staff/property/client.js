@@ -1,5 +1,5 @@
 import alt from 'alt-client';
-import { view, setView, toggleView, closeView } from '/helpers/cursor.js';
+import { view, setView, toggleView, closeView, getAddress } from '/helpers/cursor.js';
 
 alt.onServer('StaffProperties', (update, propertiesHtml, interiorsJson) => {
   if (update) {

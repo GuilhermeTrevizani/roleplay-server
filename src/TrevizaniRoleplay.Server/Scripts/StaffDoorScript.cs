@@ -82,14 +82,14 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var factionId = new Guid(factionIdString);
+            var factionId = factionIdString.ToGuid();
             if (!string.IsNullOrWhiteSpace(factionIdString) && !Global.Factions.Any(x => x.Id == factionId))
             {
                 player.EmitStaffShowMessage($"Facção {factionId} não existe.");
                 return;
             }
 
-            var companyId = new Guid(companyIdString);
+            var companyId = companyIdString.ToGuid();
             if (!string.IsNullOrWhiteSpace(companyIdString) && !Global.Companies.Any(x => x.Id == companyId))
             {
                 player.EmitStaffShowMessage($"Empresa {factionId} não existe.");
@@ -105,13 +105,14 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
             else
             {
-                door.Update(name, hash, pos.X, pos.Y, pos.Z, factionId, companyId, locked);
                 door = Global.Doors.FirstOrDefault(x => x.Id == id);
                 if (door == null)
                 {
                     player.EmitStaffShowMessage(Global.RECORD_NOT_FOUND);
                     return;
                 }
+
+                door.Update(name, hash, pos.X, pos.Y, pos.Z, factionId, companyId, locked);
             }
 
             await using var context = new DatabaseContext();
@@ -157,9 +158,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                         <td class='text-center'>{(door.Locked ? "SIM" : "NÃO")}</td>
                         <td class='text-center'>
                             <input id='json{door.Id}' type='hidden' value='{Functions.Serialize(door)}' />
-                            <button onclick='goto({door.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>
-                            <button onclick='edit({door.Id})' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='remove(this, {door.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                            <button onclick='goto(`{door.Id}`)' type='button' class='btn btn-dark btn-sm'>IR</button>
+                            <button onclick='edit(`{door.Id}`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='remove(this, `{door.Id}`)' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
             }

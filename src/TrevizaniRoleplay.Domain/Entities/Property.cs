@@ -42,6 +42,7 @@ namespace TrevizaniRoleplay.Domain.Entities
             Address = address;
             Number = number;
             Items = [];
+            Furnitures = [];
         }
 
         public void Update(PropertyInterior interior, float entrancePosX, float entrancePosY, float entrancePosZ, int entranceDimension,

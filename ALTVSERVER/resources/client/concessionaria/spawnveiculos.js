@@ -11,14 +11,14 @@ function abrirSpawnVeiculos(titulo, itens) {
             <td class='text-center'>${p.Seized}</td> 
             <td class='text-center'>${p.Dismantled}</td> 
             <td class="text-center">
-                <button class="btn btn-xs btn-primary" type="button" onclick="spawnarVeiculo(${p.Id})">Spawnar</button>
+                <button class="btn btn-xs btn-primary" type="button" onclick="spawnVehicle('${p.Id}')">Spawnar</button>
             </td>
         </tr>`);
   });
 }
 
-function spawnarVeiculo(item) {
-  alt.emit("spawnarVeiculo", parseInt(item));
+function spawnVehicle(item) {
+  alt.emit("spawnarVeiculo", item);
 }
 
 if ('alt' in window)

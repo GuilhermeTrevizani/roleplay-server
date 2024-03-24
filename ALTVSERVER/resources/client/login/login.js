@@ -1,5 +1,4 @@
 function requestDiscordToken() {
-  alt.log('request');
   alt.emit('requestDiscordToken');
 }
 

@@ -30,7 +30,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 })
             );
 
-            player.Emit("StaffFactions", false, GetFactionJSON(), jsonTypes);
+            player.Emit("StaffFactions", false, GetFactionsHTML(), jsonTypes);
         }
 
         [AsyncClientEvent(nameof(StaffFactionSave))]
@@ -90,7 +90,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Facção | {Functions.Serialize(faction)}", null);
 
-            var html = GetFactionJSON();
+            var html = GetFactionsHTML();
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 target.Emit("StaffFactions", true, html);
         }
@@ -130,13 +130,13 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var factionId = new Guid(factionIdString);
-            var factionRankId = new Guid(factionRankIdString);
+            var factionId = factionIdString.ToGuid();
+            var factionRankId = factionRankIdString.ToGuid();
             var isNew = string.IsNullOrWhiteSpace(factionRankIdString);
             var factionRank = new FactionRank();
             if (isNew)
             {
-                factionRank.Create(factionId,
+                factionRank.Create(factionId!.Value,
                     Global.FactionsRanks.Where(x => x.FactionId == factionId).Select(x => x.Position).DefaultIfEmpty(0).Max() + 1,
                     name, salary);
             }
@@ -168,7 +168,7 @@ namespace TrevizaniRoleplay.Server.Scripts
 
             await player.GravarLog(LogType.Staff, $"Gravar Rank | {Functions.Serialize(factionRank)}", null);
 
-            var html = Functions.GetFactionRanksHTML(factionId);
+            var html = Functions.GetFactionRanksHTML(factionId!.Value);
             foreach (var target in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 target.Emit("StaffShowFactionRanks", true, html);
         }
@@ -277,7 +277,7 @@ namespace TrevizaniRoleplay.Server.Scripts
                 return;
             }
 
-            var factionId = new Guid(factionIdString);
+            var factionId = factionIdString.ToGuid();
             var faction = Global.Factions.FirstOrDefault(x => x.Id == factionId);
             if (faction == null)
                 return;
@@ -339,9 +339,9 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var factionId = new Guid(factionIdString);
-            var characterId = new Guid(characterIdString);
-            var factionRankId = new Guid(factionRankIdString);
+            var factionId = factionIdString.ToGuid();
+            var characterId = characterIdString.ToGuid();
+            var factionRankId = factionRankIdString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == characterId);
             if (character == null)
             {
@@ -386,14 +386,14 @@ namespace TrevizaniRoleplay.Server.Scripts
             var target = Global.SpawnedPlayers.FirstOrDefault(x => x.Character.Id == character.Id);
             if (target != null)
             {
-                target.Character.UpdateFaction(factionRankId, Functions.Serialize(factionFlags), badge);
+                target.Character.UpdateFaction(factionRankId!.Value, Functions.Serialize(factionFlags), badge);
                 target.FactionFlags = factionFlags;
                 target.SendMessage(MessageType.Success, $"{player.User.Name} alterou suas informações na facção.");
                 await target.Save();
             }
             else
             {
-                character.UpdateFaction(factionRankId, Functions.Serialize(factionFlags), badge);
+                character.UpdateFaction(factionRankId!.Value, Functions.Serialize(factionFlags), badge);
                 context.Characters.Update(character);
                 await context.SaveChangesAsync();
             }
@@ -401,7 +401,7 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Você alterou as informações de {character.Name} na facção.", true);
             await player.GravarLog(LogType.Staff, $"Salvar Membro Facção {factionId} {characterId} {factionRankId} {badge} {flagsJSON}", target);
 
-            var html = await Functions.GetFactionMembersHTML(factionId);
+            var html = await Functions.GetFactionMembersHTML(factionId!.Value);
             foreach (var targetStaff in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 targetStaff.Emit("StaffShowFactionMembers", true, html);
         }
@@ -416,8 +416,8 @@ namespace TrevizaniRoleplay.Server.Scripts
             }
 
             await using var context = new DatabaseContext();
-            var factionId = new Guid(factionIdString);
-            var characterId = new Guid(characterIdString);
+            var factionId = factionIdString.ToGuid();
+            var characterId = characterIdString.ToGuid();
             var character = await context.Characters.FirstOrDefaultAsync(x => x.Id == characterId);
             if (character == null)
             {
@@ -457,12 +457,12 @@ namespace TrevizaniRoleplay.Server.Scripts
             player.EmitStaffShowMessage($"Você expulsou {character.Name} da facção.", true);
             await player.GravarLog(LogType.Staff, $"Expulsar Facção {factionId} {characterId}", target);
 
-            var html = await Functions.GetFactionMembersHTML(factionId);
+            var html = await Functions.GetFactionMembersHTML(factionId!.Value);
             foreach (var targetStaff in Global.SpawnedPlayers.Where(x => x.StaffFlags.Contains(StaffFlag.Factions)))
                 targetStaff.Emit("StaffShowFactionMembers", true, html);
         }
 
-        private static string GetFactionJSON()
+        private static string GetFactionsHTML()
         {
             var html = string.Empty;
             if (Global.Factions.Count == 0)
@@ -481,9 +481,9 @@ namespace TrevizaniRoleplay.Server.Scripts
                         <td>{faction.Slots}</td>
                         <td class='text-center'>
                             <input id='json{faction.Id}' type='hidden' value='{Functions.Serialize(faction)}' />
-                            <button onclick='editar(`{faction.Id}(`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
-                            <button onclick='ranks((`{faction.Id}(`)' type='button' class='btn btn-dark btn-sm'>RANKS</button>
-                            <button onclick='members((`{faction.Id}(`)' type='button' class='btn btn-dark btn-sm'>MEMBROS</button>
+                            <button onclick='editar(`{faction.Id}`)' type='button' class='btn btn-dark btn-sm'>EDITAR</button>
+                            <button onclick='ranks(`{faction.Id}`)' type='button' class='btn btn-dark btn-sm'>RANKS</button>
+                            <button onclick='members(`{faction.Id}`)' type='button' class='btn btn-dark btn-sm'>MEMBROS</button>
                         </td>
                     </tr>";
             }

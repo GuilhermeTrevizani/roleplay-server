@@ -16,8 +16,12 @@ namespace TrevizaniRoleplay.Server.Commands
                 return;
             }
 
-            var property = Global.Properties.FirstOrDefault();
-            property?.StartAlarm();
+            var vehicle = Global.Vehicles.FirstOrDefault();
+            if (vehicle != null)
+                player.SetIntoVehicle(vehicle, 1);
+
+            //var property = Global.Properties.FirstOrDefault();
+            //property?.StartAlarm();
 
             //await Global.DiscordClient.SetGameAsync("olá marilene");
 

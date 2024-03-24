@@ -31,27 +31,27 @@ alt.onServer('ToggleViewCellphone', (_cellphone, _flightMode) => {
       webView.unfocus();
       isCellphoneOpened = false;
     });
-    webView.on('smartphone:contacts:update', (numero, nome) => {
-      const found = contacts.find(x => x.Numero === numero);
+    webView.on('smartphone:contacts:update', (number, name) => {
+      const found = contacts.find(x => x.Number === number);
       if (found) {
-        found.Nome = nome;
-        found.Numero = numero;
+        found.Name = name;
+        found.Number = number;
       } else {
         contacts.push({
-          Numero: numero,
-          Nome: nome
+          Number: number,
+          Name: name
         });
       }
-      contacts = contacts.sort((a, b) => (a.Nome > b.Nome) ? 1 : ((b.Nome > a.Nome) ? -1 : 0));
-      alt.emitServer('AdicionarContatoCelular', numero, nome);
+      contacts = contacts.sort((a, b) => (a.Name > b.Name) ? 1 : ((b.Name > a.Name) ? -1 : 0));
+      alt.emitServer('AdicionarContatoCelular', number, name);
       updateContacts();
     });
 
-    webView.on('smartphone:contacts:delete', (numero) => {
-      const found = contacts.find(x => x.Numero === numero);
+    webView.on('smartphone:contacts:delete', (number) => {
+      const found = contacts.find(x => x.Number === number);
       if (found)
         contacts.splice(contacts.indexOf(found), 1);
-      alt.emitServer('RemoverContatoCelular', numero);
+      alt.emitServer('RemoverContatoCelular', number);
       updateContacts();
     });
 

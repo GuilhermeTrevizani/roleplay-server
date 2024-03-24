@@ -60,7 +60,7 @@ function editMember(id) {
     content: '<form action="">' +
       '<div class="form-group">' +
       '<label>ID do Personagem</label>' +
-      `<input value="${id}" id="id" type="number" readonly class="form-control"/>` +
+      `<input value="${id}" id="id" type="text" readonly class="form-control"/>` +
       '</div>' +
       '<div class="form-group">' +
       '<label>Rank</label>' +
@@ -70,7 +70,7 @@ function editMember(id) {
       '<label>Flags</label>' +
       `<select id="flags" class="form-control" multiple></select>` +
       '</div>' +
-      government ? htmlGovernment : '' +
+      (government ? htmlGovernment : '') +
       '</form>',
     buttons: {
       formSubmit: {
@@ -85,7 +85,7 @@ function editMember(id) {
 
           alt.emit('save',
             id,
-            parseInt(rank),
+            rank,
             parseInt($('#badge').val()),
             JSON.stringify($('#flags').val()));
           return false;

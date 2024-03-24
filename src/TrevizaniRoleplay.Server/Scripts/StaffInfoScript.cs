@@ -128,8 +128,8 @@ namespace TrevizaniRoleplay.Server.Scripts
                         <td>{info.Dimension}</td>
                         <td>{info.Message}</td>
                         <td class='text-center'>
-                            {(!userId.HasValue ? $"<button onclick='goto({info.Id})' type='button' class='btn btn-dark btn-sm'>IR</button>" : string.Empty)}
-                            <button onclick='remove(this, {info.Id})' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
+                            {(!userId.HasValue ? $"<button onclick='goto(`{info.Id}`)' type='button' class='btn btn-dark btn-sm'>IR</button>" : string.Empty)}
+                            <button onclick='remove(this, `{info.Id}`)' type='button' class='btn btn-danger btn-sm'>EXCLUIR</button>
                         </td>
                     </tr>";
             }
